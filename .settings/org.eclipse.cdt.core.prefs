@@ -1,0 +1,9 @@
+#Mon Aug 25 20:27:30 EDT 2008
+eclipse.preferences.version=1
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="JAVAH_CLASSPATH" operation\="append" value\="../../bin"/>\n<variable delimiter\=";" name\="CXX" operation\="replace" value\="arm-poky-linux-gnueabi-g++"/>\n<variable delimiter\=";" name\="CXXFLAGS" operation\="replace" value\="-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp"/>\n<variable delimiter\=";" name\="COMMON_CLASSPATH" operation\="replace" value\="${CHECKOUT_DIR}/com.buglabs.bug.jni.common/bin"/>\n<variable delimiter\=";" name\="STAGING_BUG_INCDIR" operation\="replace" value\="/home/jconnolly/buglabs/poky/com.buglabs.build.oe/build/tmp/staging//bug-poky-linux-gnueabi/kernel/include"/>\n</environment>\n
+indexer/filesToParseUpFront=
+indexer/indexAllFiles=false
+indexer/indexerId=org.eclipse.cdt.core.fastIndexer
+indexer/skipReferences=false
+indexer/skipTypeReferences=false
+indexerId=org.eclipse.cdt.core.fastIndexer
