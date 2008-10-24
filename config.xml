@@ -1,0 +1,14 @@
+<cruisecontrol>
+	<property file="./system.properties" />
+ 	<property environment="env" toupper="true"/>
+    <property name="ccdir" value="${env.PWD}" />
+        
+	<!--  Build Test -->
+	<include.projects file="${config.dir}/com.buglabs.buildtest.xml"/>	
+	<!--<include.projects file="${config.dir}/com.buglabs.bug.ltib.xml"/>-->
+	<include.projects file="${config.dir}/com.buglabs.osgi.concierge.xml"/>	
+	<include.projects file="${config.dir}/com.buglabs.dragonfly.xml"/>	
+	<include.projects file="${config.dir}/com.buglabs.bug.osgi.xml"/>	
+	<include.projects file="${config.dir}/com.buglabs.bug.emulator.xml"/>
+	<include.projects file="${config.dir}/com.buglabs.sdk.xml"/>		
+</cruisecontrol>

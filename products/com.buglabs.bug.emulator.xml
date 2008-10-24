@@ -1,0 +1,80 @@
+<project name="build-com.buglabs.bug.emulator" default="build">
+	<property file="./../system.properties" />
+	<property name="meta.project" value="com.buglabs.bug.emulator" />
+	<property name="meta.distDirectory" location="${checkout.dir}/${meta.project}/dist" />
+	<property name="distDirectory" location="${meta.distDirectory}" />
+        <!--
+	<buildnumber file="com.buglabs.bug.emulator.buildnum" />
+	<property name="product.version" value="1.0" />
+	<property name="meta.project.version" value="${product.version}.${build.number}" />
+	-->
+	<property name="artifactDirectory" location="../artifacts/${meta.project}" />
+	<property name="toolbox.dir" location="../toolbox" />
+	<property name="externalDirectory" location="${checkout.dir}/com.buglabs.bug.kernel.external" />
+	<property name="base.build.dir" location="${basedir}/.." />
+	<tstamp/>
+	
+	<target name="build" depends="makeDirs">
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.kernel.external" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.osgi.http" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.osgi.shell" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.osgi.cm" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.common" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.bmi" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.tests.common" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.awt" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.nmea" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.base" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.module.gps" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.module.lcd" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.module.camera" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.module.motion" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.module.audio" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.emulator.module.vonhippel" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.module" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.event" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.program" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.menu" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.service" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.osgi.obr" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.buglabs.bug.update" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.public}" package="com.sun.javax.servlet" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/ch.ethz.iks.slp" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.http" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.common" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.shell" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.cm" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.module" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.event" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.program" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.menu" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.service" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.nmea" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.base" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.camera" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.audio" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.vonhippel" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.gps" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.tests.common" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.awt" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.slp" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.obr" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.update" />		
+	</target>
+
+	<target name="clean">
+		<delete dir="${checkout.dir}" />
+		<delete dir="${meta.distDirectory}" />
+	</target>
+
+	<target name="makeDirs">
+		<mkdir dir="${checkout.dir}" />
+		<mkdir dir="${meta.distDirectory}" />
+	</target>
+</project>

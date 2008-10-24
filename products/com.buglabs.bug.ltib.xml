@@ -1,0 +1,186 @@
+<project name="com.buglabs.bug.ltib" default="build">
+    <propertyfile file="${ant.project.name}.build_number.properties">
+            <entry key="build.number" type="date" value="now" pattern="yyMMDDHHmmss"/>
+    </propertyfile>
+	<property file="${ant.project.name}.build_number.properties"/>
+	<echo message="checkout.dir=/tmp/checkout/${build.number}${line.separator}" append="yes" file="../system.properties" />
+	<echo message="base.deploy.dir=/tmp/checkout/${build.number}/com.freescale.ltib2/rootfs${line.separator}"
+	      append="yes" file="../system.properties" />
+	<echo message="ltib_root=/tmp/checkout/${build.number}/com.freescale.ltib2${line.separator}"
+	      append="yes" file="../system.properties" />
+	<echo message="build.timestamp=${build.number}${line.separator}"
+	      append="yes" file="../system.properties" />
+
+	<property file="./../system.properties" />
+	<property name="meta.project" value="com.buglabs.bug.ltib" />
+	<property name="cvs.server" value="10.8.0.1" />
+	<property name="encadis.cvs.settings" value=":pserver:buglabs:bl123@${cvs.server}:/var/lib/cvsroot" />
+	<target name="checkout">
+		<exec executable="sudo" dir=".">
+			<arg line="/etc/init.d/openvpn restart" />
+		</exec>
+		<cvs cvsroot="${cvs.internal}" package="com.freescale.ltib2" command="export" tag="${build.level}" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.internal}" package="scripts" command="export" tag="HEAD" dest="${checkout.dir}" />
+		<cvs cvsroot="${cvs.internal}" package="bug_linux" command="export" tag="HEAD" dest="${checkout.dir}" />
+	</target>
+
+	<target name="build" depends="clean,makedirs,checkout,ltib">
+	</target>
+
+	<target name="build-osgi" depends="osgi-clean, makedirs,checkout,ltib-osgi" />
+
+	<target name="clean" depends="osgi-clean, ltib-clean" />
+
+	<target name="osgi-clean">
+		<ant antfile="com.buglabs.bug.osgi.xml" target="clean" />
+	</target>
+
+	<target name="ltib-clean">
+		<exec executable="sudo" dir=".">
+			<arg line="rm -Rf checkout/com.freescale.ltib2" />
+		</exec>
+		<exec executable="sudo" dir=".">
+			<arg line="rm -rf ${checkout.dir}" />
+		</exec>
+		<exec executable="sudo" dir=".">
+			<arg line="mkdir ${checkout.dir}" />
+		</exec>
+	</target>
+
+	<target name="ltib">
+		<property name="ltibRoot" value="${checkout.dir}/com.freescale.ltib2" />
+		<property name="ltibBuildSource" value="${basedir}/ltib-with-encadis-merge" />
+
+
+		<!-- Call the target that does everything -->
+		<exec executable="make" dir="${checkout.dir}">
+			<arg line="BUILD_SOURCE=${ltibBuildSource} BUILD_LEVEL=${build.level} BUILD_NUMBER=${build.number} CHECKOUT_DIR=${checkout.dir} LTIB_ROOT=${ltib_root} LTIB_ROOTFS=${base.deploy.dir} JAVA_HOME=${java.home} -f ${ltibBuildSource}/makefile" />
+		</exec>
+
+		<ant antfile="com.buglabs.bug.osgi.xml" target="make" />
+		<ant antfile="com.buglabs.bug.osgi.xml" target="generateNative" />
+		<ant antfile="com.buglabs.bug.osgi.xml" target="deleteTemporaryFiles" />
+
+		<exec executable="sudo" dir="${base.deploy.dir}">
+			<arg line="tar cvjf ${checkout.dir}/../${build.timestamp}-rootfs.tar.bz2 ." />
+		</exec>
+
+		<echo message="Build complete, possibly even successful..." />
+		<echo message="Root file system in ${base.deploy.dir}..." />
+	</target>
+
+	<target name="ltib-fixup">
+		<property name="ltibRoot" value="${checkout.dir}/com.freescale.ltib2" />
+		<property name="ltibBuildSource" value="${basedir}/ltib-with-encadis-merge" />
+
+
+		<!-- Call the target that does everything -->
+		<exec executable="make" dir="${checkout.dir}">
+			<arg line="BUILD_SOURCE=${ltibBuildSource} BUILD_LEVEL=${build.level} BUILD_NUMBER=${build.number} CHECKOUT_DIR=${checkout.dir} LTIB_ROOT=${ltib_root} LTIB_ROOTFS=${base.deploy.dir} JAVA_HOME=${java.home} -f ${ltibBuildSource}/makefile fixup" />
+		</exec>
+	</target>
+
+	<target name="ltib-phase1">
+		<property name="ltibRoot" value="${checkout.dir}/com.freescale.ltib2" />
+		<property name="ltibBuildSource" value="${basedir}/ltib-with-encadis-merge" />
+
+
+		<!-- Call the target that does everything -->
+		<exec executable="make" dir="${checkout.dir}">
+			<arg line="BUILD_SOURCE=${ltibBuildSource} BUILD_LEVEL=${build.level} BUILD_NUMBER=${build.number} CHECKOUT_DIR=${checkout.dir} LTIB_ROOT=${ltib_root} LTIB_ROOTFS=${base.deploy.dir} JAVA_HOME=${java.home} -f ${ltibBuildSource}/makefile phase1" />
+		</exec>
+	</target>
+
+	<target name="ltib-KernelPatch">
+		<property name="ltibRoot" value="${checkout.dir}/com.freescale.ltib2" />
+		<property name="ltibBuildSource" value="${basedir}/ltib-with-encadis-merge" />
+
+		<!-- Call the target that does everything -->
+		<exec executable="make" dir="${checkout.dir}">
+			<arg line="BUILD_SOURCE=${ltibBuildSource} BUILD_LEVEL=${build.level} BUILD_NUMBER=${build.number} CHECKOUT_DIR=${checkout.dir} LTIB_ROOT=${ltib_root} LTIB_ROOTFS=${base.deploy.dir} JAVA_HOME=${java.home} -f ${ltibBuildSource}/makefile KernelPatch" />
+		</exec>
+	</target>
+
+	<target name="ltib-phase2">
+		<property name="ltibRoot" value="${checkout.dir}/com.freescale.ltib2" />
+		<property name="ltibBuildSource" value="${basedir}/ltib-with-encadis-merge" />
+
+		<!-- Call the target that does everything -->
+		<exec executable="make" dir="${checkout.dir}">
+			<arg line="BUILD_SOURCE=${ltibBuildSource} BUILD_LEVEL=${build.level} BUILD_NUMBER=${build.number} CHECKOUT_DIR=${checkout.dir} LTIB_ROOT=${ltib_root} LTIB_ROOTFS=${base.deploy.dir} JAVA_HOME=${java.home} -f ${ltibBuildSource}/makefile phase2" />
+		</exec>
+	</target>
+
+	<target name="ltib-osgi">
+		<property name="ltibRoot" value="${checkout.dir}/com.freescale.ltib2" />
+		<property name="ltibBuildSource" value="${basedir}/ltib-with-encadis-merge" />
+
+		<!-- MERGE the com.freescale.ltib2 overlay -->
+		<copy todir="${checkout.dir}/com.freescale.ltib2/rootfs">
+			<fileset dir="${checkout.dir}/com.freescale.ltib2/config/platform/imx31ads/merge" />
+		</copy>
+
+		<!-- Get phoneME -->
+		<exec executable="wget">
+			<arg line="-P ${checkout.dir} http://lurcher/ltib/ppp/phoneme-advanced-mr2.tar.gz" />
+		</exec>
+
+		<!-- Copy phoneME to rootfs for building -->
+		<exec executable="tar">
+			<arg line="xzf ${checkout.dir}/phoneme-advanced-mr2.tar.gz -C ${checkout.dir}/com.freescale.ltib2/rootfs/tmp" />
+		</exec>
+
+		<!-- Build glibc (for freetype) -->
+		<exec executable="${ltibRoot}/ltib" dir="${ltibRoot}">
+			<arg line="-l glibc.spec" />
+		</exec>
+
+		<!-- Build libjpeg (for Camera driver) -->
+		<exec executable="${ltibRoot}/ltib" dir="${ltibRoot}">
+			<arg line="-p libjpeg.spec" />
+		</exec>
+
+		<!-- Build freetype for basedisplay -->
+		<exec executable="${ltibRoot}/ltib" dir="${ltibRoot}">
+			<arg line="-p freetype.spec" />
+		</exec>
+		<!-- MERGE encadis kernel for accelerometer -->
+		<exec executable="/usr/bin/python">
+			<arg line="${checkout.dir}/scripts/merge_kernel.py -n ${checkout.dir}/bug_linux -o ${checkout.dir}/com.freescale.ltib2/rpm/BUILD/linux-2.6.19.2 -v" />
+		</exec>
+
+		<ant antfile="com.buglabs.bug.osgi.xml" target="make" />
+		<ant antfile="com.buglabs.bug.osgi.xml" target="generateNative" />
+
+		<exec executable="sudo" dir="${base.deploy.dir}">
+			<arg line="tar cvjf ${checkout.dir}/../${build.timestamp}-rootfs.tar.bz2 ." />
+		</exec>
+
+		<echo message="Build complete, possibly even successful..." />
+		<echo message="Root file system in ${base.deploy.dir}..." />
+	</target>
+
+
+	<target name="makedirs">
+		<exec executable="sudo" dir=".">
+			<arg line="mkdir -p ${base.deploy.dir}" />
+		</exec>
+		<exec executable="sudo" dir=".">
+			<arg line="chown -R ${build.user.name}:${build.user.name} ${checkout.dir}" />
+		</exec>
+	</target>
+
+	<target name="makecard">
+
+		<!-- Blank the MMC Card -->
+		<exec executable="make" dir="${ltibBuildSource}">
+			<arg line="TARGET=/dev/${MMC_DEVICE} MBRIMAGE=${ltibBuildSource}/mdc-mbr-image -f ${ltibBuildSource}/makefile.install1" />
+		</exec>
+
+		<!--  Write the card -->
+		<exec executable="make" dir="${base.deploy.dir}">
+			<arg line="TARGET=/dev/${MMC_DEVICE} SOURCE=${base.deploy.dir} -f ${ltibBuildSource}/makefile.install2" />
+		</exec>
+
+	</target>
+</project>

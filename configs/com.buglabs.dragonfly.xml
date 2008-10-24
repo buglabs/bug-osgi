@@ -1,0 +1,32 @@
+<cruisecontrol>
+	<property file="./system.properties" />
+	<property name="project.name" value="com.buglabs.dragonfly"/>
+	
+	<project name="${project.name}" buildafterfailed="false">
+		<listeners>
+			<currentbuildstatuslistener file="logs/${project.name}/status.txt" />
+		</listeners>
+		<bootstrappers></bootstrappers>
+
+		<modificationset quietperiod="${quietperiod}">
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.dragonfly" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.dragonfly.feature" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.dragonfly.ui" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.dragonfly.generators" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.dragonfly.bug.kernel" tag="${build.level}" />
+		</modificationset>
+
+		<schedule interval="${scan_interval}">
+			<ant anthome="/usr" buildfile="${project.dir}/${project.name}.xml" target="build" uselogger="true" usedebug="false"></ant>
+		</schedule>
+
+		<log logdir="logs/${project.name}" />
+
+		<publishers>
+			<artifactspublisher dir="${checkout.dir}/${project.name}.feature/dist" dest="artifacts/${project.name}" />
+			<antpublisher buildfile="toolbox/symlink.xml">
+             	<property name="ccdir" value="${ccdir}"/>
+            </antpublisher>
+		</publishers>
+	</project>
+</cruisecontrol>

@@ -1,0 +1,2783 @@
+eval 'LANG=C exec perl -w -S $0 ${1+"$@"}'
+    if $running_under_some_shell;
+$running_under_some_shell = 0;
+
+######################################################################
+#
+# Copyright � Freescale Semiconductor, Inc. 2004-2005. All rights reserved.
+#
+# Stuart Hughes, stuarth@freescale.com, 22nd Feb 2005
+#
+# This file is part of LTIB.
+#
+# LTIB is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# LTIB is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with LTIB; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# Freescale GNU/Linux Target Image Builder.
+# ------------------------------------------
+# This script can be used to build target images from source.
+# See: doc/LtibFaq for more details
+#
+######################################################################
+use 5.006_000;  # now known to work on 5.6.0, don't know the oldest ver yet
+use Getopt::Long;
+use POSIX qw(uname);
+use FindBin;
+use lib("$FindBin::Bin/bin");
+use Ltibutils;
+#use LWP::Debug qw(+);
+
+# globals, this can be set/overridden in the resource file .ltibrc
+# This can be in the same directory as the script, or in the user's
+# home directory.  First one found wins
+chomp($hostname = `hostname`);
+$top  = $FindBin::Bin;
+$bdir = "/opt/freescale";
+$cf = {
+    # configuration options
+    dev_image    => "$top/rootfs",
+    rpmdir       => "$top/rpm",
+    rpmdb        => "$top/rpmdb",
+    rpm          => "$bdir/ltib/usr/bin/rpm",
+    rpmbuild     => "rpmbuild",
+    sudo         => "sudo",
+    dodrop       => 'yes',
+    prefix       => "/usr",
+    sysconfdir   => "/etc",
+    localstatedir=> "/var",
+    mandir       => "share/man",
+    tmppath      => "$top/tmp",
+    bin_path     => "$top/bin",
+    defpfx       => "$bdir/ltib",
+    lpp          => "$bdir/pkgs",
+    spoof_path   => "$bdir/ltib/usr/spoof",
+    gpp_url      => "",
+    ppp_url      => "",
+    ldirs        => "",
+    http_proxy   => "",
+    ftp_proxy    => "",
+    proxy        => "",
+    wget_opts    => "--passive-ftp -nc --tries=1 --timeout=12 -nv",
+    configured   => "", 
+    pre_install_deps   => "
+            glibc           2.2.4
+            glibc-headers   0
+            glibc-devel     0
+            binutils        2.11.90
+#            libstdc++       0
+#            libstdc++-devel 0
+            gcc             2.96
+            gcc-c++         2.96
+            sudo            0
+            zlib            0
+            zlib-devel      0
+            rpm             0
+            rpm-build       0
+            wget            0
+            ncurses         5.1
+            ncurses-devel   0
+            m4              0
+            bison           0
+            patch           0
+#            flex            0      # added to the host packages we install
+#            texinfo         0      # added to the host packages we install
+            gettext         0
+#            autoconf        2.54   # added to the host packages we install
+#            libtool         1.4.2  # added to the host packages we install
+#            byacc           0      # needed?  report was for 8548 install
+            ",
+
+    app_version  => "6.4.1",
+    cvs_version  => '1.228.2.7',
+    fakeroot     => "",
+    config_dir   => "$top/config",
+    platforms_dir => "$top/config/platform",
+    mainlkc      => "$top/config/main.lkc",
+    conf         => "mconf",
+    defdist      => "dist/lfs-5.1",
+    pfx          => "/",
+    buildarch    => (uname())[4],
+    hostconfig   => "$top/config/platform/host/ltib.preconfig",
+    pkg_map      => "pkg_map",
+    rpmdb_nfs_warning => "$top/.rpmdb_nfs_warning",
+    host_wait_warning => "$top/.host_wait_warning2",
+    top          => $top,
+    home         => $ENV{HOME} || $ENV{LOGDIR} || (getpwuid($<))[7],
+    username     => scalar(getpwuid($<)),
+    hostname     => $hostname,
+    path_orig    => $ENV{PATH},
+    path_std     => "/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/X11R6/bin",
+    redirected   => "",
+    something_got_built => 0,
+    pkg_build_failures => "",
+    normal_exit  => 1,
+    stime        => time(),
+    sdate        => scalar(localtime()),
+    gmsdate      => scalar(gmtime()),
+
+    # buildcc could modified if we need to install a newer version
+    # changed from /usr/bin/gcc -B/usr/bin// to /usr/bin/gcc
+    # on old gcc-2.95.3, "gcc: file path prefix `/usr/bin//' never used"
+    # causes configure not to detect header when building binutils for build
+    # had to restore this this or can't build cross packages (u-boot)
+    # had to include buildcpp to get gdb-6.2 to build (path prefix problem)
+    buildcc      => "/usr/bin/gcc -B/usr/bin//",
+    buildcxx     => "/usr/bin/g++ -B/usr/bin//",
+    buildcpp     => "/usr/bin/cpp",
+    buildld      => "/usr/bin/ld",
+    buildstrip   => "/usr/bin/strip",
+    cc           => "gcc",
+    cxx          => "g++",
+    ld           => "ld",
+    ar           => "ar",
+
+    # command line options
+    mode         => "buildrpms",
+    sn           => "",
+    configure    => 0,
+    preconfig    => "",
+    profile      => "",
+    rcfile       => "",
+    logfile      => "$top/host_config.log",
+    keepsrpms    => 0,
+    verbose      => 0,
+    batch        => 0,
+    force        => 0,
+    reinstall    => 0,
+    nodeps       => 0,
+    conflicts    => 0,
+    dry          => 0,
+    coe          => 0,
+    version      => 0,
+    noredirect   => 0,
+    do_deploy    => 0,
+    download_only=> 0,
+    dltest       => 0,
+    prof         => 0,
+    hostcf       => 0,
+    
+    help         => 0,
+};
+
+use strict 'vars';
+use vars qw($cf $config_deps $build_deps $install_deps
+            $echo $pcf $ppcf $rev_install_deps $pcac);
+
+
+# package config dependencies
+$config_deps = {
+           PKG_U_BOOT   => [ qw/PKG_U_BOOT_CONFIG_TYPE PKG_U_BOOT_BUILD_ARGS
+                                PKG_U_BOOT_LEAVESRC/ ],
+           PKG_KERNEL   => [ qw/PKG_KERNEL_PRECONFIG PKG_KERNEL_WANT_HEADERS
+                                PKG_KERNEL_WANT_CF PKG_KERNEL_LEAVESRC/ ],
+           PKG_LIBC     => [ qw/PKG_LIBC_WANT_LOCALES PKG_LIBC_WANT_HEADERS
+                                PKG_LIBC_WANT_STATIC_LIBS PKG_LIBC_WANT_CF/ ],
+           PKG_BUSYBOX  => [ qw/PKG_BUSYBOX_PRECONFIG PKG_BUSYBOX_WANT_CF/ ],
+           PKG_GDB      => [ qw/PKG_GDB_NATIVE_WANT_ED PKG_GDB_CROSS_WANT_ED
+                                PKG_GDB_SERVER_WANT_ED 
+                                PKG_GDB_M68K_BDM_WANT_ED/ ],
+           PKG_OPENSSL  => [ qw/PKG_OPENSSL_WANT_SEC/ ],
+           PKG_DROPBEAR => [ qw/PKG_DROPBEAR_WANT_URANDOM_DEV
+                                PKG_DROPBEAR_WANT_NO_REV_DNS
+                                PKG_DROPBEAR_WANT_NO_X11FWD/ ],
+           PKG_SYSCONFIG=> [ qw/SYSCFG_HOSTNAME 
+                          SYSCFG_MODLIST SYSCFG_START_SYSLOG
+                          SYSCFG_LOGING_TTY SYSCFG_WANT_LOGIN_TTY
+                          SYSCFG_START_INETD SYSCFG_START_PORTMAP
+                          SYSCFG_START_DROPBEAR_SSH SYSCFG_START_BOA
+                          SYSCFG_SETTIME SYSCFG_NTP_SERVER SYSCFG_RAM_DIRS
+                          SYSCFG_START_NETWORK
+                          SYSCFG_NET_GATEWAY0 SYSCFG_NAMESERVER0
+                          SYSCFG_NET_GATEWAY1 SYSCFG_NAMESERVER1
+                          SYSCFG_IFACE0 SYSCFG_DHCPC0 SYSCFG_NET_INTERFACE0
+                          SYSCFG_IPADDR0 SYSCFG_NET_MASK0 SYSCFG_NET_BROADCAST0
+                          SYSCFG_IFACE1 SYSCFG_DHCPC1 SYSCFG_NET_INTERFACE1
+                          SYSCFG_IPADDR1 SYSCFG_NET_MASK1 SYSCFG_NET_BROADCAST1
+                          SYSCFG_IFACE2 SYSCFG_DHCPC2 SYSCFG_NET_INTERFACE2
+                          SYSCFG_IPADDR2 SYSCFG_NET_MASK2 SYSCFG_NET_BROADCAST2
+                          SYSCFG_IFACE3 SYSCFG_DHCPC3 SYSCFG_NET_INTERFACE3
+                          SYSCFG_IPADDR3 SYSCFG_NET_MASK3 SYSCFG_NET_BROADCAST3
+                          SYSCFG_IFACE4 SYSCFG_DHCPC4 SYSCFG_NET_INTERFACE4
+                          SYSCFG_IPADDR4 SYSCFG_NET_MASK4 SYSCFG_NET_BROADCAST4
+                          SYSCFG_READONLY_FS SYSCFG_START_DEVFSD
+                          SYSCFG_DEPLOYMENT_STYLE SYSCFG_INETD_ARGS
+                          SYSCFG_START_DHCPD SYSCFG_DHCPC_CMD
+                          CONFIG_SYSCFG_START_SAMBA CONFIG_SYSCFG_SMBD_ARGS
+                          CONFIG_SYSCFG_NMBD_ARGS/ ],
+           PKG_NCURSES  => [ qw/PKG_NCURSES_WANT_REDUCED_SET/ ],
+           PKG_BASH     => [ qw/PKG_BASH_WANT_NO_SH_SYMLINK/  ],
+           PKG_DHCP     => [ qw/PKG_DHCP_WANT_SERVER PKG_DHCP_WANT_CLIENT/ ],
+               };
+
+# package build dependencies
+$build_deps = { PKG_KERNEL => [ qw/PKG_SYSCONFIG/ ] };
+
+# packages install dependencies
+$install_deps = { PKG_SKELL => [ qw/PKG_SYSCONFIG/ ],
+                  PKG_BUSYBOX => [ qw/PKG_INETUTILS PKG_SYSKLOGD
+                                      PKG_SYSVINIT PKG_COREUTILS
+                                      PKG_SED PKG_TIME PKG_UTIL_LINUX
+                                      PKG_UNZIP PKG_NET_TOOLS
+                                      PKG_FINDUTILS PKG_TINYLOGIN
+                                      PKG_MODUTILS PKG_MODULE_INIT_TOOLS
+                                      PKG_KBD PKG_BZIP2 PKG_PSMISC
+                                      PKG_PROCPS PKG_NCURSES PKG_WGET
+                                      PKG_GAWK PKG_SASH PKG_BASH
+                                      PKG_TAR PKG_GREP PKG_DIFFUTILS
+                                      PKG_HDPARM PKG_PATCH PKG_LFS_UTILS
+                                      PKG_WHICH PKG_DEVFSD/],
+                  PKG_LIBC  => [ qw/PKG_GCC/ ],
+                  PKG_SASH  => [ qw/PKG_SYSVINIT PKG_BASH/ ],
+                  PKG_TINYLOGIN => [ qw/PKG_SYSVINIT/ ],
+                  PKG_POPT  => [ qw/PKG_RPM/ ],
+                  PKG_DROPBEAR => [ qw/PKG_OPENSSH/ ],
+                };
+
+my $usage =<<TXT;
+
+This script is used to manage the building of BSPs with common target
+root filesystems.  The rpms are installed as they are built
+in the directory $cf->{dev_image} (unless overriden in the resource file)
+
+Edit the file .ltibrc in this directory to change the default system
+configuration, or .ltibrc in your home directory.
+
+ltib [-m <mode>] [options....]
+    Where:
+        --mode|m 
+          Where mode is either:
+            prep        just prep the package
+            scbuild     rpmbuild -bc --short-circuit
+            scinstall   rpmbuild -bi --short-circuit
+            scdeploy    does an scinstall followed by an install to the rootfs
+            patchmerge  generate and merge a patch (requires -p <pkg>)
+            clean       clean/uninstall target packages
+            distclean   full cleanup, removes nearly everything
+            listpkgs    list packages (alphanumeric)
+            listpkgseula list package names and licenses
+            listpkgstw  list packages in twiki format
+            release     make a binary release iso image
+            config      use with --configure to do configuration only
+            shell       enter ltib shell mode (sets up spoofing etc)
+        --pkg|p       : operate on this package only
+        --configure|c : run the interactive configuration
+        --preconfig   : configuration file to build from (defaults to .config)
+        --profile     : profile file.  This is used to select an alternate
+                        set of userspace packages, this is saved and used
+                        on later runs of ltib (e.g config/profiles/max.config)
+        --rcfile|r <f>: use this resource file
+        --batch|b     : batch mode, assume yes to all questions
+        --force|f     : force rebuilds even if they are up to date
+        --reinstall|e : re-install rpms (but don't force rebuild)
+        --nodeps|n    : turn off install/uninstall dependency checks
+        --conflicts|k : don't force install rpms that have file conflicts
+        --keepsrpms|s : keep the srpms after the build (deleted by default)
+        --verbose|v   : more output
+        --dry-run|d   : mostly a dry run (calls to system are just echos)
+        --continue|C  : try to continue on package build errors (autobuilds)
+        --version|V   : print the application version and quit
+        --noredir|N   : do not redirect any output
+        --deploy|D    : run the deploy scripts even if build is up to date
+        --dlonly      : just download the packages only
+        --dltest      : test that the BSP's packages are available
+        --leavesrc|l  : leave the sources unpacked (only valid for pkg mode)
+        --hostcf      : (re)configure/build/install the host support package set
+        --help|h      : help on usage
+TXT
+
+
+if( $> == 0) {
+    print <<TXT;
+
+You should not be root when running ltib, do you really
+want to continue ?  y|N
+
+TXT
+    $_ = <STDIN>;
+    die "Goodbye\n" unless /^y/i;
+}
+
+
+Getopt::Long::Configure("no_ignore_case");
+GetOptions(
+        "mode|m:s"   => \$cf->{mode},
+        "pkg|p:s"    => \$cf->{sn},
+        "configure|c"=> \$cf->{configure},
+        "preconfig:s"=> \$cf->{preconfig},
+        "profile:s"  => \$cf->{profile},
+        "rcfile|r:s" => \$cf->{rcfile},
+        "keepsrpms|s"=> \$cf->{keepsrpms},
+        "verbose|v"  => \$cf->{verbose},
+        "batch|b"    => \$cf->{batch}, 
+        "force|f"    => \$cf->{force},
+        "reinstall|e"=> \$cf->{reinstall},
+        "nodeps|n"   => \$cf->{nodeps},
+        "conflicts|k"=> \$cf->{conflicts},
+        "dry-run|d"  => \$cf->{dry},
+        "continue|C" => \$cf->{coe},
+        "version|V"  => \$cf->{version},
+        "noredir|N"  => \$cf->{noredir},
+        "deploy|D"   => \$cf->{do_deploy},
+        "dlonly"     => \$cf->{download_only},
+        "dltest"     => \$cf->{dltest},
+        "prof"       => \$cf->{prof},
+        "leavesrc|l" => \$cf->{leavesrc},
+        "hostcf"     => \$cf->{hostcf},
+        "help|h"     => \$cf->{help},
+      ) or die $usage;
+
+die $usage if $cf->{help};
+die <<TXT if $cf->{version};
+ltib $cf->{app_version} ($cf->{cvs_version})
+Copyright (C) 2004-2006 Freescale Semiconductor, Inc.
+This is free software; it is licensed under the terms of the
+GNU General Public License, see 'COPYING' for the license.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+TXT
+
+# command line validation
+die "invalid mode $cf->{mode}\n", $usage 
+    unless $cf->{mode} =~ m,^(buildrpms|addsrpms|clean|distclean|scbuild|scinstall|prep|patchmerge|scdeploy|listpkgs|release|config|shell),;
+
+if($cf->{sn}) {
+    if($cf->{configure}) {
+        $cf->{configure} = '';
+        $ENV{SCB_WANT_CF} = 'y';
+    } elsif($cf->{profile}) {
+        #### TODO: temporarily allow preconfig until lkc bug is fixed
+        die <<TXT;
+The options: --profile cannot be used when 
+passing the --pkg|-p option.
+TXT
+    }
+} else {
+    if($cf->{mode} =~m,^(scbuild|scinstall|prep|scdeploy)$, ) {
+        die <<TXT;
+The options prep, scbuild, scinstall and scdeploy are only allowed when working
+on a single package, not a list.  You need to supply the option -p|--pkg <pkg>
+TXT
+    }
+    if($cf->{leaverc}) {
+        die "--leavesrc|l only work on a single package, use -p <pkg>\n";
+    }
+}
+if($cf->{preconfig} && ! -e $cf->{preconfig}) {
+    die "preconfig file: $cf->{preconfig} does not exist\n";
+}
+if($cf->{profile} && ! -e $cf->{profile}) {
+    die "profile file: $cf->{profile} does not exist\n";
+}
+$cf->{logfile} ||= "$cf->{top}/host_config.log";
+
+# allow for dry-runs
+$echo = $cf->{dry} ? "echo" : "";
+
+# scdeploy implies deploy
+$cf->{do_deploy} = 1 if $cf->{mode} eq 'scdeploy';
+
+# specifying --batch implies continue on error
+$cf->{coe} = 1   if $cf->{batch};
+
+# mode 'config' implies --configure
+$cf->{configure} = 1 if $cf->{mode} eq 'config';
+
+# load the system level configuration (download url etc)
+load_system_config($cf);
+
+# make sure that the user has reviewed basic application configuration
+check_app_is_configed();
+
+# allow for cleanup code
+foreach my $sig (qw/__DIE__ INT/) {
+    $SIG{$sig} = \&sig_handler;
+}
+
+# setup basic path to parts we will install
+$ENV{PATH} =  "$cf->{defpfx}/usr/bin:$cf->{path_std}";
+
+# turn off timestamps in the lkc menu system to prevent constant
+# cvs checkings of unchanged files
+$ENV{KCONFIG_NOTIMESTAMP} = "no";
+
+# do clean/distclean before other modes to prevent re-installing parts
+# this can't be repeatedly run as cleaning depends on a built package list
+if($cf->{mode} eq 'clean' || $cf->{mode} eq 'distclean') {
+    pre_clean_checks() or exit(0);
+    my $ret = &{"f_" . $cf->{mode}}() || 0;
+    exit($ret == 0);
+}
+
+# load a config for the host development system,
+# run pre build checks
+# build and install host parts according to config
+host_checks();
+
+# if doing host stuff, run that command
+build_host_rpms(1) if $cf->{hostcf};
+
+# do setup before target building
+pre_build_checks();
+
+# write out a release info file
+write_release_info("$cf->{top}/RELEASE_INFO");
+
+# run the requested mode
+&{"f_" . $cf->{mode}}() 
+                    or die("\n\nf_$cf->{mode}() returned an error, exiting\n");
+
+# clear transient configuration flags
+clear_transient_configs();
+
+if(   $cf->{something_got_built} || $cf->{do_deploy} ) {
+    # run the deployment section
+    if(     $cf->{mode} eq 'scdeploy'
+        || $cf->{do_deploy}
+        || ($cf->{mode} eq 'buildrpms' && ! $cf->{sn}) ) {
+
+        my $msg = "\nProcessing deployment operations\n";
+        $msg .= '=' x length($msg) . "\n";
+        print $msg;
+
+        mk_fs_image($cf->{dev_image}, "$cf->{dev_image}.tmp",
+                    "$cf->{bin_path}/device_table.txt", $pcf) 
+                                                          or die unless $echo;
+    }
+}
+summary();
+exit(0);
+
+
+#############################################
+# command line mode subroutines
+#############################################
+sub f_clean
+{ 
+    print "Cleaning out target rpms:\n";
+    local $_;
+    my @pkg_list = map { $$_->{en} ? get_pkg_name($_) : () } mk_buildlist();
+
+    foreach my $pkg (reverse @pkg_list) {
+        print("$pkg is not installed\n"), next 
+            unless `$cf->{rpm} --dbpath $cf->{rpmdb} -q $pkg` =~ m,^\Q$pkg\E,;
+        $pkg .= " $pkg-devel" 
+            if `$cf->{rpm} --dbpath $cf->{rpmdb} -q $pkg-devel` =~ m,^\Q$pkg\E,;
+        my $cmd = "$cf->{sudo} $cf->{rpm} --dbpath $cf->{rpmdb} -e --allmatches $pkg";
+        $cmd .= " --nodeps" if $cf->{nodeps};
+        print "$cmd\n";
+        system_nb($cmd) unless $echo;
+        return if $?
+    }
+    return 1;
+}   
+
+sub f_distclean
+{
+    # note dev_image is not removed otherwise you need to
+    # restart nfs (or run exportfs) which is a pain
+    print(<<TXT);
+You are about remove all the work you have been doing, are you really
+sure you want to completely remove files from:
+
+$cf->{rpmdir}
+$cf->{rpmdb}
+$cf->{tmppath}
+
+TXT
+    print "To continue type in 'yes': ";
+    local $_ = <STDIN>;
+    print("aborted\n"), return 1 unless /^yes$/;
+    die("no rpm database dir $cf->{rpmdb}\n") unless -d $cf->{rpmdb};
+    f_clean() if -d $cf->{rpmdb};
+
+    my $sav = {};
+    my @sav_list = qw/sn force/;
+    foreach my $k (@sav_list) {
+        $sav->{$k} = $cf->{$k}
+    }
+    pkg_cache_init();
+    $cf->{sn} = "mkdistclean.spec";
+    $cf->{force} = 1;
+    f_buildrpms() or die;
+    f_clean();
+    foreach my $k (@sav_list) {
+        $cf->{$k} = $sav->{$k}
+    }
+    undef $sav;
+
+
+system_nb(<<TXT);
+set -x
+$echo rm -f .wget_warning .rpm_warning .sudo_warning .config .tmpconfig.h .config.old .config.cmd
+$echo find config \\( -name .config -o -name .tmpconfig.h -o -name .config.old  -o -name .config.cmd -o -name defconfig.dev \\) -exec rm {} \\;
+$echo rm -rf $cf->{top}/lib
+$echo rm -rf $cf->{top}/man
+$echo rm -rf $cf->{rpmdb}
+$echo rm -rf $cf->{tmppath}
+$echo rm -rf $cf->{rpmdir}/RPMS
+$echo rm -rf $cf->{rpmdir}/SRPMS
+$echo find $cf->{rpmdir}/SPECS -type l -exec rm {} \\;
+$echo find $cf->{rpmdir}/SOURCES -type l -exec rm {} \\;
+$echo rmdir rpm/BUILD rpm/SOURCES rpm/SPECS rpm 2>/dev/null
+$echo rm -f rootfs.ext2.* vmlinux.*
+$echo rm -f $cf->{logfile}
+$echo rm -f $cf->{config_dir}/main.lkc
+$echo rmdir $cf->{dev_image}
+$echo rm -f .host_wait_warning*
+$echo rm -f $cf->{rpmdb_nfs_warning}
+$echo rm -f rootfs.jffs2 rootfs.ext2.gz
+$echo find $cf->{platforms_dir} \\( -name *.dev -o -name *.bak \\) -exec rm {} \\;
+$echo for i in faked fakeroot mkimage gdb tmake; do rm -rf $cf->{top}/bin/\$i ; done
+TXT
+    return 1;
+}
+
+sub f_buildrpms
+{
+    my($rpmbuildopts) = @_;
+    unless($rpmbuildopts) {
+        $rpmbuildopts  = $cf->{keepsrpms} ? "-ba " : "-bb ";
+    } 
+    my $ret = 1;
+    my($msg, @srpm, @rpms, $rpm, $pkg, $subpkg, $cmd, $rebuilt, $ec, $stime);
+
+    $msg = "\nProcessing platform: $pcf->{PLATFORM_COMMENT}\n";
+    $msg .= '=' x length($msg) . "\n";
+    $msg .= "(see logfile: $cf->{redirected})\n" if $cf->{redirected};
+    print $msg unless $cf->{nounpack};
+    print "using $cf->{preconfig}\n" 
+              if ($cf->{preconfig} || $cf->{redirected}) && ! $cf->{nounpack};
+
+    # remove any packages that are not in the build list
+    remove_unselected_pkgs() unless $cf->{dltest};
+
+PKG: foreach my $key (mk_buildlist()) {
+        next unless $$key->{en};
+        my $sn = $$key->{sn};
+        $msg = "\nProcessing: $sn\n";
+        $msg .= '=' x length($msg) . "\n";
+        print $msg;
+        $rebuilt = 0;
+        my $spec = get_spec($sn) or warn("skipping $sn, specfile not found\n"),
+                                                               undef $ret, next;
+        my $tok = {sources => "", patches => "" };
+        parse_spec($spec, $tok, 0);
+        @rpms = glob("$cf->{rpmdir}/RPMS/$pcf->{LINTARCH}/$tok->{name}-*");
+
+        my $pkgfail = 0;
+
+        # build if force, no rpms or if the spec file was updated
+        if(   $cf->{force}
+           || (exists $$key->{build} && $$key->{build})
+           || $cf->{dltest} || ! @rpms || -M $spec < -M $rpms[0]){
+
+            # don't do this clause if running s short-circuited mode
+            if(! $cf->{nounpack})  {
+                # commit to installing a new rpm (enforced if build fails)
+                unlink(@rpms) unless $cf->{dltest};
+
+                foreach my $url (  split(/\s*\n/, $tok->{sources}), 
+                                   split(/\s*\n/, $tok->{patches})   ) {
+                    my ($file)  = $url =~ m-/?([^/]+)$-;
+                    my $tgt = "$cf->{rpmdir}/SOURCES/$file";
+                    if(! -e $tgt || $cf->{dltest}) {
+                        my $src;
+                        unless( $src = get_file($url, $cf, 1) ) {
+                            $cf->{pkg_build_failures} .= "$sn " unless $pkgfail;
+                            $pkgfail = 1;
+                            undef $ret;
+                            next if $cf->{dltest};
+                            warn("Can't get: $file");
+                            die unless  $echo || $cf->{coe};
+                            next PKG;
+                        }
+                        next if $cf->{dltest};
+                        
+                        # needed if the lpp moves and links break
+                        unlink($tgt);
+
+                        symlink($src, $tgt)
+                                or die("symlink $cf->{lpp}/$file, $tgt: $!\n");
+                    }
+                }
+                next PKG if $cf->{download_only};
+                next PKG if $cf->{dltest};
+
+                # don't allow clobbering of existing builds
+                if( -e "$cf->{rpmdir}/BUILD/$tok->{pkg_dir_name}" ) {
+                    warn(<<TXT);
+
+Cowardly refusing to clobber existing directory:
+     $cf->{rpmdir}/BUILD/$tok->{pkg_dir_name}
+Remove this by hand if you really want to rebuild this package from scratch
+
+TXT
+                    if($cf->{mode} eq 'buildrpms') { 
+                        warn "scbuild/scdeploy already unpacked package\n";
+                        $cf->{sn} = $sn;
+                        pkg_iterate($cf->{sn});
+                        $cf->{nounpack} = 1;
+                        $ret = f_scbuild() && f_scdeploy();
+                        $cf->{leavesrc} = 0;
+                        $cf->{nounpack} = 0;
+                        pkg_iterate();
+			#$cf->{sn} = "";
+                    } else {
+                        undef $ret;
+                        $cf->{pkg_build_failures} .= "$sn ";
+                    }
+                    next if $cf->{coe} || $ret;
+                    return $ret;
+                }
+            }
+            # we may not have needed to download source, so this gets
+            # repeated.  Really time for a re-structure of code
+            next PKG if $cf->{download_only};
+
+            my $rpmclean;
+            if($cf->{leavesrc} || $pcf->{$key . '_LEAVESRC'}) {
+                $rpmclean = '';
+                $ENV{$key . '_LEAVESRC'} = 'y'; 
+            } else {
+                $rpmclean = '--clean --rmsource ';
+            }
+           
+            # build the binary rpms
+            $cmd =   "$cf->{rpmbuild} --dbpath $cf->{rpmdb} "
+                   . "--define '_unpackaged_files_terminate_build 0' "
+                   . "--define '_target_cpu $pcf->{LINTARCH}' "
+                   . "--define '__strip strip' "
+                   . "--define '_topdir $cf->{rpmdir}' "
+                   . "--define '_prefix $cf->{prefix}' "
+                   . "--define '_tmppath $cf->{tmppath}' "
+                   . "--define '_mandir $cf->{prefix}/$cf->{mandir}' "
+                   . "--define '_sysconfdir $cf->{sysconfdir}' "
+                   . "--define '_localstatedir $cf->{localstatedir}' "
+                   . "$rpmbuildopts $rpmclean $spec";
+            print "$cmd\n";
+            $stime = time();
+            $ec    = system_nb("$echo $cf->{fakeroot} $cmd");
+            print "Build time for $sn: ${\( time() - $stime )} seconds\n\n";
+            $rebuilt = 1;
+            if($ec) {
+                warn("Failed building $sn\n");
+                $cf->{pkg_build_failures} .= "$sn ";
+                undef $ret;
+                return $ret unless $echo || $cf->{coe};
+            }
+        }
+        return $ret if $rpmbuildopts =~ m,--short-circuit,;
+
+        # if anything got build, try to install it
+        if(   $rebuilt || $cf->{reinstall}
+           || (exists $$key->{install} && $$key->{install})
+           || `$cf->{rpm} --dbpath $cf->{rpmdb} -q $tok->{name} 2>/dev/null
+                                                  ` =~ m,is not installed,) {
+            # make a note that something got built
+            $cf->{something_got_built} = 1;
+
+            # handle packages that have sub-packages
+            foreach $rpm ( glob("$cf->{rpmdir}/RPMS/$pcf->{LINTARCH}/$tok->{name}-*") ) {
+                # We need to removed the package first.  This is needed
+                # because otherwise files that previously existed
+                # but no longer exist in a package would be left behind
+                # un-owned by any package
+                ($subpkg) = $rpm =~ m,/([^/]+)-[^-]+-[^-]+\.\w+\.rpm$,;
+                $cmd  = "$cf->{sudo} $cf->{rpm} ";
+                $cmd .= "--dbpath $cf->{rpmdb} ";
+                $cmd .= "-e --allmatches --nodeps ";
+                $cmd .= "$subpkg 2>/dev/null";
+                print "$cmd\n";
+                system_nb($cmd);
+
+                # install the new package
+                $cmd  = "$cf->{sudo} $cf->{rpm} ";
+                $cmd .= "--dbpath $cf->{rpmdb} ";
+                $cmd .= "--prefix $cf->{dev_image} " if $cf->{dev_image};
+                $cmd .= "--ignorearch -ivh ";
+                $cmd .= "--force "  unless $cf->{conflicts};
+                $cmd .= "--nodeps " if $cf->{nodeps};
+                $cmd .= "--excludedocs ";
+                $cmd .= "$rpm";
+                print "$cmd\n";
+
+                # make sure we're not going to clobber host files
+                check_host_clobber($rpm);
+
+                # in dry-run mode (echo), don't actually install)
+                unless($echo) {
+                    if(system_nb($cmd) != 0) {
+                        undef $ret;
+                        return $ret unless $cf->{coe};
+                    }
+                }
+
+                # the install of this package may cause others to install
+                process_pkg_triggers($key);
+            }
+        }
+    }
+    return $ret;
+}
+
+
+sub f_prep
+{
+    validate_sn();
+    my $key = get_key_by_sn($cf->{sn});
+    $$key->{build}  = 1;
+    $cf->{leavesrc} = 1;
+    return f_buildrpms("-bp");
+}
+
+sub f_scbuild
+{
+    validate_sn();
+    my $key = get_key_by_sn($cf->{sn});
+    $$key->{build}  = 1;
+    $cf->{leavesrc} = 1;
+    $cf->{nounpack} = 1;
+    return f_buildrpms("-bc --short-circuit");
+}
+
+sub f_scinstall
+{
+    validate_sn();
+    my $key = get_key_by_sn($cf->{sn});
+    $$key->{build}  = 1;
+    $cf->{leavesrc} = 1;
+    $cf->{nounpack} = 1;
+    return f_buildrpms("-bi --short-circuit");
+}
+
+sub f_scdeploy
+{
+    validate_sn();
+    my $sn = $cf->{sn};
+    my $key = get_key_by_sn($sn);
+    #$$key->{build}  = 1;
+    
+    my $tspec = "$cf->{rpmdir}/SPECS/$sn.spec";
+    unlink($tspec) if -f $tspec;
+
+    # we expect the user to have run these before
+    # f_scbuild()   or die();
+    f_scinstall() or return;
+
+    my $spec = get_spec($sn) or die();
+    my $tok = {sources => "", patches => "", prep => "" };
+    parse_spec($spec, $tok, 1);
+    open(SPEC, ">$tspec") or die("can't open $tspec for write: $!");
+    my $pfx_def = "";
+    my $pfx_ref = "";
+    if($tok->{pfx}) {
+    		    warn("Defining pfx as $tok->{pfx}\n");
+		    $pfx_def = "%define pfx $tok->{pfx}\n";
+		    $pfx_ref = "Prefix		: %{pfx}";
+    }
+    else {
+    	 warn("No pfx definition\n");
+    }
+    print SPEC <<TXT;
+${\( exists $tok->{base} ? "%define base $tok->{base}" : '' )}
+${pfx_def}
+Summary         : test deployment of $tok->{name}
+Name            : $tok->{name}
+Version         : $tok->{version}
+Release         : $tok->{release}
+License         : $tok->{license}
+Vendor          : Freescale
+Packager        : auto-generated
+Group           : test/test
+BuildRoot       : $tok->{buildroot}
+Autoreqprov     : no
+${pfx_ref}
+
+%Description
+%{summary}
+
+From an scdeploy !!!!
+
+%Prep
+
+%Build
+
+%Install
+
+%Clean
+
+%Files$tok->{files}
+TXT
+    close SPEC;
+
+    # invalidate the cache entry as we want to find the new one next
+    get_spec($sn, 'del');
+
+    my $ret = f_buildrpms("-bb");
+    unlink($tspec);
+    return $ret;
+}
+
+sub f_addsrpms
+{
+die "not implemented yet";
+    my ($packages, $srpm, $pkg);
+    # ??? should this be spec name, or package name (name:<> in specfile)
+    foreach my $key (mk_buildlist()) {
+         $packages->{$$key->{sn}} = 1;
+    }
+    for $srpm (@ARGV) {
+        warn("skipping: $srpm, doesn't look like an srpm\n"), next 
+                                               unless $srpm =~ m,\.src\.rpm$,;
+        ($pkg) = $srpm =~ m,/([^/]+)-[^-]+-[^-]+\.\w+\.rpm$,;
+        warn("skipping: $srpm, $pkg is already in the package list\n"),next
+                                               if $packages->{$pkg};
+        print "importing $srpm to $cf->{rpmdir}\n";
+        system_nb(<<TXT) == 0 or die;
+set -x -e
+echo rpm --dbpath $cf->{rpmdb} --define '_topdir $cf->{rpmdir}' -ivh $srpm
+TXT
+    }
+}
+
+sub f_patchmerge
+{
+    warn(<<TXT), return 1 if $echo;
+
+Cannot run patchmerge with --dry-run
+
+TXT
+    die(<<TXT) unless $cf->{sn};
+
+-m patchmerge only works on one package which you must supply with the
+-p <pkg> option
+TXT
+
+    validate_sn();
+    my ($specout, $specin) = get_spec($cf->{sn}) or die();
+    my $spec = $specin || $specout;
+    my $tok = {sources => "", patches => "", prep => "" };
+    parse_spec($spec, $tok, 0);
+    my $pkg_dir_name = $tok->{pkg_dir_name};
+    die(<<TXT) unless -d "$cf->{rpmdir}/BUILD/$pkg_dir_name";
+
+Cannot generate a patch for $spec,
+the directory: $cf->{rpmdir}/BUILD/$pkg_dir_name
+is missing (maybe you haven't built it with -m scbuild ?)
+TXT
+    die(<<TXT) unless $tok->{prep};
+
+Can't find the prep token to insert the patch unpack command
+TXT
+
+    die(<<TXT) if -e "$cf->{rpmdir}/BUILD/$pkg_dir_name.modified";
+
+The directory '$cf->{rpmdir}/BUILD/$pkg_dir_name.modified'
+already exists.  You need to move this out the way before running 
+patchmerge.  Patchmerge will preserve your working copy of the 
+source by moving:
+   $cf->{rpmdir}/BUILD/$pkg_dir_name
+to:
+   $cf->{rpmdir}/BUILD/$pkg_dir_name.modified
+TXT
+
+    # read in the spec file and work out the next patch number to use
+    my ($num, @p);
+    local $/ = undef;
+    open(SPEC, $spec) or die("can't open $spec : $!");
+    local $_ = <SPEC>;
+    close(SPEC);
+    (@p) = m,^patch(\d*),gim;
+    @p = sort { $a <=> $b } @p;
+    $num = $p[-1] || 0;
+    $num++;
+
+    # ensure his patch name is not already in the gpp (use seconds since 1970)
+    my $pname = "$tok->{name}-$tok->{version}-$cf->{stime}.patch";
+
+    system_nb(<<TXT) == 0 or die;
+set -x
+mv $cf->{rpmdir}/BUILD/$pkg_dir_name $cf->{rpmdir}/BUILD/$pkg_dir_name.modified
+cd $cf->{rpmdir}/BUILD/$pkg_dir_name.modified
+make distclean
+cd -
+$cf->{rpmbuild} --dbpath $cf->{rpmdb} --define '_target_cpu $pcf->{LINTARCH}' --define '_topdir $cf->{rpmdir}' --define '_prefix $cf->{prefix}' --define '_tmppath $cf->{tmppath}' --define '_mandir $cf->{prefix}/$cf->{mandir}' --define '_sysconfdir $cf->{sysconfdir}' -bp $specout >/dev/null || exit 1
+cd $cf->{rpmdir}/BUILD
+diff --exclude CVS -uNr $pkg_dir_name $pkg_dir_name.modified > $cf->{lpp}/$pname
+rm -rf $cf->{rpmdir}/BUILD/$pkg_dir_name
+TXT
+    
+    open(SPEC, ">$spec.bak") or die("can't open $spec.bak for writing: $!");
+    print SPEC $_;
+    close SPEC;
+    s,^(BuildRoot\s*:.*),Patch$num          : $pname\n$1,mi;
+    s,^(%[Pp]rep.+?)(?=\s*(^%[Bb]uild|\Z)),$1\n%patch$num -p1,sm;
+
+    open(SPEC, ">$spec") or die("can't open $spec for writing : $!");
+    print SPEC $_;
+    close SPEC;
+    print <<TXT;
+
+A patch has been generated and placed in:
+
+    $cf->{lpp}/$pname
+
+You need to check this and removed any bogus entries that may exist
+due to and incomplete "make distclean" 
+
+In addition, the specfile:
+    $spec
+had been edited, and an entry for the new patch has been put in there,
+a backup of the original specfile is in
+    $spec.bak
+
+TXT
+    return 1;
+}
+
+sub f_listpkgseula
+{
+	return f_listpkgs('eula');
+}
+sub f_listpkgstw
+{
+    return f_listpkgs('twiki');
+}
+sub f_listpkgs
+{
+   my ($mode) = @_;
+	if ($mode eq "eula") {
+		# Set large FORMAT_LINES_PER_PAGE so there is only one page
+		$= = 10000;
+		# Disable page break characters
+		#$^L = "";
+	}
+   my ($tok, $en, $sn);
+   $mode ||= 'text';
+	# Set FORMAT_NAME
+   $~ = $mode;
+   $^ = $mode . "_top";
+
+format text_top =
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<< @|||||| @<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+'-----------------------','----------------','-------','-------','-----------------------------------------'
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<< @|||||| @<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+'Package', 'Spec file', 'Enabled','License','Summary'
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<< @|||||| @<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+'-----------------------','----------------','-------','-------','-----------------------------------------'
+.
+format text =
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<< @|||||| @<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$tok->{name}.'-'.$tok->{version}.'-'.$tok->{release}, $sn, $en, $tok->{license}, $tok->{summary}
+.
+format twiki_top =
+@<@<<<<<<<<<<<<<<<<<<<<<<<<<<@<@<<<<<<<<<<<<<<<<<<<<<<@<@|||||@<@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<@<@*@<
+'|','*Package*','|','*Spec Name*','|','*En*','|','*Summary*','|','*License*','|'
+.
+format twiki =
+@<@<<<<<<<<<<<<<<<<<<<<<<<<<<@<@<<<<<<<<<<<<<<<<<<<<<<@<@|||||@<@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<@<@*@<
+'|',$tok->{name}.'-'.$tok->{version}.'-'.$tok->{release},'|',$sn,'|',$en,'|',$tok->{summary},'|',$tok->{license},'|'
+.
+format eula_top =
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<
+'Package', 'License'
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<
+'-----------------------','-------'
+.
+format eula =
+@<<<<<<<<<<<<<<<<<<<<<<< @*
+"$tok->{name}-$tok->{version}-$tok->{release}", $tok->{license}
+.
+
+   # sort the keylist by alphabetic spec name
+   my @keylist = sort { $$a->{sn} cmp $$b->{sn} } mk_buildlist();
+   foreach my $key ( @keylist  ) {
+       $sn = $$key->{sn};
+       $en = $$key->{en} ? 'y' : 'n';
+       my $spec = get_spec($sn) or warn("skipping $sn\n"), next;
+       $tok = {sources => "", patches => "" };
+       parse_spec($spec, $tok, 0);
+       write;
+   } 
+   return 1;
+}
+
+sub write_release_info
+{
+    my ($file, $cvs, $rel) = @_;
+    $cvs ||= 'none';
+    $rel ||= 'none';
+
+    open(RI, ">$file") or warn("open: >$file : $!"), return;
+    print RI <<TXT;
+Release date = $cf->{gmsdate} UTC
+Release user = $cf->{username}
+Release host = $cf->{hostname}
+Release dir  = $cf->{top}
+CVS tag      = $cvs
+Release tag  = $rel
+App version  = $cf->{app_version}
+CVS version  = $cf->{cvs_version}
+TXT
+    close RI;
+    return 1;
+}
+
+sub f_release
+{
+    # For now, don't allow batch mode releases until we've figured out
+    # all the details of passing in the information needed.
+    die("Batch mode is enabled, cannot make iso release!!\n") if $cf->{batch};
+
+    local $_;
+
+    print <<TXT;
+
+You are about to create an iso image from this working project.
+This will include all sources and built rpms for the target platform,
+as well as the LTIB source code.
+
+Before doing this, you should have done the following:
+
+ 1. Make sure you have checked in any changes (cvs commit) 
+ 2. Make sure your source code is up to date (cvs up -dP)
+ 3. Configured ltib for the target
+ 4. Run ltib to build all the selected packages
+
+Do you want to continue: Y|n ?
+TXT
+    if(! $cf->{batch} ) {
+        $_ = <STDIN>;
+        print("aborted\n"), return 1 if /^n/;
+    }
+
+    # Normally everything is driven from CVS but there are some secret
+    # tagnames that let you do releases from working copies, or just 
+    # the HEAD of cvs.
+    # HEAD : normal, except no tagging and just use the cvs HEAD for the export
+    # localdir : use the content of the local dir using a list in file MANIFEST
+    # localdir_nobuild : same as localdir, but don't do the package build
+    my $cvstags;
+    my $tag = "rel-$pcf->{PLATFORM}-$cf->{stime}";
+    my $date = gm_yyyymmdd();
+    my $rel = "ltib-$pcf->{PLATFORM}-$date";
+    print <<TXT;
+
+Please enter the cvs tag name for this release, or
+if you just type enter, the timestamp $tag will be used
+
+TXT
+    if(! $cf->{batch} ) {
+        while(1) {
+            $_ = <STDIN>;
+            if ( !defined $_ ) {
+                # Prevent infinite loop if tag is from here file in script.
+                die("STDIN is not defined, exiting\n");
+            }
+            chomp($_);
+            $tag = $_ if $_;
+            last if $tag eq 'localdir' || $tag eq 'localdir_nobuild' 
+                                       || $tag eq 'HEAD';
+            if($tag !~ m,^[a-zA-Z][\w-]+$,) {
+                print(<<TXT);
+Illegal tag name, tags need to be specified as follows:
+
+* Start with an uppercase or lowercase letter
+* Subsequently and can also contain uppercase and lowercase letters, 
+  digits, `-', and `_'
+TXT
+                next;
+            }
+            unless($cvstags) {
+                print("gathering a list of cvs tags used so far, pls wait\n");
+                %$cvstags = map { $_ => 1 } get_cvs_tags();
+            }
+            last unless exists $cvstags->{$tag};
+            print(  "The tag you've chosen is already in cvs, "
+                  . "please choose another\n");
+        }
+    }
+
+    # check for unsaved config changes
+    print "\nChecking for unsaved config changes:\n\n";
+    my @devs = glob("$cf->{platforms_dir}/$pcf->{PLATFORM}/*.dev");
+    system_nb(<<TXT) == 0 or die "\nPlease save your changes before continuing\n";
+set -e
+diff -qN  $cf->{platforms_dir}/$pcf->{PLATFORM}/defconfig $cf->{platforms_dir}/$pcf->{PLATFORM}/.config
+for i in @devs
+do
+    diff -qN $cf->{platforms_dir}/$pcf->{PLATFORM}/`basename \$i .dev` \$i
+done
+TXT
+    if($tag ne 'localdir' && $tag ne 'localdir_nobuild') {
+        print "\nChecking that cvs is up to date\n";
+        my $cvs_state = `cvs -nq up 2>&1`;
+        if($cvs_state =~ m,^(?:C|M|U|A|R),m) {
+            die(<<TXT);
+
+$cvs_state
+
+Your working directory is not in sync with cvs (see above), please do a:
+cvs up -dP
+cvs commit
+
+TXT
+        }
+    }
+
+    system_nb(<<TXT) ==  0 or die;
+set -x -e
+rm -rf stage
+mkdir -p stage
+
+if [ "$tag" != "HEAD" -a "$tag" != "localdir" -a "$tag" != "localdir_nobuild" ]
+then
+    cvs tag -c $tag .
+fi
+
+if [ "$tag" != "localdir" -a "$tag" != "localdir_nobuild" ]
+then
+    cvs export -kv -d stage -r $tag ltib
+    rm -rf stage/CVS
+    for i in `ls stage/config/platform | grep -E -v '($pcf->{PLATFORM}|host)'`
+    do
+        rm -rf stage/config/platform/\$i
+    done
+    rm -rf stage/dist/FC-2
+    rm -rf stage/internal
+    rm -rf $rel
+else
+    rsync -av --files-from=MANIFEST . stage
+    if [ -d overlay -a -f overlay/MANIFEST ]
+    then
+        rsync -av --files-from=overlay/MANIFEST overlay stage
+    fi
+fi
+mkdir $rel
+mv stage $rel
+mv $rel/stage $rel/$rel
+cp $rel/$rel/bin/ltib_install $rel/install
+mkdir $rel/pkgs
+
+
+# do a dltest to make sure that all files have been uploaded
+if [ "$tag" != "localdir" -a "$tag" != "localdir_nobuild" ]
+then
+    ./ltib --dltest
+fi
+
+# work in the release staging area
+cd $rel/$rel
+
+# built to make sure all generated pieces make it onto the iso
+if [  "$tag" != "localdir_nobuild" ]
+then 
+    ./ltib --preconfig config/platform/$pcf->{PLATFORM}/defconfig --configure --batch
+fi
+
+# remove the rootfs components
+./ltib -m clean
+
+# remove unwanted log files and host package install check files
+rm -f .host_wait_warning* host_config.log
+rm -f $cf->{rpmdb_nfs_warning}
+rm -rf rpm/BUILD/*
+
+cd -
+
+TXT
+    
+    print("copy all sources\n");
+    copy_all_sources("$rel/pkgs/") or die;
+
+    print("copy all toolchain rpm/srpms\n");
+    foreach my $rpm (list_all_toolchains()) { 
+        my $path = get_file($rpm, $cf, 1) or die "can't get $rpm";
+        system_nb("cp -af $path $rel/pkgs/") == 0 or die;
+        $rpm =~ s,\.[^.]+\.rpm,.src.rpm,;
+        $path = get_file($rpm, $cf, 1);
+        system_nb("cp -af $path $rel/pkgs/") == 0 or die;
+    }
+
+    print("copy host support package sources\n");
+    pkg_cache_init();
+    $pcf = parse_dotconfig($cf->{hostconfig});
+    copy_sources("$rel/pkgs/") or die;
+
+    print("copy rpm-fs sources\n");
+    copy_spec_sources("rpm-fs", "$rel/pkgs/") or die;
+
+    # output some helpful release information
+    write_release_info("$rel/$rel/RELEASE_INFO", $tag, $rel) or die;
+
+    system_nb(<<TXT) ==  0 or die;
+set -x -e
+cp $rel/$rel/RELEASE_INFO $rel/RELEASE_INFO
+cd $rel
+tar zcf ltib.tar.gz $rel
+rm -rf $rel
+cd -
+mkisofs -A "$rel" -J -allow-leading-dots -l -joliet-long -publisher "Freescale" -o $rel.iso -r -v -V "ltib" $rel
+rm -rf $rel
+
+TXT
+
+    return 1;
+}
+
+sub copy_spec_sources
+{
+    my ($sn, $dest) = @_;
+    my $spec = get_spec($sn) or warn("skipping $sn\n"), return;
+    my $tok = {sources => "", patches => "" };
+    parse_spec($spec, $tok, 0);
+    foreach my $url (  split(/\s*\n/, $tok->{sources}),
+                       split(/\s*\n/, $tok->{patches})   ) {
+        my $src = get_file($url, $cf, 1) or warn("can't get: $url"), return;
+        system_nb("set -x ; cp -af $src $dest") == 0 or die;
+        if(-f "$src.md5") {
+            system_nb("set -x ; cp -af $src.md5 $dest") == 0 or die;
+        }
+    }
+    return 1;
+}
+
+sub copy_all_sources
+{
+    my ($dest) = @_;
+
+    foreach my $key ( mk_buildlist()  ) {
+        copy_spec_sources($$key->{sn}, $dest) or die;
+    }
+    return 1;
+}
+
+sub copy_sources
+{
+    my ($dest) = @_;
+
+    foreach my $key ( mk_buildlist()  ) {
+        next unless $$key->{en};
+        copy_spec_sources($$key->{sn}, $dest) or die;
+    }
+    return 1;
+}
+
+sub list_all_toolchains
+{
+    my $lkc = "$cf->{platforms_dir}/$pcf->{PLATFORM}/main.lkc";
+    my @tcs;
+    my $scan = 0;
+    local $_;
+    open(LKC, $lkc) or die("open $lkc : $!");
+    while(<LKC>) {
+        next unless $scan || m,^\s*config\s+TOOLCHAIN\s*$,;
+        $scan = 1, next unless $scan;
+        last if m,^\s*config\s+,;
+        push(@tcs, $1) if m,([\S]+\.rpm),;
+    }
+    return @tcs;
+}
+
+#############################################
+# application support subroutines
+#############################################
+
+sub check_app_is_configed
+{
+    my ($missing, $var) = ("");
+
+    foreach $var (qw/dev_image rpmdir rpmdb bin_path
+                     defpfx lpp spoof_path config_dir
+                     platforms_dir mainlkc conf defdist pfx buildarch
+                     pkg_map top home username path_std
+                     pre_install_deps/ ) {
+            $missing .= "$var " unless $cf->{$var};
+        die <<TXT if $missing;
+
+This utility uses configuration values that are set in:
+
+$cf->{rcfile}
+
+The following configuration symbols have not been set:
+
+$missing
+
+TXT
+    }
+    # ltib should be run from the ltib directory
+    if( ! -d "./config/platform" ) {
+        die <<TXT;
+
+Cannot find directory: ./config/platforms
+
+This does not look like an ltib directory.  To run ltib, you should
+cd first to the directory: $cf->{top}
+
+TXT
+    }
+    return 1;
+}
+
+sub load_system_config
+{
+    my($cf) = @_;
+
+    # if passed, the cfile should exist
+    die <<TXT if $cf->{rcfile} && ! -f $cf->{rcfile};
+The passed rcfile: $cf->{rcfile} is missing
+TXT
+    foreach my $rc ($cf->{rcfile}, "$cf->{home}/.ltibrc", "$cf->{top}/.ltibrc"){
+        if(-f $rc) {
+            parse_config($rc, $cf, { strip_blank => 1, 
+                                     strip_comment => 1,
+                                     strip_trailing => 1} );
+            $cf->{rcfile} = $rc;
+            last;
+        }
+    }
+    die(<<TXT) unless $cf->{rcfile};
+top = $cf->{top}
+could not locate resource file:
+    $cf->{rcfile}
+    $cf->{home}/.ltibrc
+    $cf->{top}/.ltibrc
+TXT
+    return 1;
+}
+
+
+sub build_host_rpms
+{
+    my ($allow_hostcf) = @_;
+
+    # save some old config values
+    my $sav = {};
+    my @sav_list = qw/dev_image prefix sysconfdir rpmdir rpmdb nodeps force
+                      reinstall dodrop preconfig/;
+    foreach my $k (@sav_list) {
+        $sav->{$k} = $cf->{$k};
+    }
+    # override with suitable host values (some host pkgs are not relocatable)
+    $cf->{dev_image}     = '/';                  # install prefix
+    $cf->{prefix}        = "$cf->{defpfx}/usr";  # build prefix
+    $cf->{sysconfdir}    = "$cf->{defpfx}/etc";  # config files
+    $cf->{rpmdir}        = "$cf->{defpfx}/usr/src/rpm";
+    $cf->{rpmdb}         = "$cf->{defpfx}/var/lib/rpm";
+    $cf->{nodeps}        = 1;
+    $cf->{force}         = 0 unless $allow_hostcf;
+    $cf->{reinstall}     = 0;
+
+    # pull in and parse the host platform config
+    if($allow_hostcf == 1) {
+        # we are working on host packages
+        ltib_host_config();
+        $cf->{dodrop} = 'ask';
+    } else {
+        # this is the case where we are doing just the basic host packages
+        $cf->{dodrop} = 'no';
+        $cf->{preconfig} = $cf->{hostconfig};
+    }
+    pkg_cache_init();
+    $pcf = parse_dotconfig($cf->{preconfig});
+    check_platform_config($pcf);
+    setup_env_vars($cf, $pcf);
+    check_toolchain_setup($pcf);
+
+    # we can get here at install time, or later config of host packages 
+    if($cf->{hostcf} && $cf->{mode} ne 'config' ) {
+        &{"f_" . $cf->{mode}}()
+                    or die("\n\nf_$cf->{mode}() returned an error, exiting\n");
+        exit 0;
+    }
+
+    # build host rpms
+    f_buildrpms() or die;
+
+    # restore
+    foreach my $k (@sav_list) { $cf->{$k} = $sav->{$k} }
+    undef $sav;
+
+    return 1;
+}
+
+sub host_checks
+{
+    # do not attempt to re-install host packages once 
+    # we have got through here completely once
+    return 1 if -f $cf->{host_wait_warning} || $cf->{dltest};
+    
+    # check the basic build host package dependencies
+    check_basic_deps() or die;
+
+    # check that this host has the necessary applications available
+    # to at least install binary rpms
+    check_sudo_setup();
+
+    # after this may take some time to complete
+    print <<TXT;
+
+Installing host support packages.
+
+This only needs to be done once per host, but may take up to
+an hour to complete ...
+
+If an error occurs, a log file with the full output may be found in:
+$cf->{logfile}
+
+TXT
+
+    # remove the previous logfile
+    unlink($cf->{logfile});
+
+    # redirect output to logfile
+    redirect($cf->{logfile});
+
+    # use the host's rpm to bootstrap a known version of rpm 
+    check_rpm_setup() or die;
+
+    # check/create required directories
+    check_dirs();
+
+    # turn on output again as the user may have to interact
+    redirect();
+
+    # redirect output to logfile
+    redirect($cf->{logfile});
+
+    # build and install rpms for the host
+    build_host_rpms(0);
+
+    redirect();
+    touch($cf->{host_wait_warning});
+    return 1;
+}
+
+sub pre_build_checks
+{
+    ltib_config();
+    pkg_cache_init();
+    $pcf = parse_dotconfig($cf->{preconfig});
+    if( -f "$cf->{preconfig}.old" ) {
+        $ppcf = parse_dotconfig("$cf->{preconfig}.old");
+        process_full_rebuild();
+    }
+    check_platform_config($pcf);
+    setup_env_vars($cf, $pcf);
+
+    # add distcc hosts if this has been setup
+    $ENV{DISTCC_HOSTS} = $cf->{DISTCC_HOSTS} 
+                       if ! defined $ENV{DISTCC_HOSTS} && $cf->{DISTCC_HOSTS};
+    $ENV{DISTCC_TCP_CORK} = $cf->{DISTCC_TCP_CORK} 
+         if ! defined $ENV{DISTCC_TCP_CORK} && defined $cf->{DISTCC_TCP_CORK};
+    $ENV{MAKEFLAGS} = $cf->{MAKEFLAGS} 
+                       if ! defined $ENV{MAKEFLAGS} && $cf->{MAKEFLAGS};
+
+    # this is to catch mangled databases before we had a known rpm
+    # once this has rippled through all users it could come out
+    die "$cf->{rpm} has gone missing" unless -f $cf->{rpm};
+    my $qo = `$cf->{rpm} --dbpath -q $cf->{rpmdb} bogus-package 2>&1`;
+    if($qo =~ m,unsupported hash version:,m) {
+        system_nb("rm -rf $cf->{rpmdb}/*") == 0 or die;
+    }
+
+    # this allows you to have entries like: /home/seh/rpmdb_$PLATFORM
+    $cf->{rpmdb} =~ s,\$([\w]+),$pcf->{$1},g;
+
+    # make rpm directories
+    mk_rpm_dirs($cf->{rpmdir}, $cf->{rpmdb}, $cf->{dev_image}, $cf->{tmppath});
+
+    # make sure spoofing is working
+    check_spoofing();
+
+    # make shure we can build packages
+    check_toolchain_setup($pcf);
+
+    # check merge updates and force merge package build if necessary
+    check_merge_updates($pcf);
+
+    # clean up stale rpm-tmp files
+    system("rm -f $cf->{tmppath}/rpm-tmp.*");
+
+    # we only want to record something go built for target packages
+    $cf->{something_got_built} = 0;
+
+    return 1;
+}
+
+sub pre_clean_checks
+{
+    warn("can't clean, no preconfig or .config file"), return
+                            unless $cf->{preconfig} || -f "$cf->{top}/.config";
+    ltib_config();
+    pkg_cache_init();
+    $pcf = parse_dotconfig($cf->{preconfig});
+    check_platform_config($pcf);
+    setup_env_vars($cf, $pcf);
+
+    # check/create required directories
+    check_dirs();
+
+    # this allows you to have entries like: /home/seh/rpmdb_$PLATFORM
+    $cf->{rpmdb} =~ s,\$([\w]+),$pcf->{$1},g;
+
+    return 1;
+}
+
+sub setup_env_vars
+{
+    my($cf, $pcf) = @_;
+
+    # these are "special cases"
+    $pcf->{GNUTARCH} = $cf->{buildarch} if $pcf->{GNUTARCH} eq "buildarch";
+    $pcf->{LINTARCH} = g2larch($cf->{buildarch})
+                                        if $pcf->{LINTARCH} eq "buildarch";
+    $pcf->{CFGHOST} = "$cf->{buildarch}-linux" 
+                                        if $pcf->{CFGHOST} eq "buildarch";
+
+
+    $ENV{UNSPOOF_PATH} = 
+                 "$cf->{bin_path}:"
+                 . "$cf->{defpfx}/usr/bin:" 
+                 . ($pcf->{TOOLCHAIN_PATH} ? "$pcf->{TOOLCHAIN_PATH}/bin:" : "")
+                 .  $cf->{path_std};
+    $ENV{SPOOF_PATH} = ($pcf->{TOOLCHAIN_PREFIX} ? "$cf->{spoof_path}:" : "")
+                 .  $ENV{UNSPOOF_PATH};
+    $ENV{PATH}      = $ENV{SPOOF_PATH};
+    $ENV{TOP}       = $cf->{top};
+    $ENV{DEV_IMAGE} = $cf->{dev_image};
+    $ENV{DEFPFX}    = $cf->{defpfx};
+    $ENV{BUILDCC}   = $cf->{buildcc};
+    $ENV{BUILDCXX}  = $cf->{buildcxx};
+    $ENV{BUILDCPP}  = $cf->{buildcpp};
+    $ENV{BUILDLD}   = $cf->{buildld};
+    $ENV{BUILDSTRIP}= $cf->{buildstrip};
+    $ENV{BUILDARCH} = $cf->{buildarch};
+    $ENV{CC}        = $cf->{cc};
+    $ENV{CXX}       = $cf->{cxx};
+    $ENV{LD}        = $cf->{ld};
+    $ENV{AR}        = $cf->{ar};
+    $ENV{GNUTARCH}  = $pcf->{GNUTARCH};
+    $ENV{LINTARCH}  = $pcf->{LINTARCH};
+    $ENV{CFGHOST}   = $pcf->{CFGHOST};
+    $ENV{TOOLCHAIN_PREFIX} = $pcf->{TOOLCHAIN_PREFIX};
+    $ENV{TOOLCHAIN_PATH} = $pcf->{TOOLCHAIN_PATH};
+    $ENV{PLATFORM_PATH} = "$cf->{platforms_dir}/$pcf->{PLATFORM}";
+    $ENV{CONFIG_DIR}    = $cf->{config_dir};
+    $ENV{TOOLCHAIN_TYPE} = $pcf->{TOOLCHAIN_TYPE} || "";
+    $ENV{PLATFORM}      = $pcf->{PLATFORM};
+    $ENV{CPU}           = $pcf->{CPU} || "";
+    $ENV{ENDIAN}        = $pcf->{ENDIAN} || "big";
+    $ENV{PKG_U_BOOT_CONFIG_TYPE} = $pcf->{PKG_U_BOOT_CONFIG_TYPE} || "";
+    $ENV{PKG_U_BOOT_BUILD_ARGS}  = $pcf->{PKG_U_BOOT_BUILD_ARGS}  || "";
+    $ENV{UCLIBC} = $pcf->{UCLIBC} || "";
+    $ENV{TOOLCHAIN_CFLAGS} = $pcf->{TOOLCHAIN_CFLAGS} || "";
+    $ENV{RPMDB} = $cf->{rpmdb};
+
+    if($cf->{verbose}) {
+        foreach my $v (qw/PATH TOP DEV_IMAGE BUILDCC BUILDLD BUILDSTRIP
+                          BUILDARCH GNUTARCH LINTARCH CFGHOST
+                          TOOLCHAIN_PREFIX PLATFORM_PATH
+                          CPU PKG_U_BOOT_CONFIG_TYPE PKG_U_BOOT_BUILD_ARGS
+                          UCLIBC CONFIG_DIR ENDIAN/ ) {
+            warn("setting ENV{$v}=$ENV{$v}\n");
+        }
+    }
+     
+    foreach my $k ( grep { m,(_PRECONFIG|_WANT_|SYSCFG_), } keys %$pcf ) {
+        next unless $pcf->{$k};
+        warn("setting ENV{$k}=$pcf->{$k}\n") if $cf->{verbose};
+        $ENV{$k} = $pcf->{$k};
+    }
+    return 1;
+}
+
+sub process_full_rebuild
+{
+    return 1 if -M "$cf->{preconfig}.old" <= -M $cf->{preconfig};
+
+    if(system_nb("diff -qN $cf->{preconfig} $cf->{preconfig}.old >/dev/null")) {
+        $cf->{do_deploy} = 1;
+    }
+
+    my $need_frb = 0;
+    foreach my $dep (qw/PLATFORM GNUTARCH LINTARCH CFGHOST TOOLCHAIN DISTRO/) {
+        my $cur = $pcf->{$dep}  || "";
+        my $pre = $ppcf->{$dep} || "";
+        if( $cur ne $pre ) {
+            $need_frb= 1;
+            warn("CONFIG_$dep forced a full rebuild\n");
+            last;
+        }
+    }
+    system_nb("rm -f $cf->{rpmdir}/RPMS//$pcf->{LINTARCH}/*") if $need_frb;
+    touch("$cf->{preconfig}.old");
+    return 1;
+}
+
+sub process_pkg_deps
+{
+    my ($key, $spec_name) = @_;
+
+    # return if there is no previous platform config structure
+    return 1 unless $ppcf;
+
+    my $spec = get_spec($spec_name) or return;
+
+    # assume done if the specfile was touched after the .config file
+    return 1 if -M $spec <= -M $cf->{preconfig};    
+
+    foreach my $dep ( @{$config_deps->{$key}} ) {
+        my $cur = $pcf->{$dep}  || "";
+        my $pre = $ppcf->{$dep} || "";
+        if( $cur ne $pre ) {
+            warn "$dep has changed, $spec_name needs a rebuild\n";
+            touch($spec);
+        }
+    }
+    return 1;
+}
+
+sub process_pkg_triggers
+{
+    my ($key) = @_;
+    return unless exists $build_deps->{$key} || $install_deps->{$key};
+    foreach my $dep ( @{$build_deps->{$key}} ) {
+        if(exists $$dep->{was_en} && $$dep->{was_en}) {
+            $$dep->{en} = 1;
+        }
+        $$dep->{build} = 1;
+        warn "$$dep->{sn} rebuild forced by $$key->{sn}\n" if $$dep->{en};
+    }
+    foreach my $dep ( @{$install_deps->{$key}} ) {
+        if(exists $$dep->{was_en} && $$dep->{was_en}) {
+            $$dep->{en} = 1;
+        }
+        $$dep->{install} = 1;
+        warn "$$dep->{sn} install forced by $$key->{sn}\n" if $$dep->{en};
+    }
+}
+
+sub build_rev_triggers
+{
+    return if defined $rev_install_deps;
+
+    foreach my $hr ($build_deps, $install_deps) {
+        foreach my $k ( keys %$hr ) {
+            foreach my $dep ( @{$hr->{$k}} ) {
+                push @{$rev_install_deps->{$dep}}, $k;
+            }
+        }
+    }
+}
+
+sub has_rev_trigger
+{
+    my ($key) = @_;
+
+    build_rev_triggers();
+
+    return exists $rev_install_deps->{$key} ? 1: 0;
+}
+
+sub get_rev_triggers
+{
+    build_rev_triggers();
+    return keys %$rev_install_deps;
+}
+
+sub process_pkg_rev_triggers
+{
+    my ($key) = @_;
+
+    build_rev_triggers();
+
+    # it is valid that a package may not have a key during development
+    return unless $key;          
+
+    foreach my $k (@{$rev_install_deps->{$key}}) {
+        warn("re-installing $$k->{sn} because $$key->{sn} was dropped\n");
+        $$k->{install} = 1;
+    }
+}
+
+sub pkg_cache_init
+{
+    # this was changed from an outer lexical to global to keep older
+    # version from warning about 'not staying shared'
+    $pcac = {};
+}
+
+#
+# Process build list.
+# Cycle through all packages and build a list of keys for each package,
+# these keys are placed in a build ordered array.
+# For a key to be added, it needs to be in both the platforms .config
+# file and in one of the pkg_map files.
+# As the keys are process, attributes for that key are saved into
+# a hash that is referenced using a soft reference to the key name
+#
+sub mk_buildlist 
+{
+    return @{$pcac->{mk_buildlist}} if exists $pcac->{mk_buildlist};
+
+    warn("PROFILE:: mk_buildlist():\n", caller_stack(), "\n") if $cf->{prof};
+
+    my $pre = '^([\w]+)\s*=\s*([\S]+)';
+    my $key;
+    local $_;
+
+    # load up the main map
+    my $map = "$cf->{top}/$pcf->{DISTRO}/common/$cf->{pkg_map}";
+    open(MAP, $map) or die("open($map): $!\n");
+    while(<MAP>) {
+        chomp;
+        m,$pre,o or next;
+        my $key = $1;
+        next unless defined $pcf->{$key};
+        push @{$pcac->{mk_buildlist}}, $key;
+
+        # if the package name is in the .config use that name, otherwise
+        # use the one from the package map
+        if($pcf->{$key} && $pcf->{$key} ne 'y') {
+            $$key->{sn} = $pcf->{$key};
+            $$key->{en} = 1;
+        } else {
+            $$key->{sn} = $2;
+            $$key->{en} = $pcf->{$key} eq 'y' ? 1 : 0;
+        }
+        warn "mk_buildlist: key=$key, sn=$$key->{sn}, en=$$key->{en}\n"
+                                                            if $cf->{verbose};
+    }
+    close MAP;
+
+    # load up the override map if present.  These should be bools.
+    # It makes no sense to have u-boot or kernels in them
+    $map = "$cf->{platforms_dir}/$pcf->{PLATFORM}/$cf->{pkg_map}";
+    if( -f $map ) {
+        open(MAP, $map) or die("open($map): $!\n");
+        while(<MAP>) {
+            chomp;
+            m,$pre,o or next;
+            $key = $1;
+            unless(exists $$key->{sn}) {
+                warn("$key in $map is not selectable\n"), next
+                                                    unless exists $pcf->{$key};
+                push @{$pcac->{mk_buildlist}}, $key;
+                $$key->{en} = $pcf->{$key} eq 'y' ? 1 : 0;
+            }
+            $$key->{sn} = $2;
+        }
+    }
+    close MAP;
+
+    # A user can specifiy -p <pkg>.  Without the '.spec' extention
+    # means we should lookup the specfile name from the package.
+    # If the '.spec' extension is passed, then the user means
+    # the actual spec file name.  This is needed
+    # so we can ask to build a specific package without regard to
+    # whether it's part of our current platform configuration
+    if($cf->{sn}) {
+        if( substr($cf->{sn}, -5, 5) eq ".spec" ) {
+            substr($cf->{sn}, -5, 5) = "";
+        } else {
+            my ($key, $lu_pkg, $pkg, $pkg_len, $found);
+            $pkg     = $cf->{sn};
+            $pkg_len = length($cf->{sn});
+            foreach $key ( @{$pcac->{mk_buildlist}} ) {
+                $lu_pkg = get_pkg_name($key) or die;
+                if( unpack("A" . $pkg_len, $lu_pkg) eq $pkg ) {
+                    $found = $$key->{sn};
+                    last;
+                }
+            }
+            die <<TXT unless $found;
+
+Cannot find spec file that contains the package name $pkg.
+If necessary please give the whole spec file name (with the    
+.spec extension).
+
+TXT
+            $cf->{sn} = $found;
+        }
+        pkg_iterate($cf->{sn});
+    }
+
+    # process the package dependencies
+    foreach $key ( @{$pcac->{mk_buildlist}} ) {
+        process_pkg_deps($key, $$key->{sn}) if $$key->{en};
+    } 
+
+    return @{$pcac->{mk_buildlist}};
+}
+
+# If a spec name is passed, turn off all packages except that one
+# if no spec name is passed, restore all packages to their previous state
+sub pkg_iterate
+{
+    my ($sn) = @_;
+    my $key = 'userpkg';
+
+    foreach my $tkey (@{$pcac->{mk_buildlist}}) {
+        if($sn) {
+            $$tkey->{was_en} = $$tkey->{en};
+            $$tkey->{en} = 0;
+            $key = $tkey if $$tkey->{sn} eq $sn;
+        } else {
+            $$tkey->{en} = $$tkey->{was_en};
+        }
+    }
+    return 1 unless $sn;
+
+    # if this spec name is unknown, fabricate a key
+    unless(exists $$key->{sn}) {
+        push @{$pcac->{mk_buildlist}}, $key;
+        $$key->{sn} = $sn;
+    }
+    $$key->{en} = 1;
+    $$key->{build} = 1 if $cf->{force};
+    return 1;
+}
+
+sub validate_sn
+{
+    mk_buildlist();
+}
+
+sub get_key_by_sn
+{
+    my ($sn) = @_;
+    foreach my $key ( mk_buildlist() ) {
+        return $key if $$key->{sn} eq $sn;
+    }
+    return 'userpkg';
+}
+
+# Return the name of a package referenced by key
+# this is from the Name: field in the spec file, which
+# may be different from the spec file name
+# This is an ugly optimisation as the cost of parsing the spec files
+# and reducing the macros is quite high
+sub get_pkg_name
+{
+    my ($key) = @_;
+    return $$key->{pkg} if exists $$key->{pkg};
+
+    my $sn = $$key->{sn} or return;
+    my $spec = get_spec($sn) or return;
+    my $tok = {};
+    parse_spec($spec, $tok, 0, 'name');
+    die("$spec does not contain an entry for Name:") unless $tok->{name};
+    $$key->{pkg} = $tok->{name};
+    return $$key->{pkg};
+}
+
+sub remove_unselected_pkgs
+{
+    # don't do this if user is working on a single package
+    return 1 if $cf->{sn} || $cf->{dodrop} eq 'no';
+    local $_;
+    my @installed = split(/[\s\n]+/, `$cf->{rpm}  --dbpath $cf->{rpmdb} -qa --queryformat "%{name} "`);
+    my @drop_list = ();
+    my $pkg2key   = {};
+    my @buildlist = mk_buildlist();
+    my @wanted    = grep { $$_->{en} } @buildlist;
+    my ($key, $pkg, $len);
+
+INST:
+    foreach my $inst ( @installed ) {
+        foreach $key ( @wanted ) {
+            $pkg = get_pkg_name($key) or next;
+            $len = length $inst;
+            next INST if $inst eq $pkg;
+        }
+        # the installed package is not in the list of enabled packages
+        push(@drop_list, $inst);
+        
+        # check to see if this package has any reverse triggers
+        foreach $key ( get_rev_triggers() ) {
+            $pkg = get_pkg_name($key) or next;
+            $len = length $pkg;
+            if( $inst eq $pkg ) {
+                $pkg2key->{$inst} = $key;
+                last;
+            }    
+        }
+    }
+    warn("installed = ", join(", ", @installed), "\n") if $cf->{verbose};
+    warn("drop_list = ", join(", ", @drop_list), "\n") if $cf->{verbose};
+    return 1 unless @drop_list;
+
+    print "\n" if @drop_list;
+    foreach my $rpmname ( reverse(@drop_list) ) {
+        next if $rpmname =~ m,^(?:rpm-fs|tc-mtwk-|mtwk-lnx-|ppc-uclibc-tc|tc-fsl-|freescale-coldfire-),;
+        if($cf->{dodrop} eq 'ask') {
+            print "Drop package $rpmname ? (y|N)" if $cf->{dodrop} eq 'ask';
+            $_ = <STDIN>;
+            next unless m,^y,;
+        }
+        print "Dropping de-selected package $rpmname\n";
+        my $cmd =   "$cf->{sudo} $cf->{rpm} --dbpath $cf->{rpmdb} "
+               . "-e --allmatches $rpmname --nodeps";
+        print "$cmd\n";
+        system_nb($cmd) == 0 or die unless $echo;
+        process_pkg_rev_triggers($pkg2key->{$rpmname});
+    } 
+    return 1;
+}
+
+# this extra block is to emulate static variables
+sub BEGIN {
+my $rpm_specs  = "";
+my $pcf_distro = "";
+my $defdist    = "";
+my $plat_specs = "";
+my $cache      = {};
+my @dirs       = ();
+
+sub get_spec
+{
+    my ($sn, $mode) = @_;
+    unless($sn) {
+        warn("get_spec():\n", caller_stack(), "\n");
+        return;
+    }
+    my $spec  = "$sn.spec";
+    $mode ||= "";
+    delete $cache->{$sn} if $mode eq 'del';
+    $cache = {}          if $mode eq 'delall';
+
+
+    if(   $rpm_specs  ne "$cf->{rpmdir}/SPECS"
+       || $pcf_distro ne "$cf->{top}/$pcf->{DISTRO}"
+       || $defdist    ne "$cf->{top}/$cf->{defdist}"
+       || $plat_specs ne "$cf->{platforms_dir}/$pcf->{PLATFORM}" ) {
+        $rpm_specs   = "$cf->{rpmdir}/SPECS";
+        $pcf_distro  = "$cf->{top}/$pcf->{DISTRO}";
+        $defdist     = "$cf->{top}/$cf->{defdist}";
+        $plat_specs  = "$cf->{platforms_dir}/$pcf->{PLATFORM}";
+
+        @dirs    = ($rpm_specs, $plat_specs, glob("$pcf_distro/*") );
+        push(@dirs, glob("$defdist/*")) unless $defdist eq $pcf_distro;
+        $cache = {};
+    }
+    if(exists $cache->{$sn}) {
+        return wantarray ? @{$cache->{$sn}} : $cache->{$sn}[0];
+    }
+    warn("PROFILE:: get_spec ($sn):\n", caller_stack(), "\n") if $cf->{prof};
+
+    # try to locate the spec file
+    foreach my $dir ( @dirs ) { 
+        my $specpath = "$dir/$spec";
+        my $specinpath = "";
+        if(-e "$specpath.in") {
+            $specinpath = "$specpath.in";
+            $specpath   = "$cf->{tmppath}/$spec";
+            open(SPECIN, $specinpath) or die("can't open $specinpath: $!");
+            local $_ = <SPECIN>;
+            my $tmplpath;
+            my ($tmpl) = m,template\s*=\s*([\S]+),i or die("no template");
+            foreach my $tdir ( $dir, @dirs ) {
+               $tmplpath = "$tdir/$tmpl", last if -e "$tdir/$tmpl"; 
+            }
+            die("no template") unless $tmplpath;
+            warn("template: $tmplpath\n") if $cf->{verbose};
+            if(! -f $specpath  || (-M $specinpath < -M $specpath) 
+                               || (-M $tmplpath   < -M $specpath)   ) {  
+                expand_spec($specpath, $specinpath, $tmplpath);
+            }
+        }
+        if(-e $specpath) {
+           warn("spec files: [ $specpath, $specinpath ]\n") if $cf->{verbose};
+           $cache->{$sn} = [ $specpath, $specinpath ];
+           return wantarray ? @{$cache->{$sn}} : $cache->{$sn}[0];
+        }
+    }
+    undef $cache->{$sn};
+
+    warn(<<TXT);
+
+get_spec: can't find spec file $spec
+
+in search any of the directories:
+    $rpm_specs
+    $plat_specs
+    $pcf_distro
+
+TXT
+    warn "    $defdist\n" if $defdist ne $pcf_distro;
+    return wantarray ? () : undef;
+}
+}
+
+# check the most basic host services are available
+sub check_basic_deps
+{
+    my @failed = ();
+
+    foreach my $dep ( split(/\n/, $cf->{pre_install_deps}) ) {
+        next if $dep =~ m,^\s*$,;
+        next if $dep =~ m,^\s*#,;
+        $dep =~ s,^\s*,,;
+        my ($pkg, $min) = split(/\s+/, $dep);
+        my ($ver, $info) = get_ver($pkg);
+        warn "pkg=$pkg, min=$min, got: $ver, $info\n" if $cf->{verbose};
+        if($ver ne -1) {
+            next if cmp_ver($ver, $min) >= 0;
+            $info = $ver;
+        }
+        push @failed, [ $pkg, $min, $info ];         
+    }
+    return 1 unless @failed;
+
+    no strict 'vars';
+    $~ = 'inst';
+    $^ = 'inst_top';
+    my @ar;
+
+format inst_top =
+@<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<  @<<<<<<<<<<<<<<<
+'Package',             'Minimum ver', 'Installed info'
+@<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<  @<<<<<<<<<<<<<<<
+'-------',             '-----------','---------------'
+.
+format inst =
+@<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<  @*
+$ar->[0],              $ar->[1],     $ar->[2]
+.
+
+    print(<<TXT);
+
+ltib cannot be run because one or more of the host packages needed
+to run it are either missing or out of date.
+
+Please install/upgrade these packages and then re-try.
+
+TXT
+    foreach $ar ( @failed ) {
+       write;
+    }
+    return;
+}
+
+sub check_platform_config
+{
+    my ($pcf) = @_;
+
+    # mandatory direct values
+    my $ndef = "";
+    foreach my $k (qw/TOOLCHAIN_PREFIX TOOLCHAIN_PATH
+                   GNUTARCH LINTARCH CFGHOST/) {
+        $ndef .= "$k " unless exists $pcf->{$k};    
+    }
+    die "You must set configuration values in $cf->{preconfig} for:\n  $ndef\n"
+                                                                   if $ndef;
+    # indirect checks
+    if( ! $pcf->{TOOLCHAIN} && $pcf->{TOOLCHAIN_PATH}) {
+        die("Cannot find $pcf->{TOOLCHAIN_PREFIX}gcc in $pcf->{TOOLCHAIN_PATH}/bin") unless -x "$pcf->{TOOLCHAIN_PATH}/bin/$pcf->{TOOLCHAIN_PREFIX}gcc"
+    }
+
+}
+
+sub mk_rpm_dirs
+{
+    my($rpmdir, $rpmdb, $dev_image, $tmppath) = @_;
+
+    # make the basic rpm directory structure
+    system_nb(<<TXT) == 0 or die;
+for i in BUILD RPMS SOURCES SPECS SRPMS
+do
+    mkdir -p $rpmdir/\$i
+done
+for i in $dev_image $rpmdb $tmppath
+do
+    if [ ! -e \$i ]
+    then
+        mkdir -p \$i
+    fi
+done
+TXT
+    # IMPORTANT: make sure users don't install in /
+    if( $dev_image =~ m,^\s*//\s*$, ) {
+        die "dev_image cannot be set to '$dev_image'";
+    }
+    # make sure dev_image is a directory and has write permissions
+    # by the real user id
+    die "dev_image: $dev_image is not a directory" unless -d $dev_image;
+    die "dev_image: $dev_image is not writable by the user"
+                                                   unless -W $dev_image; 
+
+    if(! -f $cf->{rpmdb_nfs_warning} ) {
+        # make sure the rpmdb directory is not an nfs mount
+        my $fstype = cmd_w_to(5, "df -PT $cf->{rpmdb} |tail -1") || "fake nfs";
+        $fstype = (split(/\s+/, $fstype))[1];
+        if($fstype eq 'nfs') {
+            warn(<<TXT);
+
+Ideally the rpm database should not be located in an NFS mounted filesystem. 
+On some systems this may cause cause problems due to filesystem locking
+and this application.  If you have this problem, you'll see error
+messages like: "error: cannot get exclusive lock on ..../Packages"
+
+You may move the database to a local disk by changing the entry in your
+rcfile ($cf->{rcfile}) from $rpmdb
+to somewhere that is not on an NFS filesystem
+ 
+Do you want to continue and attempt to use this NFS area for your rpmdb (y|n)?
+TXT
+            local $_ = <STDIN>;
+            die "Goodbye\n" unless /^y/i;
+            touch($cf->{rpmdb_nfs_warning});
+        }
+    }
+    
+    # initialise the target's rpm database directory if not done before
+    if(! -e "$rpmdb/Packages") {
+        system_nb(<<TXT) == 0 or die;
+set -e
+$cf->{rpm} --dbpath $rpmdb --initdb
+TXT
+    }
+
+    return 1;
+}
+
+sub check_rpm_setup
+{
+    my ($hrpm) = `which rpm`;
+    return 1 if $hrpm =~ m,$cf->{defpfx},;
+  
+    # use the host's rpm to build and install a known version
+    # at this point we haven't parsed any pcf (platform config)
+    # so we write our own
+    $pcf = {};
+    $pcf->{PLATFORM_COMMENT} = 'host support';
+    $pcf->{DISTRO}   = 'dist/lfs-5.1';
+    $pcf->{PLATFORM} = 'host';
+    $pcf->{GNUTARCH} = $cf->{buildarch};
+    $pcf->{LINTARCH} = g2larch($cf->{buildarch});
+    $pcf->{CFGHOST}  = "$cf->{buildarch}-linux";
+
+    # invalidate the cache
+    my $sav = {};
+    my @sav_list = qw/dev_image nodeps sn force reinstall dodrop ldirs
+                     prefix sysconfdir rpmbuild rpm rpmdir rpmdb lpp tmppath/;
+    foreach my $k (@sav_list) { $sav->{$k} = $cf->{$k} }
+    $cf->{dev_image}     = "";
+    $cf->{nodeps}        = 1;
+    pkg_cache_init();
+    $cf->{sn}            = "rpm-fs.spec";
+    $cf->{force}         = 0;
+    $cf->{reinstall}     = 1;
+    $cf->{dodrop}        = 'no';
+    $cf->{prefix}        = "$cf->{defpfx}/usr";
+    $cf->{sysconfdir}    = "$cf->{defpfx}/etc";
+    chomp($cf->{rpmbuild} = `which rpmbuild 2>/dev/null` || "rpm\n");
+    $cf->{rpm}           = "rpm";
+    $cf->{lpp}           = "/tmp";
+    $cf->{ldirs}         = $cf->{lpp};
+    $cf->{tmppath}       = "/tmp";
+
+    # we need to make a known rpm using the host's rpm first of all
+    # we use a bogus database area
+    $cf->{rpmdir} = "/tmp/rpm-$cf->{username}";    
+    $cf->{rpmdb}  = "$cf->{rpmdir}/rpmdb";
+    mk_rpm_dirs($cf->{rpmdir}, $cf->{rpmdb}, "$cf->{rpmdir}/rootfs",$cf->{tmppath});
+    f_buildrpms() or die;
+    # put back the database information
+    my @rpms = glob("$cf->{rpmdir}/RPMS/$pcf->{LINTARCH}/$cf->{sn}-*");
+    my $rpm  = $rpms[0] or die  "could not glob rpm in: "
+                        . "$cf->{rpmdir}/RPMS/$pcf->{LINTARCH}/$cf->{sn}-*";
+    my $cmd  = "$cf->{sudo} $sav->{rpm} --dbpath $cf->{defpfx}/var/lib/rpm ";
+       $cmd .= "-Uv --justdb --notriggers --noscripts --nodeps ";
+       $cmd .= "$rpm";
+    print "$cmd\n";
+    system_nb($cmd);
+    system_nb("rm -rf $cf->{rpmdir}") == 0 or die;
+
+    # The existing host rpms are possibly invalid now so remove them
+    system_nb("rm -f $cf->{defpfx}/usr/src/rpm/RPMS/$pcf->{LINTARCH}/*");
+
+    # restore cf
+    foreach my $k (@sav_list) {
+        $cf->{$k} = $sav->{$k}
+    }
+    undef $sav;
+
+    return 1;
+}
+
+#
+# Check that the user has sudo permission to run rpm as root without
+# the need to enter a password.  If this has not been correctly configured
+# then ask the user to get this added to the sudoers file and abort.
+#
+sub check_sudo_setup
+{
+    my ($hostrpm) = `PATH=$cf->{path_std} ; which rpm`;
+    chomp($hostrpm);
+    my $s = `yes "" | sudo -S -l 2>&1`;
+    my $hostrpm_ok = $s =~ /(?:\(root\)|\(ALL\))\s+NOPASSWD:.*[\s,]$hostrpm/m;
+    my $fsrpm_ok   = $s =~ /(?:\(root\)|\(ALL\))\s+NOPASSWD:.*[\s,]$cf->{rpm}/m;
+    my $all_ok     = $s =~ /(?:\(root\)|\(ALL\))\s+NOPASSWD:\s+ALL/m,;
+    return 1 if $all_ok;
+    return 1 if $hostrpm_ok && $fsrpm_ok;
+
+    die <<TXT;
+
+I ran the command: sudo -S -l which returned:
+
+$s
+This means you don't have sudo permission to execute rpm commands as root
+without a password.  This is needed for this build script to operate correctly.
+
+To configure this, as root using the command "/usr/sbin/visudo", 
+and add the following line in the User privilege section:
+
+$cf->{username} ALL = NOPASSWD: $hostrpm, $cf->{rpm}
+
+TXT
+die;
+    return 1;
+}
+
+sub check_dirs
+{
+    # we share the download cache area, all must be able to write there
+    if(! -e $cf->{lpp} ) {
+        system_nb("mkdir -p $cf->{lpp}") == 0 or die(<<TXT);
+
+Cannot create the download directory:
+ $cf->{lpp}
+
+Either change to a global directory you have write permissions to,
+or create it as root.  Please set the permissions to 777
+
+TXT
+    }
+    my $lpp_mode = (stat("$cf->{lpp}"))[2];
+    unless( ($lpp_mode & 040777) == 040777 ) {
+        chmod(0777, $cf->{lpp}) == 1  or die <<TXT;
+
+Build script aborting as the lpp directory is not configured properly.
+Directory: $cf->{lpp} must exist with read, write, and search
+permissions for owner, group, and world, i.e. drwxrwxrwx
+
+TXT
+    }
+    if( -d "$cf->{top}/pkgs" ) {
+        print "Updating lpp from local packages\n";
+        my ($path, $fn);
+        foreach $path ( glob("$cf->{top}/pkgs/*") ) {
+            ($fn) = $path =~ m,([^/]+)$,;  
+            next if -f "$cf->{lpp}/$fn";
+            system_nb("set -x; cp -dp $path $cf->{lpp}/$fn") == 0 or die;
+        }
+        system_nb("rm -rf $cf->{top}/pkgs 2>/dev/null");
+    }
+    return 1;
+}
+
+sub check_spoofing
+{
+    die("spoofing is not set up") unless -e $cf->{spoof_path};
+    return 1;
+}
+
+sub check_toolchain_setup
+{
+    my ($pcf) = @_;
+
+    # test whether the compiler is present on the system, and if
+    # not then install it (this is one package we can't build)
+    # not deal with x86 isms in a crude way (subst)
+    if($pcf->{TOOLCHAIN}) {
+        my $tc_rpm = $pcf->{TOOLCHAIN};
+        $tc_rpm =~ s/\.\w+\.rpm//;
+        `$cf->{rpm} -q $tc_rpm 2>/dev/null`;
+        if(! -e  "$pcf->{TOOLCHAIN_PATH}/bin/$pcf->{TOOLCHAIN_PREFIX}gcc"
+           || `$cf->{rpm} -q $tc_rpm 2>/dev/null` =~ m,is not installed,
+           || $cf->{dltest}) {
+           $pcf->{TOOLCHAIN} =~ s,i\d86,$cf->{buildarch}, 
+                                                  if $cf->{buildarch} eq 'ppc';
+            print "Installing: $pcf->{TOOLCHAIN}\n" unless $cf->{dltest};
+            my $tc = get_file("$pcf->{TOOLCHAIN}", $cf, 1);
+            return 1 if $cf->{dltest};
+            warn("Can't get: $pcf->{TOOLCHAIN}"), die unless $tc;
+
+            my $cmd =   "$cf->{sudo} $cf->{rpm} "
+                   . "--dbpath $cf->{defpfx}/var/lib/rpm "
+                   . "-ivh --force --ignorearch $tc";
+            print "$cmd\n";
+            return 1 if $echo;
+
+            # switch stdout with stderr and run the command to capture stderr
+            my $err = `$cmd 3>&1 1>&2 2>&3 3>&-`;
+            if($? && $err !~ m,is already installed,) { 
+                die "Failed to install: $pcf->{TOOLCHAIN}:\n$err\n"
+            }
+        }
+    }
+
+    # check that this toolchain can be accessed without the abs path
+    my $gcc_path = `which $pcf->{TOOLCHAIN_PREFIX}gcc 2>/dev/null` 
+                                                                or die(<<TXT);
+
+$pcf->{TOOLCHAIN_PREFIX}gcc is not in your PATH environment:
+
+PATH=$ENV{PATH}
+
+TXT
+    chomp($gcc_path);
+
+    # no more checks if purely through our PATH
+    return 1 if ! $pcf->{TOOLCHAIN_PATH};
+
+    # short hand for a long name
+    my $tc_exe =  "$pcf->{TOOLCHAIN_PATH}/bin/$pcf->{TOOLCHAIN_PREFIX}gcc";
+
+    # check that there is a compiler at the specified path
+    die(<<TXT) unless -x $tc_exe;
+
+Cannot find executable toolchain:
+
+$tc_exe
+
+Please check your configuration.
+
+TXT
+
+    # make sure that the gcc in the path and tc_exe are the same
+    die(<<TXT) if $gcc_path ne $tc_exe;
+
+Found $pcf->{TOOLCHAIN_PREFIX}gcc through your PATH at:
+
+$gcc_path
+
+Expected to find it at:
+
+$tc_exe
+
+PATH=$ENV{PATH}
+
+TXT
+    return 1;
+}
+
+sub check_merge_updates
+{
+    my ($pcf) = @_;
+    my $spec;
+    foreach my $dir ( $ENV{PLATFORM_PATH}, $ENV{TOP} ) {
+        next unless -d "$dir/merge";
+        $spec = get_spec("merge") unless $spec;
+        local $_ = `find $dir/merge -newer $spec 2>/dev/null`;
+        warn "newer than $spec: $_\n" if $_ && $cf->{verbose};
+        touch($spec), last if $_;
+    }
+    return 1;
+}
+
+# we have to be very careful with packages that have a
+# prefix of effectively /, if the package builds wrongly
+# it will scribble of the host's installation.  For this
+# reason we check carefully that this cannot happen
+# This is to handle building packages that need to be installed
+# on the host under {defpfx}
+sub check_host_clobber
+{
+    my ($rpm) = @_;
+    my ($len, $cmd, $pkg_prefix, $inst_pfx, $path, $line);
+
+    $pkg_prefix = `$cf->{rpm} -qp --queryformat "%{PREFIXES}\n" $rpm`;
+    chomp($pkg_prefix);
+    $pkg_prefix  = '' if $pkg_prefix eq '(none)';
+    $inst_pfx = $cf->{dev_image};
+    $inst_pfx =~ s,/+,/,g;
+
+    # if a relocatable package, and were installing in our project area
+    # then we can bypass this strict test
+    $len = length($cf->{top});
+    if($pkg_prefix && unpack("A$len", $inst_pfx) eq $cf->{top}) {
+       warn("skip host clobber check, pkg_prefix=$pkg_prefix inst=$inst_pfx\n")
+                                                              if $cf->{verbose};
+       return 1;
+    }
+
+    # if removing the install prefix results in anything in getting installed
+    # under anything except /opt, /tmp, /home exit in a big hurry.
+    $len = length($pkg_prefix);
+    $cmd = "$cf->{rpm} -qlp $rpm";
+    open(CMD, "$cmd |") or die("can't fork $cmd: $!\n");
+    while(defined($line = <CMD>)) {
+        chomp($line);
+        last if $line eq '(contains no files)';
+        ($path) = unpack ("x$len A*", $line);
+        $path   = $inst_pfx . $path;
+        $path   =~ s,/+,/,g;
+        if( $path !~ m,^/(?:opt|tmp|home), ) {
+            die("ERROR: $rpm\nwould clobber $path\n");
+        }
+    }
+    return 1;
+}
+
+sub summary
+{
+    return 1 unless $cf->{mode} eq 'buildrpms';
+
+    my $edate = localtime();
+    my $elapsed  = time() - $cf->{stime};
+    $cf->{normal_exit} = 0 if $cf->{pkg_build_failures};
+
+    print <<TXT;
+
+Started: $cf->{sdate}
+Ended:   $edate
+Elapsed: $elapsed seconds
+
+TXT
+
+if( $cf->{normal_exit} ) {
+    print "Build Succeeded\n\n";
+    return 1;
+}
+if( $cf->{pkg_build_failures}) {
+    my $desc = $cf->{dltest} ? "would not have complete downloads available" 
+                             : "failed to build";
+    print "These packages $desc:\n$cf->{pkg_build_failures}\n";
+}
+print "Build Failed\n\n";
+    return;
+
+}
+
+sub sig_handler
+{
+    warn @_;
+    $cf->{normal_exit} = 0;
+    summary();
+    my $logfile = $cf->{redirected};
+    redirect();
+    warn "Exiting on error or interrupt\n";
+    warn "Please see $logfile for details\n" if $logfile;
+    exit(1);
+}
+
+sub ltib_host_config
+{
+    my $cf_main = {};
+
+    my $hostpath = "$cf->{top}/config/platform/host";
+
+    # so you want to add some new host packages
+    system_nb(<<TXT) == 0 or die;
+set -ex
+cd $hostpath
+PLATFORM=$pcf->{PLATFORM}
+PLATFORM=\${PLATFORM:-unknown}
+if [ ! -f .config ]
+then
+    if [ -f \${PLATFORM}.config ]
+    then 
+        cp \${PLATFORM}.config .config
+    else
+        cp $cf->{hostconfig} .config
+    fi
+fi
+if [ "$cf->{configure}" = "1" ]
+then
+    mconf main.lkc
+fi
+if [ -f .config ]
+then
+    cp .config \${PLATFORM}.config
+fi
+TXT
+    $cf->{preconfig} = "$hostpath/.config";
+    die("No config saved") unless -f $cf->{preconfig};
+    return 1;
+}
+
+
+sub ltib_config
+{
+    # this is a special case that should not really exist
+    return if $cf->{preconfig} && $cf->{dltest};
+
+    my $cf_main = {};
+    my ($plat_dir, $atime, $mtime);
+
+    # this is the normal path after a choice for the target has been set
+    if( ! $cf->{configure} && ! $cf->{preconfig} && ! $cf->{profile}
+                                                 && -f "$cf->{top}/.config" ) {
+        $cf_main = parse_dotconfig("$cf->{top}/.config");
+        $plat_dir = $cf_main->{PLATFORM_DIR} or die "no PLATFORM_DIR";
+
+        if(-f "$plat_dir/.config") {
+            # The normal case where the .config is new than the defconfig
+            if(-M "$plat_dir/.config" <=  -M "$plat_dir/defconfig") {
+                $cf->{preconfig} = "$plat_dir/.config";
+                return 1;
+            }
+
+            # the defconfig is newer than the .config, this is normally
+            # because someone else has updated cvs.  In this case, use
+            # the new defconfig.  Note mconf/conf use defconfig if .config
+            # is missing.
+            warn("Using update $plat_dir/defconfig\n");
+            rename("$plat_dir/.config", "$plat_dir/.config.$cf->{stime}")
+                                                     if -f "$plat_dir/.config";
+            $cf->{batch} = 1;
+
+        } else {
+            # the platform's .config is missing, need to re-select the
+            # platform again
+            unlink "$cf->{top}/.config";
+        }
+    }
+
+    # In batch mode, we don't want any user interaction
+    $cf->{conf} = $cf->{batch} ? "yes '' | conf" : "mconf";
+
+    # if passed a preconfig, we use this as a starting point
+    if($cf->{preconfig} ) {
+        my $th = parse_dotconfig($cf->{preconfig});
+        $plat_dir = "config/platform/$th->{PLATFORM}";
+        undef $th;
+
+        # auto-generate the main config file
+        mk_main_conf() or die;
+
+        # this is here to take care of the situation where you
+        # run an autobuild (--preconfig x --profile y --batch)
+        # and you then want to run a configure on a subsequent run
+        my $platform = "";
+        open(MC, $cf->{mainlkc}) or die "open $cf->{mainlkc} : $!";
+        while(<MC>) {
+            if( m,$plat_dir"\s+if\s+(\w+), ) {
+                $platform = "CONFIG_$1";
+                last;
+            }
+        } 
+        close MC;
+        die "No match for $plat_dir in $cf->{mainlkc}" unless $platform;
+        open(TOPCF, ">$cf->{top}/.config") or die("open $cf->{top}/.config:$!");
+        print TOPCF "$platform=y\n";
+        print TOPCF "CONFIG_PLATFORM_DIR=\"$plat_dir\"\n";
+        close TOPCF;
+
+    } else {
+        # Choose the system if not already chosen
+        if(! -f "$cf->{top}/.config") {
+            mk_main_conf() or die;
+            system_nb("$cf->{conf} $cf->{mainlkc}") == 0 or die;
+        }
+        # Source the .config file and turn into a hash
+        $cf_main = parse_dotconfig(".config");
+    }
+    
+    # Run the platform specific config
+    $plat_dir ||= $cf_main->{PLATFORM_DIR};
+
+    # preconfigs/profiles effectively invalidate the .config.old output
+    # from mconf/conf.  We save .config to restore it later as .config.old
+    if( ($cf->{preconfig} || $cf->{profile}) && -f "$plat_dir/.config") {
+        ($atime, $mtime) = (stat("$plat_dir/.config"))[8,9];
+        system_nb("cp $plat_dir/.config $plat_dir/.config.$cf->{stime}");
+    }
+
+    system_nb(<<TXT) == 0 or die;
+set -ex
+if [ -n "$cf->{preconfig}" ]
+then
+    cp $cf->{preconfig} $plat_dir/.config
+fi
+if [ -n "$cf->{profile}" ]
+then
+    cat  $cf->{profile} >> $plat_dir/.config
+fi
+cd $plat_dir
+$cf->{conf} main.lkc
+cp .config defconfig.dev
+TXT
+    $cf->{preconfig} = "$plat_dir/.config";
+    if(-f "$plat_dir/.config.$cf->{stime}") {
+        rename("$plat_dir/.config.$cf->{stime}", "$plat_dir/.config.old");
+        utime($atime, $mtime, "$cf->{preconfig}.old")
+                   or warn "could not reset times on $cf->{preconfig}.old: $!";
+    }
+    $cf->{mode} eq 'config' ? exit 0 : return 1;
+}
+
+sub mk_main_conf
+{
+    my ($dir, $ent, $p, $mcf) = ("config/platform", "", {});
+    my $platforms = (); 
+    opendir(DIR, $dir) or warn("can't open $dir: $!"), return;
+    while( defined($ent = readdir(DIR)) ) {
+        next unless -d "$dir/$ent";
+        next if $ent eq 'CVS' || $ent eq '.' || $ent eq '..';
+        $p->{$ent} = 0;
+    }
+    closedir(DIR);
+    local $/ = "";
+    foreach my $mcf (keys %$p) {
+        open(CF, "$dir/$mcf/main.lkc") 
+                     or warn("mk_main_conf: skipping config dir: $mcf\n"), next;
+        while(<CF>) {
+            m,^config PLATFORM_COMMENT.+default\s+(.+)\n,ms && do {
+                $p->{$mcf} = $1;
+                last
+            };
+        }
+        close CF;
+    }
+    open(MCF, ">$cf->{mainlkc}") or die "open $cf->{mainlkc} : $!\n";
+    print MCF <<TXT;
+config CONFIG_TITLE
+    string
+    default "GNU/Linux Target Image Builder : Platform Selection"
+
+mainmenu "GNU/Linux Target Image Builder main menu"
+
+choice
+    prompt "Platform choice"
+    help
+       This menu will let you choose from a list of boards
+
+TXT
+    foreach $mcf (sort keys %$p) {
+        next if ! $p->{$mcf};
+        print MCF "    config PLATFORM_$mcf\n";
+        print MCF "        bool $p->{$mcf}";
+    }
+    print MCF <<TXT;
+endchoice
+
+config PLATFORM_DIR
+    string
+TXT
+    foreach $mcf (keys %$p) {
+        print MCF "    default \"$dir/$mcf\" if PLATFORM_$mcf\n";
+    }
+    close MCF;
+
+    return 1;
+}
+
+sub clear_transient_configs
+{
+    my $file = $cf->{preconfig};
+    my ($atime, $mtime) = (stat($file))[8,9];
+    local $^I = '.bak';
+    @ARGV = $file;
+    while(<>) {
+        s,^(\w+WANT_CF)=y,# $1 is not set,;
+        s,^(\w+LEAVESRC)=y,# $1 is not set,;
+        print;
+    }
+    utime($atime, $mtime, $file) or warn "could not reset times on $file: $!";
+}
+
+sub f_shell
+{
+    print "Entering ltib shell mode, type 'exit' to quit\n";
+    my $rc = 'ltib_bashrc';
+    open(RC, ">$rc") or die("can't open $rc for write: $!");
+    print RC <<TXT;
+export PS1="LTIB> "
+alias rpm="rpm --dbpath $cf->{rpmdb}"
+
+# Target man pages
+function tman()
+{
+    export MANPATH=\$DEV_IMAGE/man:\$DEV_IMAGE/usr/man:\$DEV_IMAGE/usr/share/man:\$DEV_IMAGE/usr/local/man
+    man \$1
+}
+TXT
+    close RC;
+    system_nb("/bin/bash --rcfile $rc");
+    unlink $rc;
+    exit 0;
+}
+
+sub f_shell_bug
+{
+    print "Entering ltib shell mode, type 'exit' to quit\n";
+    my $rc = 'ltib_bashrc';
+    open(RC, ">$rc") or die("can't open $rc for write: $!");
+    print RC <<TXT;
+export PS1="LTIB> "
+alias rpm="rpm --dbpath $cf->{rpmdb}"
+
+# Target man pages
+function tman()
+{
+    export MANPATH=\$DEV_IMAGE/man:\$DEV_IMAGE/usr/man:\$DEV_IMAGE/usr/share/man:\$DEV_IMAGE/usr/local/man
+    man \$1
+}
+TXT
+    close RC;
+    system_nb("/bin/bash --rcfile $rc bug_build.sh");
+    unlink $rc;
+    exit 0;
+}
+
+sub redirect
+{
+    return 1 if $cf->{noredir};
+
+    my ($file) = @_;
+    local $^W = 0;
+    if($file) {
+        if( ! $cf->{redirected} ) {
+            open(SAVEOUT, ">&STDOUT");
+            open(SAVEERR, ">&STDERR");
+            if(0) {
+              print SAVEOUT "hack to prevent used only once warning\n";
+              print SAVEERR "hack to prevent used only once warning\n";
+            }
+        }
+        open(STDOUT, ">>$file") or die("can't redirect stderr to $file: $!");
+        open(STDERR, ">&STDOUT") or die("can't dup stderr to stdout");
+        select STDERR; $| = 1;
+        select STDOUT; $| = 1;
+        $cf->{redirected} = $file;
+        return 1;
+    }
+    return 1 unless $cf->{redirected};
+    open(STDOUT, ">&SAVEOUT");
+    open(STDERR, ">&SAVEERR");
+    $cf->{redirected} = "";
+    return 1;
+}
+
+sub expand_spec
+{
+    my ($specpath, $specinpath, $tmplpath) = @_;
+    open(SPECIN, "$specinpath")   or die("can't open $specpath.in: $!");
+    open(TMPL, $tmplpath)         or die("can't open $tmplpath: $!");
+    open(SPEC, ">$specpath")      or die("can't open $specpath for write: $!");
+    while(<SPECIN>) {
+        print SPEC;
+    }
+    close(SPECIN);
+    while(<TMPL>) {
+        print SPEC;
+    }
+    close(TMPL);
+    close(SPEC);
+
+    return 1;
+}

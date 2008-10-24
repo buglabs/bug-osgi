@@ -1,0 +1,62 @@
+<project name="build-com.buglabs.dragonfly" default="build">
+	<property file="../system.properties" />
+	<property name="meta.project" value="com.buglabs.dragonfly" />
+	<property name="project" value="com.buglabs.dragonfly.feature" />
+
+	<!--
+	<buildnumber file="com.buglabs.dragonfly.buildnum" />
+	<property name="product.version" value="1.0" />
+	<property name="meta.project.version" value="${build.number}" />
+	-->
+	<property name="deploy.dir" location="/opt/cruisecontrol-bin-2.5/artifacts/${meta.project}/current" />
+	<property name="CCBaseDirectory" location="./.." />
+	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
+	<property name="eclipse.file" value="${user.home}/com.eclipse.sdk/eclipse-lin.tar.gz" />
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="/usr/share/ant/lib/ant-contrib-0.6.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="build" depends="clean,setup">
+		<!-- Get the latest from CVS -->
+		<cvs cvsroot="${cvs.public}" package="${project}" command="co" tag="${build.level}" dest="${checkout.dir}" />
+
+		<!-- check if eclipse binary exists, if it does, copy to tmp otherwise get it -->
+		<if>
+			<available file="${eclipse.file}" type="file" />
+			<then>
+				<echo message="${eclipse.file} exists, copying..." />
+				<copy todir="${checkout.dir}/com.eclipse.sdk">
+					<fileset file="${eclipse.file}" />
+				</copy>
+			</then>
+			<else>
+				<echo message="${eclipse.file} does not exist, getting file..." />
+				<mkdir dir="${eclipse.dir}" />
+				<get src="${svn}/eclipse-lin.tar.gz" dest="${eclipse.file}" username="${svn.username}" password="${svn.password}" />
+
+				<copy todir="${checkout.dir}/com.eclipse.sdk">
+					<fileset file="${eclipse.file}" />
+				</copy>
+			</else>
+		</if>
+
+		<exec dir="${checkout.dir}/com.eclipse.sdk" executable="tar">
+			<arg line="xfzv eclipse-lin.tar.gz" />
+		</exec>
+
+		<!-- Call the target that does everything -->
+		<ant antfile="build.xml" target="bundles.all" dir="${checkout.dir}/${project}" />
+	</target>
+
+
+	<target name="clean">
+		<delete dir="${checkout.dir}" />
+	</target>
+
+	<target name="setup">
+		<mkdir dir="${checkout.dir}" />
+	</target>
+</project>

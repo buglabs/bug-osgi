@@ -1,0 +1,29 @@
+<cruisecontrol>
+	<property file="./system.properties" />
+	<property name="project.name" value="com.buglabs.bug.ltib"/>
+	
+	<project name="${project.name}" buildafterfailed="false">
+		<listeners>
+			<currentbuildstatuslistener file="logs/${project.name}/status.txt" />
+		</listeners>
+		<bootstrappers></bootstrappers>
+
+		<modificationset quietperiod="${quietperiod}">
+			<cvs cvsroot="${cvs.internal}" module="com.freescale.ltib2" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.sun.phoneme_advanced" tag="${build.level}" />
+		</modificationset>
+
+		<schedule interval="${scan_interval}">
+			<ant anthome="/usr" buildfile="${project.dir}/${project.name}.xml" target="build" uselogger="true" usedebug="false"></ant>
+		</schedule>
+
+		<log logdir="logs/${project.name}" />
+
+		<publishers>
+			<artifactspublisher dir="${checkout.dir}/${project.name}/dist" dest="artifacts/${project.name}" />
+			<antpublisher buildfile="toolbox/symlink.xml">
+             	<property name="ccdir" value="${ccdir}"/>
+            </antpublisher>
+		</publishers>
+	</project>
+</cruisecontrol>

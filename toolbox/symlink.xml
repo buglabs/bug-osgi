@@ -1,0 +1,9 @@
+<project name="symlink" default="symlink">
+  <property environment="env" />
+  <target name="symlink">
+    <symlink   
+      link="${ccdir}/artifacts/${projectname}/current"  
+      resource="${ccdir}/artifacts/${projectname}/${cctimestamp}"  
+      overwrite="true"/>
+  </target>
+</project>

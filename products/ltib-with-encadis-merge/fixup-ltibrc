@@ -1,0 +1,3 @@
+#!/bin/zsh
+
+sed -i "s;^#%dev_image\$;%dev_image\n$LTIB_ROOTFS\n\n;" $LTIB_BUILD/.ltibrc

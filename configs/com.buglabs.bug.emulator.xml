@@ -1,0 +1,36 @@
+<cruisecontrol>
+	<property file="./system.properties" />
+	<property name="project.name" value="com.buglabs.bug.emulator" />
+
+	<project name="${project.name}" buildafterfailed="false">
+		<listeners>
+			<currentbuildstatuslistener file="logs/${project.name}/status.txt" />
+		</listeners>
+		<bootstrappers></bootstrappers>
+
+		<modificationset quietperiod="${quietperiod}">
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.module" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.service" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.program" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.event" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.module.gps" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.module.lcd" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.module.camera" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.common" tag="${build.level}" />
+			<cvs cvsroot="${cvs.internal}" module="com.buglabs.bug.bmi" tag="${build.level}" />
+		</modificationset>
+
+		<schedule interval="${scan_interval}">
+			<ant anthome="/usr" buildfile="${project.dir}/${project.name}.xml" target="build" uselogger="true" usedebug="false"></ant>
+		</schedule>
+
+		<log logdir="logs/${project.name}" />
+
+		<publishers>
+			<artifactspublisher dir="${checkout.dir}/${project.name}/dist" dest="artifacts/${project.name}" />
+			<antpublisher buildfile="toolbox/symlink.xml">
+             	<property name="ccdir" value="${ccdir}"/>
+            </antpublisher>
+		</publishers>
+	</project>
+</cruisecontrol>

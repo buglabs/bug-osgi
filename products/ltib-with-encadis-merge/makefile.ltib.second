@@ -1,0 +1,13 @@
+
+.phony=all
+
+LTIB_COMMAND=LANG=C BUILD_LEVEL=$(BUILD_LEVEL) BUILD_NUMBER=$(BUILD_NUMBER) CHECKOUT_DIR=$(CHECKOUT_DIR) LTIB_BUILD=$(LTIB_BUILD) LTIB_ROOT=$(LTIB_ROOT) LTIB_ROOTFS=$(LTIB_ROOTFS) JAVA_HOME=$(JAVA_HOME) ./ltib --noredir --verbose
+
+all:
+	$(LTIB_COMMAND) --mode shell < $(BUILD_SOURCE)/ltib-shell-script1
+	$(LTIB_COMMAND) --mode shell < $(BUILD_SOURCE)/ltib-shell-script2
+	$(LTIB_COMMAND) --mode shell < $(BUILD_SOURCE)/ltib-shell-script3
+	$(LTIB_COMMAND) --preconfig config/platform/imx31ads/defconfig_bug --mode scinstall -p kernel-2.6.19-mx.spec --batch
+	$(LTIB_COMMAND) --preconfig config/platform/imx31ads/defconfig_bug --mode scdeploy -p kernel-2.6.19-mx.spec --batch
+	$(LTIB_COMMAND) -p fbprogress.spec
+	make -C $(LTIB_ROOTFS)/lib/modules -f $(BUILD_SOURCE)/makefile.dolink

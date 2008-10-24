@@ -1,0 +1,224 @@
+<!-- 
+Script that builds Dragonfly SDK for all three platforms
+
+This script first executes build_components target which builds emulator, cte and dragonfly ui.
+Then script fill unizp plugins and features directories to a tmp folder from which these directories
+will be copied to extracted distribution of eclipse for Linux, Mac OS X and Windows.
+-->
+<project name="build-com.buglabs.sdk" default="build">
+	<property file="../system.properties" />
+	<property name="meta.project" value="com.buglabs.dragonfly" />
+	<buildnumber file="com.buglabs.dragonfly.buildnum" />
+	<property name="meta.project.version" value="${build.number}" />
+	<property name="build.type" value="${build.letter}" />
+	<property name="product.version" value="1.0.0." />
+	<property name="sdk.build.dir" value="${checkout.dir}/com.buglabs.sdk/dist" />
+	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
+	<tstamp/>
+        <property name="build.id" value="${build.number}_${build.letter}${DSTAMP}${TSTAMP}" />
+	<property name="run.dir" location="${basedir}/.." />
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="/usr/share/ant/lib/ant-contrib-0.6.jar" />
+		</classpath>
+	</taskdef>
+
+	<!-- builds eclipse with SDK for each OS -->
+	<target name="build" depends="build_components,get_eclipse">
+		<!-- unzip created features and plugins to be used in platform specific Eclipse distro -->
+		<unzip
+			src="${checkout.dir}/${meta.project}.feature/dist/${meta.project}.feature-${build.id}.zip"
+			dest="${sdk.build.dir}/tmp" />
+
+		<!-- LINUX BUILD -->
+		<!-- copy linux eclipse -->
+		<copy todir="${sdk.build.dir}">
+			<fileset dir="${eclipse.dir}.lin" />
+		</copy>
+
+		<!-- uncompress eclipse -->
+		<exec dir="${sdk.build.dir}" executable="tar">
+			<arg line="xfzv eclipse-lin.tar.gz" />
+		</exec>
+
+		<!-- copy plugins and features directory to uncompressed eclipse directory -->
+		<copy todir="${sdk.build.dir}/eclipse">
+			<fileset dir="${sdk.build.dir}/tmp/eclipse" />
+		</copy>
+
+		<!-- create a new tar file with dragonfly plugins and features -->
+		<exec dir="${sdk.build.dir}" executable="zip">
+			<arg line="-r dragonfly-lin-${product.version}${build.id}.zip eclipse" />
+		</exec>
+
+		<!-- delete linux specific tar -->
+		<delete file="${sdk.build.dir}/eclipse.tar.gz"/>
+		<delete dir="${sdk.build.dir}/eclipse"/>
+
+		<!-- MAC BUILD -->
+		<copy todir="${sdk.build.dir}">
+			<fileset dir="${eclipse.dir}.mac" />
+		</copy>
+
+		<exec dir="${sdk.build.dir}" executable="tar">
+			<arg line="xfzv eclipse-mac.tar.gz" />
+		</exec>
+
+		<copy todir="${sdk.build.dir}/eclipse">
+			<fileset dir="${sdk.build.dir}/tmp/eclipse" />
+		</copy>
+
+		<exec dir="${sdk.build.dir}" executable="zip">
+			<arg line="-r dragonfly-mac-${product.version}${build.id}.zip eclipse" />
+		</exec>
+
+		<!-- delete mac specific tar -->
+		<delete file="${sdk.build.dir}/eclipse.tar.gz"/>
+		<delete dir="${sdk.build.dir}/eclipse"/>
+
+		<!-- WINDOWS BUILD -->
+		<copy todir="${sdk.build.dir}">
+			<fileset dir="${eclipse.dir}.win" />
+		</copy>
+
+		<exec dir="${sdk.build.dir}" executable="tar">
+			<arg line="xfzv eclipse-win.tar.gz" />
+		</exec>
+
+		<copy todir="${sdk.build.dir}/eclipse">
+			<fileset dir="${sdk.build.dir}/tmp/eclipse" />
+		</copy>
+
+		<exec dir="${sdk.build.dir}" executable="zip">
+			<arg line="-r dragonfly-win-${product.version}${build.id}.zip eclipse" />
+		</exec>
+
+		<!-- delete all files except dragonfly zips of eclipse with Dragonfly -->
+		<delete dir="${sdk.build.dir}/eclipse"/>
+
+		<delete includeemptydirs="true">
+			<fileset dir="${sdk.build.dir}">
+				<exclude name="dragonfly*" />
+			</fileset>
+		</delete>
+
+		<mkdir dir="${run.dir}/artifacts/com.buglabs.sdk/${product.version}${build.id}" />
+
+		<copy todir="${run.dir}/artifacts/com.buglabs.sdk/${product.version}${build.id}">
+			<fileset dir="${checkout.dir}/com.buglabs.sdk/dist" />
+		</copy>
+
+		<exec dir="${run.dir}/artifacts/com.buglabs.sdk/" executable="rm">
+			<arg line="current" />
+		</exec>
+
+		<symlink link="${run.dir}/artifacts/com.buglabs.sdk/current" resource="${run.dir}/artifacts/com.buglabs.sdk/${product.version}${build.id}"/>
+	</target>
+
+	<!-- retrieves ecilpse tar files for each OS -->
+	<target name="get_eclipse">
+		<if>
+			<available file="${eclipse.dir}.lin/eclipse-lin.tar.gz" type="file"/>
+			<then>
+				<echo message="${eclipse.dir}.lin/eclipse-lin.tar.gz exists..."/>
+			</then>
+			<else>
+				<echo message="${eclipse.dir}.lin/eclipse-lin.tar.gz does not exist, getting file..."/>
+				<mkdir dir="${eclipse.dir}.lin" />
+				<get src="${svn}/eclipse-lin.tar.gz" dest="${eclipse.dir}.lin/eclipse-lin.tar.gz"
+					 username="${svn.username}" 
+                     password="${svn.password}"/>
+			</else>
+		</if>
+
+		<if>
+			<available file="${eclipse.dir}.mac/eclipse-mac.tar.gz" type="file"/>
+			<then>
+				<echo message="${eclipse.dir}/com.eclipse.sdk.mac/eclipse-mac.tar.gz exists..."/>
+			</then>
+			<else>
+				<echo message="${eclipse.dir}.mac/eclipse-mac.tar.gz does not exist, getting file..."/>
+				<mkdir dir="${eclipse.dir}.mac" />
+				<get src="${svn}/eclipse-mac.tar.gz" 
+     				 dest="${eclipse.dir}.mac/eclipse-mac.tar.gz"  
+ 				     username="${svn.username}" 
+                     password="${svn.password}"/>
+			</else>
+		</if>
+
+		<if>
+			<available file="${eclipse.dir}.win/eclipse-win.tar.gz" type="file"/>
+			<then>
+				<echo message="${eclipse.dir}.win/eclipse-win.tar.gz exists..."/>
+			</then>
+			<else>
+				<echo message="${eclipse.dir}.win/eclipse-win.tar.gz does not exist, getting file..."/>
+				<mkdir dir="${eclipse.dir}.win" />
+				<get src="${svn}/eclipse-win.tar.gz" 
+     				 dest="${eclipse.dir}.win/eclipse-win.tar.gz"  
+ 				     username="${svn.username}" 
+                     password="${svn.password}"/>
+			</else>
+		</if>
+	</target>
+
+	<!-- 
+		builds individual components of the SDK, here we need perform task of each project's cruisecontrol publishing manually
+		since we can't call cruisecontrol scripts located in configs directory from this script
+	 -->
+	<target name="build_components" depends="clean,setup">
+		<echo message="Building emulator..." />
+		<ant antfile="./com.buglabs.bug.emulator.xml" target="build" />
+
+		<mkdir dir="${run.dir}/artifacts/com.buglabs.bug.emulator/${product.version}${build.id}" />
+
+		<copy todir="${run.dir}/artifacts/com.buglabs.bug.emulator/${product.version}${build.id}">
+			<fileset dir="${checkout.dir}/${meta.project}/dist" />
+		</copy>
+
+		<exec dir="${run.dir}/artifacts/com.buglabs.bug.emulator/" executable="rm">
+			<arg line="current" />
+		</exec>
+
+		<symlink link="${run.dir}/artifacts/com.buglabs.bug.emulator/current" resource="${run.dir}/artifacts/com.buglabs.bug.emulator/${product.version}${build.id}"/>
+
+		<echo message="Building CTE..." />
+		<ant antfile="./com.buglabs.osgi.concierge.xml" target="build" />
+
+		<mkdir dir="${run.dir}/artifacts/com.buglabs.osgi.concierge/${product.version}${build.id}" />
+
+		<copy todir="${run.dir}/artifacts/com.buglabs.osgi.concierge/${product.version}${build.id}">
+				<fileset dir="${checkout.dir}/com.buglabs.osgi.concierge.feature/dist" />
+		</copy>
+
+		<exec dir="${run.dir}/artifacts/com.buglabs.osgi.concierge/" executable="rm">
+				<arg line="current" />
+		</exec>
+
+		<symlink link="${run.dir}/artifacts/com.buglabs.osgi.concierge/current" resource="${run.dir}/artifacts/com.buglabs.osgi.concierge/${product.version}${build.id}"/>
+
+		<echo message="Building Dragonfly..." />
+		<ant antfile="./com.buglabs.dragonfly.xml" target="build" />
+
+		<mkdir dir="${run.dir}/artifacts/${meta.project}/${product.version}${build.id}" />
+
+		<copy todir="${run.dir}/artifacts/${meta.project}/${product.version}${build.id}">
+			<fileset dir="${checkout.dir}/${meta.project}.feature/dist" />
+		</copy>
+
+		<exec dir="${run.dir}/artifacts/${meta.project}/" executable="rm">
+			<arg line="current" />
+		</exec>
+
+		<symlink link="${run.dir}/artifacts/${meta.project}/current" resource="${run.dir}/artifacts/${meta.project}/${product.version}${build.id}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${sdk.build.dir}" />
+	</target>
+
+	<target name="setup">
+		<mkdir dir="${sdk.build.dir}" />
+	</target>
+</project>

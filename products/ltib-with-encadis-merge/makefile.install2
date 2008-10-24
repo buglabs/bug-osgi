@@ -1,0 +1,10 @@
+
+.phony=install
+
+install:
+	sudo mount -t ext3 $(TARGET)1 /mnt/usbflash
+	sleep 1
+	sudo tar cvf - . --preserve | (cd /mnt/usbflash; sudo tar xvf - --preserve)
+	sync
+	sudo umount /mnt/usbflash
+

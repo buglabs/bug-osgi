@@ -1,0 +1,24 @@
+<project name="build-com.buglabs.buildtest" default="build">
+	<property file="./../system.properties" />
+	<property name="meta.project" value="com.buglabs.buildtest" />
+	<buildnumber file="com.buglabs.buildtest.buildnum" />
+	<property file="com.buglabs.buildtest.buildnum" />	
+	<property name="build.label" value="${build.number}-${build.level}" />
+	
+	<target name="build" depends="clean,makedirs">
+		<!-- Get the latest from CVS -->
+
+		<cvs cvsroot=":pserver:anonymous@lurcher:/root" package="${meta.project}" command="co" tag="${build.level}" dest="${checkout.dir}" />
+
+		<!-- Call the target that does everything -->
+		<ant antfile="build.xml" target="build-everything" dir="${checkout.dir}/${meta.project}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${checkout.dir}/${meta.project}" />
+	</target>
+
+	<target name="makedirs">
+		<mkdir dir="${checkout.dir}/${meta.project}" />
+	</target>
+</project>
