@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG NMEA Parser
+Bundle-SymbolicName: com.buglabs.nmea
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.nmea,
+ com.buglabs.nmea.sentences
