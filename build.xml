@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<project name="com.buglabs.bug.module.gps" basedir=".">
+	<!-- PROJECT CONSTANTS -->
+	<property name="project" value="com.buglabs.bug.module.gps" />
+	<!-- PROJECT IMPORTS -->
+		<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml"/>
+		<import file="${common.ant.file}"/>
+</project>

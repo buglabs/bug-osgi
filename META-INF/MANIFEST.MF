@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG GPS
+Bundle-SymbolicName: com.buglabs.bug.module.gps
+Bundle-Version: 1.0.0
+Bundle-Activator: com.buglabs.bug.module.gps.Activator
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.bug.module.gps.pub,
+ org.osgi.util.position,
+ org.osgi.util.measurement
+Import-Package: org.osgi.framework;version="1.3.0",
+ com.buglabs.module,
+ org.osgi.service.log,
+ org.osgi.util.tracker,
+ com.buglabs.util.trackers,
+ com.buglabs.services.ws,
+ com.buglabs.status,
+ com.buglabs.bug.module.pub,
+ com.buglabs.util,
+ com.buglabs.bug.jni.common,
+ com.buglabs.bug.jni.gps,
+ com.buglabs.nmea,
+ com.buglabs.nmea.sentences,
+ com.buglabs.bug.menu.pub
+Bug-Bundle-Type: Module
+Bug-Module-Id: 0001
+Bug-Module-Driver-Id: bmi_gps
+
