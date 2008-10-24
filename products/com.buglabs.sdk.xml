@@ -8,14 +8,19 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 <project name="build-com.buglabs.sdk" default="build">
 	<property file="../system.properties" />
 	<property name="meta.project" value="com.buglabs.dragonfly" />
+
+
 	<buildnumber file="com.buglabs.dragonfly.buildnum" />
-	<property name="meta.project.version" value="${build.number}" />
-	<property name="build.type" value="${build.letter}" />
-	<property name="product.version" value="1.0.0." />
+
+	<tstamp />
+	<property name="timestamp" value="${DSTAMP}" />
+
+	<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
+	<property name="build.label" value="${mm.version}${build.id}" />
+	<property name="meta.project.version" value="${build.id}" />
+
 	<property name="sdk.build.dir" value="${checkout.dir}/com.buglabs.sdk/dist" />
 	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
-	<tstamp/>
-        <property name="build.id" value="${build.number}_${build.letter}${DSTAMP}${TSTAMP}" />
 	<property name="run.dir" location="${basedir}/.." />
 
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
@@ -23,6 +28,32 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 			<pathelement location="/usr/share/ant/lib/ant-contrib-0.6.jar" />
 		</classpath>
 	</taskdef>
+
+	<path id="svnant.classpath"  >
+		<fileset dir="/usr/share/ant/lib/svn/" >
+        		<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+
+
+	<target name="checkoutAndPrepare">
+		<svn>
+	        	<checkout url="file:///home/akravets/svn/bug/trunk" destPath="${checkout.dir}" />
+    		</svn>
+		<mkdir dir="${checkout.dir}/${project}/build" />
+		<mkdir dir="${checkout.dir}/${project}/build/plugins" />
+		<mkdir dir="${checkout.dir}/${project}/build/features" />
+
+		<copy todir="${checkout.dir}/${project}/build/plugins">
+			<fileset dir="${checkout.dir}" excludes="**/${project}/**"/>
+		</copy>
+
+		<copy todir="${checkout.dir}/${project}/build/features/${project}">
+			<fileset dir="${checkout.dir}/${project}" excludes="**/build/**"/>
+		</copy>
+	</target>
 
 	<!-- builds eclipse with SDK for each OS -->
 	<target name="build" depends="build_components,get_eclipse">
@@ -49,7 +80,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 
 		<!-- create a new tar file with dragonfly plugins and features -->
 		<exec dir="${sdk.build.dir}" executable="zip">
-			<arg line="-r dragonfly-lin-${product.version}${build.id}.zip eclipse" />
+			<arg line="-r dragonfly-lin-${build.label}.zip eclipse" />
 		</exec>
 
 		<!-- delete linux specific tar -->
@@ -57,6 +88,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 		<delete dir="${sdk.build.dir}/eclipse"/>
 
 		<!-- MAC BUILD -->
+<!--
 		<copy todir="${sdk.build.dir}">
 			<fileset dir="${eclipse.dir}.mac" />
 		</copy>
@@ -70,14 +102,14 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 		</copy>
 
 		<exec dir="${sdk.build.dir}" executable="zip">
-			<arg line="-r dragonfly-mac-${product.version}${build.id}.zip eclipse" />
+			<arg line="-r dragonfly-mac-${build.label}.zip eclipse" />
 		</exec>
 
-		<!-- delete mac specific tar -->
 		<delete file="${sdk.build.dir}/eclipse.tar.gz"/>
 		<delete dir="${sdk.build.dir}/eclipse"/>
-
+-->
 		<!-- WINDOWS BUILD -->
+<!--
 		<copy todir="${sdk.build.dir}">
 			<fileset dir="${eclipse.dir}.win" />
 		</copy>
@@ -91,8 +123,9 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 		</copy>
 
 		<exec dir="${sdk.build.dir}" executable="zip">
-			<arg line="-r dragonfly-win-${product.version}${build.id}.zip eclipse" />
+			<arg line="-r dragonfly-win-${build.label}.zip eclipse" />
 		</exec>
+-->
 
 		<!-- delete all files except dragonfly zips of eclipse with Dragonfly -->
 		<delete dir="${sdk.build.dir}/eclipse"/>
@@ -103,9 +136,9 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 			</fileset>
 		</delete>
 
-		<mkdir dir="${run.dir}/artifacts/com.buglabs.sdk/${product.version}${build.id}" />
+		<mkdir dir="${run.dir}/artifacts/com.buglabs.sdk/${build.label}" />
 
-		<copy todir="${run.dir}/artifacts/com.buglabs.sdk/${product.version}${build.id}">
+		<copy todir="${run.dir}/artifacts/com.buglabs.sdk/${build.label}">
 			<fileset dir="${checkout.dir}/com.buglabs.sdk/dist" />
 		</copy>
 
@@ -113,7 +146,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 			<arg line="current" />
 		</exec>
 
-		<symlink link="${run.dir}/artifacts/com.buglabs.sdk/current" resource="${run.dir}/artifacts/com.buglabs.sdk/${product.version}${build.id}"/>
+		<symlink link="${run.dir}/artifacts/com.buglabs.sdk/current" resource="${run.dir}/artifacts/com.buglabs.sdk/${build.label}"/>
 	</target>
 
 	<!-- retrieves ecilpse tar files for each OS -->
@@ -131,7 +164,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
                      password="${svn.password}"/>
 			</else>
 		</if>
-
+		<!--
 		<if>
 			<available file="${eclipse.dir}.mac/eclipse-mac.tar.gz" type="file"/>
 			<then>
@@ -161,6 +194,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
                      password="${svn.password}"/>
 			</else>
 		</if>
+		-->
 	</target>
 
 	<!-- 
@@ -169,11 +203,13 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 	 -->
 	<target name="build_components" depends="clean,setup">
 		<echo message="Building emulator..." />
-		<ant antfile="./com.buglabs.bug.emulator.xml" target="build" />
+		<ant antfile="./com.buglabs.bug.emulator.xml" target="build">
+			<property name="full.sdk.build.id" value="${build.label}"/>
+		</ant>
 
-		<mkdir dir="${run.dir}/artifacts/com.buglabs.bug.emulator/${product.version}${build.id}" />
+		<mkdir dir="${run.dir}/artifacts/com.buglabs.bug.emulator/${build.label}" />
 
-		<copy todir="${run.dir}/artifacts/com.buglabs.bug.emulator/${product.version}${build.id}">
+		<copy todir="${run.dir}/artifacts/com.buglabs.bug.emulator/${build.label}">
 			<fileset dir="${checkout.dir}/${meta.project}/dist" />
 		</copy>
 
@@ -181,14 +217,16 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 			<arg line="current" />
 		</exec>
 
-		<symlink link="${run.dir}/artifacts/com.buglabs.bug.emulator/current" resource="${run.dir}/artifacts/com.buglabs.bug.emulator/${product.version}${build.id}"/>
+		<symlink link="${run.dir}/artifacts/com.buglabs.bug.emulator/current" resource="${run.dir}/artifacts/com.buglabs.bug.emulator/${build.label}"/>
 
 		<echo message="Building CTE..." />
-		<ant antfile="./com.buglabs.osgi.concierge.xml" target="build" />
+		<ant antfile="./com.buglabs.osgi.concierge.xml" target="build">
+			<property name="full.sdk.build.id" value="${build.label}"/>
+		</ant>
 
-		<mkdir dir="${run.dir}/artifacts/com.buglabs.osgi.concierge/${product.version}${build.id}" />
+		<mkdir dir="${run.dir}/artifacts/com.buglabs.osgi.concierge/${build.label}" />
 
-		<copy todir="${run.dir}/artifacts/com.buglabs.osgi.concierge/${product.version}${build.id}">
+		<copy todir="${run.dir}/artifacts/com.buglabs.osgi.concierge/${build.label}">
 				<fileset dir="${checkout.dir}/com.buglabs.osgi.concierge.feature/dist" />
 		</copy>
 
@@ -196,14 +234,16 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 				<arg line="current" />
 		</exec>
 
-		<symlink link="${run.dir}/artifacts/com.buglabs.osgi.concierge/current" resource="${run.dir}/artifacts/com.buglabs.osgi.concierge/${product.version}${build.id}"/>
+		<symlink link="${run.dir}/artifacts/com.buglabs.osgi.concierge/current" resource="${run.dir}/artifacts/com.buglabs.osgi.concierge/${build.label}"/>
 
 		<echo message="Building Dragonfly..." />
-		<ant antfile="./com.buglabs.dragonfly.xml" target="build" />
+		<ant antfile="./com.buglabs.dragonfly.xml" target="build">
+			<property name="full.sdk.build.id" value="${build.label}"/>
+		</ant>
 
-		<mkdir dir="${run.dir}/artifacts/${meta.project}/${product.version}${build.id}" />
+		<mkdir dir="${run.dir}/artifacts/${meta.project}/${build.label}" />
 
-		<copy todir="${run.dir}/artifacts/${meta.project}/${product.version}${build.id}">
+		<copy todir="${run.dir}/artifacts/${meta.project}/${build.label}">
 			<fileset dir="${checkout.dir}/${meta.project}.feature/dist" />
 		</copy>
 
@@ -211,11 +251,11 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 			<arg line="current" />
 		</exec>
 
-		<symlink link="${run.dir}/artifacts/${meta.project}/current" resource="${run.dir}/artifacts/${meta.project}/${product.version}${build.id}"/>
+		<symlink link="${run.dir}/artifacts/${meta.project}/current" resource="${run.dir}/artifacts/${meta.project}/${build.label}"/>
 	</target>
 
 	<target name="clean">
-		<delete dir="${sdk.build.dir}" />
+		<delete dir="${checkout.dir}" />
 	</target>
 
 	<target name="setup">

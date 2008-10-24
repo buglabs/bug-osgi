@@ -1,28 +1,91 @@
-<project name="build-com.buglabs.dragonfly" default="build">
+<project name="build-com.buglabs.dragonfly" default="publish">
 	<property file="../system.properties" />
-	<property name="meta.project" value="com.buglabs.dragonfly" />
-	<property name="project" value="com.buglabs.dragonfly.feature" />
 
-	<!--
-	<buildnumber file="com.buglabs.dragonfly.buildnum" />
-	<property name="product.version" value="1.0" />
-	<property name="meta.project.version" value="${build.number}" />
-	-->
-	<property name="deploy.dir" location="/opt/cruisecontrol-bin-2.5/artifacts/${meta.project}/current" />
-	<property name="CCBaseDirectory" location="./.." />
+	<property name="project.feature" value="com.buglabs.dragonfly.feature" />
+	<property name="meta.project" value="com.buglabs.dragonfly" />
 	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
 	<property name="eclipse.file" value="${user.home}/com.eclipse.sdk/eclipse-lin.tar.gz" />
+	<property name="base.build.dir" location="${basedir}/.." />
 
+	<!-- Setup ant-contrib libraties -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 		<classpath>
 			<pathelement location="/usr/share/ant/lib/ant-contrib-0.6.jar" />
 		</classpath>
 	</taskdef>
 
-	<target name="build" depends="clean,setup">
-		<!-- Get the latest from CVS -->
-		<cvs cvsroot="${cvs.public}" package="${project}" command="co" tag="${build.level}" dest="${checkout.dir}" />
+	<!-- add SVN task -->
+	<path id="svnant.classpath"  >
+		<fileset dir="/usr/share/ant/lib/svn/" >
+        		<include name="*.jar" />
+		</fileset>
+	</path>
 
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+
+
+	<!-- ===================================================================== -->
+	<!-- Build properties setup -->
+	<!-- Depending on how this script is executed build properties are either generated or inhereted from calling script -->
+	<!-- ===================================================================== -->
+	<if>
+		<not>
+      			<isset property="full.sdk.build.id"/>
+		</not>
+      		<then>
+			<echo message="[Build type]: Running individual component build..."/>
+			<buildnumber file="com.buglabs.dragonfly.buildnum" />
+
+			<tstamp />
+			<property name="timestamp" value="${DSTAMP}" />
+
+			<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
+			<property name="build.label" value="${mm.version}${build.id}" />
+			<property name="meta.project.version" value="${build.id}" />
+      		</then>
+		<else>
+			<echo message="[Build type]: Running full SDK component build..."/>
+			<property name="build.id" value="${full.sdk.build.id}"/>
+			<property name="build.label" value="${mm.version}${build.id}" />
+			<property name="meta.project.version" value="${build.id}" />
+		</else>
+    	</if>
+
+	<target name="prepareBuildDirectories">
+		<echo message="Checking out projects from svn and preparing directories..."/>
+		<svn>
+	        	<checkout url="${svn.url}/com.buglabs.dragonfly" destPath="${checkout.dir}/com.buglabs.dragonfly" />
+	        	<checkout url="${svn.url}/com.buglabs.dragonfly.bug.kernel" destPath="${checkout.dir}/com.buglabs.dragonfly.bug.kernel" />
+	        	<checkout url="${svn.url}/com.buglabs.dragonfly.feature" destPath="${checkout.dir}/com.buglabs.dragonfly.feature" />
+	        	<checkout url="${svn.url}/com.buglabs.dragonfly.generators" destPath="${checkout.dir}/com.buglabs.dragonfly.generators" />
+	        	<checkout url="${svn.url}/com.buglabs.dragonfly.ui" destPath="${checkout.dir}/com.buglabs.dragonfly.ui" />
+	        	<checkout url="${svn.url}/com.buglabs.dragonfly.updatesite" destPath="${checkout.dir}/com.buglabs.dragonfly.updatesite" />
+
+	        	<checkout url="${svn.url}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
+	        	<checkout url="${svn.url}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
+	        	<checkout url="${svn.url}/com.buglabs.phoneme.personal" destPath="${checkout.dir}/com.buglabs.phoneme.personal" />
+    		</svn>
+
+		<!-- call CTE's target to checkout needed projects -->
+		<ant antfile="com.buglabs.osgi.concierge.xml" target="checkout" />
+
+		<mkdir dir="${checkout.dir}/${project.feature}/build" />
+		<mkdir dir="${checkout.dir}/${project.feature}/build/plugins" />
+		<mkdir dir="${checkout.dir}/${project.feature}/build/features" />
+
+		<copy todir="${checkout.dir}/${project.feature}/build/plugins">
+			<fileset dir="${checkout.dir}" excludes="**/${project.feature}/**"/>
+		</copy>
+
+		<copy todir="${checkout.dir}/${project.feature}/build/features/${project.feature}">
+			<fileset dir="${checkout.dir}/${project.feature}" excludes="**/build/**"/>
+		</copy>
+	</target>
+
+	<target name="build" depends="clean,setup,prepareBuildDirectories">
+		<echo message="#########################"/>
+		<echo message="Building Dragonfly SDK..."/>	
+		<echo message="#########################"/>
 		<!-- check if eclipse binary exists, if it does, copy to tmp otherwise get it -->
 		<if>
 			<available file="${eclipse.file}" type="file" />
@@ -48,15 +111,35 @@
 		</exec>
 
 		<!-- Call the target that does everything -->
-		<ant antfile="build.xml" target="bundles.all" dir="${checkout.dir}/${project}" />
+		<ant antfile="build.xml" target="bundles.all" dir="${checkout.dir}/${project.feature}" />
 	</target>
 
+	<!-- 
+		this target is called by default in the script. When building from com.buglabs.sdk.xml call build target so that that script will generate appropriate
+		file names
+	-->
+	<target name="publish" depends="build">
+		<echo message="Publishing ${meta.project}..."/>
+		<mkdir dir="${base.build.dir}/artifacts/${meta.project}/${build.label}" />
+
+		<copy todir="${base.build.dir}/artifacts/${meta.project}/${build.label}">
+			<fileset dir="${checkout.dir}/${project.feature}/dist" />
+		</copy>
+
+		<exec dir="${base.build.dir}/artifacts/${meta.project}/" executable="rm">
+			<arg line="current" />
+		</exec>		
+
+		<symlink link="${base.build.dir}/artifacts/${meta.project}/current" resource="${base.build.dir}/artifacts/${meta.project}/${build.label}"/>
+	</target>
 
 	<target name="clean">
+		<echo message="Deleting previous checkout directories..."/>
 		<delete dir="${checkout.dir}" />
 	</target>
 
 	<target name="setup">
+		<echo message="Setting up checkout directories..."/>
 		<mkdir dir="${checkout.dir}" />
 	</target>
 </project>
