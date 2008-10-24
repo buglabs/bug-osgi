@@ -37,24 +37,6 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 
 	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
 
-
-	<target name="checkoutAndPrepare">
-		<svn>
-	        	<checkout url="file:///home/akravets/svn/bug/trunk" destPath="${checkout.dir}" />
-    		</svn>
-		<mkdir dir="${checkout.dir}/${project}/build" />
-		<mkdir dir="${checkout.dir}/${project}/build/plugins" />
-		<mkdir dir="${checkout.dir}/${project}/build/features" />
-
-		<copy todir="${checkout.dir}/${project}/build/plugins">
-			<fileset dir="${checkout.dir}" excludes="**/${project}/**"/>
-		</copy>
-
-		<copy todir="${checkout.dir}/${project}/build/features/${project}">
-			<fileset dir="${checkout.dir}/${project}" excludes="**/build/**"/>
-		</copy>
-	</target>
-
 	<!-- builds eclipse with SDK for each OS -->
 	<target name="build" depends="build_components,get_eclipse">
 		<!-- unzip created features and plugins to be used in platform specific Eclipse distro -->
