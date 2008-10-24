@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project name="com.buglabs.bug.jni.lcd" basedir=".">
+	<!-- PROJECT CONSTANTS -->
+	<property name="project" value="com.buglabs.bug.jni.lcd" />
+	<property name="sourceDir" value="./src/java"/>
+	<!-- PROJECT IMPORTS -->
+		<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml"/>
+		<import file="${common.ant.file}"/>
+</project>

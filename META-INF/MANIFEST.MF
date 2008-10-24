@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG JNI LCD
+Bundle-SymbolicName: com.buglabs.bug.jni.lcd
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Import-Package: com.buglabs.bug.jni.common
+Export-Package: com.buglabs.bug.jni.lcd
+Bundle-NativeCode: /lib/libLCD.so;
+ osname=linux
+
