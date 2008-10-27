@@ -28,5 +28,8 @@ public class Camera extends CharDevice {
 	}
 	
 	public native int init();
+	public native int overlayinit(int left, int top, int width, int height);
+	public native int overlaystart();
+	public native int overlaystop();
 	public native byte[] grabFrame();
 }

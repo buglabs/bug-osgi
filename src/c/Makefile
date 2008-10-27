@@ -1,8 +1,8 @@
 JAVAH = javah
 
-ifdef LTIB_ROOTFS
-PHONEME_HOME=$(LTIB_ROOTFS)/tmp/phoneme-advanced/cdc/build/linux-arm-mx31
-endif
+#ifdef LTIB_ROOTFS
+#PHONEME_HOME=$(LTIB_ROOTFS)/tmp/phoneme-advanced/cdc/build/linux-arm-mx31
+#endif
 
 empty :=
 space := $(empty) $(empty)
@@ -14,12 +14,13 @@ ARCH := $(word 2,$(tokens))
 
 LIB_DIR = ../../lib/
 
-ifndef BUG_LINUX_SRC
-	BUG_LINUX_SRC=$(CHECKOUT_DIR)/com.freescale.ltib2/rpm/BUILD/linux-2.6.19.2
-endif
+#ifndef BUG_LINUX_SRC
+#	BUG_LINUX_SRC=$(CHECKOUT_DIR)/com.freescale.ltib2/rpm/BUILD/linux-2.6.19.2
+#endif
 
 INCLUDE = -Iinclude/
-INCLUDE += -I$(STAGING_BUG_INCDIR)
+#INCLUDE += -I$(STAGING_BUG_INCDIR)
+INCLUDE += -I../../../com.buglabs.bug.jni.common/src/c/include
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
@@ -28,8 +29,9 @@ INCLUDE += -I$(PHONEME_HOME)/../../src/
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
 INCLUDE += -I$(BUG_LINUX_SRC)/include
 
-LD_FLAGS = -L$(CHECKOUT_DIR)/com.buglabs.bug.jni.common/lib
-LD_FLAGS = -L${STAGING_LIBDIR}/bug
+#LD_FLAGS = -L$(CHECKOUT_DIR)/com.buglabs.bug.jni.common/lib
+LD_FLAGS = -L../../../com.buglabs.bug.jni.common/lib
+#LD_FLAGS = -L${STAGING_LIBDIR}/bug
 LD_FLAGS += -lCommon -ljpeg
 
 ALL_CXXFLAGS += $(INCLUDE) $(CXXFLAGS)
@@ -49,6 +51,7 @@ SRCS = $(foreach jniclass,$(JNI_CLASSES),$(subst .,,$(suffix $(jniclass))).cpp)
 OBJS = $(SRCS:.cpp=.o)
 
 JNI_HEADERS = $(foreach jniheader,$(subst .,_,$(JNI_CLASSES)), include/jni/$(jniheader).h) 
+#JNI_HEADER = include/$(subst .,_,$(JNI_CLASSES)).h
 
 printvars:
 	@echo "JNI_CLASSES: " $(JNI_CLASSES)
