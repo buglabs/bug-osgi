@@ -20,6 +20,7 @@
 package com.buglabs.bug.module.camera.pub;
 
 import java.io.InputStream;
+import java.awt.Rectangle;
 
 /**
  * An interface for a device that can return images.
@@ -28,6 +29,9 @@ import java.io.InputStream;
  */
 public interface ICameraDevice {
 	public byte[] getImage();
+	public boolean initOverlay(Rectangle pbounds);
+	public boolean startOverlay();
+	public boolean stopOverlay();
 	public InputStream getImageInputStream();
 	public String getFormat();
 }

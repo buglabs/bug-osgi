@@ -19,6 +19,7 @@
  */
 package com.buglabs.bug.module.camera;
 
+import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -269,7 +270,29 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	public byte[] getImage() {
 		return camera.grabFrame();
 	}
-
+	
+	public boolean initOverlay(Rectangle pbounds){
+		
+		if (camera.overlayinit(pbounds.x, pbounds.y, pbounds.width, pbounds.height) < 0)
+			return false;
+		else
+			return true;		
+	}
+	
+	public boolean startOverlay(){
+		if (camera.overlaystart() < 0)
+			return false;
+		else
+			return true;
+	}
+	
+	public boolean stopOverlay(){
+		if (camera.overlaystop() < 0)
+			return false;
+		else
+			return true;		
+	}
+	
 	public InputStream getImageInputStream() {
 		return new ByteArrayInputStream(camera.grabFrame());
 	}
