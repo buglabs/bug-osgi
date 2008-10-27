@@ -1,3 +1,0 @@
-cd rpm/BUILD/linux-2.6.19.2
-make ARCH=arm CROSS_COMPILE='' HOSTCC='/usr/bin/gcc -B /usr/bin/' modules -j16
-exit

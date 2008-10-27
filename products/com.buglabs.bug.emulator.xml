@@ -36,11 +36,11 @@
 			<tstamp />
 			<property name="timestamp" value="${DSTAMP}" />
 			<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
-			<property name="project.version" value="${mm.version}${build.id}" />
+			<property name="project.version" value="${bug.version}${build.id}" />
       		</then>
 		<else>
 			<echo message="[Build type]: Running full SDK component build..."/>
-			<property name="project.version" value="${mm.version}${full.sdk.build.id}"/>
+			<property name="project.version" value="${bug.version}.${full.sdk.build.id}"/>
 		</else>
     	</if>
 
@@ -51,33 +51,36 @@
 	<tstamp/>
 	
 	<target name="checkout" description="Checks out projects from svn" depends="clean,makeDirs">
+		<!-- checkout slp from cvs for now -->
+		<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />
 		<svn>
-			<checkout url="${svn.url}/com.buglabs.bug.kernel.external" destPath="${checkout.dir}/com.buglabs.bug.kernel.external" />
-			<checkout url="${svn.url}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
-			<checkout url="${svn.url}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
-			<checkout url="${svn.url}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
-			<checkout url="${svn.url}/com.buglabs.osgi.shell" destPath="${checkout.dir}/com.buglabs.osgi.shell" />
-			<checkout url="${svn.url}/com.buglabs.osgi.cm" destPath="${checkout.dir}/com.buglabs.osgi.cm" />
-			<checkout url="${svn.url}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
-			<checkout url="${svn.url}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
-			<checkout url="${svn.url}/com.buglabs.bug.program" destPath="${checkout.dir}/com.buglabs.bug.program" />
-			<checkout url="${svn.url}/com.buglabs.bug.menu" destPath="${checkout.dir}/com.buglabs.bug.menu" />
-			<checkout url="${svn.url}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
-			<checkout url="${svn.url}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.base" destPath="${checkout.dir}/com.buglabs.bug.emulator.base" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.bmi" destPath="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.module.lcd" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.module.camera" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.camera" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.module.motion" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.module.audio" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.audio" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.module.vonhippel" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.vonhippel" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.module.gps" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.gps" />
-			<checkout url="${svn.url}/com.buglabs.bug.tests.common" destPath="${checkout.dir}/com.buglabs.bug.tests.common" />
-			<checkout url="${svn.url}/com.buglabs.bug.emulator.awt" destPath="${checkout.dir}/com.buglabs.bug.emulator.awt" />
-			<checkout url="${svn.url}/com.buglabs.bug.slp" destPath="${checkout.dir}/com.buglabs.bug.slp" />
-			<checkout url="${svn.url}/com.buglabs.osgi.obr" destPath="${checkout.dir}/com.buglabs.osgi.obr" />
-			<checkout url="${svn.url}/com.buglabs.bug.update" destPath="${checkout.dir}/com.buglabs.bug.update" />
-			<checkout url="${svn.url}/com.sun.javax.servlet" destPath="${checkout.dir}/com.sun.javax.servlet" />
+			<!--<checkout url="${svn.url.bug}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />-->
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.kernel.external" destPath="${checkout.dir}/com.buglabs.bug.kernel.external" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
+			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.shell" destPath="${checkout.dir}/com.buglabs.osgi.shell" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.cm" destPath="${checkout.dir}/com.buglabs.osgi.cm" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.program" destPath="${checkout.dir}/com.buglabs.bug.program" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.menu" destPath="${checkout.dir}/com.buglabs.bug.menu" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
+			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.base" destPath="${checkout.dir}/com.buglabs.bug.emulator.base" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bmi" destPath="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.accelerometer" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.accelerometer" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.lcd" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.camera" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.camera" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.motion" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.audio" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.audio" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.vonhippel" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.vonhippel" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.gps" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.gps" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.tests.common" destPath="${checkout.dir}/com.buglabs.bug.tests.common" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.awt" destPath="${checkout.dir}/com.buglabs.bug.emulator.awt" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.slp" destPath="${checkout.dir}/com.buglabs.bug.slp" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.obr" destPath="${checkout.dir}/com.buglabs.osgi.obr" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.update" destPath="${checkout.dir}/com.buglabs.bug.update" />
+			<checkout url="${svn.url.bug}/com.sun.javax.servlet" destPath="${checkout.dir}/com.sun.javax.servlet" />
 		</svn>
 	</target>
 
@@ -95,6 +98,7 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.nmea" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.base" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.accelerometer" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.camera" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />

@@ -1,9 +1,0 @@
-cd rpm/BUILD/linux-2.6.19.2
-sed -i "s;CONFIG_LOCALVERSION=\"\";CONFIG_LOCALVERSION=\"-$BUILD_LEVEL-$BUILD_NUMBER\";" new_config
-sed -i "s;\$UNAME_RELEASE;2.6.19.2-$BUILD_LEVEL-$BUILD_NUMBER;" new_config
-sed -i "s;CONFIG_LOCALVERSION_AUTO.*$;# CONFIG_LOCALVERSION_AUTO is not set;" new_config
-sed -i "s;^\(.* .* \".*\)\"$;\1-$BUILD_LEVEL-$BUILD_NUMBER\";" arch/arm/configs/imx31ads_defconfig
-cp new_config .config
-touch .config
-make ARCH=arm CROSS_COMPILE='' HOSTCC='/usr/bin/gcc -B /usr/bin/' oldconfig -j16
-exit

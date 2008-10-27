@@ -1,5 +1,0 @@
-.phony=dolink
-
-dolink:
-	sudo ln -s 2.6.19.2-$(BUILD_LEVEL)-$(BUILD_NUMBER) 2.6.19.2
-

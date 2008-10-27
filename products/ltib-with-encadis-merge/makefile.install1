@@ -1,9 +1,0 @@
-
-.phony=install
-
-install:
-	sudo dd if=$(MBRIMAGE) of=$(TARGET)
-	sleep 1
-	sudo mkfs.ext3 $(TARGET)1
-	sleep 1
-

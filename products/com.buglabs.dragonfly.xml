@@ -40,13 +40,13 @@
 			<property name="timestamp" value="${DSTAMP}" />
 
 			<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
-			<property name="build.label" value="${mm.version}${build.id}" />
+			<property name="build.label" value="${sdk.version}.${build.id}" />
 			<property name="meta.project.version" value="${build.id}" />
       		</then>
 		<else>
 			<echo message="[Build type]: Running full SDK component build..."/>
 			<property name="build.id" value="${full.sdk.build.id}"/>
-			<property name="build.label" value="${mm.version}${build.id}" />
+			<property name="build.label" value="${sdk.version}.${build.id}" />
 			<property name="meta.project.version" value="${build.id}" />
 		</else>
     	</if>
@@ -54,17 +54,21 @@
 	<target name="prepareBuildDirectories">
 		<echo message="Checking out projects from svn and preparing directories..."/>
 		<svn>
-	        	<checkout url="${svn.url}/com.buglabs.dragonfly" destPath="${checkout.dir}/com.buglabs.dragonfly" />
-	        	<checkout url="${svn.url}/com.buglabs.dragonfly.bug.kernel" destPath="${checkout.dir}/com.buglabs.dragonfly.bug.kernel" />
-	        	<checkout url="${svn.url}/com.buglabs.dragonfly.feature" destPath="${checkout.dir}/com.buglabs.dragonfly.feature" />
-	        	<checkout url="${svn.url}/com.buglabs.dragonfly.generators" destPath="${checkout.dir}/com.buglabs.dragonfly.generators" />
-	        	<checkout url="${svn.url}/com.buglabs.dragonfly.ui" destPath="${checkout.dir}/com.buglabs.dragonfly.ui" />
-	        	<checkout url="${svn.url}/com.buglabs.dragonfly.updatesite" destPath="${checkout.dir}/com.buglabs.dragonfly.updatesite" />
+	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly" destPath="${checkout.dir}/com.buglabs.dragonfly" />
+	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.bug.kernel" destPath="${checkout.dir}/com.buglabs.dragonfly.bug.kernel" />
+	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.feature" destPath="${checkout.dir}/com.buglabs.dragonfly.feature" />
+	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.generators" destPath="${checkout.dir}/com.buglabs.dragonfly.generators" />
+	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.ui" destPath="${checkout.dir}/com.buglabs.dragonfly.ui" />
+	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.updatesite" destPath="${checkout.dir}/com.buglabs.dragonfly.updatesite" />
 
-	        	<checkout url="${svn.url}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
-	        	<checkout url="${svn.url}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
-	        	<checkout url="${svn.url}/com.buglabs.phoneme.personal" destPath="${checkout.dir}/com.buglabs.phoneme.personal" />
+	        	<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
+			<!--
+	        	<checkout url="${svn.url.dragonfly}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
+			-->
+	        	<checkout url="${svn.url.dragonfly}/com.buglabs.phoneme.personal" destPath="${checkout.dir}/com.buglabs.phoneme.personal" />
     		</svn>
+		<!-- checkout slp from cvs for now -->
+                <cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />
 
 		<!-- call CTE's target to checkout needed projects -->
 		<ant antfile="com.buglabs.osgi.concierge.xml" target="checkout" />
