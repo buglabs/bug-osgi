@@ -139,7 +139,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 		
 		mdaccRef = context.registerService(IMDACCModuleControl.class.getName(), this, createBasicServiceProperties());	
-		regionKey = StatusBarUtils.displayImage(context, icon);
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	private void configureAccelerometer() {
