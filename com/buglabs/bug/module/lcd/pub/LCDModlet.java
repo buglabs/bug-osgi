@@ -120,7 +120,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 		}
 		
-		regionKey = StatusBarUtils.displayImage(context, icon);
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	public void stop() throws Exception {
