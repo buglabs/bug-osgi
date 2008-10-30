@@ -1,11 +1,6 @@
 Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Servlet Plug-in
-Bundle-SymbolicName: com.sun.javax.servlet
-Bundle-Version: 1.0.0
-Bundle-Vendor: BUG Labs Inc
-Eclipse-LazyStart: true
-Export-Package: javax.servlet,
- javax.servlet.http,
- javax.servlet.resources
- 
+Bundle-SymbolicName: javax.servlet.source
+Bundle-Name: javax.servlet.source
+Bundle-Version: 2.3.0.v200806031603
+Bundle-Vendor: Eclipse Orbit
+Export-Package: javax.servlet, javax.servlet.http, javax.servlet.jsp, javax.servlet.resources
