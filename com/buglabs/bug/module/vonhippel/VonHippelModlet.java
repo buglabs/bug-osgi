@@ -94,7 +94,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModul
 		VonHippelWS vhWS = new VonHippelWS(vhDevice);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
 		//mdaccRef = context.registerService(IMDACCModuleControl.class.getName(), this, createBasicServiceProperties());	
-		regionKey = StatusBarUtils.displayImage(context, icon);
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 
