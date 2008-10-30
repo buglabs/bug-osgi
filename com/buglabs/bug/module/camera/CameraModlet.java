@@ -176,7 +176,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		
 		bepReg = context.registerService(ICameraButtonEventProvider.class.getName(), bep, createRemotableProperties(getButtonServiceProperties()));
 		// Display the camera icon
-		regionKey = StatusBarUtils.displayImage(context, icon);
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 
 		List wsProviders = new ArrayList();
 		wsProviders.add(this);
