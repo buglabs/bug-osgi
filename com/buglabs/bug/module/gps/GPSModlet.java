@@ -121,7 +121,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		nmeaRef = context.registerService(INMEARawFeed.class.getName(), gpsd, createRemotableProperties(null));
 		nmeaProviderRef = context.registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createRemotableProperties(null));
 		wsTracker = PublicWSAdminTracker.createTracker(context, this);
-		regionKey = StatusBarUtils.displayImage(context, icon);
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 
 		timer = new Timer();
 		timer.schedule(new GPSFIXLEDStatusTask(this), 500, 5000);
