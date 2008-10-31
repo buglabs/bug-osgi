@@ -3,13 +3,10 @@ package com.buglabs.bug.module.lcd.pub;
 import java.io.IOException;
 
 import com.buglabs.module.IModuleControl;
+import com.buglabs.module.IModuleLEDController;
 
-public interface ILCDModuleControl extends IModuleControl {
-	public int LEDRedOff() throws IOException;		// Turn off red LED
-	public int LEDRedOn() throws IOException;
-	public int LEDGreenOff() throws IOException;		// Turn off red LED
-	public int LEDGreenOn() throws IOException;
-
+public interface ILCDModuleControl extends IModuleControl, IModuleLEDController {
+	
 	/**
 	 * @param val Set's the intensity of the backlight 0-7.
 	 * 

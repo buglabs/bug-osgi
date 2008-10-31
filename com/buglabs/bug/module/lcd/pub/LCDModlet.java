@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.accelerometer.pub.IAccelerometerRawFeed;
@@ -33,8 +32,9 @@ import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 /**
  * LCD Modlet class for 1x LCD module.
+ * 
  * @author kgilmer
- *
+ * 
  */
 public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IModuleDisplay {
 
@@ -42,7 +42,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private final int slotId;
 	private final String moduleId;
 	private final String moduleName;
-	private final LogService logService;
+
 	private ServiceRegistration moduleRef;
 	private ServiceRegistration moduleDisplayServReg;
 	private final int LCD_WIDTH = 320;
@@ -50,28 +50,27 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private String regionKey;
 	private ServiceRegistration lcdControlServReg;
 
-	private static boolean icon[][] = {
-		{false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false},
-		{false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false},
-		{false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false},
-		{false,false,true,true,true,true,true,true,true,true,true,true,true,true,false,false},
-		{false,true,false,false,false,false,false,false,false,false,false,false,false,false,true,false},
-		{false,true,false,true,false,true,false,true,false,true,false,true,false,false,true,false},
-		{false,true,false,false,true,false,true,false,true,false,true,false,true,false,true,false},
-		{false,true,false,true,false,true,false,true,false,true,false,true,false,false,true,false},
-		{false,true,false,false,true,false,true,false,true,false,true,false,true,false,true,false},
-		{false,true,false,true,false,true,false,true,false,true,false,true,false,false,true,false},
-		{false,true,false,false,true,false,true,false,true,false,true,false,true,false,true,false},
-		{false,true,false,true,false,true,false,true,false,true,false,true,false,false,true,false},
-		{false,true,false,false,true,false,true,false,true,false,true,false,true,false,true,false},
-		{false,true,false,true,false,true,false,true,false,true,false,true,false,false,true,false},
-		{false,true,false,false,false,false,false,false,false,false,false,false,false,false,true,false},
-		{false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false},
-		{false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false},
-		{false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false},
-		{false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false},
-		{false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-		};
+	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
+			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
+			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
+			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
+			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
+			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
+			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
+			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
+			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
+			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
+			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
+			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
+	
 	private LCDAccelerometerInputStreamProvider lcd_acc_is_prov;
 	private ServiceRegistration accIsProvRef;
 	private ServiceRegistration accRawFeedProvRef;
@@ -80,19 +79,18 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private CharDevice accel;
 	private CharDeviceInputStream accIs;
 
-	public LCDModlet(BundleContext context, int slotId, String moduleId, LogService logService) {
+	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
 		this.moduleName = "LCD";
-		this.logService = logService;
 	}
 
 	public void setup() throws Exception {
 		String lcd_accel_devnode = "/dev/bmi_lcd_acc_m" + (slotId + 1);
 		accel = new CharDevice();
 		int result = accel.open(lcd_accel_devnode, FCNTL_H.O_RDWR);
-		if(result >= 0) {
+		if (result >= 0) {
 			accIs = new CharDeviceInputStream(accel);
 			lcd_acc_is_prov = new LCDAccelerometerInputStreamProvider(accIs);
 		}
@@ -107,38 +105,38 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 		moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), this, createRemotableProperties(props));
 		lcdControlServReg = context.registerService(ILCDModuleControl.class.getName(), this, createRemotableProperties(null));
-		
-		if(lcd_acc_is_prov != null) {
+
+		if (lcd_acc_is_prov != null) {
 			lcd_acc_is_prov.start();
 			accIsProvRef = context.registerService(IAccelerometerSampleFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
 			accRawFeedProvRef = context.registerService(IAccelerometerRawFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
-			
+
 			LCDAccelerometerSampleProvider accsp = new LCDAccelerometerSampleProvider(lcd_acc_is_prov);
-			
+
 			accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), accsp, createRemotableProperties(createBasicServiceProperties()));
 			AccelerationWS accWs = new AccelerationWS(accsp);
 			wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 		}
-		
+
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	public void stop() throws Exception {
 		StatusBarUtils.releaseRegion(context, regionKey);
-		
-		if(lcd_acc_is_prov != null) {
+
+		if (lcd_acc_is_prov != null) {
 			lcd_acc_is_prov.interrupt();
 			wsAccTracker.close();
 			accIsProvRef.unregister();
 			accRawFeedProvRef.unregister();
 			accSampleProvRef.unregister();
 		}
-		
+
 		moduleRef.unregister();
 		moduleDisplayServReg.unregister();
 		lcdControlServReg.unregister();
 	}
-	
+
 	/**
 	 * @return A dictionary with R-OSGi enable property.
 	 */
@@ -146,9 +144,9 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		if (ht == null) {
 			ht = new Hashtable();
 		}
-		
+
 		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-		
+
 		return ht;
 	}
 
@@ -158,7 +156,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		p.put("Slot", Integer.toString(slotId));
 		return p;
 	}
-	
+
 	public List getModuleProperties() {
 		List properties = new ArrayList();
 
@@ -193,20 +191,20 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		return moduleName;
 	}
 
-	public int LEDGreenOff() throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_GLEDOFF(slotId);
+	public int setLEDGreen(boolean state) throws IOException {
+		if (state) {
+			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_GLEDON(slotId);
+		} else {
+			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_GLEDOFF(slotId);
+		}
 	}
 
-	public int LEDGreenOn() throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_GLEDON(slotId);
-	}
-
-	public int LEDRedOff() throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_RLEDOFF(slotId);
-	}
-
-	public int LEDRedOn() throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_RLEDON(slotId);
+	public int setLEDRed(boolean state) throws IOException {
+		if (state) {
+			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_RLEDON(slotId);
+		} else {
+			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_RLEDOFF(slotId);
+		}
 	}
 
 	public int getStatus() throws IOException {
