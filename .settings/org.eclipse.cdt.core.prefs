@@ -1,4 +1,4 @@
-#Tue Aug 12 11:20:51 GMT-05:00 2008
+#Fri Oct 31 12:28:07 EDT 2008
 eclipse.preferences.version=1
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true" appendContributed\="true"/>\n
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.2107444662=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="CXX" operation\="append" value\="arm-none-linux-gnueabi-g++"/>\n<variable delimiter\=";" name\="CXXFLAGS" operation\="append" value\="-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp"/>\n<variable delimiter\=";" name\="COMMON_CLASSPATH" operation\="append" value\="${CHECKOUT_DIR}/com.buglabs.bug.jni.common/bin"/>\n<variable delimiter\=";" name\="JAVAH_CLASSPATH" operation\="append" value\="../../bin"/>\n</environment>\n
