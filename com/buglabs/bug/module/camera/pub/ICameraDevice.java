@@ -19,8 +19,8 @@
  */
 package com.buglabs.bug.module.camera.pub;
 
-import java.io.InputStream;
 import java.awt.Rectangle;
+import java.io.InputStream;
 
 /**
  * An interface for a device that can return images.
