@@ -9,6 +9,7 @@ import java.util.Timer;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.log.LogService;
 import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
 import org.osgi.util.position.Position;
@@ -34,6 +35,7 @@ import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.WSResponse;
+import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
 import com.buglabs.util.SelfReferenceException;
 import com.buglabs.util.StreamMultiplexer;
@@ -104,11 +106,14 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private Timer timer;
 
+	private LogService log;
+
 	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleName = moduleName;
 		this.moduleId = moduleId;
+		this.log = LogServiceUtil.getLogService(context);
 	}
 
 	public void start() throws Exception {
@@ -124,7 +129,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 
 		timer = new Timer();
-		timer.schedule(new GPSFIXLEDStatusTask(this), 500, 5000);
+		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
 		//TODO: Start position and sentence services when we achieve GPS lock
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
@@ -173,7 +178,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 						* Math.PI / 180.0, Unit.rad), new Measurement(0.0d, Unit.m), null, null);
 				return pos;
 			} catch (NumberFormatException e) {
-				// TODO: Log this and/or handle it properly
+				log.log(LogService.LOG_ERROR, "Unable to parse position.", e);
 				return null;
 			}
 		} else {
@@ -211,8 +216,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			properties.add(new ModuleProperty(PROPERTY_ANTENNA, antenna, "String", false));
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(LogService.LOG_ERROR, "Exception occured while getting module properties.", e);
 		}
 
 		return properties;
@@ -309,8 +313,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 				}
 			}
 		} catch (SelfReferenceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(LogService.LOG_ERROR, "Xml error", e);
 		}
 		return root.toString();
 	}

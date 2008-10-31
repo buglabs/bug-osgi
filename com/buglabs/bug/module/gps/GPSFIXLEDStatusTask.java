@@ -3,13 +3,17 @@ package com.buglabs.bug.module.gps;
 import java.io.IOException;
 import java.util.TimerTask;
 
+import org.osgi.service.log.LogService;
+
 import com.buglabs.bug.module.gps.pub.IGPSModuleControl;
 
 public class GPSFIXLEDStatusTask extends TimerTask {
 	private IGPSModuleControl control;
+	private final LogService log;
 	
-	public GPSFIXLEDStatusTask(IGPSModuleControl control) {
+	public GPSFIXLEDStatusTask(IGPSModuleControl control, LogService log) {
 		this.control = control;
+		this.log = log;
 	}
 	
 	public void run() {
@@ -19,26 +23,23 @@ public class GPSFIXLEDStatusTask extends TimerTask {
 			status = control.getStatus();
 		
 			if((status & 0x01) == 0) {
-				control.LEDGreenOn();
-				control.LEDRedOff();
+				control.setLEDGreen(true);
+				control.setLEDRed(false);
 				Thread.sleep(delay);
-				control.LEDGreenOff();
-				control.LEDRedOff();
+				control.setLEDGreen(false);
+				control.setLEDGreen(false);
 			} else {
-				control.LEDGreenOff();
-				control.LEDRedOn();
+				control.setLEDGreen(false);
+				control.setLEDRed(true);
 				Thread.sleep(delay);
-				control.LEDGreenOff();
-				control.LEDRedOff();
+				control.setLEDGreen(false);
+				control.setLEDRed(false);
 			}
 		} catch (IOException e) {
-			// TODO: Log this
-			System.out.println("FIXLEDStatusTask: Unable to query gps control on slot " +
-								control.getSlotId());
-			e.printStackTrace();
+			log.log(LogService.LOG_ERROR,"FIXLEDStatusTask: Unable to query gps control on slot " +
+								control.getSlotId(), e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//Ignore interruption
 		}
 	}
 }
