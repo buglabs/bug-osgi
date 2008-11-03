@@ -3,12 +3,17 @@ package com.buglabs.bug.module.gps;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
@@ -17,6 +22,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.jni.common.CharDeviceInputStream;
 import com.buglabs.bug.jni.common.CharDeviceUtils;
+import com.buglabs.bug.jni.common.FCNTL_H;
 import com.buglabs.bug.jni.gps.GPS;
 import com.buglabs.bug.jni.gps.GPSControl;
 import com.buglabs.bug.menu.pub.StatusBarUtils;
@@ -117,7 +123,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void start() throws Exception {
-
+		log.log(log.LOG_DEBUG, "GPSModlet start enter");
 		gpsd.start();
 		nmeaProvider.start();
 
@@ -133,7 +139,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		//TODO: Start position and sentence services when we achieve GPS lock
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
-
+		log.log(log.LOG_DEBUG, "GPSModlet start leave");
 	}
 	
 	/**
@@ -150,6 +156,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void stop() throws Exception {
+		log.log(log.LOG_DEBUG, "GPSModlet stop enter");
 		timer.cancel();
 
 		StatusBarUtils.releaseRegion(context, regionKey);
@@ -167,6 +174,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		gpsd.interrupt();
 		gpsis.close();
 		gpscontrol.close();
+		log.log(log.LOG_DEBUG, "GPSModlet stop leave");
 	}
 
 	public Position getPosition() {
@@ -327,11 +335,12 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void setup() throws Exception {
+		log.log(log.LOG_DEBUG, "GPSModlet setup() enter");
 		String devnode_gps = "/dev/ttymxc" + Integer.toString(slotId);
 		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(slotId + 1);
 
 		GPS gps = new GPS();
-		CharDeviceUtils.openDeviceWithRetry(gps, devnode_gps, 2);
+		CharDeviceUtils.openDeviceWithRetry(gps, devnode_gps, FCNTL_H.O_RDWR | FCNTL_H.O_NONBLOCK, 2);
 
 		int result = gps.init();
 		if(result < 0) {
@@ -339,12 +348,67 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		gpsis = new CharDeviceInputStream(gps);
-		gpsd = new NMEARawFeed(gpsis);
+		log.log(log.LOG_DEBUG, "GPSModlet setup() getting delay");
+		long delay = 1000; //getReadDelay();
+		log.log(log.LOG_DEBUG, "GPSModlet setup() delay = " + delay);
+		gpsd = new NMEARawFeed(gpsis, delay);
 		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream());
 
 		gpscontrol = new GPSControl();
 
 		CharDeviceUtils.openDeviceWithRetry(gpscontrol, devnode_gpscontrol, 2);
+		log.log(log.LOG_DEBUG, "GPSModlet setup leave");
+	}
+
+	private long getReadDelay() {
+		log.log(log.LOG_DEBUG, "GPSModlet getReadDelay enter");
+		ServiceReference sr = context.getServiceReference(ConfigurationAdmin.class.getName());
+		
+		long read_delay = 100;
+		
+		if(sr != null) {
+			ConfigurationAdmin ca = (ConfigurationAdmin) context.getService(sr);
+			log.log(log.LOG_DEBUG, "GPSModlet getReadDelay obtained cm");
+			if(ca != null) {
+				Configuration c;
+				try {
+					c = ca.getConfiguration(getModuleName());
+					log.log(log.LOG_DEBUG, "GPSModlet getReadDelay: got configuration");
+					String key = "ReadDelay";
+					Configuration[] listConfigurations = ca.listConfigurations("");
+					log.log(LogService.LOG_INFO, String.valueOf("@@@@@@ " + listConfigurations.length));
+					String factoryPid = c.getPid();
+					log.log(LogService.LOG_INFO, factoryPid);
+					Dictionary properties = c.getProperties();
+					log.log(LogService.LOG_INFO, String.valueOf(properties.size()));
+					Enumeration keys = properties.keys();
+					while(keys.hasMoreElements()){
+						Object _key = keys.nextElement();
+						log.log(LogService.LOG_INFO, "@@@@ " + key.toString());
+						
+					}
+					Object obj = c.getProperties().get(key);
+					if(obj != null) {
+						read_delay = Long.getLong((String) obj).longValue();
+						log.log(log.LOG_DEBUG, "GPSModlet getReadDelay: got delay: " + read_delay);
+					} else {
+						c.getProperties().put(key, Long.toString(read_delay));
+						c.update(c.getProperties());
+						log.log(log.LOG_DEBUG, "GPSModlet getReadDelay: wrote delay into cm");
+						
+						Object object = c.getProperties().get(key);
+						log.log(LogService.LOG_INFO, "$$$$$$$$$ Retrieving property: " + object.toString());
+					}
+				} catch (IOException e) {
+					log.log(log.LOG_ERROR, "Problem retrieving data from cm:", e);
+				} catch (InvalidSyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		log.log(log.LOG_DEBUG, "GPSModlet getReadDelay leave");
+		return read_delay;
 	}
 
 	public LatLon getLatitudeLongitude() {
