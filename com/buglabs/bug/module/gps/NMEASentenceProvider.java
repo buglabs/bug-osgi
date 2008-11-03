@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import sun.io.MalformedInputException;
+
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
 import com.buglabs.nmea.NMEAParser;
 import com.buglabs.nmea.sentences.NMEAParserException;
@@ -32,17 +34,24 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 			String sentence;
 			NMEAParser parser = new NMEAParser();
 			
-			while(!Thread.currentThread().isInterrupted() && (sentence = br.readLine()) != null) {
-				try {
-					Object objSentence = parser.parse(sentence);
-					
-					if(objSentence != null && objSentence instanceof RMC) {
-						cachedRMC = (RMC) objSentence;
+			do {
+				 try {
+					 sentence = br.readLine(); 
+				 } catch (MalformedInputException e) {
+					 sentence = "";
+					 continue;
+				 }
+				 
+				 try {
+						Object objSentence = parser.parse(sentence);
+						
+						if(objSentence != null && objSentence instanceof RMC) {
+							cachedRMC = (RMC) objSentence;
+						}
+					} catch (NMEAParserException e) {
+						//TODO: Handle parser exceptions, atleast log it
 					}
-				} catch (NMEAParserException e) {
-					//TODO: Handle parser exceptions, atleast log it
-				}
-			}
+			} while(!Thread.currentThread().isInterrupted() && (sentence != null));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
