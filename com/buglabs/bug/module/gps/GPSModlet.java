@@ -349,7 +349,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 		gpsis = new CharDeviceInputStream(gps);
 		log.log(log.LOG_DEBUG, "GPSModlet setup() getting delay");
-		long delay = 1000; //getReadDelay();
+		long delay = getReadDelay();
 		log.log(log.LOG_DEBUG, "GPSModlet setup() delay = " + delay);
 		gpsd = new NMEARawFeed(gpsis, delay);
 		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream());
@@ -375,21 +375,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 					c = ca.getConfiguration(getModuleName());
 					log.log(log.LOG_DEBUG, "GPSModlet getReadDelay: got configuration");
 					String key = "ReadDelay";
-					Configuration[] listConfigurations = ca.listConfigurations("");
-					log.log(LogService.LOG_INFO, String.valueOf("@@@@@@ " + listConfigurations.length));
 					String factoryPid = c.getPid();
-					log.log(LogService.LOG_INFO, factoryPid);
 					Dictionary properties = c.getProperties();
-					log.log(LogService.LOG_INFO, String.valueOf(properties.size()));
-					Enumeration keys = properties.keys();
-					while(keys.hasMoreElements()){
-						Object _key = keys.nextElement();
-						log.log(LogService.LOG_INFO, "@@@@ " + key.toString());
-						
-					}
 					Object obj = c.getProperties().get(key);
 					if(obj != null) {
-						read_delay = Long.getLong((String) obj).longValue();
+						read_delay = Long.parseLong(obj.toString());
 						log.log(log.LOG_DEBUG, "GPSModlet getReadDelay: got delay: " + read_delay);
 					} else {
 						c.getProperties().put(key, Long.toString(read_delay));
@@ -401,9 +391,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 					}
 				} catch (IOException e) {
 					log.log(log.LOG_ERROR, "Problem retrieving data from cm:", e);
-				} catch (InvalidSyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		}
