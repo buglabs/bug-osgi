@@ -30,7 +30,8 @@ public class MotionAccelerometerSampleStream extends
 	public AccelerometerSample readSample() throws IOException {
 		byte[] data = new byte[6];			
 		short[] sample = null;
-
+		System.out.println("readSample enter");
+		
 		int result = read(data);
 		if(result == data.length) {
 			sample = new short[3];
@@ -42,7 +43,10 @@ public class MotionAccelerometerSampleStream extends
 				sample[i] = (short) (byte1 >> 6);
 				sample[i] +=  (byte0 << 2);
 			}
+		} else {
+			throw new IOException("Unable to read sample from accelerometer\n Read length = " + result);
 		}
+		
 		
 		return new AccelerometerSample(convertToGs(sample[2]),
 									   convertToGs(sample[1]),
