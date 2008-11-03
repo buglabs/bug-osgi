@@ -39,4 +39,8 @@ public class AccelerometerSample {
 	public void setAccelerationZ(float accelerationZ) {
 		this.accelerationZ = accelerationZ;
 	}
+	
+	public String toString() {
+		return "X = " + accelerationX + " Y = " + accelerationY + "Z = " + accelerationZ;
+	}
 }
