@@ -30,7 +30,6 @@ public class MotionAccelerometerSampleStream extends
 	public AccelerometerSample readSample() throws IOException {
 		byte[] data = new byte[6];			
 		short[] sample = null;
-		System.out.println("readSample enter");
 		
 		int result = read(data);
 		if(result == data.length) {
