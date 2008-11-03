@@ -8,8 +8,8 @@ import com.buglabs.util.StreamMultiplexer;
 
 public class NMEARawFeed extends StreamMultiplexer implements INMEARawFeed {
 
-	public NMEARawFeed(InputStream is) {
-		super(is);
+	public NMEARawFeed(InputStream is, long read_delay) {
+		super(is, 1, 0, read_delay);
 		setName("NMEARawFeed");
 		setLogService(LogServiceUtil.getLogService(Activator.getInstance().getBundleContext()));
 	}
