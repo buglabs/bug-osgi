@@ -40,12 +40,33 @@ public class StreamMultiplexer extends Thread {
 	private int bufferLength = 1;	
 	private ArrayList listeners = new ArrayList();
 	private int delay = 0;
+	private long read_delay = 0;
 	private LogService log;
 
+	/**
+	 * 
+	 * @param is InputStream to use as source
+	 * @param bufferLength the number of bytes to attempt reading simultaneously from the Input Stream.
+	 * @param delay how long to wait in milliseconds until we check if anyone has requested an inputstream.
+	 */
 	public StreamMultiplexer(InputStream is, int bufferLength, int delay) {
 		this.is = is;
 		this.bufferLength = bufferLength;
 		this.delay = delay;
+	}
+	
+	/**
+	 * 
+	 * @param is InputStream to use as source
+	 * @param bufferLength the number of bytes to attempt reading simultaneously from the Input Stream.
+	 * @param delay how long to wait in milliseconds until we check if anyone has requested an inputstream.
+	 * @param read_delay the amount of time to wait between empty reads. 
+	 */
+	public StreamMultiplexer(InputStream is, int bufferLength, int delay, long read_delay) {
+		this.is = is;
+		this.bufferLength = bufferLength;
+		this.delay = delay;
+		this.read_delay = read_delay;
 	}
 
 	/**
@@ -86,13 +107,17 @@ public class StreamMultiplexer extends Thread {
 			if (log != null) {
 				log.log(LogService.LOG_DEBUG, name + ": Started");
 			}
-			while(!Thread.currentThread().isInterrupted()) {
+			while(!isInterrupted()) {
 
 				if(outputStreamWriters.size() > 0) {
 					read = is.read(buff);
 					if(read == -1) {
-						break;
+						if(read_delay != 0) {
+							sleep(read_delay);
+						}
+						continue;
 					}
+					
 					synchronized(outputStreamWriters) {
 						Iterator iter = outputStreamWriters.iterator();
 						while(iter.hasNext() && read != -1) {
@@ -122,6 +147,9 @@ public class StreamMultiplexer extends Thread {
 			if (log != null) {
 				log.log(LogService.LOG_WARNING, "An IOException was generated", e1);
 			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
 			//If we are going down, close all streams.
 			try {
