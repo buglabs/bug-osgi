@@ -11,6 +11,12 @@ public interface ILCDModuleControl extends IModuleControl, IModuleLEDController 
 	 * @param val Set's the intensity of the backlight 0-7.
 	 * 
 	 */
+	public int setBackLight(int val) throws IOException;		// Set IOX backlight bits [2:0]
+	
+	/**
+	 * @param val Set's the intensity of the backlight 0-7.
+	 * @deprecated use setBackLight.
+	 */
 	public int setBlackLight(int val) throws IOException;		// Set IOX backlight bits [2:0]
 	
 	/**
