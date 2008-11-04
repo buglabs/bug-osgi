@@ -60,9 +60,9 @@
 	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.generators" destPath="${checkout.dir}/com.buglabs.dragonfly.generators" />
 	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.ui" destPath="${checkout.dir}/com.buglabs.dragonfly.ui" />
 	        	<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.updatesite" destPath="${checkout.dir}/com.buglabs.dragonfly.updatesite" />
+				<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.help" destPath="${checkout.dir}/com.buglabs.dragonfly.help" />
+				<checkout url="${svn.url.dragonfly}/com.buglabs.phoneme.personal" destPath="${checkout.dir}/com.buglabs.phoneme.personal" />
 	        	<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
-				<checkout url="${svn.url.bug}/com.buglabs.dragonfly.help" destPath="${checkout.dir}/com.buglabs.dragonfly.help" />
-        		<checkout url="${svn.url.dragonfly}/com.buglabs.phoneme.personal" destPath="${checkout.dir}/com.buglabs.phoneme.personal" />
 			<!--
 	        	<checkout url="${svn.url.dragonfly}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
 			-->
