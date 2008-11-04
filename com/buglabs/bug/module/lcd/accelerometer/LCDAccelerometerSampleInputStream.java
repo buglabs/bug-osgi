@@ -27,6 +27,8 @@ public class LCDAccelerometerSampleInputStream extends
 			for(int i = 0; i < sample.length; ++i) {
 				sample[i] = (short)((short)(data[i*2] << 8) + (short)data[i*2 + 1]);
 			}
+		} else {
+			throw new IOException("Unable to read sample from accelerometer\n Read length = " + result);
 		}
 		
 		return new AccelerometerSample(convertToGs(sample[2]),
