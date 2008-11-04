@@ -15,7 +15,6 @@ import com.buglabs.status.IStatusBarProvider;
 public class Activator implements BundleActivator, IModletFactory {
 	private BundleContext context;
 	private ServiceRegistration sr;
-	private ServiceTracker menuTracker;
 	
 	private static Activator instance;
 	
@@ -29,9 +28,6 @@ public class Activator implements BundleActivator, IModletFactory {
 		sr = context.registerService(IModletFactory.class.getName(), this, null);	
 		
 		Filter f = context.createFilter("(| (" + Constants.OBJECTCLASS + "=" + IStatusBarProvider.class.getName() + ") (" + Constants.OBJECTCLASS + "=" + IPositionProvider.class.getName() + "))");
-		
-		menuTracker = new ServiceTracker(context, f, new StatusBarCustomizer(context));
-		menuTracker.open();
 	}
 
 	public void stop(BundleContext context) throws Exception {
