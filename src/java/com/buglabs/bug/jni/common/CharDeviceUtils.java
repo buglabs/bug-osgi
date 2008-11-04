@@ -10,12 +10,16 @@ import java.io.IOException;
 public class CharDeviceUtils {
 	
 	public static void openDeviceWithRetry(CharDevice d, String devnode, int attempts) throws Exception {
+		openDeviceWithRetry(d, devnode, FCNTL_H.O_RDWR, attempts);
+	}
+	
+	public static void openDeviceWithRetry(CharDevice d, String devnode, int flags, int attempts) throws Exception {
 		int attempt_number = 0;
 		int retval = 0;
 		
-		while(retval <= 0 && attempt_number < 2) {
+		while(retval <= 0 && attempt_number < attempts) {
 			attempt_number++;
-			retval = d.open(devnode, FCNTL_H.O_RDWR);
+			retval = d.open(devnode, flags);
 			if(retval < 0) {
 				String errormsg = "Unable to open " + devnode + "retrying";
 				Thread.sleep(2000);
