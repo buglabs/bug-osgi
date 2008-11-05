@@ -165,7 +165,8 @@ public class StreamMultiplexer extends Thread {
 				}
 
 				//Close the gps stream
-				is.close();
+				if(is != null)
+					is.close();
 			} catch (IOException e) {
 				if (log != null) {
 					log.log(LogService.LOG_WARNING, "An IOException was generated", e);
