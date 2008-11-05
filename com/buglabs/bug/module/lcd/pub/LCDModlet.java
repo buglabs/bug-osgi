@@ -218,8 +218,12 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	public int enable() throws IOException {
 		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_CLRRST(slotId);
 	}
-
+	
 	public int setBlackLight(int val) throws IOException {
+		return setBackLight(val);
+	}
+
+	public int setBackLight(int val) throws IOException {
 		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_SET_BL(slotId, val);
 	}
 }
