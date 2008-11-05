@@ -33,6 +33,7 @@ import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.bug.module.gps.pub.LatLon;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
+import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.nmea.DegreesMinutesSeconds;
@@ -114,6 +115,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private LogService log;
 
+	private ServiceRegistration ledRef;
+
 	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
@@ -128,6 +131,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		nmeaProvider.start();
 
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, createRemotableProperties(null));
+		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
 		gpsControlRef = context.registerService(IGPSModuleControl.class.getName(), this, createRemotableProperties(null));
 		nmeaRef = context.registerService(INMEARawFeed.class.getName(), gpsd, createRemotableProperties(null));
 		nmeaProviderRef = context.registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createRemotableProperties(null));
@@ -167,7 +171,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		moduleRef.unregister();
 		gpsControlRef.unregister();
 		nmeaRef.unregister();
-
+		ledRef.unregister();
 		positionRef.unregister();
 		nmeaProviderRef.unregister();
 		nmeaProvider.interrupt();
