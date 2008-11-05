@@ -27,6 +27,7 @@ import com.buglabs.bug.module.motion.pub.IMotionRawFeed;
 import com.buglabs.bug.module.motion.pub.IMotionSubject;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
+import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.util.IStreamMultiplexerListener;
@@ -105,6 +106,8 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 	private ServiceRegistration accSampleFeedRef;
 
+	private ServiceRegistration ledRef;
+
 	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
@@ -119,7 +122,8 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 		motionSubjectRef = context.registerService(IMotionSubject.class.getName(), motionSubject, createBasicServiceProperties());
 		motionRawFeedRef = context.registerService(IMotionRawFeed.class.getName(), motiond, createBasicServiceProperties());
-
+		ledRef = context.registerService(IModuleLEDController.class.getName(), this, null);
+		
 		MotionWS motionWS = new MotionWS();
 		motionSubject.register(motionWS);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, motionWS);
@@ -166,6 +170,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		accSampleProvRef.unregister();
 		accSampleFeedRef.unregister();
 		mdaccRef.unregister();
+		ledRef.unregister();
 
 		motionSubject.interrupt();
 		motiond.interrupt();
