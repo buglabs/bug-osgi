@@ -43,6 +43,7 @@ import com.buglabs.bug.module.camera.pub.ICameraDevice;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
+import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.services.ws.IWSResponse;
@@ -118,6 +119,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	private CameraControl cc;
 
 	private InputEventProvider bep;
+	private ServiceRegistration ledRef;
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -170,6 +172,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		cameraControlRef = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createRemotableProperties(null));
 		moduleControl = context.registerService(IModuleControl.class.getName(), this, createRemotableProperties(null));
 		cameraService = context.registerService(ICameraDevice.class.getName(), this, createRemotableProperties(null));
+		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
 		
 		bep = new CameraInputEventProvider(DEVNODE_INPUT_DEVICE, logService);
 		bep.start();
@@ -202,6 +205,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		cameraControlRef.unregister();
 		cameraService.unregister();
 		moduleControl.unregister();
+		ledRef.unregister();
 		bep.tearDown();
 		bepReg.unregister();
 		wsTracker.close();
