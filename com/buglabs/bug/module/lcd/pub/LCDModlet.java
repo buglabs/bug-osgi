@@ -25,6 +25,7 @@ import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerSampleProvider;
 import com.buglabs.bug.module.motion.pub.AccelerationWS;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
+import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.util.RemoteOSGiServiceConstants;
@@ -78,6 +79,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private ServiceTracker wsAccTracker;
 	private CharDevice accel;
 	private CharDeviceInputStream accIs;
+	private ServiceRegistration lcdRef;
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -98,7 +100,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 	public void start() throws Exception {
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
-
+		lcdRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
 		Dictionary props = new Hashtable();
 		props.put("width", new Integer(LCD_WIDTH));
 		props.put("height", new Integer(LCD_HEIGHT));
@@ -133,6 +135,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		}
 
 		moduleRef.unregister();
+		lcdRef.unregister();
 		moduleDisplayServReg.unregister();
 		lcdControlServReg.unregister();
 	}
