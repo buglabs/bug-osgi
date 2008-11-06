@@ -193,5 +193,80 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModul
 		return -1;
 	}
 
+	public void clearGPIO(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void clearIOX(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void doADC() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void doDAC() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public int getRDACResistance() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int getStatus() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void makeGPIOIn(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void makeGPIOOut(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void makeIOXIn(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void makeIOXOut(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public int readADC() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void readDAC() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setGPIO(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setIOX(int pin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setRDACResistance(int resistance) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
