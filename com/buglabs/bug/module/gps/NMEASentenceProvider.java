@@ -1,11 +1,10 @@
 package com.buglabs.bug.module.gps;
 
 import java.io.BufferedReader;
+import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import sun.io.MalformedInputException;
 
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
 import com.buglabs.nmea.NMEAParser;
@@ -37,7 +36,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 			do {
 				 try {
 					 sentence = br.readLine(); 
-				 } catch (MalformedInputException e) {
+				 } catch (CharConversionException e) {
 					 sentence = "";
 					 continue;
 				 }
