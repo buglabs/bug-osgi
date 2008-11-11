@@ -70,7 +70,6 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 		<delete dir="${sdk.build.dir}/eclipse"/>
 
 		<!-- MAC BUILD -->
-<!--
 		<copy todir="${sdk.build.dir}">
 			<fileset dir="${eclipse.dir}.mac" />
 		</copy>
@@ -89,9 +88,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 
 		<delete file="${sdk.build.dir}/eclipse.tar.gz"/>
 		<delete dir="${sdk.build.dir}/eclipse"/>
--->
 		<!-- WINDOWS BUILD -->
-<!--
 		<copy todir="${sdk.build.dir}">
 			<fileset dir="${eclipse.dir}.win" />
 		</copy>
@@ -107,8 +104,6 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 		<exec dir="${sdk.build.dir}" executable="zip">
 			<arg line="-r dragonfly-win-${build.label}.zip eclipse" />
 		</exec>
--->
-
 		<!-- delete all files except dragonfly zips of eclipse with Dragonfly -->
 		<delete dir="${sdk.build.dir}/eclipse"/>
 
@@ -146,7 +141,6 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
                      password="${svn.password}"/>
 			</else>
 		</if>
-		<!--
 		<if>
 			<available file="${eclipse.dir}.mac/eclipse-mac.tar.gz" type="file"/>
 			<then>
@@ -176,7 +170,6 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
                      password="${svn.password}"/>
 			</else>
 		</if>
-		-->
 	</target>
 
 	<!-- 
