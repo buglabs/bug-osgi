@@ -16,7 +16,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 	<property name="timestamp" value="${DSTAMP}" />
 
 	<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
-	<property name="build.label" value="${mm.version}${build.id}" />
+	<property name="build.label" value="${sdk.version}${build.id}" />
 	<property name="meta.project.version" value="${build.id}" />
 
 	<property name="sdk.build.dir" value="${checkout.dir}/com.buglabs.sdk/dist" />
