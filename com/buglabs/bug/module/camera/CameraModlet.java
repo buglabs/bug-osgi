@@ -167,11 +167,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 			logService.log(LogService.LOG_ERROR, errormsg);
 			throw e;
 		}
-		System.out.println("I'm here!");
-		System.out.println("I'm here!");
-		System.out.println("I'm here!");
-		System.out.println("I'm here!");
-		System.out.println("I'm here!");
 		cameraControl = new CameraModuleControl(cc);
 		cameraControlRef = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createRemotableProperties(null));
 		moduleControl = context.registerService(IModuleControl.class.getName(), this, createRemotableProperties(null));
