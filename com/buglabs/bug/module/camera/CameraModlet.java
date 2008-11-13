@@ -172,7 +172,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		cameraControlRef = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createRemotableProperties(null));
 		moduleControl = context.registerService(IModuleControl.class.getName(), this, createRemotableProperties(null));
 		cameraService = context.registerService(ICameraDevice.class.getName(), this, createRemotableProperties(null));
-		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
+		ledRef = context.registerService(IModuleLEDController.class.getName(), cameraControl, createRemotableProperties(null));
 		
 		bep = new CameraInputEventProvider(DEVNODE_INPUT_DEVICE, logService);
 		bep.start();
