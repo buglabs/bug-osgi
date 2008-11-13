@@ -4,9 +4,10 @@ import java.io.IOException;
 
 import com.buglabs.bug.jni.camera.CameraControl;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
+import com.buglabs.module.IModuleLEDController;
 
 
-public class CameraModuleControl implements ICameraModuleControl {
+public class CameraModuleControl implements ICameraModuleControl, IModuleLEDController {
 
 	private CameraControl cc;
 

@@ -9,7 +9,7 @@ import com.buglabs.module.IModuleLEDController;
  * 
  * @author Angel Roman
  */
-public interface ICameraModuleControl extends IModuleLEDController {
+public interface ICameraModuleControl {
 	/**
 	 * Sets the beam intensity
 	 * 
