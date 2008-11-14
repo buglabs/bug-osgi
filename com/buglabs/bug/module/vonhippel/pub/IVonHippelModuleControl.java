@@ -8,19 +8,19 @@ public interface IVonHippelModuleControl {
 	public int LEDGreenOff() throws IOException;
 	public int LEDGreenOn() throws IOException;
 	
-	public int getStatus();
-	public void makeGPIOOut(int pin);
-	public void makeGPIOIn(int pin);
-	public void setGPIO(int pin);
-	public void clearGPIO(int pin);
-	public void makeIOXOut(int pin);
-	public void makeIOXIn(int pin);
-	public void setIOX(int pin);
-	public void clearIOX(int pin);
-	public void setRDACResistance(int resistance);
-	public int getRDACResistance();
-	public void doADC();
-	public int readADC();
-	public void doDAC();
-	public void readDAC();
+	public int getStatus() throws IOException;
+	public void makeGPIOOut(int pin) throws IOException;
+	public void makeGPIOIn(int pin) throws IOException;
+	public void setGPIO(int pin) throws IOException;
+	public void clearGPIO(int pin) throws IOException;
+	public void makeIOXOut(int pin) throws IOException;
+	public void makeIOXIn(int pin) throws IOException;
+	public void setIOX(int pin) throws IOException;
+	public void clearIOX(int pin) throws IOException;
+	public void setRDACResistance(int resistance) throws IOException;
+	public int getRDACResistance() throws IOException;
+	public void doADC() throws IOException;
+	public int readADC() throws IOException;
+	public void doDAC() throws IOException;
+	public void readDAC() throws IOException;
 }
