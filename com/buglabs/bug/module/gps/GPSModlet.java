@@ -47,7 +47,7 @@ import com.buglabs.util.StreamMultiplexer;
 import com.buglabs.util.XmlNode;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
-public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, PublicWSProvider, IPositionProvider {
+public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, PublicWSProvider, IPositionProvider, IModuleLEDController {
 
 	private BundleContext context;
 
