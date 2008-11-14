@@ -35,7 +35,7 @@ import com.buglabs.util.RemoteOSGiServiceConstants;
 import com.buglabs.util.StreamMultiplexerEvent;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
-public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleControl, IStreamMultiplexerListener {
+public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleControl, IStreamMultiplexerListener, IModuleLEDController {
 
 	private BundleContext context;
 
