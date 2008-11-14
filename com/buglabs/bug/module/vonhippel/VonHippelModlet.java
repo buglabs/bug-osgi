@@ -16,12 +16,13 @@ import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
 import com.buglabs.bug.module.vonhippel.pub.VonHippelWS;
 import com.buglabs.module.IModuleControl;
+import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 //import com.buglabs.util.RemoteOSGiServiceConstants;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
-public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModuleControl{
+public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModuleControl, IModuleLEDController{
 
 	private BundleContext context;
 
@@ -48,6 +49,8 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModul
 	private String regionKey;
 
 	private ServiceRegistration vhModuleRef;
+
+	private ServiceRegistration ledref;
 
 
 
@@ -91,6 +94,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModul
 	public void start() throws Exception {
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, createBasicServiceProperties());
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), this, createBasicServiceProperties());
+		ledref  = context.registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhDevice);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
 		//mdaccRef = context.registerService(IMDACCModuleControl.class.getName(), this, createBasicServiceProperties());	
@@ -114,6 +118,9 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModul
 		
 		if (vhModuleRef != null) {
 			vhModuleRef.unregister();
+		}
+		if (ledref !=null){
+			ledref.unregister();
 		}
 	}
 
@@ -266,6 +273,23 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModul
 	public void setRDACResistance(int resistance) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public int setLEDGreen(boolean state) throws IOException {
+		if (state){
+			return LEDGreenOn();
+		}
+		else
+			return LEDGreenOff();
+	}
+
+	public int setLEDRed(boolean state) throws IOException {
+		if (state){
+			return LEDRedOn();
+		}
+		else
+			return LEDRedOff();
+	
 	}
 
 
