@@ -200,79 +200,91 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl, IModul
 		return -1;
 	}
 
-	public void clearGPIO(int pin) {
-		// TODO Auto-generated method stub
+	public void clearGPIO(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_CLRGPIO(pin);
+		}
 		
 	}
 
-	public void clearIOX(int pin) {
-		// TODO Auto-generated method stub
+	public void clearIOX(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_CLRIOX(pin);
+		}
 		
 	}
 
-	public void doADC() {
-		// TODO Auto-generated method stub
+	public void doADC() throws IOException{
+		//
+		throw new IOException("VonHippelModlet.doADC() is not yet implemented");
 		
 	}
 
-	public void doDAC() {
-		// TODO Auto-generated method stub
+	public void doDAC() throws IOException{
+		throw new IOException("VonHippelModlet.doDAC() is not yet implemented");
 		
 	}
 
-	public int getRDACResistance() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getRDACResistance() throws IOException{
+		throw new IOException("VonHippelModlet.getRDACResistance() is not yet implemented");
 	}
 
-	public int getStatus() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getStatus() throws IOException{
+		throw new IOException("VonHippelModlet.getStatus() is not yet implemented");
 	}
 
-	public void makeGPIOIn(int pin) {
-		// TODO Auto-generated method stub
+	public void makeGPIOIn(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_MKGPIO_IN(pin);
+		}
+	}
+
+	public void makeGPIOOut(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_MKGPIO_OUT(pin);
+		}
 		
 	}
 
-	public void makeGPIOOut(int pin) {
-		// TODO Auto-generated method stub
+	public void makeIOXIn(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_MKIOX_IN(pin);
+		}
 		
 	}
 
-	public void makeIOXIn(int pin) {
-		// TODO Auto-generated method stub
+	public void makeIOXOut(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_MKIOX_OUT(pin);
+		}
 		
 	}
 
-	public void makeIOXOut(int pin) {
-		// TODO Auto-generated method stub
+	public int readADC() throws IOException{
+		throw new IOException("VonHippelModlet.readADC() is not yet implemented");
+	}
+
+	public void readDAC() throws IOException{
+		throw new IOException("VonHippelModlet.readDAC() is not yet implemented");
 		
 	}
 
-	public int readADC() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public void readDAC() {
-		// TODO Auto-generated method stub
+	public void setGPIO(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_SETGPIO(pin);
+		}
 		
 	}
 
-	public void setGPIO(int pin) {
-		// TODO Auto-generated method stub
+	public void setIOX(int pin) throws IOException{
+		if (vhDevice !=null){
+			vhDevice.ioctl_BMI_VH_SETIOX(pin);
+		}
 		
 	}
 
-	public void setIOX(int pin) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setRDACResistance(int resistance) {
-		// TODO Auto-generated method stub
-		
+	public void setRDACResistance(int resistance)throws IOException {
+		throw new IOException("VonHippelModlet.setRDACResistance(int resistance) is not yet implemented");				
 	}
 
 	public int setLEDGreen(boolean state) throws IOException {
