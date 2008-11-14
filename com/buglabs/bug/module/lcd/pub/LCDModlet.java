@@ -37,7 +37,7 @@ import com.buglabs.util.trackers.PublicWSAdminTracker;
  * @author kgilmer
  * 
  */
-public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IModuleDisplay {
+public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IModuleDisplay, IModuleLEDController {
 
 	private final BundleContext context;
 	private final int slotId;
