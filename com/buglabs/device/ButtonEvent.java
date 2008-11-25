@@ -65,12 +65,15 @@ public class ButtonEvent {
 	private final int button;
 	
 	private final long action;
+	
+	private final String source;
 
 	public ButtonEvent(int key) {
 		this.rawValue = key;
 		this.duration = 0;
 		this.button = 0;
 		this.action = 0;
+		this.source = null;
 	}
 
 	public ButtonEvent(int rawValue, float duration) {
@@ -78,6 +81,7 @@ public class ButtonEvent {
 		this.duration = duration;
 		this.button = 0;
 		this.action = 0;
+		this.source = null;
 	}
 
 	public ButtonEvent(int rawValue, float duration, int button) {
@@ -85,6 +89,7 @@ public class ButtonEvent {
 		this.duration = duration;
 		this.button = button;
 		this.action = 0;
+		this.source = null;
 	}
 	
 	public ButtonEvent(int rawValue, float duration, int button, long action) {
@@ -92,21 +97,51 @@ public class ButtonEvent {
 		this.duration = duration;
 		this.button = button;
 		this.action = action;
+		this.source = null;
+	}
+	
+	public ButtonEvent(int rawValue, float duration, int button, long action, String source) {
+		this.rawValue = rawValue;
+		this.duration = duration;
+		this.button = button;
+		this.action = action;
+		this.source = source;
 	}
 
+	/**
+	 * @return Code for button pressed.
+	 */
 	public int getButton() {
 		return button;
 	}
 
+	/**
+	 * @return
+	 * This value is not used.  Each button event is discreet.
+	 * @deprecated
+	 */
 	public float getDuration() {
 		return duration;
 	}
 
+	/**
+	 * @return The raw code from the event provider.
+	 */
 	public int getRawValue() {
 		return rawValue;
 	}
 	
+	/**
+	 * @return
+	 */
 	public long getAction() {
 		return action;
+	}
+	
+	/**
+	 * @return The source of the event.
+	 */
+	public String getSource() {
+		return source;
 	}
 }
