@@ -69,7 +69,7 @@ public class InputEventProvider extends Thread implements IButtonEventProvider {
 				Iterator iter = listeners.iterator();
 				
 				for(int i = 0; i < inputEvents.length; ++i) {					
-					ButtonEvent b = new ButtonEvent(inputEvents[i].code, 0, inputEvents[i].code, convertButtonAction(inputEvents[i].value));
+					ButtonEvent b = new ButtonEvent(inputEvents[i].code, 0, inputEvents[i].code, convertButtonAction(inputEvents[i].value), this.getClass().toString());
 				
 					while(iter.hasNext()) {
 						IButtonEventListener l = (IButtonEventListener) iter.next();
