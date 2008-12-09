@@ -338,7 +338,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		return null;
 	}
 
-	}
+	
 
 	public OutputStream getRS232OutputStream() {
 		CommConnection cc;
