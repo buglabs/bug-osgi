@@ -1,6 +1,8 @@
 package com.buglabs.bug.module.vonhippel.pub;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public interface IVonHippelModuleControl {
 	public int LEDRedOff() throws IOException;		// Turn off red LED
@@ -23,4 +25,9 @@ public interface IVonHippelModuleControl {
 	public int readADC() throws IOException;
 	public void doDAC() throws IOException;
 	public void readDAC() throws IOException;
+	
+	public InputStream getRS232InputStream();
+	public OutputStream getRS232OutputStream();
+	
+	
 }
