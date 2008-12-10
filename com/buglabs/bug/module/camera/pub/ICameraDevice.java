@@ -29,6 +29,7 @@ import java.io.InputStream;
  */
 public interface ICameraDevice {
 	public byte[] getImage();
+	public byte[] getImage(int sizeX, int sizeY, int format, boolean highQuality);
 	public boolean initOverlay(Rectangle pbounds);
 	public boolean startOverlay();
 	public boolean stopOverlay();

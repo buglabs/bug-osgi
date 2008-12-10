@@ -273,6 +273,10 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	public byte[] getImage() {
 		return camera.grabFrame();
 	}
+
+	public byte[] getImage(int sizeX, int sizeY, int format, boolean highQuality) {
+		return camera.grabFrameExt(sizeX, sizeY, format, highQuality);
+	}
 	
 	public boolean initOverlay(Rectangle pbounds){
 		
