@@ -194,8 +194,8 @@ int camera_overlay_setup(int fd_v4l, struct v4l2_format *fmt, int disp_lcd, int 
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_initExt(JNIEnv * env, jobject jobj,
-								      int sizeX, int sizeY,
-								      int pixelFormat, boolean highQuality)
+								      jint sizeX, jint sizeY,
+								      jint pixelFormat, jboolean highQuality)
 {
 	struct v4l2_format format;
 	struct v4l2_streamparm parm;
@@ -258,8 +258,8 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_init(JNIEnv * env,
 }
 
 JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrameExt(JNIEnv * env, jobject jobj,
-										 int sizeX, int sizeY,
-										 int format, boolean highQuality)
+										 jint sizeX, jint sizeY,
+										 jint format, jboolean highQuality)
 {
 	int fd = getFileDescriptorField(env, jobj);
 	
