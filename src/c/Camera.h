@@ -22,8 +22,8 @@
 
 #include <unistd.h>
 
-#define WIDTH 1600
-#define HEIGHT 1200
+#define DEFAULT_WIDTH 1600
+#define DEFAULT_HEIGHT 1200
 
 size_t compressUYVY(int fd, unsigned char * buff, int length);
 

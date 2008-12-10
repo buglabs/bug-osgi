@@ -39,9 +39,9 @@ extern "C" {
 
 using namespace std;
 
-size_t compressUYVY(int fd, unsigned char * buff, int length) {
+size_t compressUYVY(int fd, unsigned char * buff, int length, int sizeX, int sizeY) {
 	int bytesPerPixel = 2;
-	int byteSize = WIDTH * HEIGHT * bytesPerPixel;
+	int byteSize = sizeX * sizeY * bytesPerPixel;
 	unsigned char * data = 0;
 	unsigned char * realdata = (unsigned char *) malloc(byteSize);
 	memset(realdata, 0, byteSize);
@@ -68,8 +68,8 @@ size_t compressUYVY(int fd, unsigned char * buff, int length) {
 	  comp.err = jpeg_std_error(&error);
 	  jpeg_create_compress(&comp);
 	  jpeg_stdio_dest(&comp, out);
-	  comp.image_width = WIDTH;
-	  comp.image_height = HEIGHT;
+	  comp.image_width = sizeX;
+	  comp.image_height = sizeY;
 	  comp.input_components = 3;
 	  comp.in_color_space = JCS_YCbCr;
 	  jpeg_set_defaults(&comp);
@@ -77,18 +77,18 @@ size_t compressUYVY(int fd, unsigned char * buff, int length) {
 	  jpeg_start_compress(&comp, TRUE);
 
 
-	  unsigned char * yuvBuf = (unsigned char *) calloc(WIDTH, 3);
+	  unsigned char * yuvBuf = (unsigned char *) calloc(sizeX, 3);
 	  
 	  if(yuvBuf < 0) {
 	    return FALSE;
 	  }
 
-	  for (i = 0; i < HEIGHT; ++i) {
+	  for (i = 0; i < sizeY; ++i) {
 	    //convert a scanline from CbYCrY to YCbCr
 	    unsigned char * yuvPtr = yuvBuf;
 	    unsigned char * uyvyPtr = data;
 
-	    while(yuvPtr < (unsigned char *) (yuvBuf + (WIDTH * 3))) {
+	    while(yuvPtr < (unsigned char *) (yuvBuf + (sizeX * 3))) {
 	      yuvPtr[0] = uyvyPtr[1];
 	      yuvPtr[1] = uyvyPtr[0];
 	      yuvPtr[2] = uyvyPtr[2];
@@ -101,7 +101,7 @@ size_t compressUYVY(int fd, unsigned char * buff, int length) {
 	    }
 
 	    jpeg_write_scanlines(&comp, &yuvBuf, 1);
-	    data += (WIDTH * 2);
+	    data += (sizeX * 2);
 	  }
 	 
 	  free(yuvBuf);
@@ -193,7 +193,9 @@ int camera_overlay_setup(int fd_v4l, struct v4l2_format *fmt, int disp_lcd, int 
         return TPASS;
 }
 
-JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_init(JNIEnv * env, jobject jobj)
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_initExt(JNIEnv * env, jobject jobj,
+								      int sizeX, int sizeY,
+								      int pixelFormat, boolean highQuality)
 {
 	struct v4l2_format format;
 	struct v4l2_streamparm parm;
@@ -210,11 +212,11 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_init(JNIEnv * env,
 		return -1;
 	}
 	
-	format.fmt.pix.width = WIDTH;
-	format.fmt.pix.height = HEIGHT;
-	format.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
-	format.fmt.pix.sizeimage = WIDTH * HEIGHT * 16 / 8;
-	format.fmt.pix.bytesperline = WIDTH * 16 / 8;
+	format.fmt.pix.width = sizeX;
+	format.fmt.pix.height = sizeY;
+	format.fmt.pix.pixelformat = pixelFormat;
+	format.fmt.pix.sizeimage = sizeX * sizeY * 16 / 8;
+	format.fmt.pix.bytesperline = sizeY * 16 / 8;
 	
 	if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_S_FMT, &format) == -1) {
 		perror(strcat("Unable to set video format", strerror(errno)));
@@ -225,20 +227,20 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_init(JNIEnv * env,
 	crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	crop.c.left = 0;
 	crop.c.top = 0;
-	crop.c.width = WIDTH;
-	crop.c.height = HEIGHT;
+	crop.c.width = sizeX;
+	crop.c.height = sizeY;
 	
 	if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_S_CROP, &crop) < 0)
 	{
 		perror(strcat("Unable to set crop\n", strerror(errno)));
 	    return errno;
 	}
-	
+
 	//set capture parameters
 		parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		parm.parm.capture.timeperframe.numerator = 1;
 		parm.parm.capture.timeperframe.denominator = 5;
-		parm.parm.capture.capturemode = V4L2_MODE_HIGHQUALITY;
+		parm.parm.capture.capturemode = highQuality ? V4L2_MODE_HIGHQUALITY : 0;
 		
 		if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_S_PARM, &parm) < 0) {
 			perror(strcat("Unable to set capture parameters", strerror(errno)));
@@ -248,7 +250,16 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_init(JNIEnv * env,
 	return 0;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrame(JNIEnv * env, jobject jobj)
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_init(JNIEnv * env, jobject jobj)
+{
+  return Java_com_buglabs_bug_jni_camera_Camera_initExt(env, jobj,
+							DEFAULT_WIDTH, DEFAULT_HEIGHT,
+							V4L2_PIX_FMT_UYVY, true);
+}
+
+JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrameExt(JNIEnv * env, jobject jobj,
+										 int sizeX, int sizeY,
+										 int format, boolean highQuality)
 {
 	int fd = getFileDescriptorField(env, jobj);
 	
@@ -256,7 +267,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrame(JN
 	struct v4l2_streamparm parm;
 	
 	//workaround for driver
-	Java_com_buglabs_bug_jni_camera_Camera_init(env, jobj);
+	Java_com_buglabs_bug_jni_camera_Camera_initExt(env, jobj, sizeX, sizeY, format, highQuality);
 	
 	struct v4l2_format fmt;
 	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -273,7 +284,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrame(JN
 	//printf("Read: %i bytes\n", bytesRead);
 	
 	
-	size_t jpegsize = compressUYVY(fd, buff, fmt.fmt.pix.sizeimage);
+	size_t jpegsize = compressUYVY(fd, buff, fmt.fmt.pix.sizeimage, sizeX, sizeY);
 	
 	//workaround for driver
 		parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -298,6 +309,13 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrame(JN
 	return dirbuff;
 }
 
+
+JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrame(JNIEnv * env, jobject jobj)
+{
+  return Java_com_buglabs_bug_jni_camera_Camera_grabFrameExt(env, jobj,
+							     DEFAULT_WIDTH, DEFAULT_HEIGHT,
+							     V4L2_PIX_FMT_UYVY, true);
+}
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_overlayinit(JNIEnv * env, jobject jobj, jint left, jint top, jint width, jint height)
 {
