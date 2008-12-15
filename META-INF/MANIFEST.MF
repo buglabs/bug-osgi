@@ -21,8 +21,6 @@ Import-Package: org.osgi.util.position,
  com.buglabs.bug.jni.motion,
  com.buglabs.bug.jni.accelerometer,
  com.buglabs.bug.accelerometer.pub,
- com.buglabs.nmea,
- com.buglabs.nmea.sentences,
  com.buglabs.bug.menu.pub
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0002
