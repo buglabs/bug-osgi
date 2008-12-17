@@ -28,12 +28,9 @@ public class DegreesMinutesSeconds {
 	public double getSeconds() {
 		int i = dms.indexOf(".");
 		
-		String seconds = dms.substring(i+1);
+		String seconds = dms.substring(i);
 		
-		if(seconds.length() > 2) {
-			return Double.parseDouble(seconds.substring(0, 2) + "." + seconds.substring(2));
-		}
-		return Double.parseDouble(seconds);
+		return Double.parseDouble(seconds) * 60;
 	}
 	
 	public double toDecimalDegrees() {
