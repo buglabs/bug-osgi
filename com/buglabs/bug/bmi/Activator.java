@@ -175,6 +175,11 @@ public class Activator implements BundleActivator, ServiceListener {
 		if (driverName.equals("bmi_audio")) {
 			return "000A";
 		}
+		
+		if (driverName.equals("libertas_bmi")){
+			return "0008";
+		}
+		
 
 		logService.log(LogService.LOG_ERROR, "Unable to map " + driverName + " to a module ID.");
 
