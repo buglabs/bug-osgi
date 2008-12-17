@@ -50,9 +50,19 @@ public class ButtonEvent {
 
 	public static final int BUTTON_SELECT = 257;
 	
-	public static final int BUTTON_AUDIO_1 = 266;
+	public static final int BUTTON_AUDIO = 40;
 	
-	public static final int BUTTON_AUDIO_2 = 267;
+	//audio module doesn't really fit the normal conventions.  the getButton() 
+	//returns the same thing for both sides of the rocker, for both pressed/released events.
+	//The only way to distinguish is by getting the action.  
+	//Currently there is no way to determine which side of the rocker was released 
+	//these static final vars should remain until the driver is refactored to more clearly
+	//express the button events
+	public static final int BUTTON_AUDIO_VOLUP_PRESSED_ACTION = 32;
+	
+	//see above
+	public static final int BUTTON_AUDIO_VOLDOWN_PRESSED_ACTION = 16;
+	
 	
 	public static final int KEY_DOWN = 1;
 	
