@@ -408,7 +408,13 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	public LatLon getLatitudeLongitude() {
 		RMC rmc = nmeaProvider.getRMC();
-		return new LatLon(Double.parseDouble(rmc.getLatitude()), Double.parseDouble(rmc.getLongitude()));
+		//TODO: Change API to throw exception when RMC is unavailable
+		// instead of returning null;
+		if(rmc != null) {
+			return new LatLon(rmc.getLatitudeAsDMS().toDecimalDegrees(), rmc.getLongitudeAsDMS().toDecimalDegrees());
+		}
+		return null;
+		
 	}
 
 	public int LEDGreenOff() throws IOException {
