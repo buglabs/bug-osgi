@@ -185,7 +185,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
 	    cc = (CommConnection) Connector.open(
 				"comm:/dev/ttymxc/"+ slotId + 
-				";baudrate=4800;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
+				";baudrate=9600;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
 				Connector.READ_WRITE, true);
 	}
 
