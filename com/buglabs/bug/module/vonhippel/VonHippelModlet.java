@@ -54,6 +54,8 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 
 	private ServiceRegistration ledref;
 
+	private CommConnection cc;
+
 	private static boolean icon[][] = {
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
@@ -127,6 +129,9 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		if (ledref != null) {
 			ledref.unregister();
 		}
+		if (cc !=null){
+			cc.close();
+		}
 	}
 
 	private Properties createBasicServiceProperties() {
@@ -177,15 +182,11 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		int slot = slotId + 1;
 		String devnode_vh = "/dev/bmi_vh_control_m" + slot;
 		vhDevice = new VonHippel();
-		if (System.getProperty("microedition.commports") == null) {
-			System.setProperty("microedition.commports", "/dev/ttymxc/"
-					+ slotId);
-		} else {
-			System.setProperty("microedition.commports", System
-					.getProperty("microedition.commports")
-					+ "," + "dev/ttymxc/" + slotId);
-		}
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
+	    cc = (CommConnection) Connector.open(
+				"comm:/dev/ttymxc/"+ slotId + 
+				";baudrate=4800;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
+				Connector.READ_WRITE, true);
 	}
 
 	public int LEDGreenOff() throws IOException {
@@ -324,12 +325,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 	}
 
 	public InputStream getRS232InputStream() {
-		CommConnection cc;
 		try {
-		    cc = (CommConnection) Connector.open(
-			"comm:/dev/ttymxc/"+ slotId + 
-			";baudrate=4800;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
-			Connector.READ_WRITE, true);
 		    return (cc.openInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -341,12 +337,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 	
 
 	public OutputStream getRS232OutputStream() {
-		CommConnection cc;
 		try {
-		    cc = (CommConnection) Connector.open(
-			"comm:/dev/ttymxc/"+ slotId + 
-			";baudrate=4800;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
-			Connector.READ_WRITE, true);
 		    return (cc.openOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
