@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.buglabs.bug.module.vonhippel.RS232Configuration;
+
 /**
  * 
  * @author jconnolly
@@ -206,5 +208,6 @@ public interface IVonHippelModuleControl {
 	 */
 	public OutputStream getRS232OutputStream();
 	
+	public RS232Configuration getRS232Configuration();
 	
 }
