@@ -31,6 +31,8 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 
 	private BundleContext context;
 
+	private RS232Configuration serialConfig;
+
 	private boolean deviceOn = true;
 
 	private int slotId;
@@ -57,19 +59,32 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 	private CommConnection cc;
 
 	private static boolean icon[][] = {
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, true, true, true, true, true, true, true, true,	true, true, true, true, false, false },
-			{ false, true, false, false, false, false, false, false, false,	false, false, false, false, false, true, false },
-			{ false, true, false, true, false, true, false, true, false, true, false, true, false, true, true, false },
-			{ false, true, true, false, true, false, true, false, true, false, true, false, true, false, true, false },
-			{ false, true, false, false, false, false, false, false, false,	false, false, false, false, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true,	false, false, true, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true,	false, false, true, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true,	true, true, true, false, true, false },
-			{ false, true, false, false, true, false, true, false, false, true,	false, false, true, false, true, false },
+			{ false, false, false, false, false, false, false, false, false,
+					false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false,
+					false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false,
+					false, false, false, false, false, false, false },
+			{ false, false, true, true, true, true, true, true, true, true,
+					true, true, true, true, false, false },
+			{ false, true, false, false, false, false, false, false, false,
+					false, false, false, false, false, true, false },
+			{ false, true, false, true, false, true, false, true, false, true,
+					false, true, false, true, true, false },
+			{ false, true, true, false, true, false, true, false, true, false,
+					true, false, true, false, true, false },
+			{ false, true, false, false, false, false, false, false, false,
+					false, false, false, false, false, true, false },
+			{ false, true, false, true, false, false, false, true, false, true,
+					false, false, true, false, true, false },
+			{ false, true, false, true, false, false, false, true, false, true,
+					false, false, true, false, true, false },
+			{ false, true, false, true, false, false, false, true, false, true,
+					false, false, true, false, true, false },
+			{ false, true, false, true, false, false, false, true, false, true,
+					true, true, true, false, true, false },
+			{ false, true, false, false, true, false, true, false, false, true,
+					false, false, true, false, true, false },
 			{ false, true, false, false, false, true, false, false, false,
 					true, false, false, true, false, true, false },
 			{ false, true, false, false, false, false, false, false, false,
@@ -91,6 +106,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		this.slotId = slotId;
 		this.moduleName = moduleName;
 		this.moduleId = moduleId;
+
 	}
 
 	public void start() throws Exception {
@@ -107,6 +123,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		// createBasicServiceProperties());
 		regionKey = StatusBarUtils.displayImage(context, icon, this
 				.getModuleName());
+		this.serialConfig = new RS232Configuration();
 	}
 
 	public void stop() throws Exception {
@@ -129,7 +146,7 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		if (ledref != null) {
 			ledref.unregister();
 		}
-		if (cc !=null){
+		if (cc != null) {
 			cc.close();
 		}
 	}
@@ -183,10 +200,12 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 		String devnode_vh = "/dev/bmi_vh_control_m" + slot;
 		vhDevice = new VonHippel();
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
-	    cc = (CommConnection) Connector.open(
-				"comm:/dev/ttymxc/"+ slotId + 
-				";baudrate=9600;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
-				Connector.READ_WRITE, true);
+		cc = (CommConnection) Connector
+				.open(
+						"comm:/dev/ttymxc/"
+								+ slotId
+								+ ";baudrate=9600;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
+						Connector.READ_WRITE, true);
 	}
 
 	public int LEDGreenOff() throws IOException {
@@ -248,8 +267,10 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 	}
 
 	public int getStatus() throws IOException {
-		throw new IOException(
-				"VonHippelModlet.getStatus() is not yet implemented");
+		if (vhDevice != null) {
+			return vhDevice.ioctl_BMI_VH_GETSTAT();
+		}
+		return -1;
 	}
 
 	public void makeGPIOIn(int pin) throws IOException {
@@ -326,24 +347,55 @@ public class VonHippelModlet implements IModlet, IVonHippelModuleControl,
 
 	public InputStream getRS232InputStream() {
 		try {
-		    return (cc.openInputStream());
+			return (cc.openInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		 
+
 		return null;
 	}
-
-	
 
 	public OutputStream getRS232OutputStream() {
 		try {
-		    return (cc.openOutputStream());
+			return (cc.openOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		 
+
 		return null;
 	}
 
+	public RS232Configuration getRS232Configuration() {
+		return serialConfig;
+	}
+
+	public void setRS232Configuration(RS232Configuration config){
+		/*this.serialConfig = config;
+		try {
+			cc.close();
+			String configstring = 
+		    
+					"comm:/dev/ttymxc/"+ slotId + 
+					";baudrate="+config.getBaudrate()+";" +
+					"bitsperchar="+config.getBitsperchar()+";" +
+					"stopbits="+config.getStopbits()+";"+
+					"parity="+config.getParity();
+					if (config.isAutocts()){
+						configstring+="autocts=on";
+					}
+					else 
+						configstring+="autocts=off";
+					if (config.is                                                                                                                                                                                                                                                               )
+			"autocts=off;" +
+					"autorts=off;" +
+					"blocking=off",
+					Connector.READ_WRITE, true);
+					
+					cc = (CommConnection) Connector.open(
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+	}
 }
