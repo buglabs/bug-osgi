@@ -182,7 +182,7 @@ public class VonHippelModuleControl {
 	}
 
 	public RS232Configuration getRS232Configuration() {
-		return serialConfig;
+		return null;
 	}
 
 	public void setRS232Configuration(RS232Configuration config){
