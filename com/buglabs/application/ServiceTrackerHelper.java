@@ -35,6 +35,13 @@ import com.buglabs.util.ServiceFilterGenerator;
  *
  */
 public class ServiceTrackerHelper {
+	/**
+	 * @param context BundleContext
+	 * @param services Services to be tracked
+	 * @param runnable Object handling service changes
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
 	public static ServiceTracker createAndOpen(BundleContext context, List services, RunnableWithServices runnable) throws InvalidSyntaxException {
 		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(services));
 		ServiceTracker st = new ServiceTracker(context, filter, new ServiceTrackerCustomizerAdapter(context, runnable, services));
@@ -43,6 +50,14 @@ public class ServiceTrackerHelper {
 		return st;
 	}
 
+	/**
+	 * @param context BundleContext
+	 * @param services Services to be tracked
+	 * @param runnable Object handling service changes
+	 * @return
+	 * @throws InvalidSyntaxException
+	 * 
+	 */
 	public static ServiceTracker createAndOpen(BundleContext context, String[] services, RunnableWithServices runnable) throws InvalidSyntaxException {
 
 		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(Arrays.asList(services)));
@@ -52,7 +67,60 @@ public class ServiceTrackerHelper {
 		return st;
 	}
 
+	/**
+	 * @param context BundleContext
+	 * @param service Service to be tracked
+	 * @param runnable Object handling service changes
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
 	public static ServiceTracker createAndOpen(BundleContext context, String service, RunnableWithServices runnable) throws InvalidSyntaxException {
+		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(Arrays.asList(new String[] { service })));
+		ServiceTracker st = new ServiceTracker(context, filter, new ServiceTrackerCustomizerAdapter(context, runnable, Arrays.asList(new String[] { service })));
+		st.open();
+
+		return st;
+	}
+	
+	/**
+	 * @param context BundleContext
+	 * @param services Services to be tracked
+	 * @param runnable Object handling service changes
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static ServiceTracker createAndOpen(BundleContext context, List services, ServiceChangeListener runnable) throws InvalidSyntaxException {
+		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(services));
+		ServiceTracker st = new ServiceTracker(context, filter, new ServiceTrackerCustomizerAdapter(context, runnable, services));
+		st.open();
+
+		return st;
+	}
+
+	/**
+	 * @param context BundleContext
+	 * @param services Services to be tracked
+	 * @param runnable Object handling service changes
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static ServiceTracker createAndOpen(BundleContext context, String[] services, ServiceChangeListener runnable) throws InvalidSyntaxException {
+
+		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(Arrays.asList(services)));
+		ServiceTracker st = new ServiceTracker(context, filter, new ServiceTrackerCustomizerAdapter(context, runnable, Arrays.asList(services)));
+		st.open();
+
+		return st;
+	}
+
+	/**
+	 * @param context BundleContext
+	 * @param services Services to be tracked
+	 * @param runnable Object handling service changes
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static ServiceTracker createAndOpen(BundleContext context, String service, ServiceChangeListener runnable) throws InvalidSyntaxException {
 		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(Arrays.asList(new String[] { service })));
 		ServiceTracker st = new ServiceTracker(context, filter, new ServiceTrackerCustomizerAdapter(context, runnable, Arrays.asList(new String[] { service })));
 		st.open();

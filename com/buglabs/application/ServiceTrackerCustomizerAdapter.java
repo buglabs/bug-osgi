@@ -85,10 +85,15 @@ class ServiceTrackerCustomizerAdapter implements ServiceTrackerCustomizer, IServ
 		String[] objClassName = (String[]) reference
 				.getProperty(Constants.OBJECTCLASS);
 
+		//If the client used ServiceChangeListener, give granular service notifications.
+		if (runnable instanceof ServiceChangeListener) {
+			((ServiceChangeListener)runnable).serviceAvailable(obj);
+		}
+		
 		if (servicesMap.containsKey(objClassName[0]) && servicesMap.get(objClassName[0]) == null) {
 			logService.log(LogService.LOG_DEBUG, context.getBundle().getLocation() + "  Tracking Service: " + objClassName[0] + " with implementation: " + obj.toString());			
 			servicesMap.put(objClassName[0], obj);
-		
+			
 			if (canStart()) {
 				logService.log(LogService.LOG_DEBUG, "Tracker Complete.");
 				doStart();
