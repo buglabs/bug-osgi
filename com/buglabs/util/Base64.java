@@ -1091,7 +1091,7 @@ public class Base64 {
 					} // end else if: also padded correctly
 					else {
 						// Must have broken out from above.
-						throw new java.io.IOException("Improperly padded Base64 input.");
+						throw new java.io.IOException("Base64.java: Improperly padded Base64 input.");
 					} // end
 
 				} // end else: decode
