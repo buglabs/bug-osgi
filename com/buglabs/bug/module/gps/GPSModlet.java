@@ -206,15 +206,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public List getModuleProperties() {
 		List properties = new ArrayList();
 
-		//properties.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
+		try {
+			properties.add(new ModuleProperty("Status", "" + this.getStatus()));
+		} catch (IOException e1) {
+		}
 		properties.add(new ModuleProperty("Slot", "" + slotId));
-
-		/*Position pos = getPosition();
-		if (pos != null) {
-			properties.add(new ModuleProperty("Location", getPosition().toString()));
-		}*/
-
-		//properties.add(new ModuleProperty("State", Boolean.toString(deviceOn), "Boolean", true));
 
 		try {
 			int status = getStatus();
