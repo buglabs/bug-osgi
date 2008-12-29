@@ -116,7 +116,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	}
 
 	public void start() throws Exception {
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, createBasicServiceProperties());
+		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
 		motiond.start();
 		motionSubject.start();
 
