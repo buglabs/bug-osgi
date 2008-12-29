@@ -5,6 +5,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.bug.module.pub.IModlet;
