@@ -134,7 +134,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		log.log(LogService.LOG_DEBUG, "GPSModlet defaulting to passive (external) antenna");
 		setPassiveAntenna();
 
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, createRemotableProperties(null));
+		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
 		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
 		gpsControlRef = context.registerService(IGPSModuleControl.class.getName(), this, createRemotableProperties(null));
 		nmeaRef = context.registerService(INMEARawFeed.class.getName(), gpsd, createRemotableProperties(null));
