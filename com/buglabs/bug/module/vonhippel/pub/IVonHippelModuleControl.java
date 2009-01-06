@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.buglabs.bug.module.vonhippel.RS232Configuration;
-
 /**
  * 
  * @author jconnolly
@@ -182,8 +180,8 @@ public interface IVonHippelModuleControl {
 	/**
 	 * Gets the input stream associated with the RS232 port on Von Hippel module.
 	 * This implementation is based on the javax.microedition.commports API.  The
-	 * port is set up with the following parameters in VonHippelModlet:
-	 * baudrate=4800
+	 * port is set up with the following parameters in VonHippelModuleControl:
+	 * baudrate=9600
 	 * bitsperchar=8
 	 * stopbits=1
 	 * parity=none
@@ -196,8 +194,8 @@ public interface IVonHippelModuleControl {
 	/**
 	 * Gets the output stream associated with the RS232 port on Von Hippel module.
 	 * This implementation is based on the javax.microedition.commports API.  The
-	 * port is set up with the following parameters in VonHippelModlet:
-	 * baudrate=4800
+	 * port is set up with the following parameters in VonHippelModuleControl:
+	 * baudrate=9600
 	 * bitsperchar=8
 	 * stopbits=1
 	 * parity=none
@@ -208,6 +206,5 @@ public interface IVonHippelModuleControl {
 	 */
 	public OutputStream getRS232OutputStream();
 	
-	public RS232Configuration getRS232Configuration();
 	
 }

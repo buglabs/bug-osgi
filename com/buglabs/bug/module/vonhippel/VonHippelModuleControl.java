@@ -180,39 +180,7 @@ public class VonHippelModuleControl {
 
 		return null;
 	}
-
-	public RS232Configuration getRS232Configuration() {
-		return null;
-	}
-
-	public void setRS232Configuration(RS232Configuration config){
-		/*this.serialConfig = config;
-		try {
-			cc.close();
-			String configstring = 
-		    
-					"comm:/dev/ttymxc/"+ slotId + 
-					";baudrate="+config.getBaudrate()+";" +
-					"bitsperchar="+config.getBitsperchar()+";" +
-					"stopbits="+config.getStopbits()+";"+
-					"parity="+config.getParity();
-					if (config.isAutocts()){
-						configstring+="autocts=on";
-					}
-					else 
-						configstring+="autocts=off";
-					if (config.is                                                                                                                                                                                                                                                               )
-			"autocts=off;" +
-					"autorts=off;" +
-					"blocking=off",
-					Connector.READ_WRITE, true);
-					
-					cc = (CommConnection) Connector.open(
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		
-	}
+
 
 }
