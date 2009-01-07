@@ -20,6 +20,7 @@
 package com.buglabs.bug.input.pub;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 import org.osgi.service.log.LogService;
@@ -44,8 +45,10 @@ public class InputEventProvider extends Thread implements IButtonEventProvider {
 	}
 	
 	public void addListener(IButtonEventListener listener) {
-		if(!listeners.contains(listener)) {
-			listeners.add(listener);
+		synchronized (listeners) {
+			if(!listeners.contains(listener)) {
+				listeners.add(listener);
+			}	
 		}
 	}
 
@@ -62,20 +65,24 @@ public class InputEventProvider extends Thread implements IButtonEventProvider {
 			log.log(LogService.LOG_ERROR, "Unable to open input device: " + inputDevice);
 		}
 		
-		while(!isInterrupted()) {
-			InputEvent[] inputEvents = dev.readEvents();
-			
-			synchronized(listeners) {
-				Iterator iter = listeners.iterator();
-				
-				for(int i = 0; i < inputEvents.length; ++i) {					
-					ButtonEvent b = new ButtonEvent(inputEvents[i].code, 0, inputEvents[i].code, convertButtonAction(inputEvents[i].value), this.getClass().toString());
-				
-					while(iter.hasNext()) {
-						IButtonEventListener l = (IButtonEventListener) iter.next();
-						l.buttonEvent(b);
+		while (!isInterrupted()) {
+			try {
+				InputEvent[] inputEvents = dev.readEvents();
+
+				synchronized (listeners) {
+					Iterator iter = listeners.iterator();
+
+					for (int i = 0; i < inputEvents.length; ++i) {
+						ButtonEvent b = new ButtonEvent(inputEvents[i].code, 0, inputEvents[i].code, convertButtonAction(inputEvents[i].value), this.getClass().toString());
+
+						while (iter.hasNext()) {
+							IButtonEventListener l = (IButtonEventListener) iter.next();
+							l.buttonEvent(b);
+						}
 					}
 				}
+			} catch (ConcurrentModificationException e) {
+				log.log(LogService.LOG_ERROR, "Concurrency issue", e);
 			}
 		}
 		
