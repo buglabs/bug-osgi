@@ -1,3 +1,30 @@
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *    - Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *    - Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
+ *      used to endorse or promote products derived from this software without
+ *      specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
 package com.buglabs.bug.module.gps;
 
 import java.io.IOException;
@@ -49,8 +76,9 @@ import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 /**
  * The Modlet exports the hardware-level services to the OSGi runtime.
+ * 
  * @author kgilmer
- *
+ * 
  */
 public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, PublicWSProvider, IPositionProvider, IModuleLEDController {
 
@@ -90,25 +118,25 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	private String regionKey;
 
 	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-		{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-		{ false, true, true, true, true, false, false, false, false, false, false, false, false, false, true, false },
-		{ false, true, true, true, true, true, true, true, false, false, false, false, false, false, true, false },
-		{ false, true, true, true, true, true, true, true, true, true, false, false, false, false, true, false },
-		{ false, true, true, true, true, true, true, true, true, true, true, false, false, false, true, false },
-		{ false, true, true, true, true, true, true, true, true, true, true, true, false, false, true, false },
-		{ false, true, true, false, false, false, true, false, false, false, true, false, false, false, true, false },
-		{ false, true, false, true, true, true, true, false, true, false, true, false, true, true, true, false },
-		{ false, true, false, true, false, false, true, false, false, false, true, false, false, false, true, false },
-		{ false, true, false, true, true, false, true, false, true, true, true, true, true, false, true, false },
-		{ false, true, true, false, false, false, true, false, true, true, true, false, false, false, true, false },
-		{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-		{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
+			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
+			{ false, true, true, true, true, false, false, false, false, false, false, false, false, false, true, false },
+			{ false, true, true, true, true, true, true, true, false, false, false, false, false, false, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, false, false, false, false, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, false, false, false, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, true, false, false, true, false },
+			{ false, true, true, false, false, false, true, false, false, false, true, false, false, false, true, false },
+			{ false, true, false, true, true, true, true, false, true, false, true, false, true, true, true, false },
+			{ false, true, false, true, false, false, true, false, false, false, true, false, false, false, true, false },
+			{ false, true, false, true, true, false, true, false, true, true, true, true, true, false, true, false },
+			{ false, true, true, false, false, false, true, false, true, true, true, false, false, false, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
 
 	private GPSControl gpscontrol;
 
@@ -134,14 +162,16 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		this.log = LogServiceUtil.getLogService(context);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.buglabs.bug.module.pub.IModlet#start()
 	 */
 	public void start() throws Exception {
 		log.log(LogService.LOG_DEBUG, "GPSModlet start enter");
 		gpsd.start();
 		nmeaProvider.start();
-		
+
 		// default to passive (external) antenna, until
 		// such time as we have confidence in the internal
 		// antenna's ability to obtain a fix
@@ -158,12 +188,12 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 		timer = new Timer();
 		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
-		//TODO: Start position and sentence services when we achieve GPS lock
+		// TODO: Start position and sentence services when we achieve GPS lock
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
 		log.log(LogService.LOG_DEBUG, "GPSModlet start leave");
 	}
-	
+
 	/**
 	 * @return A dictionary with R-OSGi enable property.
 	 */
@@ -171,13 +201,15 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		if (ht == null) {
 			ht = new Hashtable();
 		}
-		
+
 		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-		
+
 		return ht;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.buglabs.bug.module.pub.IModlet#stop()
 	 */
 	public void stop() throws Exception {
@@ -202,12 +234,14 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		log.log(LogService.LOG_DEBUG, "GPSModlet stop leave");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.buglabs.bug.module.gps.pub.IPositionProvider#getPosition()
 	 */
 	public Position getPosition() {
 		RMC rmc = nmeaProvider.getRMC();
-		
+
 		if (rmc != null && !rmc.isEmpty()) {
 			try {
 				Position pos = new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS()
@@ -224,7 +258,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.buglabs.module.IModuleControl#getModuleProperties()
 	 */
 	public List getModuleProperties() {
@@ -246,9 +282,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			properties.add(new ModuleProperty(PROPERTY_GPS_FIX, Boolean.toString((status &= 0x1) == 0)));
 
 			String antenna = PROPERTY_ANTENNA_ACTIVE;
-			if((status &= 0xC0) == IGPSModuleControl.STATUS_PASSIVE_ANTENNA) {
+			if ((status &= 0xC0) == IGPSModuleControl.STATUS_PASSIVE_ANTENNA) {
 				antenna = PROPERTY_ANTENNA_PASSIVE;
-			} 
+			}
 			properties.add(new ModuleProperty(PROPERTY_ANTENNA, antenna, "String", false));
 
 		} catch (IOException e) {
@@ -266,8 +302,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		if (property.getName().equals("State")) {
 			deviceOn = Boolean.valueOf((String) property.getValue()).booleanValue();
 			return true;
-		} else if(property.getName().equals(PROPERTY_ANTENNA)) {
-			if(property.getValue().toString().equals(PROPERTY_ANTENNA_PASSIVE)) {
+		} else if (property.getName().equals(PROPERTY_ANTENNA)) {
+			if (property.getValue().toString().equals(PROPERTY_ANTENNA_PASSIVE)) {
 				gpscontrol.ioctl_BMI_GPS_PASSIVE_ANT();
 				System.out.println("Passive");
 			} else {
@@ -371,7 +407,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		CharDeviceUtils.openDeviceWithRetry(gps, devnode_gps, FCNTL_H.O_RDWR | FCNTL_H.O_NONBLOCK, 2);
 
 		int result = gps.init();
-		if(result < 0) {
+		if (result < 0) {
 			throw new RuntimeException("Unable to initialize gps device: " + devnode_gpscontrol);
 		}
 
@@ -391,13 +427,13 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	private long getReadDelay() {
 		log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay enter");
 		ServiceReference sr = context.getServiceReference(ConfigurationAdmin.class.getName());
-		
+
 		long read_delay = 100;
-		
-		if(sr != null) {
+
+		if (sr != null) {
 			ConfigurationAdmin ca = (ConfigurationAdmin) context.getService(sr);
 			log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay obtained cm");
-			if(ca != null) {
+			if (ca != null) {
 				Configuration c;
 				try {
 					c = ca.getConfiguration(getModuleName());
@@ -406,14 +442,14 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 					String factoryPid = c.getPid();
 					Dictionary properties = c.getProperties();
 					Object obj = c.getProperties().get(key);
-					if(obj != null) {
+					if (obj != null) {
 						read_delay = Long.parseLong(obj.toString());
 						log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay: got delay: " + read_delay);
 					} else {
 						c.getProperties().put(key, Long.toString(read_delay));
 						c.update(c.getProperties());
 						log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay: wrote delay into cm");
-						
+
 						Object object = c.getProperties().get(key);
 						log.log(LogService.LOG_INFO, "$$$$$$$$$ Retrieving property: " + object.toString());
 					}
@@ -428,23 +464,23 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	public LatLon getLatitudeLongitude() {
 		RMC rmc = nmeaProvider.getRMC();
-		//TODO: Change API to throw exception when RMC is unavailable
+		// TODO: Change API to throw exception when RMC is unavailable
 		// instead of returning null;
-		if(rmc != null) {
+		if (rmc != null) {
 			return new LatLon(rmc.getLatitudeAsDMS().toDecimalDegrees(), rmc.getLongitudeAsDMS().toDecimalDegrees());
 		}
 		return null;
-		
+
 	}
 
 	public int LEDGreenOff() throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
+		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_GLEDOFF();
 		}
 
-		if(result < 0) {
+		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_GLEDOFF failed");
 		}
 
@@ -454,11 +490,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int LEDGreenOn() throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
+		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_GLEDON();
 		}
 
-		if(result < 0) {
+		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_GLEDON failed");
 		}
 
@@ -468,11 +504,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int LEDRedOff() throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
+		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_RLEDOFF();
 		}
 
-		if(result < 0) {
+		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_GLEDON failed");
 		}
 
@@ -482,11 +518,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int LEDRedOn() throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
+		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_RLEDON();
 		}
 
-		if(result < 0) {
+		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_RLEDON failed");
 		}
 
@@ -496,11 +532,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int getStatus() throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
+		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_GETSTAT();
 		}
 
-		if(result < 0) {
+		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_GETSTAT failed");
 		}
 
@@ -510,11 +546,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int setActiveAntenna() throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
+		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_ACTIVE_ANT();
 		}
 
-		if(result < 0) {
+		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_GLEDON failed");
 		}
 
@@ -524,11 +560,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int setPassiveAntenna() throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
+		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_PASSIVE_ANT();
 		}
 
-		if(result < 0) {
+		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_GLEDON failed");
 		}
 
@@ -538,8 +574,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int setLEDGreen(boolean state) throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
-			if(state) {
+		if (gpscontrol != null) {
+			if (state) {
 				return LEDGreenOn();
 			} else {
 				return LEDGreenOff();
@@ -552,9 +588,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public int setLEDRed(boolean state) throws IOException {
 		int result = -1;
 
-		if(gpscontrol != null) {
-			if(gpscontrol != null) {
-				if(state) {
+		if (gpscontrol != null) {
+			if (gpscontrol != null) {
+				if (state) {
 					return LEDRedOn();
 				} else {
 					return LEDRedOff();

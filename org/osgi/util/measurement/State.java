@@ -1,62 +1,64 @@
-/*
- * $Header: /opt/tmp/root/com.buglabs.bug.module.gps/org/osgi/util/measurement/State.java,v 1.1 2008-08-22 15:49:52 kgilmer Exp $
- *
- * Copyright (c) The Open Services Gateway Initiative (2002).
- * All Rights Reserved.
- *
- * Implementation of certain elements of the Open Services Gateway Initiative
- * (OSGI) Specification may be subject to third party intellectual property
- * rights, including without limitation, patent rights (such a third party may
- * or may not be a member of OSGi). OSGi is not responsible and shall not be
- * held responsible in any manner for identifying or failing to identify any or
- * all such third party intellectual property rights.
- *
- * This document and the information contained herein are provided on an "AS
- * IS" basis and OSGI DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL
- * NOT INFRINGE ANY RIGHTS AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT WILL OSGI BE LIABLE FOR ANY
- * LOSS OF PROFITS, LOSS OF BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF
- * BUSINESS, OR FOR DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTIAL,
- * PUNITIVE OR CONSEQUENTIAL DAMAGES OF ANY KIND IN CONNECTION WITH THIS
- * DOCUMENT OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH LOSS OR DAMAGE.
- *
- * All Company, brand and product names may be trademarks that are the sole
- * property of their respective owners. All rights reserved.
- */
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *    - Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *    - Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
+ *      used to endorse or promote products derived from this software without
+ *      specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
 
 package org.osgi.util.measurement;
 
 /**
  * Groups a state name, value and timestamp.
- *
- * <p>The state itself is represented
- * as an integer and the time is measured in milliseconds since midnight,
- * January 1, 1970 UTC.
- *
- * <p>A <tt>State</tt> object is immutable so that it may be
- * easily shared.
- *
+ * 
+ * <p>
+ * The state itself is represented as an integer and the time is measured in
+ * milliseconds since midnight, January 1, 1970 UTC.
+ * 
+ * <p>
+ * A <tt>State</tt> object is immutable so that it may be easily shared.
+ * 
  * @version $Revision: 1.1 $
  * @author Open Services Gateway Initiative
  */
 
-public class State
-{
+public class State {
 	final int value;
 	final long time;
 	final String name;
 
 	/**
 	 * Create a new <tt>State</tt> object.
-	 *
-	 * @param value The value of the state.
-	 * @param name The name of the state.
-	 * @param time The time measured in milliseconds since midnight, January 1, 1970 UTC.
+	 * 
+	 * @param value
+	 *            The value of the state.
+	 * @param name
+	 *            The name of the state.
+	 * @param time
+	 *            The time measured in milliseconds since midnight, January 1,
+	 *            1970 UTC.
 	 */
-	public State(int value, String name, long time)
-	{
+	public State(int value, String name, long time) {
 		this.value = value;
 		this.name = name;
 		this.time = time;
@@ -64,79 +66,72 @@ public class State
 
 	/**
 	 * Create a new <tt>State</tt> object with a time of 0.
-	 *
-	 * @param value The value of the state.
-	 * @param name The name of the state.
+	 * 
+	 * @param value
+	 *            The value of the state.
+	 * @param name
+	 *            The name of the state.
 	 */
-	public State(int value, String name)
-	{
+	public State(int value, String name) {
 		this(value, name, 0);
 	}
 
-
 	/**
 	 * Returns the value of this <tt>State</tt>.
-	 *
+	 * 
 	 * @return The value of this <tt>State</tt> object.
 	 */
-	public final int getValue()
-	{
+	public final int getValue() {
 		return value;
 	}
 
 	/**
 	 * Returns the time with which this <tt>State</tt> was created.
-	 *
-	 * @return The time with which this <tt>State</tt> was created.
-	 * The time is measured in milliseconds since midnight, January 1, 1970 UTC.
+	 * 
+	 * @return The time with which this <tt>State</tt> was created. The time
+	 *         is measured in milliseconds since midnight, January 1, 1970 UTC.
 	 */
-	public final long getTime()
-	{
+	public final long getTime() {
 		return time;
 	}
 
 	/**
 	 * Returns the name of this <tt>State</tt>.
-	 *
+	 * 
 	 * @return The name of this <tt>State</tt> object.
 	 */
-	public final String getName()
-	{
+	public final String getName() {
 		return name;
 	}
 
 	/**
 	 * Returns a <tt>String</tt> object representing this object.
-	 *
+	 * 
 	 * @return a <tt>String</tt> object representing this object.
 	 */
-	public String toString()
-	{
+	public String toString() {
 		StringBuffer sb = new StringBuffer();
 
 		sb.append(value);
 
-		if (name != null)
-		{
+		if (name != null) {
 			sb.append(" \"");
 			sb.append(name);
 			sb.append("\"");
 		}
 
-		return(sb.toString());
+		return (sb.toString());
 	}
 
 	/**
 	 * Returns a hash code value for this object.
-	 *
+	 * 
 	 * @return A hash code value for this object.
 	 */
-	public int hashCode()
-	{
+	public int hashCode() {
 		int hash = value;
 
-		if (name != null)
-		{
+		if (name != null) {
 			hash ^= name.hashCode();
 		}
 
@@ -144,44 +139,37 @@ public class State
 	}
 
 	/**
-	 * Return whether the specified object is equal to this object.
-	 * Two <tt>State</tt> objects are equal if they have same value and name.
-	 *
-	 * @param obj The object to compare with this object.
-	 * @return <tt>true</tt> if this object is equal to the specified
-	 * object; <tt>false</tt> otherwise.
+	 * Return whether the specified object is equal to this object. Two
+	 * <tt>State</tt> objects are equal if they have same value and name.
+	 * 
+	 * @param obj
+	 *            The object to compare with this object.
+	 * @return <tt>true</tt> if this object is equal to the specified object;
+	 *         <tt>false</tt> otherwise.
 	 */
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
 
-		if (!(obj instanceof State))
-		{
+		if (!(obj instanceof State)) {
 			return false;
 		}
 
-		State that = (State)obj;
+		State that = (State) obj;
 
-		if (value != that.value)
-		{
+		if (value != that.value) {
 			return false;
 		}
 
-		if (name == that.name)
-		{
+		if (name == that.name) {
 			return true;
 		}
 
-		if (name == null)
-		{
+		if (name == null) {
 			return false;
 		}
 
 		return name.equals(that.name);
 	}
 }
-
-
