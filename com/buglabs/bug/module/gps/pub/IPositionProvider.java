@@ -10,12 +10,12 @@ import org.osgi.util.position.Position;
  */
 public interface IPositionProvider {
 	/**
-	 * @return current position as Position object.
+	 * @return current position as Position object or null if unable to determine position.
 	 */
 	public Position getPosition();
 
 	/**
-	 * @return current position as LatLon object.
+	 * @return current position as LatLon object or null if unable to determine Lat/Long.
 	 */
 	public LatLon getLatitudeLongitude();
 }

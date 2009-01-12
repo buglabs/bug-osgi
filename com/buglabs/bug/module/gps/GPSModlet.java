@@ -47,6 +47,11 @@ import com.buglabs.util.StreamMultiplexer;
 import com.buglabs.util.XmlNode;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
+/**
+ * The Modlet exports the hardware-level services to the OSGi runtime.
+ * @author kgilmer
+ *
+ */
 public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, PublicWSProvider, IPositionProvider, IModuleLEDController {
 
 	private BundleContext context;
@@ -115,6 +120,12 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private ServiceRegistration ledRef;
 
+	/**
+	 * @param context
+	 * @param slotId
+	 * @param moduleId
+	 * @param moduleName
+	 */
 	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
@@ -123,6 +134,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		this.log = LogServiceUtil.getLogService(context);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.pub.IModlet#start()
+	 */
 	public void start() throws Exception {
 		log.log(LogService.LOG_DEBUG, "GPSModlet start enter");
 		gpsd.start();
@@ -163,6 +177,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		return ht;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.pub.IModlet#stop()
+	 */
 	public void stop() throws Exception {
 		log.log(LogService.LOG_DEBUG, "GPSModlet stop enter");
 		timer.cancel();
@@ -185,9 +202,13 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		log.log(LogService.LOG_DEBUG, "GPSModlet stop leave");
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.IPositionProvider#getPosition()
+	 */
 	public Position getPosition() {
 		RMC rmc = nmeaProvider.getRMC();
-		if (rmc != null) {
+		
+		if (rmc != null && !rmc.isEmpty()) {
 			try {
 				Position pos = new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS()
 						.toDecimalDegrees()
@@ -203,6 +224,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.module.IModuleControl#getModuleProperties()
+	 */
 	public List getModuleProperties() {
 		List properties = new ArrayList();
 
