@@ -1,22 +1,30 @@
-/* Copyright (c) 2007, 2008 Bug Labs, Inc.
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
- *   
- * This program is free software; you can redistribute it and/or  
- * modify it under the terms of the GNU General Public License version  
- * 2 only, as published by the Free Software Foundation.   
- *   
- * This program is distributed in the hope that it will be useful, but  
- * WITHOUT ANY WARRANTY; without even the implied warranty of  
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU  
- * General Public License version 2 for more details (a copy is  
- * included at http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).   
- *   
- * You should have received a copy of the GNU General Public License  
- * version 2 along with this work; if not, write to the Free Software  
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  
- * 02110-1301 USA   
- *
- */
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *    - Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *    - Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
+ *      used to endorse or promote products derived from this software without
+ *      specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
 package com.buglabs.bug.module.camera;
 
 import java.awt.Rectangle;
@@ -80,7 +88,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	private ServiceRegistration moduleControl;
 
 	private ServiceRegistration cameraService;
-	
+
 	private ServiceRegistration bepReg;
 
 	private LogService logService;
@@ -92,25 +100,25 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	private String regionKey;
 
 	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-		{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-		{ false, true, false, false, false, false, false, false, false, false, false, true, true, false, true, false },
-		{ false, true, false, false, true, true, true, true, true, true, true, true, true, false, true, false },
-		{ false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false },
-		{ false, true, false, true, false, false, false, false, true, true, true, true, true, false, true, false },
-		{ false, true, false, true, false, false, true, true, false, true, true, true, true, false, true, false },
-		{ false, true, false, true, false, false, true, true, false, true, true, true, true, false, true, false },
-		{ false, true, false, true, false, true, false, false, true, true, true, true, true, false, true, false },
-		{ false, true, false, true, false, true, true, true, true, true, true, true, true, false, true, false },
-		{ false, true, false, true, true, true, true, true, true, true, true, true, true, false, true, false },
-		{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-		{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-		{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
+			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
+			{ false, true, false, false, false, false, false, false, false, false, false, true, true, false, true, false },
+			{ false, true, false, false, true, true, true, true, true, true, true, true, true, false, true, false },
+			{ false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false },
+			{ false, true, false, true, false, false, false, false, true, true, true, true, true, false, true, false },
+			{ false, true, false, true, false, false, true, true, false, true, true, true, true, false, true, false },
+			{ false, true, false, true, false, false, true, true, false, true, true, true, true, false, true, false },
+			{ false, true, false, true, false, true, false, false, true, true, true, true, true, false, true, false },
+			{ false, true, false, true, false, true, true, true, true, true, true, true, true, false, true, false },
+			{ false, true, false, true, true, true, true, true, true, true, true, true, true, false, true, false },
+			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
 
 	private CameraModuleControl cameraControl;
 
@@ -146,24 +154,22 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		modProps = new ArrayList();
 
 		camera = new Camera();
-		//TODO: Change this when we move to linux 2.6.22 or greater since
-		//BMI agent should listen to UDEV ACTION=="online" before starting modlets
+		// TODO: Change this when we move to linux 2.6.22 or greater since
+		// BMI agent should listen to UDEV ACTION=="online" before starting
+		// modlets
 		try {
 			CharDeviceUtils.openDeviceWithRetry(camera, CAMERA_DEVICE_NODE, 2);
 		} catch (IOException e) {
-			String errormsg =  "Unable to open camera device node: " + CAMERA_DEVICE_NODE +
-			"\n trying again...";
+			String errormsg = "Unable to open camera device node: " + CAMERA_DEVICE_NODE + "\n trying again...";
 			logService.log(LogService.LOG_ERROR, errormsg);
 			throw e;
 		}
-		
-	
+
 		cc = new CameraControl();
 		try {
 			CharDeviceUtils.openDeviceWithRetry(cc, CAMERA_CONTROL_DEVICE_NODE, 2);
-		} catch (IOException e){
-			String errormsg =  "Unable to open camera device node: " + CAMERA_CONTROL_DEVICE_NODE +
-			"\n trying again...";
+		} catch (IOException e) {
+			String errormsg = "Unable to open camera device node: " + CAMERA_CONTROL_DEVICE_NODE + "\n trying again...";
 			logService.log(LogService.LOG_ERROR, errormsg);
 			throw e;
 		}
@@ -172,10 +178,10 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		moduleControl = context.registerService(IModuleControl.class.getName(), this, null);
 		cameraService = context.registerService(ICameraDevice.class.getName(), this, createRemotableProperties(null));
 		ledRef = context.registerService(IModuleLEDController.class.getName(), cameraControl, createRemotableProperties(null));
-		
+
 		bep = new CameraInputEventProvider(DEVNODE_INPUT_DEVICE, logService);
 		bep.start();
-		
+
 		bepReg = context.registerService(ICameraButtonEventProvider.class.getName(), bep, createRemotableProperties(getButtonServiceProperties()));
 		// Display the camera icon
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
@@ -193,9 +199,9 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		if (ht == null) {
 			ht = new Hashtable();
 		}
-		
+
 		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-		
+
 		return ht;
 	}
 
@@ -211,16 +217,16 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 		camera.close();
 		cc.close();
 	}
-	
+
 	/**
 	 * @return a dictionary of properties for the IButtonEventProvider service.
 	 */
 	private Dictionary getButtonServiceProperties() {
 		Dictionary props = new Hashtable();
-		
+
 		props.put("ButtonEventProvider", this.getClass().getName());
 		props.put("ButtonsProvided", "Camera");
-		
+
 		return props;
 	}
 
@@ -255,8 +261,9 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	public List getModuleProperties() {
 		modProps.clear();
 
-		//Removing...this information needs to come from the device.
-		//modProps.add(new ModuleProperty("MP", "" + megapixels, "Number", false));
+		// Removing...this information needs to come from the device.
+		// modProps.add(new ModuleProperty("MP", "" + megapixels, "Number",
+		// false));
 		modProps.add(new ModuleProperty("Slot", "" + slotId));
 
 		return modProps;
@@ -277,29 +284,29 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	public byte[] getImage(int sizeX, int sizeY, int format, boolean highQuality) {
 		return camera.grabFrameExt(sizeX, sizeY, format, highQuality);
 	}
-	
-	public boolean initOverlay(Rectangle pbounds){
-		
+
+	public boolean initOverlay(Rectangle pbounds) {
+
 		if (camera.overlayinit(pbounds.x, pbounds.y, pbounds.width, pbounds.height) < 0)
 			return false;
 		else
-			return true;		
+			return true;
 	}
-	
-	public boolean startOverlay(){
+
+	public boolean startOverlay() {
 		if (camera.overlaystart() < 0)
 			return false;
 		else
 			return true;
 	}
-	
-	public boolean stopOverlay(){
+
+	public boolean stopOverlay() {
 		if (camera.overlaystop() < 0)
 			return false;
 		else
-			return true;		
+			return true;
 	}
-	
+
 	public InputStream getImageInputStream() {
 		return new ByteArrayInputStream(camera.grabFrame());
 	}
