@@ -49,7 +49,7 @@ import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.lcd.Activator;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerInputStreamProvider;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerSampleProvider;
-import com.buglabs.bug.module.motion.AccelerationWS;
+import com.buglabs.bug.module.motion.pub.AccelerationWS;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
