@@ -1,22 +1,30 @@
-/* Copyright (c) 2007, 2008 Bug Labs, Inc.
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
- *   
- * This program is free software; you can redistribute it and/or  
- * modify it under the terms of the GNU General Public License version  
- * 2 only, as published by the Free Software Foundation.   
- *   
- * This program is distributed in the hope that it will be useful, but  
- * WITHOUT ANY WARRANTY; without even the implied warranty of  
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU  
- * General Public License version 2 for more details (a copy is  
- * included at http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).   
- *   
- * You should have received a copy of the GNU General Public License  
- * version 2 along with this work; if not, write to the Free Software  
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  
- * 02110-1301 USA   
- *
- */
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *    - Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *    - Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
+ *      used to endorse or promote products derived from this software without
+ *      specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
 package com.buglabs.menu;
 
 import java.util.Comparator;
@@ -42,39 +50,45 @@ public interface IMenuNode {
 
 	/**
 	 * @return <code>true</code> if the children should be sorted, and <code>
-	 * false</code> if they should not be.
+	 * false</code>
+	 *         if they should not be.
 	 */
 	public boolean sortChildren();
-	
+
 	/**
-	 * @return The Comparator to sort by if <code>sortChildren()</code> returns
-	 * <code>true</code>.  If <code>null</code> is returned, and <code>sortChildren()</code>
-	 * returns true, the natural ordering, taken from the <code>compareTo()</code> method, 
-	 * will be used.
+	 * @return The Comparator to sort by if <code>sortChildren()</code>
+	 *         returns <code>true</code>. If <code>null</code> is returned,
+	 *         and <code>sortChildren()</code> returns true, the natural
+	 *         ordering, taken from the <code>compareTo()</code> method, will
+	 *         be used.
 	 */
 	public Comparator getComparator();
-	
+
 	/**
 	 * @return <code>true</code> if number of children greater than 0.
 	 */
 	public boolean hasChildren();
-	
+
 	/**
-	 * If a node is busy, the menu system will display a spinner in the place of the node.  The user
-	 * will be able to go back to other nodes while the node is busy.  The correct way to utilize this
-	 * feature is to set the node to busy, spawn a new Thread to take care of the work, and set the
-	 * node to not busy after the thread completes.  This way, the menu system will not block.
+	 * If a node is busy, the menu system will display a spinner in the place of
+	 * the node. The user will be able to go back to other nodes while the node
+	 * is busy. The correct way to utilize this feature is to set the node to
+	 * busy, spawn a new Thread to take care of the work, and set the node to
+	 * not busy after the thread completes. This way, the menu system will not
+	 * block.
 	 * 
-	 * @return <code>true</code> if the node is busy and <code>false</code> if the node is not busy.
+	 * @return <code>true</code> if the node is busy and <code>false</code>
+	 *         if the node is not busy.
 	 */
 	public boolean isBusy();
-	
+
 	/**
 	 * 
-	 * @return Alternate text to display when a node is busy.  If <code>null</code>, use the node name.
+	 * @return Alternate text to display when a node is busy. If
+	 *         <code>null</code>, use the node name.
 	 */
 	public String getBusyName();
-	
+
 	/**
 	 * Iterate through ancestors until one of specified type is found. NULL if
 	 * none found.
@@ -118,22 +132,24 @@ public interface IMenuNode {
 	 * @param name
 	 */
 	public abstract void setName(String name);
-	
+
 	/**
 	 * 
 	 * @return a '.' separated path for this node.
 	 */
 	public abstract String getPath();
-	
+
 	/**
 	 * 
-	 * @return <code>true</code> if this node should currently display an error, <code>false</code> otherwise.
+	 * @return <code>true</code> if this node should currently display an
+	 *         error, <code>false</code> otherwise.
 	 */
 	public abstract boolean isError();
-	
+
 	/**
 	 * 
-	 * @return The name to display if <code>isError()</code> returns <code>true</code>.
+	 * @return The name to display if <code>isError()</code> returns
+	 *         <code>true</code>.
 	 */
 	public abstract String getErrorName();
 }

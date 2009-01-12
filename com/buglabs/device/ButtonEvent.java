@@ -1,22 +1,30 @@
-/* Copyright (c) 2007, 2008 Bug Labs, Inc.
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
- *   
- * This program is free software; you can redistribute it and/or  
- * modify it under the terms of the GNU General Public License version  
- * 2 only, as published by the Free Software Foundation.   
- *   
- * This program is distributed in the hope that it will be useful, but  
- * WITHOUT ANY WARRANTY; without even the implied warranty of  
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU  
- * General Public License version 2 for more details (a copy is  
- * included at http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).   
- *   
- * You should have received a copy of the GNU General Public License  
- * version 2 along with this work; if not, write to the Free Software  
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  
- * 02110-1301 USA   
- *
- */
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *    - Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *    - Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
+ *      used to endorse or promote products derived from this software without
+ *      specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
 package com.buglabs.device;
 
 /**
@@ -37,45 +45,47 @@ public class ButtonEvent {
 	public static final int BUTTON_LEFT = 263;
 
 	public static final int BUTTON_RIGHT = 262;
-	
+
 	public static final int BUTTON_UP = 264;
 
 	public static final int BUTTON_DOWN = 265;
-	
+
 	public static final int BUTTON_CAMERA_ZOOM_IN = 258;
-	
+
 	public static final int BUTTON_CAMERA_ZOOM_OUT = 257;
-	
+
 	public static final int BUTTON_CAMERA_SHUTTER = 256;
 
 	public static final int BUTTON_SELECT = 257;
-	
+
 	public static final int BUTTON_AUDIO = 40;
-	
-	//audio module doesn't really fit the normal conventions.  the getButton() 
-	//returns the same thing for both sides of the rocker, for both pressed/released events.
-	//The only way to distinguish is by getting the action.  
-	//Currently there is no way to determine which side of the rocker was released 
-	//these static final vars should remain until the driver is refactored to more clearly
-	//express the button events
+
+	// audio module doesn't really fit the normal conventions. the getButton()
+	// returns the same thing for both sides of the rocker, for both
+	// pressed/released events.
+	// The only way to distinguish is by getting the action.
+	// Currently there is no way to determine which side of the rocker was
+	// released
+	// these static final vars should remain until the driver is refactored to
+	// more clearly
+	// express the button events
 	public static final int BUTTON_AUDIO_VOLUP_PRESSED_ACTION = 32;
-	
-	//see above
+
+	// see above
 	public static final int BUTTON_AUDIO_VOLDOWN_PRESSED_ACTION = 16;
-	
-	
+
 	public static final int KEY_DOWN = 1;
-	
+
 	public static final int KEY_UP = 0;
-	
+
 	private final int rawValue;
 
 	private final float duration;
 
 	private final int button;
-	
+
 	private final long action;
-	
+
 	private final String source;
 
 	public ButtonEvent(int key) {
@@ -101,7 +111,7 @@ public class ButtonEvent {
 		this.action = 0;
 		this.source = null;
 	}
-	
+
 	public ButtonEvent(int rawValue, float duration, int button, long action) {
 		this.rawValue = rawValue;
 		this.duration = duration;
@@ -109,7 +119,7 @@ public class ButtonEvent {
 		this.action = action;
 		this.source = null;
 	}
-	
+
 	public ButtonEvent(int rawValue, float duration, int button, long action, String source) {
 		this.rawValue = rawValue;
 		this.duration = duration;
@@ -126,8 +136,7 @@ public class ButtonEvent {
 	}
 
 	/**
-	 * @return
-	 * This value is not used.  Each button event is discreet.
+	 * @return This value is not used. Each button event is discreet.
 	 * @deprecated
 	 */
 	public float getDuration() {
@@ -140,14 +149,14 @@ public class ButtonEvent {
 	public int getRawValue() {
 		return rawValue;
 	}
-	
+
 	/**
 	 * @return
 	 */
 	public long getAction() {
 		return action;
 	}
-	
+
 	/**
 	 * @return The source of the event.
 	 */
