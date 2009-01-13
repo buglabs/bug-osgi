@@ -39,6 +39,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogService;
 import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
@@ -241,7 +242,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 */
 	public Position getPosition() {
 		RMC rmc = nmeaProvider.getRMC();
-
+		log.log(LogService.LOG_DEBUG, "Evaluating RMC: " + rmc.getLatitude() + " " + rmc.getLongitude());
 		if (rmc != null && !rmc.isEmpty()) {
 			try {
 				Position pos = new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS()
