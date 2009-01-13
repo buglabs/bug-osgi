@@ -34,6 +34,11 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.module.gps.pub.IGPSModuleControl;
 
+/**
+ * A class to express GPS state with GPS module LED
+ * @author aroman
+ *
+ */
 public class GPSFIXLEDStatusTask extends TimerTask {
 	private IGPSModuleControl control;
 	private final LogService log;

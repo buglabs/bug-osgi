@@ -38,6 +38,11 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.status.IStatusBarProvider;
 
+/**
+ * A class to show GPS state on BUG base LCD
+ * @author aroman, kgilmer
+ *
+ */
 public class StatusBarCustomizer implements ServiceTrackerCustomizer {
 
 	private final BundleContext context;

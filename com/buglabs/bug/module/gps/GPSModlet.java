@@ -417,7 +417,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		long delay = getReadDelay();
 		log.log(LogService.LOG_DEBUG, "GPSModlet setup() delay = " + delay);
 		gpsd = new NMEARawFeed(gpsis, delay);
-		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream());
+		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream(), log);
 
 		gpscontrol = new GPSControl();
 

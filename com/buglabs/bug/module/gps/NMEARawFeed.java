@@ -33,6 +33,11 @@ import com.buglabs.bug.module.gps.pub.INMEARawFeed;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.StreamMultiplexer;
 
+/**
+ * Provides client access to raw NMEA data from GPS device.
+ * @author aroman
+ *
+ */
 public class NMEARawFeed extends StreamMultiplexer implements INMEARawFeed {
 
 	public NMEARawFeed(InputStream is, long read_delay) {

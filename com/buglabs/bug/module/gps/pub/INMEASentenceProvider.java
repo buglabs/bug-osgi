@@ -36,7 +36,7 @@ import com.buglabs.nmea.sentences.RMC;
  */
 public interface INMEASentenceProvider {
 	/**
-	 * Provides the latest RMC sentence read from the GPS Device.
+	 * Provides the latest RMC sentence read from the GPS Device, or null if no information is available.
 	 * 
 	 * @return RMC sentence object
 	 */

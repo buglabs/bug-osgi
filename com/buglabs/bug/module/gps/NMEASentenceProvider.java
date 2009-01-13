@@ -33,21 +33,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.osgi.service.log.LogService;
+
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
 import com.buglabs.nmea.NMEAParser;
 import com.buglabs.nmea.sentences.NMEAParserException;
 import com.buglabs.nmea.sentences.RMC;
 
+/**
+ * This class is a thread that listens for NMEA sentences on the InputStream passed in the constructor, and will present the last
+ * parsed sentence to clients.
+ * 
+ * @author aroman
+ *
+ */
 public class NMEASentenceProvider extends Thread implements INMEASentenceProvider {
 
 	private InputStream nmeaStream;
 
 	private RMC cachedRMC;
 
-	public NMEASentenceProvider(InputStream nmeaStream) {
+	private final LogService log;
+
+	public NMEASentenceProvider(InputStream nmeaStream, LogService log) {
 		this.nmeaStream = nmeaStream;
+		this.log = log;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.INMEASentenceProvider#getRMC()
+	 */
 	public RMC getRMC() {
 		return cachedRMC;
 	}
@@ -69,18 +84,18 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 				}
 
 				try {
+					log.log(LogService.LOG_DEBUG, "Raw NMEA Line: " + sentence);
 					Object objSentence = parser.parse(sentence);
 
 					if (objSentence != null && objSentence instanceof RMC) {
 						cachedRMC = (RMC) objSentence;
 					}
 				} catch (NMEAParserException e) {
-					// TODO: Handle parser exceptions, atleast log it
+					log.log(LogService.LOG_ERROR, "An error occured while parsing sentence.", e);
 				}
 			} while (!Thread.currentThread().isInterrupted() && (sentence != null));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(LogService.LOG_ERROR, "An IO Error occurred in reading from NMEA stream.", e);
 		} finally {
 			try {
 				if (br != null) {
