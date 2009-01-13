@@ -36,7 +36,8 @@ import javax.microedition.io.Connector;
 
 import com.buglabs.bug.jni.vonhippel.VonHippel;
 
-public class VonHippelModuleControl {
+public class VonHippelModuleControl implements IVonHippelModuleControl {
+
 
 	private VonHippel vhDevice;
 	private int slotId;
