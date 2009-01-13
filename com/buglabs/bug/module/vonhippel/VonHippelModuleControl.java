@@ -36,8 +36,9 @@ import javax.microedition.io.Connector;
 
 import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
+import com.buglabs.module.IModuleLEDController;
 
-public class VonHippelModuleControl implements IVonHippelModuleControl {
+public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleLEDController {
 
 
 	private VonHippel vhDevice;
