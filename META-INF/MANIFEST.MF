@@ -4,4 +4,5 @@ Bundle-SymbolicName: com.buglabs.nmea
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.nmea,
- com.buglabs.nmea.sentences
+ com.buglabs.nmea.sentences,
+ com.buglabs.nmea2
