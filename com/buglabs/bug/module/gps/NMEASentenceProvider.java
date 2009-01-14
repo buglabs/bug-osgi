@@ -32,13 +32,22 @@ import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
-import com.buglabs.nmea.NMEAParser;
+import com.buglabs.bug.module.gps.pub.INMEASentenceSubscriber;
 import com.buglabs.nmea.sentences.NMEAParserException;
-import com.buglabs.nmea.sentences.RMC;
+import com.buglabs.nmea2.AbstractNMEASentence;
+import com.buglabs.nmea2.NMEASentenceFactory;
+import com.buglabs.nmea2.RMC;
+import com.buglabs.util.LogServiceUtil;
 
 /**
  * This class is a thread that listens for NMEA sentences on the InputStream passed in the constructor, and will present the last
@@ -47,25 +56,36 @@ import com.buglabs.nmea.sentences.RMC;
  * @author aroman
  *
  */
-public class NMEASentenceProvider extends Thread implements INMEASentenceProvider {
+public class NMEASentenceProvider extends Thread implements INMEASentenceProvider, ServiceListener {
 
 	private InputStream nmeaStream;
 
 	private RMC cachedRMC;
 
-	private final LogService log;
+	private LogService log = null;
+	private volatile int index = 0;
+	private List subscribers;
 
-	public NMEASentenceProvider(InputStream nmeaStream, LogService log) {
+	private final BundleContext context;
+	
+	public NMEASentenceProvider(InputStream nmeaStream, BundleContext context) {
 		this.nmeaStream = nmeaStream;
-		this.log = log;
+		this.context = context;
+		this.log = LogServiceUtil.getLogService(context);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.buglabs.bug.module.gps.pub.INMEASentenceProvider#getRMC()
+	 * @deprecated
 	 */
-	public RMC getRMC() {
+	public com.buglabs.nmea.sentences.RMC getRMC() {
+		return new com.buglabs.nmea.sentences.RMC(cachedRMC);
+	}
+	
+	public RMC getLastRMC() {
 		return cachedRMC;
 	}
+	
 
 	public void run() {
 		BufferedReader br = null;
@@ -73,7 +93,6 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		try {
 			br = new BufferedReader(new InputStreamReader(nmeaStream));
 			String sentence;
-			NMEAParser parser = new NMEAParser();
 
 			do {
 				try {
@@ -85,10 +104,16 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 
 				try {
 					log.log(LogService.LOG_DEBUG, "Raw NMEA Line: " + sentence);
-					Object objSentence = parser.parse(sentence);
+					AbstractNMEASentence objSentence = NMEASentenceFactory.getSentence(sentence);
 
 					if (objSentence != null && objSentence instanceof RMC) {
 						cachedRMC = (RMC) objSentence;
+						index++;
+					} 
+					if (objSentence == null) {
+						log.log(LogService.LOG_DEBUG, "Ignoring sentence: " + sentence);
+					} else {
+						notifySubscribers(objSentence);
 					}
 				} catch (NMEAParserException e) {
 					log.log(LogService.LOG_ERROR, "An error occured while parsing sentence.", e);
@@ -108,6 +133,39 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void notifySubscribers(AbstractNMEASentence objSentence) {
+		if (subscribers == null || subscribers.size() == 0)  {
+			return;
+		}
+		
+		synchronized (subscribers) {
+			for (Iterator i = subscribers.iterator(); i.hasNext();) {
+				INMEASentenceSubscriber sub = (INMEASentenceSubscriber) i.next();
+				
+				sub.sentenceReceived(objSentence);
+			}
+		}
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void serviceChanged(ServiceEvent event) {
+		
+		switch (event.getType()) {
+		case ServiceEvent.REGISTERED:
+			if (subscribers == null) {
+				subscribers = new ArrayList();
+			}
+			subscribers.add(context.getService(event.getServiceReference()));
+			break;
+		case ServiceEvent.UNREGISTERING:
+			subscribers.remove(context.getService(event.getServiceReference()));
+			break;
 		}
 	}
 }

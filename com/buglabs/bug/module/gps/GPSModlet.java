@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Timer;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogService;
 import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
@@ -55,6 +55,7 @@ import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.gps.pub.IGPSModuleControl;
 import com.buglabs.bug.module.gps.pub.INMEARawFeed;
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
+import com.buglabs.bug.module.gps.pub.INMEASentenceSubscriber;
 import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.bug.module.gps.pub.LatLon;
 import com.buglabs.bug.module.pub.IModlet;
@@ -172,7 +173,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		log.log(LogService.LOG_DEBUG, "GPSModlet start enter");
 		gpsd.start();
 		nmeaProvider.start();
-
+		
 		// default to passive (external) antenna, until
 		// such time as we have confidence in the internal
 		// antenna's ability to obtain a fix
@@ -192,6 +193,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		// TODO: Start position and sentence services when we achieve GPS lock
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
+		context.addServiceListener(nmeaProvider,  "(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ")");
 		log.log(LogService.LOG_DEBUG, "GPSModlet start leave");
 	}
 
@@ -221,7 +223,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		if (wsTracker != null) {
 			wsTracker.close();
 		}
-
+		
+		context.removeServiceListener(nmeaProvider);
 		moduleRef.unregister();
 		gpsControlRef.unregister();
 		nmeaRef.unregister();
@@ -417,7 +420,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		long delay = getReadDelay();
 		log.log(LogService.LOG_DEBUG, "GPSModlet setup() delay = " + delay);
 		gpsd = new NMEARawFeed(gpsis, delay);
-		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream(), log);
+		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream(), context);
 
 		gpscontrol = new GPSControl();
 

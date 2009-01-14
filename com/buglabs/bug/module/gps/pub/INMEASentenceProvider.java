@@ -37,8 +37,19 @@ import com.buglabs.nmea.sentences.RMC;
 public interface INMEASentenceProvider {
 	/**
 	 * Provides the latest RMC sentence read from the GPS Device, or null if no information is available.
-	 * 
+	 * @deprecated
 	 * @return RMC sentence object
 	 */
 	public RMC getRMC();
+	
+	/**
+	 * @return Last parsed RMC NMEA sentence, or null if no sentence has been received.
+	 */
+	public com.buglabs.nmea2.RMC getLastRMC();
+	
+	/**
+	 * @return the index of the RMC value currently available.
+	 * Useful for determining if new RMC is available.
+	 */
+	public int getIndex();
 }
