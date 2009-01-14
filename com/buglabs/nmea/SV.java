@@ -52,10 +52,13 @@ public class SV {
 		} catch (NumberFormatException e) {
 			this.azimuth = -1;
 		}
-
 		try {
-			// Remove any CRC
-			this.SNR = Integer.parseInt(StringUtil.split(SNR, "*")[0]);
+			if (SNR.indexOf('*') > -1) {
+				// Remove any CRC
+				this.SNR = Integer.parseInt(StringUtil.split(SNR, "*")[0]);
+			} else {
+				this.SNR = Integer.parseInt(SNR);
+			}
 		} catch (NumberFormatException e) {
 			this.SNR = -1;
 		}
