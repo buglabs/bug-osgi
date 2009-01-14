@@ -48,6 +48,16 @@ public class RMC extends PositionSentence {
 		super("$GPRMC");
 	}
 
+	public RMC(com.buglabs.nmea2.RMC newRMC) {
+		super("$GPRMC");
+		this.timeOfFix = newRMC.getTimeOfFix();
+		this.dataStatus = newRMC.getDataStatus();
+		this.groundSpeed = newRMC.getGroundSpeed();
+		this.dateStamp = newRMC.getDateStamp();
+		this.magneticVariation = newRMC.getMagneticVariation();
+		this.trackMadeGood = newRMC.getTrackMadeGood();
+	}
+	
 	public Object parse(String sentence) {
 		magneticVariation = "";
 
@@ -131,5 +141,9 @@ public class RMC extends PositionSentence {
 
 	public String getMagneticVaration() {
 		return magneticVariation;
+	}
+	
+	public String toString() {
+		return "timeOfFix: " + timeOfFix + "  dataStatus: " + dataStatus + "  groundSpeed: " + groundSpeed + " trackMadeGood: " + trackMadeGood + " dateStamp: " + dateStamp + " magneticVariation: " + magneticVariation + "  " + super.toString();
 	}
 }
