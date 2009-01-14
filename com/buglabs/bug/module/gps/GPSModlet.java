@@ -57,6 +57,7 @@ import com.buglabs.bug.module.gps.pub.INMEARawFeed;
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
 import com.buglabs.bug.module.gps.pub.INMEASentenceSubscriber;
 import com.buglabs.bug.module.gps.pub.IPositionProvider;
+import com.buglabs.bug.module.gps.pub.IPositionSubscriber;
 import com.buglabs.bug.module.gps.pub.LatLon;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
@@ -64,7 +65,7 @@ import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.nmea.DegreesMinutesSeconds;
-import com.buglabs.nmea.sentences.RMC;
+import com.buglabs.nmea2.RMC;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
@@ -193,7 +194,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		// TODO: Start position and sentence services when we achieve GPS lock
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
-		context.addServiceListener(nmeaProvider,  "(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ")");
+		context.addServiceListener(nmeaProvider,  "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "=" + IPositionSubscriber.class.getName() + "))");
 		log.log(LogService.LOG_DEBUG, "GPSModlet start leave");
 	}
 
@@ -244,9 +245,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 * @see com.buglabs.bug.module.gps.pub.IPositionProvider#getPosition()
 	 */
 	public Position getPosition() {
-		RMC rmc = nmeaProvider.getRMC();
+		RMC rmc = nmeaProvider.getLastRMC();
 		log.log(LogService.LOG_DEBUG, "Evaluating RMC: " + rmc.getLatitude() + " " + rmc.getLongitude());
-		if (rmc != null && !rmc.isEmpty()) {
+		if (rmc != null) {
 			try {
 				Position pos = new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS()
 						.toDecimalDegrees()
@@ -375,7 +376,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 					root.addChildElement(new XmlNode("Altitude", p.getAltitude().toString()));
 				}
 
-				RMC rmc = nmeaProvider.getRMC();
+				RMC rmc = nmeaProvider.getLastRMC();
 
 				DegreesMinutesSeconds dmsLat = rmc.getLatitudeAsDMS();
 				DegreesMinutesSeconds dmsLon = rmc.getLongitudeAsDMS();
@@ -467,9 +468,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public LatLon getLatitudeLongitude() {
-		RMC rmc = nmeaProvider.getRMC();
-		// TODO: Change API to throw exception when RMC is unavailable
-		// instead of returning null;
+		com.buglabs.nmea2.RMC rmc = nmeaProvider.getLastRMC();
+
 		if (rmc != null) {
 			return new LatLon(rmc.getLatitudeAsDMS().toDecimalDegrees(), rmc.getLongitudeAsDMS().toDecimalDegrees());
 		}

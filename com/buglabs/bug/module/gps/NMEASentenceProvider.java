@@ -40,9 +40,14 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.service.log.LogService;
+import org.osgi.util.measurement.Measurement;
+import org.osgi.util.measurement.Unit;
+import org.osgi.util.position.Position;
 
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
 import com.buglabs.bug.module.gps.pub.INMEASentenceSubscriber;
+import com.buglabs.bug.module.gps.pub.IPositionProvider;
+import com.buglabs.bug.module.gps.pub.IPositionSubscriber;
 import com.buglabs.nmea.sentences.NMEAParserException;
 import com.buglabs.nmea2.AbstractNMEASentence;
 import com.buglabs.nmea2.NMEASentenceFactory;
@@ -143,11 +148,23 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		
 		synchronized (subscribers) {
 			for (Iterator i = subscribers.iterator(); i.hasNext();) {
-				INMEASentenceSubscriber sub = (INMEASentenceSubscriber) i.next();
+				Object subscriber = i.next();
 				
-				sub.sentenceReceived(objSentence);
+				if (subscriber instanceof INMEASentenceSubscriber) {
+					INMEASentenceSubscriber sub = (INMEASentenceSubscriber) subscriber;
+					sub.sentenceReceived(objSentence);
+				} else if (subscriber instanceof IPositionSubscriber && objSentence instanceof RMC){
+					IPositionSubscriber sub = (IPositionSubscriber) subscriber;
+					sub.positionUpdate(calculatePosition((RMC) objSentence));
+				}
 			}
 		}
+	}
+	
+	private Position calculatePosition(RMC rmc) {
+		return new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS()
+				.toDecimalDegrees()
+				* Math.PI / 180.0, Unit.rad), new Measurement(0.0d, Unit.m), null, null);
 	}
 
 	public int getIndex() {
