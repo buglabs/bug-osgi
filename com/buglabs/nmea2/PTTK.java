@@ -76,8 +76,8 @@ public final class PTTK extends AbstractNMEASentence {
 	 * @see com.buglabs.nmea2.AbstractNMEASentence#validate()
 	 */
 	protected void validate() {
-		if (msg == null || code == null) {
-			throw new NMEAParserException("Invalid NMEA sentence data.", null);
+		if (msg == null) {
+			throw new NMEAParserException("Invalid NMEA sentence data.");
 		}
 	}
 
