@@ -27,9 +27,20 @@
  *******************************************************************************/
 package com.buglabs.nmea.sentences;
 
+/**
+ * An unchecked exception for NMEA parsing errors.
+ * @author aroman
+ *
+ */
 public class NMEAParserException extends RuntimeException {
+
+	private static final long serialVersionUID = -9090324234509872630L;
 
 	public NMEAParserException(String msg, Throwable e) {
 		super(msg, e);
+	}
+	
+	public NMEAParserException(String msg) {
+		super(msg);
 	}
 }

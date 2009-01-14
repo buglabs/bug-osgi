@@ -1,5 +1,7 @@
 package com.buglabs.nmea2;
 
+import com.buglabs.nmea.DegreesMinutesSeconds;
+
 
 /**
  * Contains RMC type NMEA sentences.
@@ -70,37 +72,79 @@ public final class RMC extends AbstractNMEASentence {
 	}
 
 	protected void validate() {
-		
+		//nothing to validate here.
 	}
 
+	/**
+	 * @return Magnetic Variation
+	 */
 	public String getMagneticVariation() {
 		return magneticVariation;
 	}
 
+	/**
+	 * @return Time of Fix
+	 */
 	public String getTimeOfFix() {
 		return timeOfFix;
 	}
 
+	/**
+	 * @return Data Status
+	 */
 	public String getDataStatus() {
 		return dataStatus;
 	}
 
+	/**
+	 * @return Latitude
+	 */
 	public String getLatitude() {
 		return latitude;
 	}
 
+	/**
+	 * @return Longitude
+	 */
 	public String getLongitude() {
 		return longitude;
 	}
+	
 
+	/**
+	 * Calculate latitude in degrees minutes seconds units.
+	 * @return
+	 */
+	public DegreesMinutesSeconds getLatitudeAsDMS() {
+		return new DegreesMinutesSeconds(latitude);
+	}
+
+	/**
+	 *  Calculate longitude in degrees minutes seconds units.
+	 * @return
+	 */
+	public DegreesMinutesSeconds getLongitudeAsDMS() {
+		return new DegreesMinutesSeconds(longitude);
+	}
+
+
+	/**
+	 * @return Ground Speed 
+	 */
 	public String getGroundSpeed() {
 		return groundSpeed;
 	}
 
+	/**
+	 * @return Trakc Make Good
+	 */
 	public String getTrackMadeGood() {
 		return trackMadeGood;
 	}
 
+	/**
+	 * @return Date of sample
+	 */
 	public String getDateStamp() {
 		return dateStamp;
 	}
