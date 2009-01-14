@@ -27,17 +27,39 @@
  *******************************************************************************/
 package com.buglabs.nmea;
 
+import com.buglabs.nmea.sentences.NMEAParserException;
+
+/**
+ * A class to store DMS style location information.
+ * @author aroman
+ *
+ */
 public class DegreesMinutesSeconds {
 
 	private String dms;
 
+	/**
+	 * Will throw NMEAParserException if parsing error occurs.
+	 * @param dms
+	 */
 	public DegreesMinutesSeconds(String dms) {
+		if (dms == null || dms.length() ==0 || dms.indexOf(',') == -1 || dms.indexOf('.') == -1) {
+			throw new NMEAParserException("Unable to parse DMS: " + dms);
+		}
+		
 		int i = dms.indexOf(",");
 		this.dms = dms.substring(0, i);
 	}
 
+	/**
+	 * @return Degrees part of DMS
+	 */
 	public double getDegrees() {
 		int i = dms.indexOf(".");
+		
+		if (i < 2) {
+			throw new NMEAParserException("Unable to calculate degrees from " + dms);
+		}
 
 		if (dms.charAt(0) == '0') {
 			return Double.parseDouble("-" + dms.substring(1, i - 2));
@@ -46,12 +68,23 @@ public class DegreesMinutesSeconds {
 		return Double.parseDouble(dms.substring(0, i - 2));
 	}
 
+	/**
+	 * @return Minutes part of DMS value
+	 */
 	public double getMinutes() {
 		int i = dms.indexOf(".");
 
+		if (i < 2) {
+			throw new NMEAParserException("Unable to calculate minutes from " + dms);
+		}
+
+		
 		return Double.parseDouble(dms.substring(i - 2, i));
 	}
 
+	/**
+	 * @return Seconds part of DMS value
+	 */
 	public double getSeconds() {
 		int i = dms.indexOf(".");
 
@@ -60,6 +93,10 @@ public class DegreesMinutesSeconds {
 		return Double.parseDouble(seconds) * 60;
 	}
 
+	/**
+	 * Convert DegreesMinutesSeconds to decimal degrees
+	 * @return
+	 */
 	public double toDecimalDegrees() {
 		double decimal = getSeconds() / 60.0;
 		double result = (getMinutes() + decimal) / 60.0;
