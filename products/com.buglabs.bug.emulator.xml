@@ -1,5 +1,5 @@
 <project name="build-com.buglabs.bug.emulator" default="publish">
-	<property file="./../system.properties" />
+    <property file="./../system.${build.level}.properties" />
 	<property name="meta.project" value="com.buglabs.bug.emulator" />
 	<property name="meta.distDirectory" location="${checkout.dir}/${meta.project}/dist" />
 	<property name="distDirectory" location="${meta.distDirectory}" />
@@ -44,7 +44,7 @@
 		</else>
     	</if>
 
-	<property name="artifactDirectory" location="../artifacts/${meta.project}" />
+        <property name="artifactDirectory" location="../artifacts/${build.level}/${meta.project}" />
 	<property name="toolbox.dir" location="../toolbox" />
 	<property name="externalDirectory" location="${checkout.dir}/com.buglabs.bug.kernel.external" />
 	<property name="base.build.dir" location="${basedir}/.." />
@@ -119,17 +119,17 @@
 	-->
 	<target name="publish" depends="build">
 		<echo message="Publishing ${meta.project}..."/>
-		<mkdir dir="${base.build.dir}/artifacts/${meta.project}/${project.version}" />
+        <mkdir dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}" />
 
-		<copy todir="${base.build.dir}/artifacts/${meta.project}/${project.version}">
+        <copy todir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}">
 			<fileset dir="${checkout.dir}/${meta.project}/dist" />
 		</copy>
 
-		<exec dir="${base.build.dir}/artifacts/${meta.project}/" executable="rm">
+        <exec dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/" executable="rm">
 			<arg line="current" />
 		</exec>
 
-		<symlink link="${base.build.dir}/artifacts/${meta.project}/current" resource="${base.build.dir}/artifacts/${meta.project}/${project.version}"/>
+        <symlink link="${base.build.dir}/artifacts/${build.level}/${meta.project}/current" resource="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}"/>
 	</target>
 
 	<target name="clean">
