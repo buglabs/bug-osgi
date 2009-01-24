@@ -27,9 +27,13 @@
  *******************************************************************************/
 package com.buglabs.util;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * To be used by generators.
@@ -38,6 +42,10 @@ import org.osgi.framework.Constants;
  * 
  */
 public class ServiceFilterGenerator {
+	/**
+	 * @param services A set of strings of class names.
+	 * @return A LDAP filter string that can be used to construct a Filter.
+	 */
 	public static String generateServiceFilter(List services) {
 		if (services.size() == 1) {
 			return "(" + Constants.OBJECTCLASS + "=" + ((String) services.get(0)) + ")";
@@ -46,5 +54,18 @@ public class ServiceFilterGenerator {
 		}
 
 		return "";
+	}
+	
+	/**
+	 * Generate a Filter object from an array of Service names and a bundle context.
+	 * @param context
+	 * @param services
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static Filter generateServiceFilter(BundleContext context, String [] services) throws InvalidSyntaxException {
+		String filterString = generateServiceFilter(Arrays.asList(services));
+
+		return context.createFilter(filterString);
 	}
 }
