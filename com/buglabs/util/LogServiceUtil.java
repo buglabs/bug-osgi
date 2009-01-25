@@ -28,8 +28,10 @@
 package com.buglabs.util;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
@@ -132,5 +134,31 @@ public class LogServiceUtil {
 		}
 
 		return logService;
+	}
+	
+	/**
+	 * Log a bundle exception and print nested exception if it exists.
+	 * @param logService
+	 * @param message
+	 * @param exception
+	 */
+	public static void logBundleException(LogService logService, String message, BundleException exception) {
+		// Add error handling to be specific about what exactly happened.
+		logService.log(LogService.LOG_ERROR, message + ": " + exception.getMessage());
+		stackTraceToString(exception);
+	
+		if (exception.getNestedException() != null) {
+			logService.log(LogService.LOG_ERROR, "Nested Exception: " + exception.getNestedException().getMessage() + "\n" + stackTraceToString(exception.getNestedException()));
+		}
+	}
+	
+	/**
+	 * @param t
+	 * @return A stack trace as a string.
+	 */
+	private static String stackTraceToString(Throwable t) {
+		StringWriter sw = new StringWriter();
+		t.printStackTrace(new PrintWriter(sw));
+		return sw.getBuffer().toString();
 	}
 }
