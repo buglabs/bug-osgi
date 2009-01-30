@@ -151,9 +151,8 @@ public class StreamMultiplexer extends Thread {
 								faultyStreams.add(osw);
 							}
 						}
+						removeStreams(faultyStreams);
 					}
-					removeStreams(faultyStreams);
-
 				}
 
 				try {
