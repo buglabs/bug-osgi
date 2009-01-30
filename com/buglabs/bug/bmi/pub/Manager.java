@@ -1,3 +1,30 @@
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *    - Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *    - Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
+ *      used to endorse or promote products derived from this software without
+ *      specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
 package com.buglabs.bug.bmi.pub;
 
 import java.io.PrintWriter;
@@ -27,19 +54,21 @@ import com.buglabs.util.BugBundleConstants;
 public class Manager {
 	private static Manager ref;
 
-	private final BundleContext context;
-
 	private static LogService logService;
 
 	private static Map modletFactories;
 
 	private static Map activeModlets;
 
-	private Manager(BundleContext context, LogService logService2, Map modletFactories, Map activeModlets) {
-		Manager.logService = logService2;
-		Manager.modletFactories = modletFactories;
-		Manager.activeModlets = activeModlets;
-		this.context = context;
+	public static Map getActiveModlets() {
+		return activeModlets;
+	}
+
+	/**
+	 * @return
+	 */
+	synchronized public static Manager getManager() {
+		return ref;
 	}
 
 	synchronized static public Manager getManager(BundleContext context, LogService logService, Map modletFactories, Map activeModlets) {
@@ -50,11 +79,37 @@ public class Manager {
 		return ref;
 	}
 
+	private final BundleContext context;
+
+	private Manager(BundleContext context, LogService logService2, Map modletFactories, Map activeModlets) {
+		Manager.logService = logService2;
+		Manager.modletFactories = modletFactories;
+		Manager.activeModlets = activeModlets;
+		this.context = context;
+	}
+
 	/**
+	 * Iterate through all runtime bundles and see if a bundle exists that is a
+	 * Module Bundle of the type we need.
+	 * 
+	 * @param moduleId
 	 * @return
 	 */
-	synchronized public static Manager getManager() {
-		return ref;
+	private List findLocalBundles(String moduleId) {
+		Bundle[] bundles = context.getBundles();
+		List matches = new ArrayList();
+		String id;
+		for (int i = 0; i < bundles.length; ++i) {
+			Dictionary d = bundles[i].getHeaders();
+
+			if ((id = (String) d.get(BugBundleConstants.BUG_BUNDLE_MODULE_ID)) != null) {
+				if (id.equals(moduleId)) {
+					matches.add(bundles[i]);
+				}
+			}
+		}
+
+		return matches;
 	}
 
 	public List getAllModuleIds() {
@@ -199,33 +254,5 @@ public class Manager {
 			logService.log(LogService.LOG_DEBUG, sw.getBuffer().toString());
 
 		}
-	}
-
-	/**
-	 * Iterate through all runtime bundles and see if a bundle exists that is a
-	 * Module Bundle of the type we need.
-	 * 
-	 * @param moduleId
-	 * @return
-	 */
-	private List findLocalBundles(String moduleId) {
-		Bundle[] bundles = context.getBundles();
-		List matches = new ArrayList();
-		String id;
-		for (int i = 0; i < bundles.length; ++i) {
-			Dictionary d = bundles[i].getHeaders();
-
-			if ((id = (String) d.get(BugBundleConstants.BUG_BUNDLE_MODULE_ID)) != null) {
-				if (id.equals(moduleId)) {
-					matches.add(bundles[i]);
-				}
-			}
-		}
-
-		return matches;
-	}
-
-	public static Map getActiveModlets() {
-		return activeModlets;
 	}
 }

@@ -1,3 +1,30 @@
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *    - Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *    - Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
+ *      used to endorse or promote products derived from this software without
+ *      specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
 package com.buglabs.bug.bmi;
 
 import java.io.BufferedReader;
@@ -27,6 +54,12 @@ import com.buglabs.util.StringUtil;
 public class Activator implements BundleActivator, ServiceListener {
 	private static final String DEFAULT_PIPE_FILENAME = "/tmp/eventpipe";
 
+	private static Activator ref;
+
+	public static Activator getRef() {
+		return ref;
+	}
+
 	private PipeReader pipeReader;
 
 	private String pipeFilename;
@@ -38,42 +71,6 @@ public class Activator implements BundleActivator, ServiceListener {
 	private Map activeModlets;
 
 	private BundleContext context;
-
-	private static Activator ref;
-
-	public void start(BundleContext context) throws Exception {
-		this.context = context;
-		Activator.ref = this;
-
-		modletFactories = new Hashtable();
-		activeModlets = new Hashtable();
-		ServiceReference sr = context.getServiceReference(LogService.class.getName());
-		if (sr != null) {
-			logService = (LogService) context.getService(sr);
-		}
-
-		context.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
-
-		registerExistingServices(context);
-
-		pipeFilename = context.getProperty("com.buglabs.pipename");
-
-		if (pipeFilename == null || pipeFilename.length() == 0) {
-			pipeFilename = DEFAULT_PIPE_FILENAME;
-		}
-
-		logService.log(LogService.LOG_INFO, "Creating pipe " + pipeFilename);
-		createPipe(pipeFilename);
-		pipeReader = new PipeReader(pipeFilename, Manager.getManager(context, logService, modletFactories, activeModlets), logService);
-
-		logService.log(LogService.LOG_INFO, "Initializing existing modules");
-
-		coldPlug();
-
-		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
-
-		pipeReader.start();
-	}
 
 	private void coldPlug() throws IOException {
 		Manager m = Manager.getManager();
@@ -89,49 +86,89 @@ public class Activator implements BundleActivator, ServiceListener {
 		}
 	}
 
+	private void createModlets(IModletFactory factory) throws Exception {
+		IModlet modlet = factory.createModlet(context, 0);
+		modlet.setup();
+		modlet.start();
+	}
+
 	/**
-	 * Get a list of BMIMessage strings for existing modules based on entries in
-	 * the /sys filesystem.
+	 * Create a pipe file by executing an external process. Requires that the
+	 * host system has the "mkfifo" program.
 	 * 
-	 * @return
+	 * @param filename
 	 * @throws IOException
 	 */
-	private List getSysFSModules() throws IOException {
-		List slots = null;
+	private void createPipe(String filename) throws IOException {
+		File f = new File(filename);
 
-		for (int i = 1; i < 5; ++i) {
-			String cmd = "/bin/ls -al /sys/devices/conn-m" + i + "/driver/module";
-			String response = null;
-			
-			try {
-				response = execute(cmd);
-			} catch (IOException e) {
-				logService.log(LogService.LOG_ERROR, "Error occurred while discovering modules.", e);
-				continue;
-			}
+		// Check to see if file exists. If so delete and recreate to confirm
+		// it's a pipe.
+		if (f.exists()) {
+			logService.log(LogService.LOG_INFO, "Pipe " + f.getAbsolutePath() + " already exists, deleting.");
+			destroyPipe(f);
+		}
+		String cmd = "/usr/bin/mkfifo " + f.getAbsolutePath();
 
-			if (response.trim().length() == 0) {
-				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
-				continue;
-			}
+		String error = execute(cmd);
+		logService.log(LogService.LOG_INFO, "Execution Completed.  Response: " + error);
+	}
 
-			logService.log(LogService.LOG_DEBUG, "Response: " + response);
+	
+	/**
+	 * Deletes a file
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
+	private void destroyPipe(File file) throws IOException {
+		if (!file.delete()) {
+			throw new IOException("Unable to delete file " + file.getAbsolutePath());
+		}
+		logService.log(LogService.LOG_INFO, "Deleted " + file.getAbsolutePath());
+	}
 
-			String[] elems = StringUtil.split(response, "/");
-			String driverName = elems[elems.length - 1];
+	/**
+	 * @param cmd
+	 * @return null on success, or String of error message on failure.
+	 * @throws IOException
+	 */
+	private String execute(String cmd) throws IOException {
+		String s = null;
+		StringBuffer sb = new StringBuffer();
+		boolean hasError = false;
+		logService.log(LogService.LOG_DEBUG, "Executing: " + cmd);
+		Process p = Runtime.getRuntime().exec(cmd);
+		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-			// Lazily create data structure. If no modules then not needed.
-			if (slots == null) {
-				slots = new ArrayList();
-			}
-
-			String bmiMessage = new String(getModuleIdFromDriver(driverName.trim()) + " " + getModuleVersion() + " " + (i - 1) + " ADD");
-			logService.log(LogService.LOG_DEBUG, "Sending BMI ColdPlug message: " + bmiMessage);
-			
-			slots.add(bmiMessage);
+		while ((s = stdError.readLine()) != null) {
+			sb.append(s);
+			hasError = true;
 		}
 
-		return slots;
+		if (hasError) {
+			// temp fix for ADS board. All commands return with this error.
+			if (!sb.toString().equals("Using fallback suid method")) {
+				new IOException("Failed to execute command: " + sb.toString());
+			}
+		}
+
+		BufferedReader stdOut = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		sb = new StringBuffer();
+		while ((s = stdOut.readLine()) != null) {
+			sb.append(s);
+			sb.append('\n');
+		}
+
+		return sb.toString();
+	}
+
+	protected Map getActiveModlets() {
+		return activeModlets;
+	}
+
+	protected Map getModletFactories() {
+		return modletFactories;
 	}
 
 	/**
@@ -186,13 +223,61 @@ public class Activator implements BundleActivator, ServiceListener {
 		return null;
 	}
 
-	
 	/**
 	 * @return
 	 */
 	private String getModuleVersion() {
 		// TODO determine appropriate version information.
 		return "0";
+	}
+
+	/**
+	 * Get a list of BMIMessage strings for existing modules based on entries in
+	 * the /sys filesystem.
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	private List getSysFSModules() throws IOException {
+		List slots = null;
+
+		for (int i = 1; i < 5; ++i) {
+			String cmd = "/bin/ls -al /sys/devices/conn-m" + i + "/driver/module";
+			String response = null;
+			
+			try {
+				response = execute(cmd);
+			} catch (IOException e) {
+				logService.log(LogService.LOG_ERROR, "Error occurred while discovering modules.", e);
+				continue;
+			}
+
+			if (response.trim().length() == 0) {
+				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
+				continue;
+			}
+
+			logService.log(LogService.LOG_DEBUG, "Response: " + response);
+
+			String[] elems = StringUtil.split(response, "/");
+			String driverName = elems[elems.length - 1];
+
+			// Lazily create data structure. If no modules then not needed.
+			if (slots == null) {
+				slots = new ArrayList();
+			}
+
+			String bmiMessage = new String(getModuleIdFromDriver(driverName.trim()) + " " + getModuleVersion() + " " + (i - 1) + " ADD");
+			logService.log(LogService.LOG_DEBUG, "Sending BMI ColdPlug message: " + bmiMessage);
+			
+			slots.add(bmiMessage);
+		}
+
+		return slots;
+	}
+
+	private boolean isEmpty(String element) {
+		return element == null || element.length() == 0;
 	}
 
 	private void registerExistingServices(BundleContext context2) throws InvalidSyntaxException {
@@ -203,120 +288,6 @@ public class Activator implements BundleActivator, ServiceListener {
 				registerService(sr[i], ServiceEvent.REGISTERED);
 			}
 		}
-	}
-
-	public static Activator getRef() {
-		return ref;
-	}
-
-	public void stop(BundleContext context) throws Exception {
-		stopModlets(activeModlets);
-		if (pipeReader != null) {
-			pipeReader.cancel();
-			pipeReader.interrupt();
-			logService.log(LogService.LOG_INFO, "Deleting pipe " + pipeFilename);
-			destroyPipe(new File(pipeFilename));
-		}
-		modletFactories.clear();
-	}
-
-	/**
-	 * Stop all active modlets.
-	 * 
-	 * @param activeModlets
-	 */
-	private void stopModlets(Map modlets) {
-		for (Iterator i = modlets.keySet().iterator(); i.hasNext();) {
-			String key = (String) i.next();
-
-			List modl = (List) modlets.get(key);
-
-			for (Iterator j = modl.iterator(); j.hasNext();) {
-				IModlet m = (IModlet) j.next();
-
-				try {
-					m.stop();
-				} catch (Exception e) {
-					logService.log(LogService.LOG_ERROR, "Error occured while stopping " + m.getModuleId() + ": " + e.getMessage());
-				}
-			}
-		}
-	}
-
-	/**
-	 * Create a pipe file by executing an external process. Requires that the
-	 * host system has the "mkfifo" program.
-	 * 
-	 * @param filename
-	 * @throws IOException
-	 */
-	private void createPipe(String filename) throws IOException {
-		File f = new File(filename);
-
-		// Check to see if file exists. If so delete and recreate to confirm
-		// it's a pipe.
-		if (f.exists()) {
-			logService.log(LogService.LOG_INFO, "Pipe " + f.getAbsolutePath() + " already exists, deleting.");
-			destroyPipe(f);
-		}
-		String cmd = "/usr/bin/mkfifo " + f.getAbsolutePath();
-
-		String error = execute(cmd);
-		logService.log(LogService.LOG_INFO, "Execution Completed.  Response: " + error);
-	}
-
-	/**
-	 * Deletes a file
-	 * 
-	 * @param file
-	 * @throws IOException
-	 */
-	private void destroyPipe(File file) throws IOException {
-		if (!file.delete()) {
-			throw new IOException("Unable to delete file " + file.getAbsolutePath());
-		}
-		logService.log(LogService.LOG_INFO, "Deleted " + file.getAbsolutePath());
-	}
-
-	/**
-	 * @param cmd
-	 * @return null on success, or String of error message on failure.
-	 * @throws IOException
-	 */
-	private String execute(String cmd) throws IOException {
-		String s = null;
-		StringBuffer sb = new StringBuffer();
-		boolean hasError = false;
-		logService.log(LogService.LOG_DEBUG, "Executing: " + cmd);
-		Process p = Runtime.getRuntime().exec(cmd);
-		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-		while ((s = stdError.readLine()) != null) {
-			sb.append(s);
-			hasError = true;
-		}
-
-		if (hasError) {
-			// temp fix for ADS board. All commands return with this error.
-			if (!sb.toString().equals("Using fallback suid method")) {
-				new IOException("Failed to execute command: " + sb.toString());
-			}
-		}
-
-		BufferedReader stdOut = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		sb = new StringBuffer();
-		while ((s = stdOut.readLine()) != null) {
-			sb.append(s);
-			sb.append('\n');
-		}
-
-		return sb.toString();
-	}
-
-	public void serviceChanged(ServiceEvent event) {
-		ServiceReference sr = event.getServiceReference();
-
-		registerService(sr, event.getType());
 	}
 
 	private void registerService(ServiceReference sr, int eventType) {
@@ -363,6 +334,80 @@ public class Activator implements BundleActivator, ServiceListener {
 		}
 	}
 
+	public void serviceChanged(ServiceEvent event) {
+		ServiceReference sr = event.getServiceReference();
+
+		registerService(sr, event.getType());
+	}
+
+	public void start(BundleContext context) throws Exception {
+		this.context = context;
+		Activator.ref = this;
+
+		modletFactories = new Hashtable();
+		activeModlets = new Hashtable();
+		ServiceReference sr = context.getServiceReference(LogService.class.getName());
+		if (sr != null) {
+			logService = (LogService) context.getService(sr);
+		}
+
+		context.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
+
+		registerExistingServices(context);
+
+		pipeFilename = context.getProperty("com.buglabs.pipename");
+
+		if (pipeFilename == null || pipeFilename.length() == 0) {
+			pipeFilename = DEFAULT_PIPE_FILENAME;
+		}
+
+		logService.log(LogService.LOG_INFO, "Creating pipe " + pipeFilename);
+		createPipe(pipeFilename);
+		pipeReader = new PipeReader(pipeFilename, Manager.getManager(context, logService, modletFactories, activeModlets), logService);
+
+		logService.log(LogService.LOG_INFO, "Initializing existing modules");
+
+		coldPlug();
+
+		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
+
+		pipeReader.start();
+	}
+
+	public void stop(BundleContext context) throws Exception {
+		stopModlets(activeModlets);
+		if (pipeReader != null) {
+			pipeReader.cancel();
+			pipeReader.interrupt();
+			logService.log(LogService.LOG_INFO, "Deleting pipe " + pipeFilename);
+			destroyPipe(new File(pipeFilename));
+		}
+		modletFactories.clear();
+	}
+
+	/**
+	 * Stop all active modlets.
+	 * 
+	 * @param activeModlets
+	 */
+	private void stopModlets(Map modlets) {
+		for (Iterator i = modlets.keySet().iterator(); i.hasNext();) {
+			String key = (String) i.next();
+
+			List modl = (List) modlets.get(key);
+
+			for (Iterator j = modl.iterator(); j.hasNext();) {
+				IModlet m = (IModlet) j.next();
+
+				try {
+					m.stop();
+				} catch (Exception e) {
+					logService.log(LogService.LOG_ERROR, "Error occured while stopping " + m.getModuleId() + ": " + e.getMessage());
+				}
+			}
+		}
+	}
+
 	private void validateFactory(IModletFactory factory) {
 		if (isEmpty(factory.getModuleId())) {
 			throw new RuntimeException("IModletFactory has empty Module ID.");
@@ -371,23 +416,5 @@ public class Activator implements BundleActivator, ServiceListener {
 		if (isEmpty(factory.getName())) {
 			throw new RuntimeException("IModletFactory has empty Name.");
 		}
-	}
-
-	private boolean isEmpty(String element) {
-		return element == null || element.length() == 0;
-	}
-
-	private void createModlets(IModletFactory factory) throws Exception {
-		IModlet modlet = factory.createModlet(context, 0);
-		modlet.setup();
-		modlet.start();
-	}
-
-	protected Map getModletFactories() {
-		return modletFactories;
-	}
-
-	protected Map getActiveModlets() {
-		return activeModlets;
 	}
 }
