@@ -57,7 +57,7 @@ public abstract class PositionSentence extends NMEASentence {
 	}
 
 	/**
-	 * For a given string, return true if is null or empy, false otherwise.
+	 * For a given string, return true if is null or empty, false otherwise.
 	 * 
 	 * @param val
 	 * @return

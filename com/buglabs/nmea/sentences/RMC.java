@@ -56,6 +56,8 @@ public class RMC extends PositionSentence {
 		this.dateStamp = newRMC.getDateStamp();
 		this.magneticVariation = newRMC.getMagneticVariation();
 		this.trackMadeGood = newRMC.getTrackMadeGood();
+		this.setLatitude(newRMC.getLatitude());
+		this.setLongitude(newRMC.getLongitude());
 	}
 	
 	public Object parse(String sentence) {
