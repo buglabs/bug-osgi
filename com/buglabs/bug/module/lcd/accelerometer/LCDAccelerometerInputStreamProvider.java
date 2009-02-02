@@ -37,9 +37,12 @@ import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.StreamMultiplexer;
 
 public class LCDAccelerometerInputStreamProvider extends StreamMultiplexer implements IAccelerometerSampleFeed, IAccelerometerRawFeed {
-
+	private static final int BUFFER_SIZE = 6;
+	private static final int PROCESS_DELAY = 50;
+	private static final int READ_DELAY = 250;
+	
 	public LCDAccelerometerInputStreamProvider(InputStream is) {
-		super(is, 6, 50);
+		super(is, BUFFER_SIZE, PROCESS_DELAY);
 		setName("LCDAccelerometer");
 		setLogService(LogServiceUtil.getLogService(Activator.getInstance().getBundleContext()));
 	}
