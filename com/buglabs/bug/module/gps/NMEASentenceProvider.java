@@ -84,6 +84,10 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	 * @deprecated
 	 */
 	public com.buglabs.nmea.sentences.RMC getRMC() {
+		if (cachedRMC == null) {
+			return null;
+		}
+		
 		return new com.buglabs.nmea.sentences.RMC(cachedRMC);
 	}
 	
