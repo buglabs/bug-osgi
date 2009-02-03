@@ -137,7 +137,8 @@ public class Activator implements BundleActivator, ServiceListener {
 		String s = null;
 		StringBuffer sb = new StringBuffer();
 		boolean hasError = false;
-		logService.log(LogService.LOG_DEBUG, "Executing: " + cmd);
+		
+		//logService.log(LogService.LOG_DEBUG, "Executing: " + cmd);
 		Process p = Runtime.getRuntime().exec(cmd);
 		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 

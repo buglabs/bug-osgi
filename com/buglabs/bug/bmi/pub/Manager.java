@@ -133,7 +133,6 @@ public class Manager {
 	 * @param msg
 	 */
 	public void processMessage(String msg) {
-		logService.log(LogService.LOG_DEBUG, "processing: " + msg);
 		BMIMessage message = new BMIMessage(msg);
 		List ml;
 		boolean startedBundles = false;
@@ -175,10 +174,8 @@ public class Manager {
 
 							// TODO we want to do some logic like get only the
 							// latest version of a given modlet factory.
-							logService.log(LogService.LOG_DEBUG, "Creating modlet " + mf.getName());
 							IModlet m = mf.createModlet(context, message.getSlot());
 							try {
-								logService.log(LogService.LOG_DEBUG, "Setting up modlet " + mf.getName());
 								m.setup();
 							} catch (Exception e) {
 								logService.log(LogService.LOG_ERROR, "Unable to setup Modlet " + mf.getName() + ": " + e.getMessage());
@@ -216,7 +213,7 @@ public class Manager {
 								m.stop();
 								removalList.add(m);
 							} else {
-								logService.log(LogService.LOG_DEBUG, "Ignoring " + m.getModuleId() + " in slot " + m.getSlotId());
+								logService.log(LogService.LOG_INFO, "Ignoring " + m.getModuleId() + " in slot " + m.getSlotId());
 							}
 						}
 
@@ -239,7 +236,7 @@ public class Manager {
 			logService.log(LogService.LOG_ERROR, "Bundle/Modlet error occurred: " + e.getClass().getName() + ", " + e.getMessage());
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
-			logService.log(LogService.LOG_DEBUG, sw.getBuffer().toString());
+			logService.log(LogService.LOG_ERROR, sw.getBuffer().toString());
 
 			if (e.getNestedException() != null) {
 				logService.log(LogService.LOG_ERROR, "Nested Exception: " + e.getNestedException().getClass().getName() + ", " + e.getNestedException().getMessage());
@@ -251,7 +248,7 @@ public class Manager {
 			logService.log(LogService.LOG_ERROR, "Bundle/Modlet error occurred: " + e.getClass().getName() + ", " + e.getMessage());
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
-			logService.log(LogService.LOG_DEBUG, sw.getBuffer().toString());
+			logService.log(LogService.LOG_ERROR, sw.getBuffer().toString());
 
 		}
 	}
