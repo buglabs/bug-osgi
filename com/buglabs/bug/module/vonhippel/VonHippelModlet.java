@@ -42,6 +42,7 @@ import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
+import com.buglabs.bug.module.vonhippel.pub.IVonHippelSerialPort;
 import com.buglabs.bug.module.vonhippel.pub.VonHippelWS;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
@@ -80,6 +81,10 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private VonHippelModuleControl vhc;
 
+	private ServiceRegistration vhSerialRef;
+
+	private ServiceRegistration vhLedRef;
+
 	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
@@ -112,21 +117,30 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	public void start() throws Exception {
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, createBasicServiceProperties());
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
+		vhSerialRef = context.registerService(IVonHippelSerialPort.class.getName(), vhc, createBasicServiceProperties());
+		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		ledref = context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhDevice);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
-		// mdaccRef =
-		// context.registerService(IMDACCModuleControl.class.getName(), this,
-		// createBasicServiceProperties());
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	public void stop() throws Exception {
 		StatusBarUtils.releaseRegion(context, regionKey);
+		
+		//close any open resources
+		if (vhc != null) {
+			vhc.dispose();
+		}
+		
 		if (wsMotionTracker != null) {
 			wsMotionTracker.close();
 		}
 
+		if (vhLedRef != null) {
+			vhLedRef.unregister();
+		}
+		
 		if (wsAccTracker != null) {
 			wsAccTracker.close();
 		}
@@ -138,6 +152,11 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		if (vhModuleRef != null) {
 			vhModuleRef.unregister();
 		}
+		
+		if (vhSerialRef != null) {
+			vhSerialRef.unregister();
+		}
+		
 		if (ledref != null) {
 			ledref.unregister();
 		}

@@ -231,6 +231,7 @@ public interface IVonHippelModuleControl {
 	 * VonHippelModuleControl: baudrate=9600 bitsperchar=8 stopbits=1
 	 * parity=none autocts=off autorts=off blocking=off
 	 * 
+	 * @deprecated
 	 * @return stream associated with RS232 input (reading)
 	 */
 	public InputStream getRS232InputStream();
@@ -241,7 +242,7 @@ public interface IVonHippelModuleControl {
 	 * API. The port is set up with the following parameters in
 	 * VonHippelModuleControl: baudrate=9600 bitsperchar=8 stopbits=1
 	 * parity=none autocts=off autorts=off blocking=off
-	 * 
+	 * @deprecated
 	 * @return stream associated with RS232 output (writing)
 	 */
 	public OutputStream getRS232OutputStream();

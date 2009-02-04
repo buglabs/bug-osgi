@@ -36,23 +36,52 @@ import javax.microedition.io.Connector;
 
 import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
+import com.buglabs.bug.module.vonhippel.pub.IVonHippelSerialPort;
 import com.buglabs.module.IModuleLEDController;
 
-public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleLEDController {
-
-
+public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleLEDController, IVonHippelSerialPort {
 	private VonHippel vhDevice;
-	private int slotId;
 	private CommConnection cc;
+	private InputStream inputStream;
+	private OutputStream outputStream;
+	private final int slotId;
+
+	private String baudrate;
+	private int bitsPerChar;
+	private String stopBits;
+	private String parity;
+	private boolean autoCTS;
+	private boolean autoRTS;
+	private boolean blocking;
 
 	public VonHippelModuleControl(VonHippel vh, int slotId) {
 		vhDevice = vh;
+		this.slotId = slotId;
+
+		// load defaults for comm port.
+		baudrate = "9600";
+		bitsPerChar = 8;
+		stopBits = "1";
+		parity = "none";
+		autoCTS = false;
+		autoRTS = false;
+		blocking = false;
+	}
+
+	/**
+	 * Close input and output streams.  
+	 */
+	protected void dispose() {
 		try {
-			cc = (CommConnection) Connector.open("comm:/dev/ttymxc/" + slotId + ";baudrate=9600;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off",
-					Connector.READ_WRITE, true);
+			if (inputStream != null) {
+				inputStream.close();
+			}
+			
+			if (outputStream != null) {
+				outputStream.close();
+			}
 		} catch (IOException e) {
-			System.err.println("VonHippelModuleControl: Error opening serial connection...");
-			e.printStackTrace();
+			//Disregard exception
 		}
 	}
 
@@ -191,22 +220,155 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 
 	public InputStream getRS232InputStream() {
 		try {
-			return (cc.openInputStream());
+			if (cc == null) {
+				cc = (CommConnection) Connector.open(getCommString(), Connector.READ_WRITE, true);
+			}
+			if (inputStream == null) {
+				inputStream = cc.openInputStream();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		return inputStream;
 	}
 
 	public OutputStream getRS232OutputStream() {
 		try {
-			return (cc.openOutputStream());
+			if (cc == null) {
+				cc = (CommConnection) Connector.open(getCommString(), Connector.READ_WRITE, true);
+			}
+			if (outputStream == null) {
+				outputStream = cc.openOutputStream();
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		return outputStream;
 	}
 
+	public InputStream getSerialInputStream() throws IOException {
+		if (cc == null) {
+			cc = (CommConnection) Connector.open(getCommString(), Connector.READ_WRITE, true);
+		}
+		if (inputStream == null) {
+			inputStream = cc.openInputStream();
+		}
+
+		return inputStream;
+	}
+
+	public OutputStream getSerialOutputStream() throws IOException {
+		try {
+			if (cc == null) {
+				cc = (CommConnection) Connector.open(getCommString(), Connector.READ_WRITE, true);
+			}
+			if (outputStream == null) {
+				outputStream = cc.openOutputStream();
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return outputStream;
+	}
+
+	/**
+	 * @return
+	 */
+	private String getCommString() {
+		// return "comm:/dev/ttymxc/" + slotId +
+		// ";baudrate=9600;bitsperchar=8;stopbits=1;parity=none;autocts=off;autorts=off;blocking=off";
+		return "comm:/dev/ttymxc/" + slotId + ";baudrate=" + baudrate + ";bitsperchar=" + bitsPerChar + ";stopbits=" + stopBits + ";parity=" + parity + ";autocts=" + boolToStr(autoCTS)
+				+ ";autorts=" + boolToStr(autoRTS) + ";blocking=" + boolToStr(blocking);
+	}
+
+	/**
+	 * @param val
+	 * @return comm string friendly formatting of boolean value
+	 */
+	private String boolToStr(boolean val) {
+		if (val) {
+			return "on";
+		}
+		
+		return "off";
+	}
+	
+	private void checkOpen() throws IOException {
+		throw new IOException("Serial port connection has already been created.  Unable to set parameters.");
+	}
+
+	public String getBaudrate() {
+		return baudrate;
+	}
+
+	public void setBaudrate(String baudrate) throws IOException {
+		checkOpen();
+		this.baudrate = baudrate;
+	}
+
+	public int getBitsPerChar() {
+		return bitsPerChar;
+	}
+	public String getStopBits() {
+		return stopBits;
+	}
+
+	public void setStopBits(String stopBits) throws IOException {
+		checkOpen();
+		this.stopBits = stopBits;
+	}
+
+	public String getParity() {
+		return parity;
+	}
+
+	public void setParity(String parity) throws IOException {
+		checkOpen();
+		this.parity = parity;
+	}
+
+	public boolean getAutoCTS() {
+		return autoCTS;
+	}
+
+	public void setAutoCTS(boolean autoCTS) throws IOException {
+		checkOpen();
+		this.autoCTS = autoCTS;
+	}
+
+	public boolean getAutoRTS() {
+		return autoRTS;
+	}
+
+	public void setAutoRTS(boolean autoRTS) throws IOException {
+		checkOpen();
+		this.autoRTS = autoRTS;
+	}
+
+	public boolean getBlocking() {
+		return blocking;
+	}
+
+	public void setBlocking(boolean blocking) throws IOException {
+		checkOpen();
+		this.blocking = blocking;
+	}
+
+	public boolean isInputStreamOpen() {
+		return inputStream != null;
+	}
+
+	public boolean isOutputStreamOpen() {
+		return outputStream != null;
+	}
+
+	public void setBitsPerChar(int bitsPerChar) throws IOException {
+		checkOpen();
+		this.bitsPerChar = bitsPerChar;
+	}
 }
