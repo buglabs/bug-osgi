@@ -299,7 +299,8 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 	}
 	
 	private void checkOpen() throws IOException {
-		throw new IOException("Serial port connection has already been created.  Unable to set parameters.");
+		if (isInputStreamOpen() || isOutputStreamOpen())
+			throw new IOException("Serial port connection has already been created.  Unable to set parameters.");
 	}
 
 	public String getBaudrate() {
