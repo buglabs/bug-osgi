@@ -112,20 +112,17 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 				}
 
 				try {
-					log.log(LogService.LOG_DEBUG, "Raw NMEA Line: " + sentence);
 					AbstractNMEASentence objSentence = NMEASentenceFactory.getSentence(sentence);
 
 					if (objSentence != null && objSentence instanceof RMC) {
 						cachedRMC = (RMC) objSentence;
 						index++;
 					} 
-					if (objSentence == null) {
-						log.log(LogService.LOG_DEBUG, "Ignoring sentence: " + sentence);
-					} else {
+					if (objSentence != null) {
 						notifySubscribers(objSentence);
 					}
 				} catch (NMEAParserException e) {
-					log.log(LogService.LOG_ERROR, "An error occured while parsing sentence.", e);
+					log.log(LogService.LOG_ERROR, "An error occured while parsing sentence: " + sentence, e);
 				}
 			} while (!Thread.currentThread().isInterrupted() && (sentence != null));
 		} catch (IOException e) {
