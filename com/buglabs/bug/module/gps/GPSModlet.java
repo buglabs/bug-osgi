@@ -171,14 +171,13 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 * @see com.buglabs.bug.module.pub.IModlet#start()
 	 */
 	public void start() throws Exception {
-		log.log(LogService.LOG_DEBUG, "GPSModlet start enter");
 		gpsd.start();
 		nmeaProvider.start();
 		
 		// default to passive (external) antenna, until
 		// such time as we have confidence in the internal
 		// antenna's ability to obtain a fix
-		log.log(LogService.LOG_DEBUG, "GPSModlet defaulting to passive (external) antenna");
+		log.log(LogService.LOG_INFO, "GPSModlet defaulting to passive (external) antenna");
 		setPassiveAntenna();
 
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
@@ -195,7 +194,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
 		context.addServiceListener(nmeaProvider,  "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "=" + IPositionSubscriber.class.getName() + "))");
-		log.log(LogService.LOG_DEBUG, "GPSModlet start leave");
 	}
 
 	/**
@@ -246,7 +244,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 */
 	public Position getPosition() {
 		RMC rmc = nmeaProvider.getLastRMC();
-		log.log(LogService.LOG_DEBUG, "Evaluating RMC: " + rmc.getLatitude() + " " + rmc.getLongitude());
+
 		if (rmc != null) {
 			try {
 				Position pos = new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS()
@@ -404,7 +402,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void setup() throws Exception {
-		log.log(LogService.LOG_DEBUG, "GPSModlet setup() enter");
 		String devnode_gps = "/dev/ttymxc" + Integer.toString(slotId);
 		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(slotId + 1);
 
@@ -417,20 +414,18 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		gpsis = new CharDeviceInputStream(gps);
-		log.log(LogService.LOG_DEBUG, "GPSModlet setup() getting delay");
 		long delay = getReadDelay();
-		log.log(LogService.LOG_DEBUG, "GPSModlet setup() delay = " + delay);
+
 		gpsd = new NMEARawFeed(gpsis, delay);
 		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream(), context);
 
 		gpscontrol = new GPSControl();
 
 		CharDeviceUtils.openDeviceWithRetry(gpscontrol, devnode_gpscontrol, 2);
-		log.log(LogService.LOG_DEBUG, "GPSModlet setup leave");
+
 	}
 
 	private long getReadDelay() {
-		log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay enter");
 		ServiceReference sr = context.getServiceReference(ConfigurationAdmin.class.getName());
 
 		long read_delay = 100;

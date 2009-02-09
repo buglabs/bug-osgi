@@ -46,7 +46,6 @@ import org.osgi.util.position.Position;
 
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
 import com.buglabs.bug.module.gps.pub.INMEASentenceSubscriber;
-import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.bug.module.gps.pub.IPositionSubscriber;
 import com.buglabs.nmea.sentences.NMEAParserException;
 import com.buglabs.nmea2.AbstractNMEASentence;
@@ -84,7 +83,8 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	 * @deprecated
 	 */
 	public com.buglabs.nmea.sentences.RMC getRMC() {
-		if (cachedRMC == null) {
+		// Only return RMC if valid position information is available.
+		if (cachedRMC == null || cachedRMC.getLatitude() == null || cachedRMC.getLongitude() == null) {
 			return null;
 		}
 		
