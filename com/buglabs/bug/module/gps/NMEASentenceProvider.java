@@ -92,6 +92,10 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	}
 	
 	public RMC getLastRMC() {
+		if (cachedRMC == null || cachedRMC.getLatitude() == null || cachedRMC.getLongitude() == null) {
+			return null;
+		}
+		
 		return cachedRMC;
 	}
 	

@@ -43,7 +43,7 @@ public interface INMEASentenceProvider {
 	public RMC getRMC();
 	
 	/**
-	 * @return Last parsed RMC NMEA sentence, or null if no sentence has been received.
+	 * @return Last parsed RMC NMEA sentence, or null if no sentence with location information has been received.
 	 */
 	public com.buglabs.nmea2.RMC getLastRMC();
 	
