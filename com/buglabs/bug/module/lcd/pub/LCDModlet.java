@@ -55,6 +55,7 @@ import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
+import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
@@ -143,7 +144,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			LCDAccelerometerSampleProvider accsp = new LCDAccelerometerSampleProvider(lcd_acc_is_prov);
 
 			accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), accsp, createRemotableProperties(createBasicServiceProperties()));
-			AccelerationWS accWs = new AccelerationWS(accsp);
+			AccelerationWS accWs = new AccelerationWS(accsp, LogServiceUtil.getLogService(context));
 			wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 		}
 
