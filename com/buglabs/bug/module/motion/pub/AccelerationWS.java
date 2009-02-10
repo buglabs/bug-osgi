@@ -27,8 +27,9 @@
  *******************************************************************************/
 package com.buglabs.bug.module.motion.pub;
 
-import java.io.IOException;
 import java.util.List;
+
+import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.accelerometer.pub.AccelerometerSample;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
@@ -36,14 +37,20 @@ import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.SelfReferenceException;
 import com.buglabs.util.XmlNode;
 
+/**
+ * A web service for acceleration data.
+ * @author kgilmer
+ *
+ */
 public class AccelerationWS implements PublicWSProvider {
 	private IAccelerometerSampleProvider acc;
+	private final LogService log;
 
-	public AccelerationWS(IAccelerometerSampleProvider acc) {
+	public AccelerationWS(IAccelerometerSampleProvider acc, LogService log) {
 		this.acc = acc;
+		this.log = log;
 	}
 
 	public PublicWSDefinition discover(int operation) {
@@ -84,12 +91,10 @@ public class AccelerationWS implements PublicWSProvider {
 
 				root.addChildElement(sample);
 			}
-		} catch (SelfReferenceException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO: Log this
-			e.printStackTrace();
-		}
+		} catch (Exception e) {
+			log.log(LogService.LOG_ERROR, "Error occurred while geting acceleration XML.", e);
+			return null;
+		} 
 
 		return root.toString();
 	}

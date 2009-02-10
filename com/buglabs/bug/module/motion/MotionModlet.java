@@ -58,6 +58,7 @@ import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.util.IStreamMultiplexerListener;
+import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
 import com.buglabs.util.StreamMultiplexerEvent;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
@@ -164,7 +165,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), asp, createBasicServiceProperties());
 		accSampleFeedRef = context.registerService(IAccelerometerSampleFeed.class.getName(), acceld, createBasicServiceProperties());
 		accControlRef = context.registerService(IAccelerometerControl.class.getName(), accControl, createBasicServiceProperties());
-		AccelerationWS accWs = new AccelerationWS(asp);
+		AccelerationWS accWs = new AccelerationWS(asp, LogServiceUtil.getLogService(context));
 		wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 
 		mdaccRef = context.registerService(IMDACCModuleControl.class.getName(), this, createBasicServiceProperties());
