@@ -47,6 +47,10 @@ public class NMEASentenceFactory {
 	 * @throws NMEAParserException
 	 */
 	public static AbstractNMEASentence getSentence(String gpsData) throws NMEAParserException {
+		if (gpsData == null) {
+			throw new NMEAParserException("Input data is NULL.");
+		}
+		
 		if (gpsData.startsWith(SENTENCE_TYPES[0])) {
 			return new PTTK(gpsData);
 		}
