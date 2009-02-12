@@ -31,24 +31,31 @@ import com.buglabs.nmea.sentences.NMEAParserException;
 
 /**
  * A class to store DMS style location information.
+ * 
  * @author aroman
- *
+ * 
  */
 public class DegreesMinutesSeconds {
 
 	private String dms;
+	private char direction = '?';
 
 	/**
 	 * Will throw NMEAParserException if parsing error occurs.
+	 * 
 	 * @param dms
 	 */
 	public DegreesMinutesSeconds(String dms) {
-		if (dms == null || dms.length() ==0 || dms.indexOf(',') == -1 || dms.indexOf('.') == -1) {
+		if (dms == null || dms.length() == 0 || dms.indexOf(',') == -1 || dms.indexOf('.') == -1) {
 			throw new NMEAParserException("Unable to parse DMS: " + dms);
 		}
-		
+
 		int i = dms.indexOf(",");
 		this.dms = dms.substring(0, i);
+
+		if (dms.length() > i + 1) {
+			direction = dms.charAt(i + 1);
+		}
 	}
 
 	/**
@@ -56,16 +63,21 @@ public class DegreesMinutesSeconds {
 	 */
 	public double getDegrees() {
 		int i = dms.indexOf(".");
-		
+
 		if (i < 2) {
 			throw new NMEAParserException("Unable to calculate degrees from " + dms);
 		}
 
-		if (dms.charAt(0) == '0') {
-			return Double.parseDouble("-" + dms.substring(1, i - 2));
+		double rawVal = Double.parseDouble(dms.substring(0, i - 2));
+
+		// According to
+		// http://www.nationalatlas.gov/articles/mapping/a_latlong.html
+		// S and W directional designators offer negative values for degrees.
+		if (direction == 'S' || direction == 'W') {
+			rawVal = rawVal * -1;
 		}
 
-		return Double.parseDouble(dms.substring(0, i - 2));
+		return rawVal;
 	}
 
 	/**
@@ -78,7 +90,6 @@ public class DegreesMinutesSeconds {
 			throw new NMEAParserException("Unable to calculate minutes from " + dms);
 		}
 
-		
 		return Double.parseDouble(dms.substring(i - 2, i));
 	}
 
@@ -94,7 +105,15 @@ public class DegreesMinutesSeconds {
 	}
 
 	/**
+	 * @return Direction char for unit. Can be N/S/E/W.
+	 */
+	public char getDirection() {
+		return direction;
+	}
+
+	/**
 	 * Convert DegreesMinutesSeconds to decimal degrees
+	 * 
 	 * @return
 	 */
 	public double toDecimalDegrees() {
