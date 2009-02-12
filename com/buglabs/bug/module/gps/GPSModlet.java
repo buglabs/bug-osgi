@@ -68,7 +68,7 @@ import com.buglabs.nmea.DegreesMinutesSeconds;
 import com.buglabs.nmea2.RMC;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
-import com.buglabs.services.ws.PublicWSProvider;
+import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
@@ -83,7 +83,7 @@ import com.buglabs.util.trackers.PublicWSAdminTracker;
  * @author kgilmer
  * 
  */
-public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, PublicWSProvider, IPositionProvider, IModuleLEDController {
+public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, PublicWSProvider2, IPositionProvider, IModuleLEDController {
 
 	private BundleContext context;
 
@@ -150,6 +150,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	private LogService log;
 
 	private ServiceRegistration ledRef;
+
+	private String serviceName = "Location";
 
 	/**
 	 * @param context
@@ -332,7 +334,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public PublicWSDefinition discover(int operation) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new PublicWSDefinition() {
 
 				public List getParameters() {
@@ -349,7 +351,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public IWSResponse execute(int operation, String input) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new WSResponse(getPositionXml(), "text/xml");
 		}
 		return null;
@@ -394,7 +396,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public String getPublicName() {
-		return "Location";
+		return serviceName;
 	}
 
 	public String getDescription() {
@@ -597,5 +599,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			}
 		}
 		return result;
+	}
+
+	public void setPublicName(String name) {
+		serviceName = name;
 	}
 }
