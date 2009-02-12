@@ -37,7 +37,7 @@ import java.util.Map;
  * @author dalbert
  * 
  */
-public interface PublicWSProviderWithParams extends PublicWSProvider {
+public interface PublicWSProviderWithParams extends PublicWSProvider2 {
 	/**
 	 * Execute a service with get and post parameters passed in.
 	 * 

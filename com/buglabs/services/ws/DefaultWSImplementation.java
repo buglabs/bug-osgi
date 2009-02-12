@@ -33,9 +33,9 @@ package com.buglabs.services.ws;
  * @author kgilmer
  * 
  */
-public class DefaultWSImplementation implements PublicWSProvider {
+public class DefaultWSImplementation implements PublicWSProvider2 {
 
-	private final String publicName;
+	private String publicName;
 
 	public DefaultWSImplementation(String publicName) {
 		this.publicName = publicName;
@@ -56,6 +56,10 @@ public class DefaultWSImplementation implements PublicWSProvider {
 
 	public String getDescription() {
 		return "This service has no description.";
+	}
+
+	public void setPublicName(String name) {
+		publicName = name;
 	}
 
 }

@@ -28,47 +28,21 @@
 package com.buglabs.services.ws;
 
 /**
- * This interface is a base interface for Bug services.
+ * This interface is a base interface for Bug services. The new set method
+ * allows for multiple services to exist concurrently. The PublicWSAdmin will
+ * assign a new name to services for which the default name is already being
+ * used.
  * 
- * use PublicWSProvider2, this interface maintained for compatibility.
  * @author ken
  * 
  */
-public interface PublicWSProvider {
-	public static final int GET = 1;
-
-	public static final int PUT = 2;
-
-	public static final int POST = 3;
-
-	public static final int DELETE = 4;
-
-	public static final String PACKAGE_ID = "com.buglabs.service.ws";
+public interface PublicWSProvider2 extends PublicWSProvider {
 
 	/**
-	 * @param operation
-	 *            HTTP operation. See IPublicServiceProvider.GET, etc.
-	 * @return The description of what the service requires and provides.
-	 */
-	public PublicWSDefinition discover(int operation);
-
-	/**
-	 * Execute a service. This is a proxy to a native OSGi style service.
+	 * Set the name of the service. This can be done on registration.
 	 * 
-	 * @param operation
-	 *            PublicWSProvider.GET, .PUT, .POST, .DELETE
-	 * @param input
-	 * @return
+	 * @param name
 	 */
-	public IWSResponse execute(int operation, String input);
+	public void setPublicName(String name);
 
-	/**
-	 * @return Name that this service uses.
-	 */
-	public String getPublicName();
-
-	/**
-	 * @return A brief description of the service.
-	 */
-	public String getDescription();
 }
