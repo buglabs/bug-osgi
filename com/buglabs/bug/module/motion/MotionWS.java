@@ -34,16 +34,17 @@ import java.util.List;
 import com.buglabs.bug.module.motion.pub.IMotionObserver;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
-import com.buglabs.services.ws.PublicWSProvider;
+import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.SelfReferenceException;
 import com.buglabs.util.XmlNode;
 
-public class MotionWS implements PublicWSProvider, IMotionObserver {
+public class MotionWS implements PublicWSProvider2, IMotionObserver {
 	private Date lastMotion;
+	private String serviceName = "Motion";
 
 	public PublicWSDefinition discover(int operation) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new PublicWSDefinition() {
 
 				public List getParameters() {
@@ -60,7 +61,7 @@ public class MotionWS implements PublicWSProvider, IMotionObserver {
 	}
 
 	public IWSResponse execute(int operation, String input) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new WSResponse(getTimeXml(), "text/xml");
 		}
 		return null;
@@ -83,10 +84,14 @@ public class MotionWS implements PublicWSProvider, IMotionObserver {
 	}
 
 	public String getPublicName() {
-		return "Motion";
+		return serviceName;
 	}
 
 	public void motionDetected() {
 		lastMotion = GregorianCalendar.getInstance().getTime();
+	}
+
+	public void setPublicName(String name) {
+		serviceName  = name;
 	}
 }

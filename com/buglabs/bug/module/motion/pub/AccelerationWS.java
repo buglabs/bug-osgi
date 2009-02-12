@@ -35,7 +35,7 @@ import com.buglabs.bug.accelerometer.pub.AccelerometerSample;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
-import com.buglabs.services.ws.PublicWSProvider;
+import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.XmlNode;
 
@@ -44,9 +44,10 @@ import com.buglabs.util.XmlNode;
  * @author kgilmer
  *
  */
-public class AccelerationWS implements PublicWSProvider {
+public class AccelerationWS implements PublicWSProvider2 {
 	private IAccelerometerSampleProvider acc;
 	private final LogService log;
+	private String serviceName = "Acceleration";
 
 	public AccelerationWS(IAccelerometerSampleProvider acc, LogService log) {
 		this.acc = acc;
@@ -54,7 +55,7 @@ public class AccelerationWS implements PublicWSProvider {
 	}
 
 	public PublicWSDefinition discover(int operation) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new PublicWSDefinition() {
 
 				public List getParameters() {
@@ -71,7 +72,7 @@ public class AccelerationWS implements PublicWSProvider {
 	}
 
 	public IWSResponse execute(int operation, String input) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new WSResponse(getAccelerationXml(), "text/xml");
 		}
 		return null;
@@ -104,6 +105,10 @@ public class AccelerationWS implements PublicWSProvider {
 	}
 
 	public String getPublicName() {
-		return "Acceleration";
+		return serviceName;
+	}
+
+	public void setPublicName(String name) {
+		serviceName = name;
 	}
 }
