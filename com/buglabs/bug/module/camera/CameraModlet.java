@@ -56,7 +56,7 @@ import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
-import com.buglabs.services.ws.PublicWSProvider;
+import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
@@ -67,7 +67,7 @@ import com.buglabs.util.trackers.PublicWSAdminTracker;
  * @author kgilmer
  * 
  */
-public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, IModuleControl {
+public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, IModuleControl {
 	private static final String IMAGE_MIME_TYPE = "image/jpg";
 	private static final String DEVNODE_INPUT_DEVICE = "/dev/input/bmi_cam";
 	private static final String CAMERA_DEVICE_NODE = "/dev/v4l/video0";
@@ -128,6 +128,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 
 	private InputEventProvider bep;
 	private ServiceRegistration ledRef;
+	private String serviceName = "Picture";
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -231,7 +232,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	}
 
 	public PublicWSDefinition discover(int operation) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new PublicWSDefinition() {
 
 				public List getParameters() {
@@ -248,14 +249,14 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 	}
 
 	public IWSResponse execute(int operation, String input) {
-		if (operation == PublicWSProvider.GET) {
+		if (operation == PublicWSProvider2.GET) {
 			return new WSResponse(getImageInputStream(), IMAGE_MIME_TYPE);
 		}
 		return null;
 	}
 
 	public String getPublicName() {
-		return "Picture";
+		return serviceName;
 	}
 
 	public List getModuleProperties() {
@@ -318,5 +319,9 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider, I
 
 	public String getDescription() {
 		return "This service can return image data from a hardware camera.";
+	}
+
+	public void setPublicName(String name) {
+		serviceName = name;
 	}
 }
