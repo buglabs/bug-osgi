@@ -37,6 +37,7 @@ import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.accelerometer.pub.IAccelerometerRawFeed;
@@ -45,8 +46,8 @@ import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
 import com.buglabs.bug.jni.common.CharDevice;
 import com.buglabs.bug.jni.common.CharDeviceInputStream;
 import com.buglabs.bug.jni.common.FCNTL_H;
+import com.buglabs.bug.jni.lcd.LCDControl;
 import com.buglabs.bug.menu.pub.StatusBarUtils;
-import com.buglabs.bug.module.lcd.Activator;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerInputStreamProvider;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerSampleProvider;
 import com.buglabs.bug.module.motion.pub.AccelerationWS;
@@ -66,7 +67,7 @@ import com.buglabs.util.trackers.PublicWSAdminTracker;
  * 
  */
 public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IModuleDisplay, IModuleLEDController {
-
+	private static final String DEV_NODE_CONTROL = "/dev/bmi_lcd_control";
 	private final BundleContext context;
 	private final int slotId;
 	private final String moduleId;
@@ -108,21 +109,33 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private CharDevice accel;
 	private CharDeviceInputStream accIs;
 	private ServiceRegistration lcdRef;
+	private LogService log;
+	private LCDControl lcdcontrol;
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
 		this.moduleName = "LCD";
+		this.log = LogServiceUtil.getLogService(context);
 	}
 
 	public void setup() throws Exception {
+		String devnode_control = DEV_NODE_CONTROL;
+
+		lcdcontrol = new LCDControl();
+		if (lcdcontrol.open(devnode_control, FCNTL_H.O_RDWR) < 0) {
+			throw new RuntimeException("Unable to open control device:" + devnode_control);
+		}
+		
 		String lcd_accel_devnode = "/dev/bmi_lcd_acc_m" + (slotId + 1);
 		accel = new CharDevice();
 		int result = accel.open(lcd_accel_devnode, FCNTL_H.O_RDWR);
 		if (result >= 0) {
 			accIs = new CharDeviceInputStream(accel);
 			lcd_acc_is_prov = new LCDAccelerometerInputStreamProvider(accIs);
+		} else {
+			log.log(LogService.LOG_ERROR, "Unable to open " + lcd_accel_devnode + ": " + result);
 		}
 	}
 
@@ -146,6 +159,8 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), accsp, createRemotableProperties(createBasicServiceProperties()));
 			AccelerationWS accWs = new AccelerationWS(accsp, LogServiceUtil.getLogService(context));
 			wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
+		} else {
+			log.log(LogService.LOG_ERROR, "Unable to access the accelerometer device.");
 		}
 
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
@@ -155,13 +170,19 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		StatusBarUtils.releaseRegion(context, regionKey);
 
 		if (lcd_acc_is_prov != null) {
+			log.log(LogService.LOG_DEBUG, "closing aacel");
 			lcd_acc_is_prov.interrupt();
 			wsAccTracker.close();
 			accIsProvRef.unregister();
 			accRawFeedProvRef.unregister();
 			accSampleProvRef.unregister();
+			lcd_acc_is_prov.getInputStream().close();
+			accIs.close();
+			accel.close();
+			accel = null;
 		}
-
+		
+		lcdcontrol.close();
 		moduleRef.unregister();
 		lcdRef.unregister();
 		moduleDisplayServReg.unregister();
@@ -224,30 +245,30 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 	public int setLEDGreen(boolean state) throws IOException {
 		if (state) {
-			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_GLEDON(slotId);
+			return lcdcontrol.ioctl_BMI_LCD_GLEDON(slotId);
 		} else {
-			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_GLEDOFF(slotId);
+			return lcdcontrol.ioctl_BMI_LCD_GLEDOFF(slotId);
 		}
 	}
 
 	public int setLEDRed(boolean state) throws IOException {
 		if (state) {
-			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_RLEDON(slotId);
+			return lcdcontrol.ioctl_BMI_LCD_RLEDON(slotId);
 		} else {
-			return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_RLEDOFF(slotId);
+			return lcdcontrol.ioctl_BMI_LCD_RLEDOFF(slotId);
 		}
 	}
 
 	public int getStatus() throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_GETSTAT(slotId);
+		return lcdcontrol.ioctl_BMI_LCD_GETSTAT(slotId);
 	}
 
 	public int disable() throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_SETRST(slotId);
+		return lcdcontrol.ioctl_BMI_LCD_SETRST(slotId);
 	}
 
 	public int enable() throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_CLRRST(slotId);
+		return lcdcontrol.ioctl_BMI_LCD_CLRRST(slotId);
 	}
 
 	public int setBlackLight(int val) throws IOException {
@@ -255,6 +276,6 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public int setBackLight(int val) throws IOException {
-		return Activator.getInstance().getLCDControl().ioctl_BMI_LCD_SET_BL(slotId, val);
+		return lcdcontrol.ioctl_BMI_LCD_SET_BL(slotId, val);
 	}
 }
