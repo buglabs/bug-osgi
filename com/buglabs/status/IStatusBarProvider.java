@@ -27,6 +27,8 @@
  *******************************************************************************/
 package com.buglabs.status;
 
+import com.buglabs.device.IFramebufferDevice;
+
 /**
  * A Status Bar is a bitmap display that can show the user simple status
  * messages and icons. Clients may request resources from the Status Bar
@@ -63,6 +65,28 @@ public interface IStatusBarProvider {
 	public String acquireRegion(int length);
 
 	/**
+	 * This method is used to get access to the entire LCD device.  Only
+	 * one client per JVM session may have access to display at one time.
+	 * Client will have entire display until releaseDisplay() is called.
+	 * During time of allocation no statusbar information will reach the display.
+	 * 
+	 * @return Key to display.
+	 */
+	public String acquireDisplay();
+	
+	/**
+	 * Release screen from SB and menu use.
+	 * @param key
+	 */
+	public void releaseDisplay(String key);
+	
+	/**
+	 * @param key
+	 * @return The framebuffer device for a client that has allocated entire display.
+	 */
+	public IFramebufferDevice getDisplay(String key);
+	
+	/**
 	 * Write a bitmap to the status screen. Must successfully aquire region
 	 * before calling this method.
 	 * 
@@ -80,5 +104,11 @@ public interface IStatusBarProvider {
 	 */
 	public void write(String key, String message);
 
+	/**
+	 * Deallocate a SB region
+	 * @param key
+	 */
 	public void releaseRegion(String key);
+	
+	
 }
