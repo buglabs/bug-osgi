@@ -69,9 +69,9 @@
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.base" destPath="${checkout.dir}/com.buglabs.bug.emulator.base" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bmi" destPath="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.accelerometer" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.accelerometer" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.motion" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.lcd" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.camera" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.camera" />
-			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.motion" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.audio" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.audio" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.vonhippel" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.vonhippel" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.gps" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.gps" />
