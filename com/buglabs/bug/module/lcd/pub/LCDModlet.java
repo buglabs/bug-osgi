@@ -45,6 +45,7 @@ import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
 import com.buglabs.bug.jni.common.CharDevice;
 import com.buglabs.bug.jni.common.CharDeviceInputStream;
+import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.common.FCNTL_H;
 import com.buglabs.bug.jni.lcd.LCDControl;
 import com.buglabs.bug.menu.pub.StatusBarUtils;
@@ -130,12 +131,12 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		
 		String lcd_accel_devnode = "/dev/bmi_lcd_acc_m" + (slotId + 1);
 		accel = new CharDevice();
-		int result = accel.open(lcd_accel_devnode, FCNTL_H.O_RDWR);
-		if (result >= 0) {
+		try {
+			CharDeviceUtils.openDeviceWithRetry(accel, lcd_accel_devnode, 2);
 			accIs = new CharDeviceInputStream(accel);
 			lcd_acc_is_prov = new LCDAccelerometerInputStreamProvider(accIs);
-		} else {
-			log.log(LogService.LOG_ERROR, "Unable to open " + lcd_accel_devnode + ": " + result);
+		} catch (IOException e) {
+			log.log(LogService.LOG_ERROR, e.getMessage());
 		}
 	}
 
@@ -170,7 +171,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		StatusBarUtils.releaseRegion(context, regionKey);
 
 		if (lcd_acc_is_prov != null) {
-			log.log(LogService.LOG_DEBUG, "closing aacel");
+			log.log(LogService.LOG_DEBUG, "closing accel");
 			lcd_acc_is_prov.interrupt();
 			wsAccTracker.close();
 			accIsProvRef.unregister();
