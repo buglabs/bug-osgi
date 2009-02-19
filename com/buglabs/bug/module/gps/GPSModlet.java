@@ -192,7 +192,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 		timer = new Timer();
 		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
-		// TODO: Start position and sentence services when we achieve GPS lock
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
 		context.addServiceListener(nmeaProvider,  "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "=" + IPositionSubscriber.class.getName() + "))");

@@ -110,6 +110,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 			do {
 				try {
 					sentence = br.readLine();
+					log.log(LogService.LOG_DEBUG, "GPS NMEA DEBUG: " + sentence);
 				} catch (CharConversionException e) {
 					sentence = "";
 					continue;
