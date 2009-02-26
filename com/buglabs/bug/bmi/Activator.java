@@ -218,6 +218,9 @@ public class Activator implements BundleActivator, ServiceListener {
 			return "0008";
 		}
 		
+		if (driverName.equals("bmi_zb")){
+			return "0009";
+		}
 
 		logService.log(LogService.LOG_ERROR, "Unable to map " + driverName + " to a module ID.");
 
