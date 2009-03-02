@@ -75,8 +75,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private ServiceRegistration vhModuleRef;
 
-	private ServiceRegistration ledref;
-
 	private CommConnection cc;
 
 	private VonHippelModuleControl vhc;
@@ -119,7 +117,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
 		vhSerialRef = context.registerService(IVonHippelSerialPort.class.getName(), vhc, createBasicServiceProperties());
 		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
-		ledref = context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhc);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
@@ -157,9 +154,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 			vhSerialRef.unregister();
 		}
 		
-		if (ledref != null) {
-			ledref.unregister();
-		}
 		if (cc != null) {
 			cc.close();
 		}
