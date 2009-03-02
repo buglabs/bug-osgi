@@ -120,7 +120,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		vhSerialRef = context.registerService(IVonHippelSerialPort.class.getName(), vhc, createBasicServiceProperties());
 		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		ledref = context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
-		VonHippelWS vhWS = new VonHippelWS(vhDevice);
+		VonHippelWS vhWS = new VonHippelWS(vhc);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}

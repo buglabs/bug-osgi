@@ -27,23 +27,26 @@
  *******************************************************************************/
 package com.buglabs.bug.module.vonhippel.pub;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.buglabs.bug.jni.vonhippel.VonHippel;
+import com.buglabs.bug.module.vonhippel.VonHippelModuleControl;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
+import com.buglabs.util.SelfReferenceException;
 import com.buglabs.util.XmlNode;
 
 public class VonHippelWS implements PublicWSProvider2 {
 
-	private VonHippel vhioctl;
+	
 	private String serviceName = "VonHippel";
+	private VonHippelModuleControl vhctl;
 
-	public VonHippelWS(VonHippel vhioctl) {
-		this.vhioctl = vhioctl;
-
+	public VonHippelWS(VonHippelModuleControl vhctl) {
+		this.vhctl = vhctl;
 	}
 
 	public PublicWSDefinition discover(int operation) {
@@ -65,20 +68,68 @@ public class VonHippelWS implements PublicWSProvider2 {
 
 	public IWSResponse execute(int operation, String input) {
 		if (operation == PublicWSProvider2.GET) {
-			return new WSResponse(getAccelerationXml(), "text/xml");
+			return new WSResponse(getGPIOXml(), "text/xml");
+		}
+		if (operation == PublicWSProvider2.PUT) {
+			
 		}
 		return null;
 	}
 
-	private Object getAccelerationXml() {
+	private Object getGPIOXml() {
 		XmlNode root = new XmlNode("Status");
-
-		// do some magic here to read the state of the VH module and display it
+		try {
+			//gpio.  style = <GPIO>
+			//                <Pin number="0">0</Pin>
+			// 			      <Pin number="1">0</Pin> ...
+			XmlNode gpio = new XmlNode("GPIO");
+			root.addChildElement(gpio);
+			XmlNode pin0 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>8 & 1));
+			XmlNode pin1 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>9 & 1));
+			XmlNode pin2 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>10 & 1));
+			XmlNode pin3 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>11 & 1));
+			pin0.addAttribute("number", "0");
+			pin1.addAttribute("number", "1");
+			pin2.addAttribute("number", "2");
+			pin3.addAttribute("number", "3");
+			gpio.addChildElement(pin0);
+			gpio.addChildElement(pin1);
+			gpio.addChildElement(pin2);
+			gpio.addChildElement(pin3);
+			//iox.  style = <IOX>
+			//                <Pin number="0">0</Pin>
+			// 			      <Pin number="1">0</Pin> ...
+			XmlNode iox = new XmlNode("IOX");
+			root.addChildElement(iox);
+			XmlNode ioxpin0 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>12 & 1));
+			XmlNode ioxpin1 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>13 & 1));
+			XmlNode ioxpin2 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>14 & 1));
+			XmlNode ioxpin3 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>15 & 1));
+			XmlNode ioxpin4 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>16 & 1));
+			XmlNode ioxpin5 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>17 & 1));
+			ioxpin0.addAttribute("number", "0");
+			ioxpin1.addAttribute("number", "1");
+			ioxpin2.addAttribute("number", "2");
+			ioxpin3.addAttribute("number", "3");
+			ioxpin4.addAttribute("number", "4");
+			ioxpin5.addAttribute("number", "5");
+			iox.addChildElement(ioxpin0);
+			iox.addChildElement(ioxpin1);
+			iox.addChildElement(ioxpin2);
+			iox.addChildElement(ioxpin3);
+			iox.addChildElement(ioxpin4);
+			iox.addChildElement(ioxpin5);
+		} catch (SelfReferenceException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		return root.toString();
 	}
 
 	public String getDescription() {
-		return "Returns status of pins on Von Hippel module";
+		return "Returns status of various points (GPIO, IOX) on Von Hippel module";
 	}
 
 	public String getPublicName() {
