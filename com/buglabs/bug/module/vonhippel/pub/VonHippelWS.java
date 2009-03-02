@@ -101,12 +101,12 @@ public class VonHippelWS implements PublicWSProvider2 {
 			// 			      <Pin number="1">0</Pin> ...
 			XmlNode iox = new XmlNode("IOX");
 			root.addChildElement(iox);
-			XmlNode ioxpin0 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>12 & 1));
-			XmlNode ioxpin1 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>13 & 1));
-			XmlNode ioxpin2 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>14 & 1));
-			XmlNode ioxpin3 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>15 & 1));
-			XmlNode ioxpin4 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>16 & 1));
-			XmlNode ioxpin5 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>17 & 1));
+			XmlNode ioxpin0 = new XmlNode("Pin", Integer.toString(vhctl.getStatus() & 1));
+			XmlNode ioxpin1 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>1 & 1));
+			XmlNode ioxpin2 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>2 & 1));
+			XmlNode ioxpin3 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>3 & 1));
+			XmlNode ioxpin4 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>4 & 1));
+			XmlNode ioxpin5 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>5 & 1));
 			ioxpin0.addAttribute("number", "0");
 			ioxpin1.addAttribute("number", "1");
 			ioxpin2.addAttribute("number", "2");
