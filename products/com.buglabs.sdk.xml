@@ -9,13 +9,10 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 	<property file="../system.${build.level}.properties" />
 	<property name="meta.project" value="com.buglabs.dragonfly" />
 
-
-	<buildnumber file="com.buglabs.dragonfly.buildnum" />
-
 	<tstamp />
-	<property name="timestamp" value="${DSTAMP}" />
+	<property name="timestamp" value="${DSTAMP}-${TSTAMP}" />
 
-	<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
+	<property name="build.id" value="v${timestamp}.${build.letter}" />
 	<property name="build.label" value="${sdk.version}.${build.id}" />
 	<property name="meta.project.version" value="${build.id}" />
 
