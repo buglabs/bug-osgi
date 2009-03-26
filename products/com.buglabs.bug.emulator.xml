@@ -31,11 +31,10 @@
 		</not>
       		<then>
 			<echo message="[Build type]: Running individual component build..."/>
-			<buildnumber file="com.buglabs.bug.emulator.buildnum" />
 
 			<tstamp />
-			<property name="timestamp" value="${DSTAMP}" />
-			<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
+			<property name="timestamp" value="${DSTAMP}-${TSTAMP}" />
+			<property name="build.id" value="v${timestamp}.${build.letter}" />
 			<property name="project.version" value="${bug.version}${build.id}" />
       		</then>
 		<else>

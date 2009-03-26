@@ -34,12 +34,11 @@
 		</not>
       		<then>
 			<echo message="[Build type]: Running individual component build..."/>
-			<buildnumber file="com.buglabs.osgi.concierge.buildnum" />
 
 			<tstamp />
-			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
+			<property name="timestamp" value="${DSTAMP}-${TSTAMP}" />
 
-			<property name="build.id" value="${build.number}_${build.letter}${timestamp}" />
+			<property name="build.id" value="v${timestamp}.${build.letter}" />
 			<property name="build.label" value="${cte.version}.${build.id}" />
 			<property name="meta.project.version" value="${build.id}" />
       		</then>
