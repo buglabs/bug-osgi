@@ -12,7 +12,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 	<tstamp />
 	<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 
-	<property name="build.id" value="v${timestamp}.${build.letter}" />
+	<property name="build.id" value="v${timestamp}_${build.letter}" />
 	<property name="build.label" value="${sdk.version}.${build.id}" />
 	<property name="meta.project.version" value="${build.id}" />
 

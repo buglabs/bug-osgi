@@ -34,7 +34,7 @@
 
 			<tstamp />
 			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
-			<property name="build.id" value="v${timestamp}.${build.letter}" />
+			<property name="build.id" value="v${timestamp}_${build.letter}" />
 			<property name="project.version" value="${bug.version}${build.id}" />
       		</then>
 		<else>
