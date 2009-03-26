@@ -33,7 +33,7 @@
 			<echo message="[Build type]: Running individual component build..."/>
 
 			<tstamp />
-			<property name="timestamp" value="${DSTAMP}-${TSTAMP}" />
+			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 			<property name="build.id" value="v${timestamp}.${build.letter}" />
 			<property name="project.version" value="${bug.version}${build.id}" />
       		</then>

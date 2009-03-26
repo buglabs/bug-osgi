@@ -10,7 +10,7 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 	<property name="meta.project" value="com.buglabs.dragonfly" />
 
 	<tstamp />
-	<property name="timestamp" value="${DSTAMP}-${TSTAMP}" />
+	<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 
 	<property name="build.id" value="v${timestamp}.${build.letter}" />
 	<property name="build.label" value="${sdk.version}.${build.id}" />

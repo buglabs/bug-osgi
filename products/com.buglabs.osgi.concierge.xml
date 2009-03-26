@@ -36,7 +36,7 @@
 			<echo message="[Build type]: Running individual component build..."/>
 
 			<tstamp />
-			<property name="timestamp" value="${DSTAMP}-${TSTAMP}" />
+			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 
 			<property name="build.id" value="v${timestamp}.${build.letter}" />
 			<property name="build.label" value="${cte.version}.${build.id}" />
@@ -69,7 +69,7 @@
 	<!-- this target is being used by other build scripts, do not change -->
 	<target name="checkout">
 		<svn>
-	        	<checkout url="${svn.url.cte}/com.buglabs.osgi.concierge.core" destPath="${checkout.dir}/com.buglabs.osgi.concierge.core" />
+	        <checkout url="${svn.url.cte}/com.buglabs.osgi.concierge.core" destPath="${checkout.dir}/com.buglabs.osgi.concierge.core" />
 			<checkout url="${svn.url.cte}/com.buglabs.osgi.concierge.devtools" destPath="${checkout.dir}/com.buglabs.osgi.concierge.devtools" />
 			<checkout url="${svn.url.cte}/com.buglabs.osgi.concierge.doc" destPath="${checkout.dir}/com.buglabs.osgi.concierge.doc" />
 			<checkout url="${svn.url.cte}/com.buglabs.osgi.concierge.feature" destPath="${checkout.dir}/com.buglabs.osgi.concierge.feature" />
