@@ -77,7 +77,9 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 			<arg line="xfzv eclipse-mac.tar.gz" />
 		</exec>
 
-		<copy todir="${sdk.build.dir}/eclipse">
+		<mkdir dir="${sdk.build.dir}/eclipse/dropins/dragonfly"/>
+		
+		<copy todir="${sdk.build.dir}/eclipse/dropins/dragonfly">
 			<fileset dir="${sdk.build.dir}/tmp/eclipse" />
 		</copy>
 
@@ -96,7 +98,9 @@ will be copied to extracted distribution of eclipse for Linux, Mac OS X and Wind
 			<arg line="xfzv eclipse-win.tar.gz" />
 		</exec>
 
-		<copy todir="${sdk.build.dir}/eclipse">
+		<mkdir dir="${sdk.build.dir}/eclipse/dropins/dragonfly"/>
+		
+		<copy todir="${sdk.build.dir}/eclipse/dropins/dragonfly">
 			<fileset dir="${sdk.build.dir}/tmp/eclipse" />
 		</copy>
 
