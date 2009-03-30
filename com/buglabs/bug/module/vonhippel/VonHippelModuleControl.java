@@ -139,7 +139,10 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 	}
 
 	public int getRDACResistance() throws IOException {
-		throw new IOException("VonHippelModlet.getRDACResistance() is not yet implemented");
+		if (vhDevice != null) {
+			return vhDevice.ioctl_BMI_VH_RDRDAC();
+		}
+		return -1;
 	}
 
 	public int getStatus() throws IOException {
@@ -200,7 +203,9 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 	}
 
 	public void setRDACResistance(int resistance) throws IOException {
-		throw new IOException("VonHippelModlet.setRDACResistance(int resistance) is not yet implemented");
+		if (vhDevice != null) {
+			vhDevice.ioctl_BMI_VH_SETRDAC(resistance);
+		}
 	}
 
 	public int setLEDGreen(boolean state) throws IOException {
