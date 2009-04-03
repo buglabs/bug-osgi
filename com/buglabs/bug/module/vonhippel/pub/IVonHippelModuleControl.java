@@ -40,6 +40,49 @@ import java.io.OutputStream;
  * 
  */
 public interface IVonHippelModuleControl {
+	//ADC bytes for control word 1 (for initiating conversion)
+	//These values should lie in the int passed into writeADC(control), and
+	//should resize in bits 8-15.
+	public static final int  VH_ADC_W1_EN   =   0xA0<<8 & 0x0000FF00;			
+	public static final int  VH_ADC_W1_CH01 =	0x00<<8 & 0x0000FF00;			// diff - 0, 1
+	public static final int  VH_ADC_W1_CH23	=	0x01<<8 & 0x0000FF00;			// diff - 2, 3
+	public static final int  VH_ADC_W1_CH10	=	0x08<<8 & 0x0000FF00;			// diff - 1, 0
+	public static final int  VH_ADC_W1_CH32	=	0x09<<8 & 0x0000FF00;			// diff - 3, 2
+	public static final int  VH_ADC_W1_CH0	=	0x10<<8 & 0x0000FF00;			// single-ended - 0
+	public static final int  VH_ADC_W1_CH1	=	0x18<<8 & 0x0000FF00;			// single-ended - 1
+	public static final int  VH_ADC_W1_CH2	=	0x11<<8 & 0x0000FF00;			// single-ended - 2
+	public static final int  VH_ADC_W1_CH3	=	0x19<<8 & 0x0000FF00;			// single-ended - 3
+	//ADC bytes for word 2 (rightmost 8 bits (0-7) of control int)
+	public static final int  VH_ADC_W2_EN	=	0x80 & 0x000000FF;			// Word 2 Enable
+	public static final int  VH_ADC_W2_IM	=	0x40 & 0x000000FF;			// internal temp
+	public static final int  VH_ADC_W2_SPD	=	0x08 & 0x000000FF;			// speed 2X
+	
+	//DAC values to be passed into writeDAC
+	public static final int VH_DAC_W1_UA	=	0x00;	// update DAC A output
+	public static final int VH_DAC_W1_UB	=	0x10;	// update DAC B output
+	public static final int VH_DAC_W1_LA	=	0x40;	// load DAC A input
+	public static final int VH_DAC_W1_LB	=	0x50;	// load DAC B input
+	public static final int VH_DAC_W1_ALLA	=	0x80;	// load DAC A input, update all outputs
+	public static final int VH_DAC_W1_ALLB	=	0x90;	// load DAC B input, update all outputs
+	public static final int VH_DAC_W1_ALL	=	0xC0;	// load all inputs, update all outputs
+	public static final int VH_DAC_W1_ALLI	=	0xD0;	// load all inputs
+	public static final int VH_DAC_W1_UALL	=	0xE0;	// update all - don't send data
+	public static final int VH_DAC_W1_EC	=	0xF0;	// Extended command
+	public static final int	VH_DAC_BCH		=	0x0C;	// both channel A & B
+	public static final int	VH_DAC_CHB		=	0x08;	// channel B
+	public static final int	VH_DAC_CHA		=	0x04;	// channel A
+	public static final int	VH_DAC_PD100K	=	0x03;	// power down - 100K pull down
+	public static final int	VH_DAC_PD1K		=	0x02;	// power down - 1K pull down
+	public static final int	VH_DAC_PDF		=	0x01;	// power down - float
+	public static final int	VH_DAC_PU		=	0x00;	// power up
+	
+	//DAC values to be passed into readDAC, currently not accepting params.
+	//This needs to be factored into the library, as DACRD doesn't currently
+	//accept params either.
+	public static final int VH_DAC_W1_RDA	=	0xF1;	// Read A
+	public static final int VH_DAC_W1_RDB	=	0xF2;	// Read B
+	
+	
 	/**
 	 * Set module's Red LED off. Note that the state of the LED will also be
 	 * reflected in GPIO pin 3
