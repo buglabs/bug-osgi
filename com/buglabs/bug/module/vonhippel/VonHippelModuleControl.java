@@ -124,18 +124,33 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 		if (vhDevice != null) {
 			vhDevice.ioctl_BMI_VH_CLRIOX(pin);
 		}
+	}
+ 
 
+	public void writeADC(int control) throws IOException {
+		if (vhDevice != null) {
+			vhDevice.ioctl_BMI_VH_ADCWR(control);
+		}
+	}
+	
+	public int readADC() throws IOException {
+		if (vhDevice != null) {
+			return vhDevice.ioctl_BMI_VH_ADCRD();
+		}
+		return -1;
 	}
 
-	public void doADC() throws IOException {
-		//
-		throw new IOException("VonHippelModlet.doADC() is not yet implemented");
-
+	public void writeDAC(int digital) throws IOException {
+		if (vhDevice != null) {
+			vhDevice.ioctl_BMI_VH_DACWR(digital);
+		}
 	}
-
-	public void doDAC() throws IOException {
-		throw new IOException("VonHippelModlet.doDAC() is not yet implemented");
-
+	
+	public int readDAC() throws IOException {
+		if (vhDevice != null) {
+			return vhDevice.ioctl_BMI_VH_DACRD();
+		}
+		return -1;
 	}
 
 	public int getRDACResistance() throws IOException {
@@ -176,15 +191,6 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 		if (vhDevice != null) {
 			vhDevice.ioctl_BMI_VH_MKIOX_OUT(pin);
 		}
-
-	}
-
-	public int readADC() throws IOException {
-		throw new IOException("VonHippelModlet.readADC() is not yet implemented");
-	}
-
-	public void readDAC() throws IOException {
-		throw new IOException("VonHippelModlet.readDAC() is not yet implemented");
 
 	}
 
@@ -377,4 +383,6 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 		checkOpen();
 		this.bitsPerChar = bitsPerChar;
 	}
+
+
 }

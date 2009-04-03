@@ -193,37 +193,41 @@ public interface IVonHippelModuleControl {
 	 */
 	public int getRDACResistance() throws IOException;
 
+	
 	/**
-	 * Writes control word to ADC for channel 0 single-ended conversion
-	 * 
+	 * @param control the control word to be written to ADC.
+	 * Used to initiate ADC conversion and also configure
+	 * ADC device for ADC single-ended or differential, among
+	 * other things.  see bmi_vh.h and bmi_vh.c in kernel.
 	 * @throws IOException
 	 */
-	public void doADC() throws IOException;
-
+	public void writeADC(int control) throws IOException;
+	
+	
 	/**
-	 * Reads ADC channel 0 (last conversion)
-	 * 
-	 * @return value returned by ioctl
-	 * @throws IOException
+	 * Read value after last conversion.
 	 */
 	public int readADC() throws IOException;
-
+	
 	/**
-	 * Write DAC (both channels and input registers) Note that this method
-	 * should be refactored to accept params
-	 * 
+	 * @param digital the control word encoded digital
+	 * input to be encoded as analog out.  See datasheet and
+	 * bmi_vh.h and bmi_vh.c in kernel.
 	 * @throws IOException
 	 */
-	public void doDAC() throws IOException;
-
+	public void writeDAC(int digital) throws IOException;
+	
 	/**
-	 * Read DAC channel A Note that this method should be refactored to return
-	 * value
 	 * 
-	 * @throws IOException
+	 * Read channel A after last conversion.  This should be
+	 * refactored to accept param to determine which channel 
+	 * is read back.
 	 */
-	public void readDAC() throws IOException;
+	public int readDAC() throws IOException;
+	
+	
 
+	
 	/**
 	 * Gets the input stream associated with the RS232 port on Von Hippel
 	 * module. This implementation is based on the javax.microedition.commports
