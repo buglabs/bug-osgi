@@ -42,20 +42,20 @@ import java.io.OutputStream;
 public interface IVonHippelModuleControl {
 	//ADC bytes for control word 1 (for initiating conversion)
 	//These values should lie in the int passed into writeADC(control), and
-	//should resize in bits 8-15.
-	public static final int  VH_ADC_W1_EN   =   0xA0<<8 & 0x0000FF00;			
-	public static final int  VH_ADC_W1_CH01 =	0x00<<8 & 0x0000FF00;			// diff - 0, 1
-	public static final int  VH_ADC_W1_CH23	=	0x01<<8 & 0x0000FF00;			// diff - 2, 3
-	public static final int  VH_ADC_W1_CH10	=	0x08<<8 & 0x0000FF00;			// diff - 1, 0
-	public static final int  VH_ADC_W1_CH32	=	0x09<<8 & 0x0000FF00;			// diff - 3, 2
-	public static final int  VH_ADC_W1_CH0	=	0x10<<8 & 0x0000FF00;			// single-ended - 0
-	public static final int  VH_ADC_W1_CH1	=	0x18<<8 & 0x0000FF00;			// single-ended - 1
-	public static final int  VH_ADC_W1_CH2	=	0x11<<8 & 0x0000FF00;			// single-ended - 2
-	public static final int  VH_ADC_W1_CH3	=	0x19<<8 & 0x0000FF00;			// single-ended - 3
-	//ADC bytes for word 2 (rightmost 8 bits (0-7) of control int)
-	public static final int  VH_ADC_W2_EN	=	0x80 & 0x000000FF;			// Word 2 Enable
-	public static final int  VH_ADC_W2_IM	=	0x40 & 0x000000FF;			// internal temp
-	public static final int  VH_ADC_W2_SPD	=	0x08 & 0x000000FF;			// speed 2X
+	//should reside in bits 0-7 (rightmost byte).
+	public static final int  VH_ADC_W1_EN   =   0xA0 & 0x000000FF;			
+	public static final int  VH_ADC_W1_CH01 =	0x00 & 0x000000FF;			// diff - 0, 1
+	public static final int  VH_ADC_W1_CH23	=	0x01 & 0x000000FF;			// diff - 2, 3
+	public static final int  VH_ADC_W1_CH10	=	0x08 & 0x000000FF;			// diff - 1, 0
+	public static final int  VH_ADC_W1_CH32	=	0x09 & 0x000000FF;			// diff - 3, 2
+	public static final int  VH_ADC_W1_CH0	=	0x10 & 0x000000FF;			// single-ended - 0
+	public static final int  VH_ADC_W1_CH1	=	0x18 & 0x000000FF;			// single-ended - 1
+	public static final int  VH_ADC_W1_CH2	=	0x11 & 0x000000FF;			// single-ended - 2
+	public static final int  VH_ADC_W1_CH3	=	0x19 & 0x000000FF;			// single-ended - 3
+	//ADC bytes for word 2 (8 bits (8-15) of control int)
+	public static final int  VH_ADC_W2_EN	=	0x80<<8 & 0x0000FF00;			// Word 2 Enable
+	public static final int  VH_ADC_W2_IM	=	0x40<<8 & 0x0000FF00;			// internal temp
+	public static final int  VH_ADC_W2_SPD	=	0x08<<8 & 0x0000FF00;			// speed 2X
 	
 	//DAC values to be passed into writeDAC
 	public static final int VH_DAC_W1_UA	=	0x00;	// update DAC A output
