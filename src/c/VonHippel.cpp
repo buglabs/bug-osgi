@@ -150,9 +150,9 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1DACWR
 (JNIEnv * env, jobject jobj, jint control) {
 	struct vh_dac_wr dac_wr;
-	dac_wr.w1 = (control & 0xF);
+	dac_wr.w1 = (control & 0xFF);
 	control >>= 8;
-	dac_wr.w2 = (control & 0xF);
+	dac_wr.w2 = (control & 0xFF);
 	return (ioctl(getFileDescriptorField(env, jobj), BMI_VH_DACWR, &dac_wr));
 }
 
