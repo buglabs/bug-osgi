@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *    - Redistributions of source code must retain the above copyright notice,
@@ -12,7 +12,7 @@
  *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
  *      used to endorse or promote products derived from this software without
  *      specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ extern "C" {
 #include <stdio.h>
 #include <linux/input.h>
 #include <linux/bmi/bmi_vh.h>
-#include <unistd.h>	
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -134,9 +134,9 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1ADCWR
 (JNIEnv * env, jobject jobj, jint control) {
 	struct vh_adc_wr adc_wr;
-	adc_wr.w1 = (control & 0xF);
+	adc_wr.w1 = (control & 0xFF);
 	control >>= 8;
-	adc_wr.w2 = (control & 0xF);
+	adc_wr.w2 = (control & 0xFF);
 	return (ioctl(getFileDescriptorField(env, jobj), BMI_VH_ADCWR, &adc_wr));
 }
 
@@ -168,7 +168,7 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1
 	struct spi_xfer spi_xfer;
 	int returnval;
 	ioctl(getFileDescriptorField(env, jobj), BMI_VH_DACRD, &spi_xfer);
-	int addr = (spi_xfer.addr << 16 & 0x0F00); 
+	int addr = (spi_xfer.addr << 16 & 0x0F00);
 	int data0 = (spi_xfer.data[0] << 8 & 0x00F0);
 	int data1 = (spi_xfer.data[1] & 0x000F);
 	returnval = ( addr | data0 | data1);
@@ -178,7 +178,7 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1WRITE_1SPI
 (JNIEnv * env, jobject jobj, jint control) {
 	struct spi_xfer spi_xfer;
-	spi_xfer.addr = ((control >> 16) & 0x0F); 
+	spi_xfer.addr = ((control >> 16) & 0x0F);
 	spi_xfer.data[0] = ((control >> 8) & 0x0F);
 	spi_xfer.data[1] = (control & 0x0F);
 	ioctl(getFileDescriptorField(env, jobj), BMI_VH_WRITE_SPI, &spi_xfer);
