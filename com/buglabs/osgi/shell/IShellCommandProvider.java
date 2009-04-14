@@ -30,11 +30,14 @@ package com.buglabs.osgi.shell;
 import java.util.List;
 
 /**
- * A container for commands.
+ * A container for shell commands.
  * 
  * @author kgilmer
  * 
  */
 public interface IShellCommandProvider {
+	/**
+	 * @return A list of type ICommand objects.
+	 */
 	public List getCommands();
 }

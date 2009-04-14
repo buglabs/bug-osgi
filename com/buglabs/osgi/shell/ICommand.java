@@ -39,15 +39,38 @@ import org.osgi.framework.BundleContext;
  * 
  */
 public interface ICommand {
+	/**
+	 * Command initialization.
+	 * @param arguments
+	 * @param out
+	 * @param err
+	 * @param context
+	 */
 	public void initialize(List arguments, OutputStream out, OutputStream err, BundleContext context);
 
+	/**
+	 * Execute the command
+	 * @throws Exception
+	 */
 	public void execute() throws Exception;
 
+	/**
+	 * @return true if the command and parameters are valid.  
+	 */
 	public boolean isValid();
 
+	/**
+	 * @return Name of command.
+	 */
 	public String getName();
 
+	/**
+	 * @return A short textual description of command usage.
+	 */
 	public String getUsage();
 
+	/**
+	 * @return A description of what the command does.
+	 */
 	public String getDescription();
 }
