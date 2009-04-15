@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -64,7 +65,8 @@ import com.buglabs.util.StreamMultiplexerEvent;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleControl, IStreamMultiplexerListener, IModuleLEDController {
-
+	// default is 0; make ours +1 since we're btter than BUGview at accelerometer so nyah
+	private final static int OUR_ACCELEROMETER_SERVICES_RANKING = 1;
 	private BundleContext context;
 
 	private boolean deviceOn = true;
@@ -160,11 +162,11 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 		acceld.start();
 		acceld.register(this);
-		accRawFeedRef = context.registerService(IAccelerometerRawFeed.class.getName(), acceld, createBasicServiceProperties());
+		accRawFeedRef = context.registerService(IAccelerometerRawFeed.class.getName(), acceld, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		IAccelerometerSampleProvider asp = new AccelerometerSampleProvider(acceld, accDevice);
-		accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), asp, createBasicServiceProperties());
-		accSampleFeedRef = context.registerService(IAccelerometerSampleFeed.class.getName(), acceld, createBasicServiceProperties());
-		accControlRef = context.registerService(IAccelerometerControl.class.getName(), accControl, createBasicServiceProperties());
+		accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), asp, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
+		accSampleFeedRef = context.registerService(IAccelerometerSampleFeed.class.getName(), acceld, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
+		accControlRef = context.registerService(IAccelerometerControl.class.getName(), accControl, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		AccelerationWS accWs = new AccelerationWS(asp, LogServiceUtil.getLogService(context));
 		wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 
@@ -219,6 +221,12 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
 		p.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
+		return p;
+	}
+	
+	private Properties createServicePropertiesWithRanking(final int serviceRanking) {
+		final Properties p = createBasicServiceProperties();
+		p.put(Constants.SERVICE_RANKING, new Integer(serviceRanking));
 		return p;
 	}
 
