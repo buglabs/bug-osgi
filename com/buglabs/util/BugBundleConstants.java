@@ -50,6 +50,11 @@ public interface BugBundleConstants {
 	public static final String BUG_BUNDLE_APPLICATION = "Application";
 
 	/**
+	 * A module designated as a library.
+	 */
+	public static final String BUG_BUNDLE_LIBRARY = "Library";
+	
+	/**
 	 * Header to define and describe the type of bundle in the bug context.
 	 */
 	public static final String BUG_BUNDLE_TYPE_HEADER = "Bug-Bundle-Type";
