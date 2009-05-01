@@ -73,6 +73,7 @@
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.camera" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.camera" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.audio" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.audio" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.vonhippel" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.vonhippel" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.bugbee" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.bugbee" />			
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.gps" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.gps" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.tests.common" destPath="${checkout.dir}/com.buglabs.bug.tests.common" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.awt" destPath="${checkout.dir}/com.buglabs.bug.emulator.awt" />
@@ -103,6 +104,7 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.camera" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.audio" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.vonhippel" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.bugbee" />		
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.gps" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.tests.common" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.awt" />
