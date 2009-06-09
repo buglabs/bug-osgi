@@ -27,6 +27,11 @@
  *******************************************************************************/
 package com.buglabs.bug.jni.common;
 
+/**
+ * Linux constants to be used with opening files.
+ * @author aroman
+ *
+ */
 public class FCNTL_H {
 	/**
 	 * From fcntl.h

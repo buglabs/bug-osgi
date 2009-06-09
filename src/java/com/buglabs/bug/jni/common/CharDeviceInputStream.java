@@ -30,6 +30,11 @@ package com.buglabs.bug.jni.common;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Treat a CharDeice as an input stream.
+ * @author aroman
+ *
+ */
 public class CharDeviceInputStream extends InputStream {
 	private CharDevice cdev;
 

@@ -48,7 +48,7 @@ public class CharDeviceUtils {
 			attempt_number++;
 			retval = d.open(devnode, flags);
 			if (retval < 0) {
-				String errormsg = "Unable to open " + devnode + "retrying";
+				//String errormsg = "Unable to open " + devnode + "retrying";
 				Thread.sleep(2000);
 			}
 		}

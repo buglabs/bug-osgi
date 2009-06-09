@@ -27,6 +27,13 @@
  *******************************************************************************/
 package com.buglabs.bug.jni.common;
 
+/**
+ * Access files from Java and allow ioctls on device nodes.  This class is meant to be used with
+ * Linux device nodes.
+ * 
+ * @author aroman
+ *
+ */
 public class CharDevice {
 
 	protected int fd;
@@ -39,12 +46,28 @@ public class CharDevice {
 		return fd;
 	}
 
+	/**
+	 * Open a file.
+	 * @param file
+	 * @param mode Refer to FCNTL_H class for constants to be passed in.
+	 * @return negative value on failure.
+	 */
 	public native int open(String file, int mode);
 
+	/**
+	 * @return a full line from the file.
+	 */
 	public native String getline();
 
+	/**
+	 * @return a byte as int from the file.
+	 */
 	public native int read();
 
+	/**
+	 * @param b
+	 * @return number of bytes read.
+	 */
 	public int read(byte[] b) {
 		return readBytes(b);
 	}
@@ -56,11 +79,23 @@ public class CharDevice {
 	 */
 	private native int readBytes(byte[] b);
 
+	/**
+	 * @param offset
+	 * @param whence
+	 * @return
+	 */
 	public native long lseek(long offset, int whence);
 
 	public native long write(byte[] buf, long count);
 
+	/**
+	 * @param request
+	 * @return
+	 */
 	public native int ioctl(int request);
 
+	/**
+	 * @return
+	 */
 	public native int close();
 }

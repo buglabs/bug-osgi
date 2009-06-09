@@ -27,6 +27,11 @@
  *******************************************************************************/
 package com.buglabs.bug.jni.common;
 
+/**
+ * Linux constants for file access.
+ * @author aroman
+ *
+ */
 public class UNISTD_H {
 	public static final int SEEK_SET = 0;
 	public static final int SEEK_CUR = 1;
