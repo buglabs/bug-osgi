@@ -1,6 +1,7 @@
 package com.buglabs.nmea2;
 
 import com.buglabs.nmea.DegreesMinutesSeconds;
+import com.buglabs.nmea.sentences.NMEAParserException;
 
 
 /**
@@ -72,7 +73,9 @@ public final class RMC extends AbstractNMEASentence {
 	}
 
 	protected void validate() {
-		//nothing to validate here.
+		if (isEmpty(latitude) || isEmpty(longitude)) {
+			throw new NMEAParserException("RMC sentence without long or lat defined.");
+		}
 	}
 
 	/**
