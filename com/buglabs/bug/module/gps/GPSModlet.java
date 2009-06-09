@@ -87,8 +87,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private BundleContext context;
 
-	private boolean deviceOn = true;
-
 	private int slotId;
 
 	private final String moduleId;
@@ -107,6 +105,10 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	protected static final String PROPERTY_ANTENNA_ACTIVE = "Active";
 
 	public static final String MODULE_ID = "0001";
+
+	private static final long DEFAULT_READ_DELAY = 100;
+
+	private static final String CM_READ_DELAY_KEY = "ReadDelay";
 
 	private ServiceRegistration nmeaRef;
 	private ServiceRegistration nmeaProviderRef;
@@ -176,11 +178,12 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		gpsd.start();
 		nmeaProvider.start();
 		
-		// default to passive (external) antenna, until
-		// such time as we have confidence in the internal
-		// antenna's ability to obtain a fix
-		log.log(LogService.LOG_INFO, "GPSModlet defaulting to passive (external) antenna");
-		setPassiveAntenna();
+		log.log(LogService.LOG_INFO, "GPSModlet setting active (external) antenna");
+		try {
+			setActiveAntenna();
+		} catch (IOException e) {
+			log.log(LogService.LOG_ERROR, "Failed to set GPS antenna to active (external) antenna", e);
+		}
 
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
 		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
@@ -194,7 +197,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
 
 		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
-		context.addServiceListener(nmeaProvider,  "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "=" + IPositionSubscriber.class.getName() + "))");
+		context.addServiceListener(nmeaProvider, "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "="
+				+ IPositionSubscriber.class.getName() + "))");
 	}
 
 	/**
@@ -205,9 +209,19 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			ht = new Hashtable();
 		}
 
+		try {
+			ht.put("gps.antenna.external", "" + isAntennaExternal());
+		} catch (IOException e) {
+			log.log(LogService.LOG_ERROR, "Unable to access GPS antenna state.", e);
+		}
+		
 		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
 
 		return ht;
+	}
+
+	private boolean isAntennaExternal() throws IOException {
+		return (getStatus() & 0xC0) == 0x40;
 	}
 
 	/*
@@ -223,7 +237,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		if (wsTracker != null) {
 			wsTracker.close();
 		}
-		
+
 		context.removeServiceListener(nmeaProvider);
 		moduleRef.unregister();
 		gpsControlRef.unregister();
@@ -270,10 +284,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public List getModuleProperties() {
 		List properties = new ArrayList();
 
-		try {
-			properties.add(new ModuleProperty("Status", "" + this.getStatus()));
-		} catch (IOException e1) {
-		}
 		properties.add(new ModuleProperty("Slot", "" + slotId));
 
 		try {
@@ -286,11 +296,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			properties.add(new ModuleProperty(PROPERTY_GPS_FIX, Boolean.toString((status &= 0x1) == 0)));
 
 			String antenna = PROPERTY_ANTENNA_ACTIVE;
-			if ((status &= 0xC0) == IGPSModuleControl.STATUS_PASSIVE_ANTENNA) {
+
+			if ((status & 0xC0) == IGPSModuleControl.STATUS_PASSIVE_ANTENNA) {
 				antenna = PROPERTY_ANTENNA_PASSIVE;
 			}
 			properties.add(new ModuleProperty(PROPERTY_ANTENNA, antenna, "String", false));
-
 		} catch (IOException e) {
 			log.log(LogService.LOG_ERROR, "Exception occured while getting module properties.", e);
 		}
@@ -304,7 +314,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		if (property.getName().equals("State")) {
-			deviceOn = Boolean.valueOf((String) property.getValue()).booleanValue();
 			return true;
 		} else if (property.getName().equals(PROPERTY_ANTENNA)) {
 			if (property.getValue().toString().equals(PROPERTY_ANTENNA_PASSIVE)) {
@@ -426,41 +435,51 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	}
 
+	/**
+	 * @return number of millis to wait before polling GPS device.
+	 */
 	private long getReadDelay() {
-		ServiceReference sr = context.getServiceReference(ConfigurationAdmin.class.getName());
+		Configuration c = getGPSConfiguration();
 
-		long read_delay = 100;
+		if (c == null) {
+			return DEFAULT_READ_DELAY;
+		}
+
+		try {			
+			Object obj = c.getProperties().get(CM_READ_DELAY_KEY);
+			if (obj != null) {
+				return Long.parseLong(obj.toString());
+			} else {
+				c.getProperties().put(CM_READ_DELAY_KEY, Long.toString(DEFAULT_READ_DELAY));
+				c.update(c.getProperties());
+			}
+		} catch (Exception e) {
+			log.log(LogService.LOG_ERROR, "Problem retrieving data from cm.", e);
+		}
+
+		return DEFAULT_READ_DELAY;
+	}
+
+	/**
+	 * @return a reference to a Configuration service or null if not can be
+	 *         found.
+	 */
+	private Configuration getGPSConfiguration() {
+		ServiceReference sr = context.getServiceReference(ConfigurationAdmin.class.getName());
 
 		if (sr != null) {
 			ConfigurationAdmin ca = (ConfigurationAdmin) context.getService(sr);
-			log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay obtained cm");
+			
 			if (ca != null) {
-				Configuration c;
 				try {
-					c = ca.getConfiguration(getModuleName());
-					log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay: got configuration");
-					String key = "ReadDelay";
-					String factoryPid = c.getPid();
-					Dictionary properties = c.getProperties();
-					Object obj = c.getProperties().get(key);
-					if (obj != null) {
-						read_delay = Long.parseLong(obj.toString());
-						log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay: got delay: " + read_delay);
-					} else {
-						c.getProperties().put(key, Long.toString(read_delay));
-						c.update(c.getProperties());
-						log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay: wrote delay into cm");
-
-						Object object = c.getProperties().get(key);
-						log.log(LogService.LOG_INFO, "$$$$$$$$$ Retrieving property: " + object.toString());
-					}
+					return ca.getConfiguration(getModuleName());
 				} catch (IOException e) {
-					log.log(LogService.LOG_ERROR, "Problem retrieving data from cm:", e);
+					log.log(LogService.LOG_ERROR, "Unable to access CM configuration.", e);
 				}
 			}
 		}
-		log.log(LogService.LOG_DEBUG, "GPSModlet getReadDelay leave");
-		return read_delay;
+
+		return null;
 	}
 
 	public LatLon getLatitudeLongitude() {

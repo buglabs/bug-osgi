@@ -29,14 +29,10 @@ package com.buglabs.bug.module.gps;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceRegistration;
 
-import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
-import com.buglabs.status.IStatusBarProvider;
 
 public class Activator implements BundleActivator, IModletFactory {
 	private BundleContext context;
@@ -51,9 +47,6 @@ public class Activator implements BundleActivator, IModletFactory {
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 		sr = context.registerService(IModletFactory.class.getName(), this, null);
-
-		Filter f = context.createFilter("(| (" + Constants.OBJECTCLASS + "=" + IStatusBarProvider.class.getName() + ") (" + Constants.OBJECTCLASS + "="
-				+ IPositionProvider.class.getName() + "))");
 	}
 
 	public void stop(BundleContext context) throws Exception {

@@ -55,7 +55,7 @@ public interface IGPSModuleControl extends IModuleControl, IModuleLEDController 
 	public int getStatus() throws IOException;
 
 	/**
-	 * Use the active (internal) antenna of the gps device.
+	 * Use the active (external) antenna of the gps device.
 	 * 
 	 * @return value returned by ioctl.
 	 * @throws IOException
@@ -63,7 +63,7 @@ public interface IGPSModuleControl extends IModuleControl, IModuleLEDController 
 	public int setActiveAntenna() throws IOException;
 
 	/**
-	 * Use the passive (external) antenna of the gps device.
+	 * Use the passive (internal) antenna of the gps device.
 	 * 
 	 * @return value returned by ioctl.
 	 * @throws IOException

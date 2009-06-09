@@ -38,12 +38,16 @@ import java.io.Serializable;
 public class LatLon implements Serializable {
 	private static final long serialVersionUID = 6318765018123280457L;
 
+	public double latitude;
+
+	public double longitude;
+
 	public LatLon(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
-
-	public double latitude;
-
-	public double longitude;
+	
+	public LatLon() {
+		this(0, 0);
+	}
 }
