@@ -135,7 +135,6 @@ public class Manager {
 	public void processMessage(String msg) {
 		BMIMessage message = new BMIMessage(msg);
 		List ml;
-		boolean startedBundles = false;
 		try {
 			if (message.parse()) {
 
@@ -152,7 +151,6 @@ public class Manager {
 							if (b.getState() != Bundle.ACTIVE) {
 								b.start();
 								logService.log(LogService.LOG_INFO, "Bundle " + b.getLocation() + " has been started to provide Modlets for module " + message.getModuleId());
-								startedBundles = true;
 							}
 						}
 					} else {
