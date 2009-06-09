@@ -146,9 +146,9 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 		}
 	}
 	
-	public int readDAC() throws IOException {
+	public int readDAC(int channel) throws IOException {
 		if (vhDevice != null) {
-			return vhDevice.ioctl_BMI_VH_DACRD();
+			return vhDevice.ioctl_BMI_VH_DACRD(channel);
 		}
 		return -1;
 	}
@@ -383,6 +383,8 @@ public class VonHippelModuleControl implements IVonHippelModuleControl, IModuleL
 		checkOpen();
 		this.bitsPerChar = bitsPerChar;
 	}
+
+
 
 
 }

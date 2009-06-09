@@ -262,11 +262,11 @@ public interface IVonHippelModuleControl {
 	
 	/**
 	 * 
-	 * Read channel A after last conversion.  This should be
-	 * refactored to accept param to determine which channel 
-	 * is read back.
+	 * Read channel after last conversion.  
+	 * @param channel should be either VH_DAC_W1_RDA for channel A 
+	 * or VH_DAC_W1_RDB for channel B.
 	 */
-	public int readDAC() throws IOException;
+	public int readDAC(int channel) throws IOException;
 	
 	
 
