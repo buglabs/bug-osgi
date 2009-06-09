@@ -36,5 +36,8 @@ package com.buglabs.bug.module.motion.pub;
  */
 public interface IMotionObserver {
 
+	/**
+	 * Signals the client that motion has been detected.
+	 */
 	public void motionDetected();
 }

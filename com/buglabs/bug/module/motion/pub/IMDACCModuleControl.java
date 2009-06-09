@@ -30,5 +30,10 @@ package com.buglabs.bug.module.motion.pub;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 
+/**
+ * Module control service for Motion Module.
+ * @author aroman
+ *
+ */
 public interface IMDACCModuleControl extends IModuleControl, IModuleLEDController {
 }

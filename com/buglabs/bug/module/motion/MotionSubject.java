@@ -31,43 +31,75 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.jni.motion.Motion;
 import com.buglabs.bug.module.motion.pub.IMotionObserver;
 import com.buglabs.bug.module.motion.pub.IMotionSubject;
+import com.buglabs.module.IModuleLEDController;
 
 public class MotionSubject extends Thread implements IMotionSubject {
 
 	InputStream motionIs;
 	ArrayList observers;
+	private final IModuleLEDController ledController;
+	private final Timer timer = new Timer();
+	private final LogService log;
+	private volatile boolean flashing;
 
-	MotionSubject(InputStream gpsIs) {
+	MotionSubject(InputStream gpsIs, IModuleLEDController ledController, LogService log) {
 		this.motionIs = gpsIs;
+		this.ledController = ledController;
+		this.log = log;
 		observers = new ArrayList();
 	}
 
 	public void run() {
 		byte read = 0;
-
+		byte expected = Motion.BMI_MOTION_DETECT_ENABLED | Motion.BMI_MOTION_DETECT_DELTA | Motion.BMI_MOTION_DETECT_LATCHED_STATUS | Motion.BMI_MOTION_DETECT_STATUS;
 		try {
 			while (!isInterrupted() && (read = (byte) motionIs.read()) != -1) {
-				byte expected = Motion.BMI_MOTION_DETECT_ENABLED | Motion.BMI_MOTION_DETECT_DELTA | Motion.BMI_MOTION_DETECT_LATCHED_STATUS | Motion.BMI_MOTION_DETECT_STATUS;
-
 				if (read == expected) {
 					notifyObservers();
+					flashLed();
 				}
 			}
 		} catch (IOException e) {
-			// TODO Log this
-			// e.printStackTrace();
+			log.log(LogService.LOG_ERROR, "An IOException occured while reading from Motion module.", e);
 		} finally {
 			if (motionIs != null) {
 				try {
 					motionIs.close();
 				} catch (IOException e) {
-					// TODO Log this
-					e.printStackTrace();
+					// Ignore exception
 				}
+			}
+		}
+	}
+
+	private void flashLed() {
+		if (!flashing) {
+			try {
+				flashing = true;
+				ledController.setLEDGreen(true);
+				TimerTask tt = new TimerTask() {
+
+					public void run() {
+						try {
+							ledController.setLEDGreen(false);
+							flashing = false;
+						} catch (IOException e) {
+						}
+					}
+
+				};
+				timer.schedule(tt, 400);
+
+			} catch (IOException e) {
+				//Ignore exception
 			}
 		}
 	}

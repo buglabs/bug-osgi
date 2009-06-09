@@ -36,6 +36,7 @@ import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.accelerometer.pub.AccelerometerConfiguration;
@@ -137,6 +138,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	private ServiceRegistration accSampleFeedRef;
 
 	private ServiceRegistration ledRef;
+	private LogService log;
 
 	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
@@ -146,6 +148,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	}
 
 	public void start() throws Exception {
+		log = LogServiceUtil.getLogService(context);
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
 		motiond.start();
 		motionSubject.start();
@@ -163,11 +166,11 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		acceld.start();
 		acceld.register(this);
 		accRawFeedRef = context.registerService(IAccelerometerRawFeed.class.getName(), acceld, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
-		IAccelerometerSampleProvider asp = new AccelerometerSampleProvider(acceld, accDevice);
+		IAccelerometerSampleProvider asp = new AccelerometerSampleProvider(acceld);
 		accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), asp, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		accSampleFeedRef = context.registerService(IAccelerometerSampleFeed.class.getName(), acceld, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		accControlRef = context.registerService(IAccelerometerControl.class.getName(), accControl, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
-		AccelerationWS accWs = new AccelerationWS(asp, LogServiceUtil.getLogService(context));
+		AccelerationWS accWs = new AccelerationWS(asp, log);
 		wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 
 		mdaccRef = context.registerService(IMDACCModuleControl.class.getName(), this, createBasicServiceProperties());
@@ -289,7 +292,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 		motionIs = new CharDeviceInputStream(motionDevice);
 		motiond = new MotionRawFeed(motionIs);
-		motionSubject = new MotionSubject(motiond.getInputStream());
+		motionSubject = new MotionSubject(motiond.getInputStream(), this, log);
 	}
 
 	public int setLEDGreen(boolean state) throws IOException {
