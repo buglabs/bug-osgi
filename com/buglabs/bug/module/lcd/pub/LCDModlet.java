@@ -28,12 +28,15 @@
 package com.buglabs.bug.module.lcd.pub;
 
 import java.awt.Frame;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -46,7 +49,6 @@ import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
 import com.buglabs.bug.jni.common.CharDevice;
 import com.buglabs.bug.jni.common.CharDeviceInputStream;
 import com.buglabs.bug.jni.common.CharDeviceUtils;
-import com.buglabs.bug.jni.common.FCNTL_H;
 import com.buglabs.bug.jni.lcd.LCDControl;
 import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerInputStreamProvider;
@@ -68,7 +70,9 @@ import com.buglabs.util.trackers.PublicWSAdminTracker;
  * 
  */
 public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IModuleDisplay, IModuleLEDController {
-	private static final String DEV_NODE_CONTROL = "/dev/bmi_lcd_control";
+
+	private static final String POINTERCAL_PATH = "/etc/pointercal";
+	private static final int FILE_SCAN_MILLIS = 2000;
 	private final BundleContext context;
 	private final int slotId;
 	private final String moduleId;
@@ -112,6 +116,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private ServiceRegistration lcdRef;
 	private LogService log;
 	private LCDControl lcdcontrol;
+	private Hashtable props;
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -122,13 +127,10 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public void setup() throws Exception {
-		String devnode_control = DEV_NODE_CONTROL;
+		String devnode_control = "/dev/bmi_lcd_ctl_m" + (slotId + 1);
 
 		lcdcontrol = new LCDControl();
-		if (lcdcontrol.open(devnode_control, FCNTL_H.O_RDWR) < 0) {
-			throw new RuntimeException("Unable to open control device:" + devnode_control);
-		}
-		
+		CharDeviceUtils.openDeviceWithRetry(lcdcontrol, devnode_control, 2);
 		String lcd_accel_devnode = "/dev/bmi_lcd_acc_m" + (slotId + 1);
 		accel = new CharDevice();
 		try {
@@ -143,11 +145,11 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	public void start() throws Exception {
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
 		lcdRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
-		Dictionary props = new Hashtable();
+		props = new Hashtable();
 		props.put("width", new Integer(LCD_WIDTH));
 		props.put("height", new Integer(LCD_HEIGHT));
+		props.put("Slot", "" + slotId);
 
-		moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), this, createRemotableProperties(props));
 		lcdControlServReg = context.registerService(ILCDModuleControl.class.getName(), this, createRemotableProperties(null));
 
 		if (lcd_acc_is_prov != null) {
@@ -165,6 +167,40 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		}
 
 		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
+		
+		if (calibFileExists()) {
+			// Calibration has occurred so we know the screen is usable.
+			moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), this, createRemotableProperties(props));
+		} else {
+			// The calibration program is running. Only register the service
+			// once the the calibration has occurred.
+			scheduleTimer();
+		}
+	}
+
+	/**
+	 * Create a timer task to monitor the status of a file.
+	 */
+	private void scheduleTimer() {
+		final Timer t = new Timer();
+		t.schedule(new TimerTask() {
+
+			public void run() {
+				if (calibFileExists()) {
+					t.cancel();
+					moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), LCDModlet.this, createRemotableProperties(props));
+				}
+			}
+
+		}, FILE_SCAN_MILLIS, FILE_SCAN_MILLIS);
+	}
+
+	/**
+	 * @return true if lcd calibration file exists
+	 */
+	private boolean calibFileExists() {
+		File f = new File(POINTERCAL_PATH);
+		return f.exists() && f.isFile();
 	}
 
 	public void stop() throws Exception {
@@ -177,16 +213,18 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			accIsProvRef.unregister();
 			accRawFeedProvRef.unregister();
 			accSampleProvRef.unregister();
-			lcd_acc_is_prov.getInputStream().close();
 			accIs.close();
 			accel.close();
 			accel = null;
 		}
-		
+
 		lcdcontrol.close();
 		moduleRef.unregister();
 		lcdRef.unregister();
-		moduleDisplayServReg.unregister();
+		if (moduleDisplayServReg != null) {
+			//this could be null if pointercal never completes.
+			moduleDisplayServReg.unregister();
+		}
 		lcdControlServReg.unregister();
 	}
 
@@ -196,8 +234,9 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private Dictionary createRemotableProperties(Dictionary ht) {
 		if (ht == null) {
 			ht = new Hashtable();
+			ht.put("Slot", "" + slotId);
 		}
-
+		
 		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
 
 		return ht;

@@ -32,8 +32,27 @@ import java.io.IOException;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 
+/**
+ * The interface that controls functions of the LCD module.
+ */
 public interface ILCDModuleControl extends IModuleControl, IModuleLEDController {
-
+	/**
+	 * LCD module backlight setting to OFF
+	 */
+	public static final int BACKLIGHT_OFF = 0;
+	/**
+	 * LCD module backlight setting to LOW
+	 */
+	public static final int BACKLIGHT_LOW = 1;
+	/**
+	 * LCD module backlight setting to MED
+	 */
+	public static final int BACKLIGHT_MED = 3;
+	/**
+	 * LCD module backlight setting to HIGH
+	 */
+	public static final int BACKLIGHT_HIGH = 2;
+	
 	/**
 	 * @param val
 	 *            Set's the intensity of the backlight 0-7.
