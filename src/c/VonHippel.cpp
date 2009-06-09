@@ -137,6 +137,7 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1
 	adc_wr.w1 = (control & 0xFF);
 	control >>= 8;
 	adc_wr.w2 = (control & 0xFF);
+	//printf("w1 = %u, w2=%u\n", adc_wr.w1, adc_wr.w2);
 	return (ioctl(getFileDescriptorField(env, jobj), BMI_VH_ADCWR, &adc_wr));
 }
 
@@ -153,34 +154,32 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1
 	dac_wr.w1 = (control & 0xFF);
 	control >>= 8;
 	dac_wr.w2 = (control & 0xFF);
+	//("w1 = %u, w2=%u\n", dac_wr.w1, dac_wr.w2);
 	return (ioctl(getFileDescriptorField(env, jobj), BMI_VH_DACWR, &dac_wr));
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1DACRD
-(JNIEnv * env, jobject jobj) {
-	int reading;
-	ioctl(getFileDescriptorField(env, jobj), BMI_VH_DACRD, &reading);
-	return reading;
+  (JNIEnv * env, jobject jobj, jint channel){
+	ioctl(getFileDescriptorField(env, jobj), BMI_VH_DACRD, &channel);
+	return channel;
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1READ_1SPI
 (JNIEnv * env, jobject jobj) {
 	struct spi_xfer spi_xfer;
-	int returnval;
 	ioctl(getFileDescriptorField(env, jobj), BMI_VH_DACRD, &spi_xfer);
-	int addr = (spi_xfer.addr << 16 & 0x0F00);
-	int data0 = (spi_xfer.data[0] << 8 & 0x00F0);
-	int data1 = (spi_xfer.data[1] & 0x000F);
-	returnval = ( addr | data0 | data1);
-	return returnval;
+	int addr  = (spi_xfer.addr    << 16) & 0xFF0000;
+	int data0 = (spi_xfer.data[0] <<  8) & 0x00FF00;
+	int data1 = (spi_xfer.data[1] <<  0) & 0x0000FF;
+	return addr | data0 | data1;
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1WRITE_1SPI
 (JNIEnv * env, jobject jobj, jint control) {
 	struct spi_xfer spi_xfer;
-	spi_xfer.addr = ((control >> 16) & 0x0F);
-	spi_xfer.data[0] = ((control >> 8) & 0x0F);
-	spi_xfer.data[1] = (control & 0x0F);
+	spi_xfer.addr    = (control >> 16) & 0xFF;
+	spi_xfer.data[0] = (control >>  8) & 0xFF;
+	spi_xfer.data[1] = (control >>  0) & 0xFF;
 	ioctl(getFileDescriptorField(env, jobj), BMI_VH_WRITE_SPI, &spi_xfer);
 }
 

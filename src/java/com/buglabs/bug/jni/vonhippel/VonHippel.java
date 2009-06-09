@@ -92,7 +92,7 @@ public class VonHippel extends CharDevice {
 	 * returns an int, with the voltage data returned from conversion in
 	 * rightmost bits
 	 */
-	public native int ioctl_BMI_VH_DACRD();
+	public native int ioctl_BMI_VH_DACRD(int channel);
 
 	/*
 	 * Returns an int containing addr and data first 8 bits, data 1, second 8
