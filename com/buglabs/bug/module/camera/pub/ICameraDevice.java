@@ -37,17 +37,46 @@ import java.io.InputStream;
  * 
  */
 public interface ICameraDevice {
+	/**
+	 * @return byte array representing image from camera in JPG format.
+	 */
 	public byte[] getImage();
 
+	/**
+	 * @param sizeX preferred X size of image from camera.
+	 * @param sizeY preferred Y size of image from camera.
+	 * @param format preferred format of image from camera.
+	 * @param highQuality quality setting for camera device.
+	 * @return byte array of image from camera.
+	 */
 	public byte[] getImage(int sizeX, int sizeY, int format, boolean highQuality);
 
+	/**
+	 * Initialize overlay from camera device on LCD with specific bounds.
+	 * @param pbounds
+	 * @return
+	 */
 	public boolean initOverlay(Rectangle pbounds);
 
+	/**
+	 * Start overlay of image from camera to LCD screen.
+	 * @return
+	 */
 	public boolean startOverlay();
 
+	/**
+	 * Stop overlay.
+	 * @return
+	 */
 	public boolean stopOverlay();
 
+	/**
+	 * @return inputstream of bytes from Camera device.
+	 */
 	public InputStream getImageInputStream();
 
+	/**
+	 * @return The default format images are presented in.
+	 */
 	public String getFormat();
 }
