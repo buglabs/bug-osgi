@@ -225,6 +225,10 @@ public class StreamMultiplexer extends Thread {
 		}
 	}
 
+	/**
+	 * Warning: this method is misnamed.  This method creates a new inputstream on each call.
+	 * @return
+	 */
 	public InputStream getInputStream() {
 		PipedOutputStream pos = new PipedOutputStream();
 		PipedInputStream pis = null;

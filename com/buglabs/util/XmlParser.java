@@ -27,6 +27,10 @@
  *******************************************************************************/
 package com.buglabs.util;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -104,7 +108,11 @@ public class XmlParser {
 	}
 
 	public XmlNode parse(Reader reader) throws IOException {
-		this.reader = reader;
+		if (!(reader.markSupported())) {
+			this.reader = new BufferedReader(reader);
+		} else {
+			this.reader = reader;
+		}
 
 		// skip xml declaration or DocTypes
 		skipPrologs();
