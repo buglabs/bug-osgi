@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -56,6 +58,8 @@ public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer
 	private LogService logService;
 
 	private String trackerName;
+	
+	private SortedMap servicePropertiesMap = null;
 
 	public AbstractServiceTracker(BundleContext context) {
 		this.context = context;
@@ -193,6 +197,39 @@ public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer
 		return servicesMap.get(clazz.getName());
 	}
 
+	/**
+	 * Helps set up the serviceProperties map
+	 * created to make generated code simpler
+	 * 
+	 * @param serviceName
+	 * @param properties
+	 */
+	protected final void addServiceFilters(String serviceName, String[][] properties) {
+		Map propMap = new HashMap();
+		for (int i = 0; i < properties.length; i++) {
+			propMap.put(properties[i][0], properties[i][1]);
+		} 
+		getServicePropertiesMap().put(serviceName, propMap);
+		
+		// also add it to the services list
+		getServices().add(serviceName);
+	}
+	
+	/**
+	 * returns the map of services and properties that represent
+	 * the service dependencies for this tracker
+	 * the map, in pseudo-generic code, is:
+	 * Map<String serviceName, Map<String propertyKey, String propertyVal>>
+	 * 
+	 * @return
+	 */
+	public final SortedMap getServicePropertiesMap() {
+		if (servicePropertiesMap == null) {
+			servicePropertiesMap = new TreeMap();
+		}
+		return servicePropertiesMap;
+	}		
+	
 	/**
 	 * Used to retrieve a list of qualified service names. If you want your
 	 * application to depend on another service, simply add the fully qualified

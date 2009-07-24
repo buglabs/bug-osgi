@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -16,6 +18,15 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.buglabs.util.ServiceFilterGenerator;
 
+/**
+ * DO NOT USE THIS CLASS
+ * 
+ * The functionality for filtering on Services w/ service properties was 
+ * moved into the generated applications activator, combined with AbstractServiceTracker
+ * 
+ * @author bballantine
+ *
+ */
 public abstract class AbstractServiceTracker2  
 		implements ServiceTrackerCustomizer, IServiceProvider {
 
@@ -59,19 +70,22 @@ public abstract class AbstractServiceTracker2
 	 * Implementations should add services of interest
 	 */
 	public void initServices() {
-		logService.log(LogService.LOG_DEBUG, trackerName + " A tracker in this bundle is tracking no services.");
+		logService.log(LogService.LOG_DEBUG, 
+				trackerName + " A tracker in this bundle is tracking no services.");
 	}	
 	
-	/**
-	 * Called when a new service becomes available
-	 * 
+	/*
+	 * (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
 	 */
 	public Object addingService(ServiceReference reference) {
 		//not a service we care about, return
+		// TODO - returning null might be an issue
 		if (!inServicePropertiesMap(reference)) return null;
 		
 		Object serviceObject = 
 			trackService(reference) ? getServiceObject(reference) : null;
+			
 		if (areServiceDependenciesMet() && !isRunning()) {
 			if (canStart()) performStart();
 		}
@@ -152,7 +166,7 @@ public abstract class AbstractServiceTracker2
 	 * 
 	 * @return
 	 */
-	protected final Map getServicePropertiesMap() {
+	public final Map getServicePropertiesMap() {
 		if (serviceProperties == null) {
 			serviceProperties = new HashMap();
 		}
@@ -162,6 +176,9 @@ public abstract class AbstractServiceTracker2
 	/**
 	 * Decides if the service reference is for a service that matches our
 	 * property filters.  If so, it tracks it.
+	 * 
+	 * If it doesn't satisfy our property filters, and we're already tracking it,
+	 * then stop tracking it.
 	 * 
 	 * @param reference
 	 * @return
@@ -209,7 +226,7 @@ public abstract class AbstractServiceTracker2
 		while (servicesItr.hasNext()) {
 			service = (String) servicesItr.next();
 			srs = getServiceReferences(
-					service, (Map) getServicePropertiesMap().get(service));
+					service, new TreeMap((Map) getServicePropertiesMap().get(service)));
 			if (srs == null || srs.length < 1) return false;			
 		}
 		return true;
@@ -225,8 +242,11 @@ public abstract class AbstractServiceTracker2
 	 */
 	private ServiceReference[] getServiceReferences(String serviceName, Map serviceProperties) {
 	
+		SortedMap servicesMap = new TreeMap();
+		servicesMap.put(serviceName, serviceProperties);
+		
 		String serviceFilter = ServiceFilterGenerator.
-				generateServiceFilter(serviceName, serviceProperties, true);
+				generateServiceFilter(servicesMap);
 		
 		ServiceReference[] srs = null;
 		try {
