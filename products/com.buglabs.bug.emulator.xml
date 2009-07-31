@@ -51,9 +51,9 @@
 	
 	<target name="checkout" description="Checks out projects from svn" depends="clean,makeDirs">
 		<!-- checkout slp from cvs for now -->
-		<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />
+		<!--<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />-->
 		<svn>
-			<!--<checkout url="${svn.url.bug}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />-->
+			<checkout url="${svn.url.bug}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.kernel.external" destPath="${checkout.dir}/com.buglabs.bug.kernel.external" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
