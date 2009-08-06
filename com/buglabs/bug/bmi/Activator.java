@@ -379,6 +379,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		context.removeServiceListener(this);
 		stopModlets(activeModlets);
 		if (pipeReader != null) {
 			pipeReader.cancel();
