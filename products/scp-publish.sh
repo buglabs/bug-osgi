@@ -19,9 +19,9 @@ WHOAMI=`/usr/bin/whoami`
 SOURCEDIR1=/opt/sdk_build/com.buglabs.build/artifacts/$PUBENV/com.buglabs.dragonfly/current
 FILENAME1=$SOURCEDIR1/com.buglabs.dragonfly.updatesite*.zip
 VERSION=`ls $SOURCEDIR1/updatesite/features | grep "_[IPT]" | sed 's/com\.buglabs\.dragonfly\.feature_//' | sed 's/\.jar$//'`
-REMOTESYS=buglabs_prod
-REMOTEUSER=buglabs
-REMOTEBASEDIR=/data/tmp
+REMOTESYS=newkeds
+REMOTEUSER=web
+REMOTEBASEDIR=/var/tmp
 REMOTEDIR1=$REMOTEBASEDIR/$PUBENV/$VERSION/updatesite/
 REMOTEDIR2=$REMOTEBASEDIR/$PUBENV/$VERSION/full/
 
@@ -57,7 +57,7 @@ if [ "$PUBENV" = "production" ]; then
   scp $FILENAME2 $REMOTEUSER@$REMOTESYS:$REMOTEDIR2
 fi
 echo "Running remote commands..."
-ssh $REMOTEUSER@$REMOTESYS "/usr/local/bin/setup_sdk_dirs.rb"
+ssh $REMOTEUSER@$REMOTESYS "/home/web/setup_sdk_dirs.rb"
 
 echo
 echo "Build uploaded. Please open your web browser and go to http://buglabs.net/sdk/ to verify."
