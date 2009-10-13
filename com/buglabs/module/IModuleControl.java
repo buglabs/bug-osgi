@@ -27,6 +27,7 @@
  *******************************************************************************/
 package com.buglabs.module;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -61,4 +62,18 @@ public interface IModuleControl {
 	 * @return
 	 */
 	public boolean setModuleProperty(IModuleProperty property);
+	
+	/**
+	 * Suspend the module.
+	 * 
+	 * @throws IOException
+	 */
+	public int suspend() throws IOException;
+	
+	/**
+	 * Resume the module.
+	 * 
+	 * @throws IOException
+	 */
+	public int resume() throws IOException;
 }
