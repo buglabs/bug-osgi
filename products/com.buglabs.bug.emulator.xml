@@ -54,6 +54,7 @@
 		<!--<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />-->
 		<svn>
 			<checkout url="${svn.url.bug}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
+			<checkout url="${svn.url.bug}/edu.oswego.cs.dl.util.concurrent" destPath="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.kernel.external" destPath="${checkout.dir}/com.buglabs.bug.kernel.external" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
@@ -67,6 +68,7 @@
 			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.base" destPath="${checkout.dir}/com.buglabs.bug.emulator.base" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bmi" destPath="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bluetooth" destPath="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.accelerometer" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.accelerometer" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.motion" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.lcd" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
@@ -86,6 +88,7 @@
 
 	<target name="build" depends="checkout">
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/ch.ethz.iks.slp" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.http" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.common" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.shell" />
@@ -98,6 +101,7 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.nmea" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.base" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.accelerometer" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />		
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
