@@ -66,9 +66,9 @@
 			<checkout url="${svn.url.bug}/com.buglabs.bug.menu" destPath="${checkout.dir}/com.buglabs.bug.menu" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
 			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bluetooth" destPath="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />			
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.base" destPath="${checkout.dir}/com.buglabs.bug.emulator.base" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bmi" destPath="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
-			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bluetooth" destPath="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.accelerometer" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.accelerometer" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.motion" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.lcd" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
@@ -99,9 +99,9 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.menu" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.service" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.nmea" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />		
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.base" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bmi" />
-		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.accelerometer" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.motion" />		
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.module.lcd" />
