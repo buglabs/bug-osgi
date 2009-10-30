@@ -115,6 +115,10 @@
 
 		<!-- Call the target that does everything -->
 		<ant antfile="build.xml" target="bundles.all" dir="${checkout.dir}/${project.feature}" />
+		
+		<manifest file="META-INF/MANIFEST.MF" mode="update">
+			<attribute name="BUG-API-Version" value="${bug.version}" />
+		</manifest>	
 	</target>
 
 	<!-- 
