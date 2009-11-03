@@ -68,10 +68,11 @@
     		</svn>
 		<!-- checkout slp from cvs for now -->
                 <!--<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />-->
-
+		
+		<!-- Add the BUG API Version to the Dragonfly Plugin Manifest -->
 		<manifest file="${checkout.dir}/com.buglabs.dragonfly/META-INF/MANIFEST.MF" mode="update">
 			<attribute name="BUG-API-Version" value="${bug.version}" />
-		</manifest>			
+		</manifest>		
 		
 		<!-- call CTE's target to checkout needed projects -->
 		<ant antfile="com.buglabs.osgi.concierge.xml" target="checkout" />
