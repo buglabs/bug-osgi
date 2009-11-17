@@ -53,7 +53,7 @@
 		<!-- checkout slp from cvs for now -->
 		<!--<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />-->
 		<svn>
-			<!-- checkout url="${svn.url.bug}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" / -->
+			<checkout url="${svn.url.bug}/net.contentobjects.jnotify" destPath="${checkout.dir}/net.contentobjects.jnotify" />
 			<checkout url="${svn.url.bug}/edu.oswego.cs.dl.util.concurrent" destPath="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.kernel.external" destPath="${checkout.dir}/com.buglabs.bug.kernel.external" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
@@ -88,7 +88,7 @@
 	</target>
 
 	<target name="build" depends="checkout">
-		<!-- ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/ch.ethz.iks.slp" / -->
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/net.contentobjects.jnotify" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.http" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.common" />
