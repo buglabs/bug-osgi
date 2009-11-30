@@ -118,6 +118,7 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.obr" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.update" />
 		<ant antfile="build.xml" target="build.jars" dir="${checkout.dir}/com.sun.javax.servlet" />
+                <ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/net.contentobjects.jnotify" />
 	</target>
 
 	<!-- 
