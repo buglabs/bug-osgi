@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *    - Redistributions of source code must retain the above copyright notice,
@@ -12,7 +12,7 @@
  *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
  *      used to endorse or promote products derived from this software without
  *      specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -89,5 +89,27 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_
 	return ioctl(fd, BMI_CAM_GET_SELECTED);
 }
 
+/*
+ * Class:     com_buglabs_bug_jni_camera_CameraControl
+ * Method:    ioctl_BMI_CAM_SUSPEND
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1SUSPEND
+  (JNIEnv * env, jobject jobj){
+	int fd = getFileDescriptorField(env, jobj);
+	return ioctl(fd, BMI_CAM_SUSPEND);
+}
+
+/*
+ * Class:     com_buglabs_bug_jni_camera_CameraControl
+ * Method:    ioctl_BMI_CAM_RESUME
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1RESUME
+(JNIEnv * env, jobject jobj){
+	int fd = getFileDescriptorField(env, jobj);
+	return ioctl(fd, BMI_CAM_RESUME);
+
+}
 
 

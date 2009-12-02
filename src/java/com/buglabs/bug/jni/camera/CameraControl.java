@@ -57,5 +57,9 @@ public class CameraControl extends CharDevice {
 	public native int ioctl_BMI_CAM_SELECT(int slot);
 
 	public native int ioctl_BMI_CAM_GET_SELECTED();
+	
+	public native int ioctl_BMI_CAM_SUSPEND();
+	
+	public native int ioctl_BMI_CAM_RESUME();
 
 }
