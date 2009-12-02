@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="com.buglabs.osgi.concierge.jdt.ConciergeClasspathContainerInitializer"/>
+	<classpathentry kind="con" path="com.buglabs.osgi.concierge.jdt.OSGiBundleClassPathContainerInitializer"/>
+	<classpathentry kind="con" path="com.buglabs.dragonfly.jdt.BugClasspathContainerInitializer"/>
+	<classpathentry kind="con" path="com.buglabs.phoneme.personal.PhoneMEClasspathContainer"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
