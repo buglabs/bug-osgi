@@ -1,0 +1,10 @@
+#Thu Oct 22 15:56:22 EDT 2009
+eclipse.preferences.version=1
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true" appendContributed\="true"/>\n
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.2107444662=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="JAVAH_CLASSPATH" operation\="append" value\="../../bin"/>\n<variable delimiter\=";" name\="CC" operation\="append" value\="arm-poky-linux-gnueabi-gcc"/>\n<variable delimiter\=";" name\="CXX" operation\="append" value\="arm-poky-linux-gnueabi-g++"/>\n<variable delimiter\=";" name\="COMMON_CLASSPATH" operation\="append" value\="${CHECKOUT_DIR}/com.buglabs.bug.jni.common/bin"/>\n<variable delimiter\=";" name\="CXXFLAGS" operation\="append" value\="-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp"/>\n<variable delimiter\=";" name\="STAGING_BUG_INCDIR" operation\="append" value\="/home/jconnolly/buglabs/poky/com.buglabs.build.oe/build/tmp/staging//bug-poky-linux-gnueabi/kernel/include"/>\n</environment>\n
+indexer/filesToParseUpFront=
+indexer/indexAllFiles=false
+indexer/indexerId=org.eclipse.cdt.core.fastIndexer
+indexer/skipReferences=false
+indexer/skipTypeReferences=false
+indexerId=org.eclipse.cdt.core.fastIndexer
