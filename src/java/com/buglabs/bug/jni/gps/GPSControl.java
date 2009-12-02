@@ -51,4 +51,8 @@ public class GPSControl extends CharDevice {
 	public native int ioctl_BMI_GPS_ACTIVE_ANT();
 
 	public native int ioctl_BMI_GPS_PASSIVE_ANT();
+	
+	public native int ioctl_BMI_GPS_SUSPEND();
+	
+	public native int ioctl_BMI_GPS_RESUME();
 }

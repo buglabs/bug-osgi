@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *    - Redistributions of source code must retain the above copyright notice,
@@ -12,7 +12,7 @@
  *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
  *      used to endorse or promote products derived from this software without
  *      specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -84,9 +84,9 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1
 JNIEXPORT int JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1GETSTAT(JNIEnv * env, jobject obj)
 {
 	unsigned int status = 0;
-	
+
 	int result = ioctl(getFileDescriptorField(env, obj), BMI_GPS_GETSTAT, &status);
-	
+
 	if(result < 0) {
 		//TODO: throw exception
 		return result;
@@ -104,7 +104,7 @@ JNIEXPORT int JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1G
  */
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1SETRST(JNIEnv * env, jobject obj)
 {
-	return ioctl(getFileDescriptorField(env, obj), BMI_GPS_SETRST, 0);	
+	return ioctl(getFileDescriptorField(env, obj), BMI_GPS_SETRST, 0);
 }
 
 /*
@@ -135,4 +135,26 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1PASSIVE_1ANT(JNIEnv * env, jobject obj)
 {
 	return ioctl(getFileDescriptorField(env, obj), BMI_GPS_PASSIVE_ANT, 0);
+}
+
+/*
+ * Class:     com_buglabs_bug_jni_gps_GPSControl
+ * Method:    ioctl_BMI_GPS_SUSPEND
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1SUSPEND
+(JNIEnv * env, jobject obj)
+{
+	return ioctl(getFileDescriptorField(env, obj), BMI_GPS_SUSPEND, 0);
+}
+
+/*
+ * Class:     com_buglabs_bug_jni_gps_GPSControl
+ * Method:    ioctl_BMI_GPS_RESUME
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1RESUME
+(JNIEnv * env, jobject obj)
+{
+	return ioctl(getFileDescriptorField(env, obj), BMI_GPS_RESUME, 0);
 }
