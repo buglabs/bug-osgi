@@ -27,6 +27,7 @@
  *******************************************************************************/
 package com.buglabs.bug.module.vonhippel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -35,11 +36,13 @@ import javax.microedition.io.CommConnection;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.menu.pub.StatusBarUtils;
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelSerialPort;
@@ -48,6 +51,7 @@ import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
+import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 public class VonHippelModlet implements IModlet, IModuleControl {
@@ -83,6 +87,10 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private ServiceRegistration vhLedRef;
 
+	private boolean suspended;
+
+	private LogService logService;
+
 	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
@@ -104,22 +112,35 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
 			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
 
+	private final BMIModuleProperties properties;
+
 	public VonHippelModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleName = moduleName;
 		this.moduleId = moduleId;
+		this.logService = LogServiceUtil.getLogService(context);
+		this.properties = null;
+	}
 
+	public VonHippelModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIModuleProperties properties) {
+		this.context = context;
+		this.slotId = slotId;
+		this.moduleName = moduleName;
+		this.moduleId = moduleId;
+		this.properties = properties;
+		this.logService = LogServiceUtil.getLogService(context);
 	}
 
 	public void start() throws Exception {
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, createBasicServiceProperties());
+		Properties modProperties = createBasicServiceProperties();
+		modProperties.put("Power State", suspended ? "Suspended": "Active");
+		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
 		vhSerialRef = context.registerService(IVonHippelSerialPort.class.getName(), vhc, createBasicServiceProperties());
 		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhc);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	public void stop() throws Exception {
@@ -163,18 +184,41 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		Properties p = new Properties();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
-		// p.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
+
+		if (properties != null) {
+			p.put("ModuleDescription", properties.getDescription());
+			p.put("ModuleSN", properties.getSerial_num());
+			p.put("ModuleVendorID", "" + properties.getVendor());
+			p.put("ModuleRevision", "" + properties.getRevision());
+		}
+		
 		return p;
 	}
 
+	private void updateIModuleControlProperties(){
+		if (moduleRef!=null){
+			Properties modProperties = createBasicServiceProperties();
+			modProperties.put("Power State", suspended ? "Suspended": "Active");
+			moduleRef.setProperties(modProperties);
+		}
+	}
+
 	public List getModuleProperties() {
-		List properties = new ArrayList();
+		List mprops = new ArrayList();
 
-		properties.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
-		properties.add(new ModuleProperty("Slot", "" + slotId));
-		properties.add(new ModuleProperty("State", Boolean.toString(deviceOn), "Boolean", true));
-
-		return properties;
+		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
+		mprops.add(new ModuleProperty("Slot", "" + slotId));
+		mprops.add(new ModuleProperty("State", Boolean.toString(deviceOn), "Boolean", true));
+		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended": "Active", "String", true));
+		
+		if (properties != null) {
+			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
+			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
+			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
+		}
+		
+		return mprops;
 	}
 
 	public boolean setModuleProperty(IModuleProperty property) {
@@ -185,6 +229,28 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 			deviceOn = Boolean.valueOf((String) property.getValue()).booleanValue();
 			return true;
 		}
+		if (property.getName().equals("Power State")) {
+			if (((String) property.getValue()).equals("Suspend")){
+				try{
+				suspend();
+				}
+			 catch (IOException e) {
+				 LogServiceUtil.logBundleException(logService, e.getMessage(), e);
+			}
+			}
+			else if (((String) property.getValue()).equals("Resume")){
+				
+				try {
+					resume();
+				} catch (IOException e) {
+					this.logService = LogServiceUtil.getLogService(context);
+				}
+			}
+			
+				
+			
+		}
+		
 		return false;
 	}
 
@@ -200,7 +266,35 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		return slotId;
 	}
 
+	public int resume() throws IOException {
+		int result = -1;
+
+		result = vhDevice.ioctl_BMI_VH_RESUME();
+
+		if (result < 0) {
+			throw new IOException("ioctl BMI_VH_RESUME failed");
+		}
+		suspended = false;
+		updateIModuleControlProperties();
+		return result;
+	}
+	
+
+	public int suspend() throws IOException {
+		int result = -1;
+
+		result = vhDevice.ioctl_BMI_VH_SUSPEND();
+
+		if (result < 0) {
+			throw new IOException("ioctl BMI_VH_SUSPEND failed");
+		}
+		suspended = true;
+		updateIModuleControlProperties();
+		return result;
+	}
+
 	public void setup() throws Exception {
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		int slot = slotId + 1;
 		String devnode_vh = "/dev/bmi_vh_control_m" + slot;
 		vhDevice = new VonHippel();

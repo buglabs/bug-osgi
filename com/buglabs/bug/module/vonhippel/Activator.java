@@ -31,6 +31,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
 
@@ -63,5 +64,13 @@ public class Activator implements BundleActivator, IModletFactory {
 
 	public String getVersion() {
 		return (String) context.getBundle().getHeaders().get("Bundle-Version");
+	}
+
+	public String getModuleDriver() {
+		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
+	}
+	
+	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
+		return new VonHippelModlet(context, slotId, getModuleId(), "VonHippel", properties);
 	}
 }
