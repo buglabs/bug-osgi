@@ -6,12 +6,14 @@ Bundle-Vendor: Bug Labs, Inc.
 Import-Package:  org.osgi.framework,
  org.osgi.service.log,
  org.osgi.util.tracker
-Export-Package: com.buglabs.device,
+Export-Package: com.buglabs.application,
+ com.buglabs.device,
  com.buglabs.menu,
+ com.buglabs.module,
+ com.buglabs.osgi.shell,
  com.buglabs.services.ws,
  com.buglabs.status,
+ com.buglabs.support,
  com.buglabs.util,
- com.buglabs.util.trackers,
- com.buglabs.module,
- com.buglabs.application,
- com.buglabs.osgi.shell
+ com.buglabs.util.simplerestclient,
+ com.buglabs.util.trackers

@@ -39,6 +39,7 @@ import org.osgi.service.log.LogService;
 /**
  * A class for sharing an InputStream among multiple clients.
  * 
+ * @deprecated This class can exhibit strange behavior
  * @author Angel Roman
  * 
  */
@@ -130,7 +131,9 @@ public class StreamMultiplexer extends Thread {
 				log.log(LogService.LOG_DEBUG, name + ": Started");
 			}
 			while (!isInterrupted()) {
-
+				//Detect InterruptedExceptions.
+				Thread.sleep(10);
+				
 				if (outputStreamWriters.size() > 0) {
 					read = is.read(buff);
 					if (read == -1) {
@@ -168,9 +171,8 @@ public class StreamMultiplexer extends Thread {
 			if (log != null) {
 				log.log(LogService.LOG_WARNING, "An IOException was generated", e1);
 			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (InterruptedException e) {		
+			log.log(LogService.LOG_INFO, this.getClass().getName() + " is shutting down.");
 		} finally {
 			// If we are going down, close all streams.
 			try {

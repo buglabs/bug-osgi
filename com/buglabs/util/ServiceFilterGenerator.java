@@ -27,12 +27,9 @@
  *******************************************************************************/
 package com.buglabs.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -64,6 +61,21 @@ public class ServiceFilterGenerator {
 		return "";
 	}
 
+	/**
+	 * Generate a Filter object from an array of Service names and a bundle context.
+	 * @param context
+	 * @param services
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static Filter generateServiceFilter(
+			BundleContext context, String [] services) throws InvalidSyntaxException {
+		String filterString = generateServiceFilter(Arrays.asList(services));
+
+		return context.createFilter(filterString);
+	}	
+	
+	
 	/**
 	 * servicesMap is SortedMap<String, Map<String, String>>
 	 * 	where the key is the service name and the map is a map of service properties
