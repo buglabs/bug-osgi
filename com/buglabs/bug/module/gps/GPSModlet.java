@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 import java.util.Timer;
 
 import org.osgi.framework.BundleContext;
@@ -59,6 +60,7 @@ import com.buglabs.bug.module.gps.pub.INMEASentenceSubscriber;
 import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.bug.module.gps.pub.IPositionSubscriber;
 import com.buglabs.bug.module.gps.pub.LatLon;
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
@@ -155,6 +157,10 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private String serviceName = "Location";
 
+	private boolean suspended;
+
+	private final BMIModuleProperties properties;
+
 	/**
 	 * @param context
 	 * @param slotId
@@ -166,7 +172,17 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		this.slotId = slotId;
 		this.moduleName = moduleName;
 		this.moduleId = moduleId;
+		this.properties = null;
 		this.log = LogServiceUtil.getLogService(context);
+	}
+
+	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIModuleProperties properties) {
+		this.context = context;
+		this.slotId = slotId;
+		this.moduleName = moduleName;
+		this.moduleId = moduleId;
+		this.properties = properties;
+		this.log = LogServiceUtil.getLogService(context);	
 	}
 
 	/*
@@ -175,23 +191,32 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 * @see com.buglabs.bug.module.pub.IModlet#start()
 	 */
 	public void start() throws Exception {
+		boolean retry = false;
+		int count = 0;
+		do {
+			log.log(LogService.LOG_INFO, "GPSModlet setting active (external) antenna");
+			try {
+				setActiveAntenna();
+				retry = false;
+			} catch (IOException e) {
+				log.log(LogService.LOG_ERROR, "Failed to set GPS antenna to active (external) antenna", e);
+				retry = true;
+				Thread.sleep(200);
+				count++;
+			}
+		} while (retry && count < 10);
+
 		gpsd.start();
 		nmeaProvider.start();
-		
-		log.log(LogService.LOG_INFO, "GPSModlet setting active (external) antenna");
-		try {
-			setActiveAntenna();
-		} catch (IOException e) {
-			log.log(LogService.LOG_ERROR, "Failed to set GPS antenna to active (external) antenna", e);
-		}
 
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
-		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
-		gpsControlRef = context.registerService(IGPSModuleControl.class.getName(), this, createRemotableProperties(null));
-		nmeaRef = context.registerService(INMEARawFeed.class.getName(), gpsd, createRemotableProperties(null));
-		nmeaProviderRef = context.registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createRemotableProperties(null));
+		Properties modProperties = createBasicServiceProperties();
+		modProperties.put("Power State", suspended ? "Suspended": "Active");
+		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
+		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties());
+		gpsControlRef = context.registerService(IGPSModuleControl.class.getName(), this, createBasicServiceProperties());
+		nmeaRef = context.registerService(INMEARawFeed.class.getName(), gpsd, createBasicServiceProperties());
+		nmeaProviderRef = context.registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createBasicServiceProperties());
 		wsTracker = PublicWSAdminTracker.createTracker(context, this);
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 
 		timer = new Timer();
 		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
@@ -201,6 +226,26 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 				+ IPositionSubscriber.class.getName() + "))");
 	}
 
+	private Properties createBasicServiceProperties() {
+		Properties p = new Properties();
+		p.put("Provider", this.getClass().getName());
+		p.put("Slot", Integer.toString(slotId));
+
+		if (properties != null) {
+			p.put("ModuleDescription", properties.getDescription());
+			p.put("ModuleSN", properties.getSerial_num());
+			p.put("ModuleVendorID", "" + properties.getVendor());
+			p.put("ModuleRevision", "" + properties.getRevision());
+		}
+		
+		try {
+			p.put("gps.antenna.external", "" + isAntennaExternal());
+		} catch (IOException e) {
+			log.log(LogService.LOG_ERROR, "Unable to access GPS antenna state.", e);
+		}
+		return p;
+	}
+
 	/**
 	 * @return A dictionary with R-OSGi enable property.
 	 */
@@ -208,16 +253,16 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		if (ht == null) {
 			ht = new Hashtable();
 		}
-
-		try {
-			ht.put("gps.antenna.external", "" + isAntennaExternal());
-		} catch (IOException e) {
-			log.log(LogService.LOG_ERROR, "Unable to access GPS antenna state.", e);
-		}
-		
 		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
 
 		return ht;
+	}
+	private void updateIModuleControlProperties(){
+		if (moduleRef!=null){
+			Properties modProperties = createBasicServiceProperties();
+			modProperties.put("Power State", suspended ? "Suspended": "Active");
+			moduleRef.setProperties(modProperties);
+		}
 	}
 
 	private boolean isAntennaExternal() throws IOException {
@@ -282,30 +327,38 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 * @see com.buglabs.module.IModuleControl#getModuleProperties()
 	 */
 	public List getModuleProperties() {
-		List properties = new ArrayList();
+		List mprops = new ArrayList();
 
-		properties.add(new ModuleProperty("Slot", "" + slotId));
+		mprops.add(new ModuleProperty("Slot", "" + slotId));
 
 		try {
 			int status = getStatus();
 			status &= 0xFF;
 
 			String status_str = Integer.toHexString(status);
-			properties.add(new ModuleProperty(PROPERTY_IOX, "0x" + status_str, "Integer", false));
+			mprops.add(new ModuleProperty(PROPERTY_IOX, "0x" + status_str, "Integer", false));
 
-			properties.add(new ModuleProperty(PROPERTY_GPS_FIX, Boolean.toString((status &= 0x1) == 0)));
+			mprops.add(new ModuleProperty(PROPERTY_GPS_FIX, Boolean.toString((status &= 0x1) == 0)));
 
 			String antenna = PROPERTY_ANTENNA_ACTIVE;
 
 			if ((status & 0xC0) == IGPSModuleControl.STATUS_PASSIVE_ANTENNA) {
 				antenna = PROPERTY_ANTENNA_PASSIVE;
 			}
-			properties.add(new ModuleProperty(PROPERTY_ANTENNA, antenna, "String", false));
+			mprops.add(new ModuleProperty(PROPERTY_ANTENNA, antenna, "String", false));
+			mprops.add(new ModuleProperty("Power State", suspended ? "Suspended" : "Active", "String", true));
 		} catch (IOException e) {
 			log.log(LogService.LOG_ERROR, "Exception occured while getting module properties.", e);
 		}
+		
+		if (properties != null) {
+			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
+			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
+			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
+		}
 
-		return properties;
+		return mprops;
 	}
 
 	public boolean setModuleProperty(IModuleProperty property) {
@@ -325,6 +378,23 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			}
 			return true;
 		}
+		if (property.getName().equals("Power State")) {
+			if (((String) property.getValue()).equals("Suspend")) {
+				try {
+					suspend();					
+				} catch (IOException e) {
+					LogServiceUtil.logBundleException(log, "Error while changing suspend state.", e);
+				}
+			} else if (((String) property.getValue()).equals("Resume")) {
+
+				try {
+					resume();
+				} catch (IOException e) {
+					LogServiceUtil.logBundleException(log, "Error while changing suspend state.", e);
+				}
+			}
+
+		}
 
 		return false;
 	}
@@ -339,6 +409,31 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	public int getSlotId() {
 		return slotId;
+	}
+
+	public int resume() throws IOException {
+		int result = -1;
+
+		result = gpscontrol.ioctl_BMI_GPS_RESUME();
+		suspended = false;
+		if (result < 0) {
+			throw new IOException("ioctl BMI_GPS_RESUME failed");
+		}
+		suspended = false;
+		updateIModuleControlProperties();
+		return result;
+	}
+
+	public int suspend() throws IOException {
+		int result = -1;
+
+		result = gpscontrol.ioctl_BMI_GPS_SUSPEND();
+		if (result < 0) {
+			throw new IOException("ioctl BMI_GPS_SUSPEND failed");
+		}
+		suspended = true;
+		updateIModuleControlProperties();
+		return result;
 	}
 
 	public PublicWSDefinition discover(int operation) {
@@ -412,6 +507,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void setup() throws Exception {
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		String devnode_gps = "/dev/ttymxc" + Integer.toString(slotId);
 		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(slotId + 1);
 
@@ -445,7 +541,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			return DEFAULT_READ_DELAY;
 		}
 
-		try {			
+		try {
 			Object obj = c.getProperties().get(CM_READ_DELAY_KEY);
 			if (obj != null) {
 				return Long.parseLong(obj.toString());
@@ -469,7 +565,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 		if (sr != null) {
 			ConfigurationAdmin ca = (ConfigurationAdmin) context.getService(sr);
-			
+
 			if (ca != null) {
 				try {
 					return ca.getConfiguration(getModuleName());

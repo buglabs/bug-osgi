@@ -61,7 +61,15 @@ import com.buglabs.util.LogServiceUtil;
  *
  */
 public class NMEASentenceProvider extends Thread implements INMEASentenceProvider, ServiceListener {
-
+	/**
+	 * Default value for sleep interval between GPS reads.
+	 */
+	private static final int DEFAULT_SLEEP_INTERVAL = 1000;
+	/**
+	 * System property to define sleep between GPS reads.
+	 */
+	public static final String SLEEP_INTERVAL_PROPERTY_KEY = "bug.gps.sleep_interval";
+	
 	private InputStream nmeaStream;
 
 	private RMC cachedRMC;
@@ -71,11 +79,19 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	private List subscribers;
 
 	private final BundleContext context;
+
+	private final long readSleepInterval;
 	
 	public NMEASentenceProvider(InputStream nmeaStream, BundleContext context) {
 		this.nmeaStream = nmeaStream;
 		this.context = context;
 		this.log = LogServiceUtil.getLogService(context);
+		
+		if (context.getProperty(SLEEP_INTERVAL_PROPERTY_KEY) == null) {
+			readSleepInterval = DEFAULT_SLEEP_INTERVAL;
+		} else {
+			readSleepInterval = Integer.parseInt(context.getProperty(SLEEP_INTERVAL_PROPERTY_KEY));
+		}
 	}
 
 	/* (non-Javadoc)
@@ -108,6 +124,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 			String sentence;
 
 			do {
+				Thread.sleep(readSleepInterval);
 				try {
 					sentence = br.readLine();
 					log.log(LogService.LOG_DEBUG, "GPS NMEA DEBUG: " + sentence);
@@ -131,7 +148,9 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 				}
 			} while (!Thread.currentThread().isInterrupted() && (sentence != null));
 		} catch (IOException e) {
-			log.log(LogService.LOG_ERROR, "An IO Error occurred in reading from NMEA stream.", e);
+			LogServiceUtil.logBundleException(log,  "An IO Error occurred in reading from NMEA stream.", e);
+		} catch (InterruptedException e) {
+			//Ignore this exception.
 		} finally {
 			try {
 				if (br != null) {
@@ -142,7 +161,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				LogServiceUtil.logBundleException(log, "Error while changing suspend state.", e);
 			}
 		}
 	}
