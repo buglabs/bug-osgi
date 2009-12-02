@@ -134,100 +134,116 @@ public class Manager {
 	 */
 	public void processMessage(String msg) {
 		BMIMessage message = new BMIMessage(msg);
+		
+		if (message.parse()) {
+			processMessage(message);
+		} else {
+			throw new RuntimeException("Unable to parse message: " + msg);
+		}
+	}
+
+	/**
+	 * This method is responsible for loading and starting any bundles that
+	 * provide Modlets for given module type.
+	 * 
+	 * After bundle(s) are started, those bundles expose IModulet services. The
+	 * BMI activator then listens for modlets. Upon new modlet creation, the
+	 * setup is called.
+	 * 
+	 * @param msg
+	 */
+	public void processMessage(BMIMessage message) {
+
 		List ml;
 		try {
-			if (message.parse()) {
 
-				switch (message.getEvent()) {
-				case BMIMessage.EVENT_INSERT:
-					// first see if bundle is already installed.
-					List matchingBundles = findLocalBundles(message.getModuleId());
+			switch (message.getEvent()) {
+			case BMIMessage.EVENT_INSERT:
+				// first see if bundle is already installed.
+				List matchingBundles = findLocalBundles(message.getModuleId());
 
-					if (matchingBundles.size() > 0) {
-						// check to see if any are loaded into the slot.
-						for (Iterator i = matchingBundles.iterator(); i.hasNext();) {
-							Bundle b = (Bundle) i.next();
+				if (matchingBundles.size() > 0) {
+					// check to see if any are loaded into the slot.
+					for (Iterator i = matchingBundles.iterator(); i.hasNext();) {
+						Bundle b = (Bundle) i.next();
 
-							if (b.getState() != Bundle.ACTIVE) {
-								b.start();
-								logService.log(LogService.LOG_INFO, "Bundle " + b.getLocation() + " has been started to provide Modlets for module " + message.getModuleId());
-							}
+						if (b.getState() != Bundle.ACTIVE) {
+							b.start();
+							logService.log(LogService.LOG_INFO, "Bundle " + b.getLocation() + " has been started to provide Modlets for module " + message.getModuleId());
 						}
-					} else {
-						// bundle is not installed, see if it can be retrieved
-						// from the cache.
-
-						logService.log(LogService.LOG_ERROR, "This case is not implemented; starting a module bundle that is not already in the runtime environment.");
-						return;
 					}
+				} else {
+					// bundle is not installed, see if it can be retrieved
+					// from the cache.
 
-					// Now that all the bundles associated with given module ID
-					// have been aquired and started, look for modlets to start.
-
-					ml = (List) modletFactories.get(message.getModuleId());
-
-					if (ml != null) {
-						for (Iterator i = ml.iterator(); i.hasNext();) {
-							IModletFactory mf = (IModletFactory) i.next();
-
-							// TODO we want to do some logic like get only the
-							// latest version of a given modlet factory.
-							IModlet m = mf.createModlet(context, message.getSlot());
-							try {
-								m.setup();
-							} catch (Exception e) {
-								logService.log(LogService.LOG_ERROR, "Unable to setup Modlet " + mf.getName() + ": " + e.getMessage());
-								continue;
-							}
-
-							m.start();
-							logService.log(LogService.LOG_INFO, "Started modlet from factory " + mf.getName() + "...");
-
-							// Add this model to our map of running Modlets.
-							if (!activeModlets.containsKey(m.getModuleId())) {
-								activeModlets.put(m.getModuleId(), new ArrayList());
-							}
-
-							List am = (List) activeModlets.get(m.getModuleId());
-
-							if (!am.contains(m)) {
-								am.add(m);
-							}
-						}
-					} else {
-						logService.log(LogService.LOG_ERROR, "No modlet factories support module: " + message.getModuleId());
-					}
-
-					break;
-				case BMIMessage.EVENT_REMOVE:
-					ml = (List) activeModlets.get(message.getModuleId());
-					List removalList = new ArrayList();
-
-					if (ml != null) {
-						for (Iterator i = ml.iterator(); i.hasNext();) {
-							IModlet m = (IModlet) i.next();
-							if (m.getSlotId() == message.getSlot()) {
-								logService.log(LogService.LOG_INFO, "Stopping modlet " + m.getModuleId() + "...");
-								m.stop();
-								removalList.add(m);
-							} else {
-								logService.log(LogService.LOG_INFO, "Ignoring " + m.getModuleId() + " in slot " + m.getSlotId());
-							}
-						}
-
-						for (Iterator i = removalList.iterator(); i.hasNext();) {
-							ml.remove(i.next());
-						}
-
-						removalList.clear();
-						logService.log(LogService.LOG_INFO, "Modlet cleanup complete.");
-					} else {
-						logService.log(LogService.LOG_WARNING, "There were no modlets loaded for " + message.getModuleId());
-					}
-					break;
+					logService.log(LogService.LOG_ERROR, "This case is not implemented; starting a module bundle that is not already in the runtime environment.");
+					return;
 				}
-			} else {
-				throw new RuntimeException("Unable to parse message: " + msg);
+
+				// Now that all the bundles associated with given module ID
+				// have been aquired and started, look for modlets to start.
+
+				ml = (List) modletFactories.get(message.getModuleId());
+
+				if (ml != null) {
+					for (Iterator i = ml.iterator(); i.hasNext();) {
+						IModletFactory mf = (IModletFactory) i.next();
+
+						// TODO we want to do some logic like get only the
+						// latest version of a given modlet factory.
+						IModlet m = mf.createModlet(context, message.getSlot(), message.getBMIModuleProperties());
+						try {
+							m.setup();
+						} catch (Exception e) {
+							logService.log(LogService.LOG_ERROR, "Unable to setup Modlet " + mf.getName() + ": " + e.getMessage());
+							continue;
+						}
+
+						m.start();
+						logService.log(LogService.LOG_INFO, "Started modlet from factory " + mf.getName() + "...");
+
+						// Add this model to our map of running Modlets.
+						if (!activeModlets.containsKey(m.getModuleId())) {
+							activeModlets.put(m.getModuleId(), new ArrayList());
+						}
+
+						List am = (List) activeModlets.get(m.getModuleId());
+
+						if (!am.contains(m)) {
+							am.add(m);
+						}
+					}
+				} else {
+					logService.log(LogService.LOG_ERROR, "No modlet factories support module: " + message.getModuleId());
+				}
+
+				break;
+			case BMIMessage.EVENT_REMOVE:
+				ml = (List) activeModlets.get(message.getModuleId());
+				List removalList = new ArrayList();
+
+				if (ml != null) {
+					for (Iterator i = ml.iterator(); i.hasNext();) {
+						IModlet m = (IModlet) i.next();
+						if (m.getSlotId() == message.getSlot()) {
+							logService.log(LogService.LOG_INFO, "Stopping modlet " + m.getModuleId() + "...");
+							m.stop();
+							removalList.add(m);
+						} else {
+							logService.log(LogService.LOG_INFO, "Ignoring " + m.getModuleId() + " in slot " + m.getSlotId());
+						}
+					}
+
+					for (Iterator i = removalList.iterator(); i.hasNext();) {
+						ml.remove(i.next());
+					}
+
+					removalList.clear();
+					logService.log(LogService.LOG_INFO, "Modlet cleanup complete.");
+				} else {
+					logService.log(LogService.LOG_WARNING, "There were no modlets loaded for " + message.getModuleId());
+				}
+				break;
 			}
 
 		} catch (BundleException e) {
@@ -250,4 +266,5 @@ public class Manager {
 
 		}
 	}
+
 }

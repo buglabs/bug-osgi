@@ -27,6 +27,9 @@
  *******************************************************************************/
 package com.buglabs.bug.bmi.pub;
 
+import java.text.DecimalFormat;
+
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.util.StringUtil;
 
 /**
@@ -39,6 +42,8 @@ public class BMIMessage {
 	public static final int EVENT_INSERT = 0;
 
 	public static final int EVENT_REMOVE = 1;
+	
+	private static final DecimalFormat df = new DecimalFormat("0000");
 
 	private String raw;
 
@@ -50,6 +55,8 @@ public class BMIMessage {
 
 	private String version;
 
+	private BMIModuleProperties props;
+
 	public BMIMessage(String raw) {
 		this.raw = raw;
 	}
@@ -60,7 +67,28 @@ public class BMIMessage {
 		this.slot = slot;
 		this.event = event;
 	}
+	
+	/**
+	 * A BMIMessage for inserted module with parsed properties.
+	 * @param props
+	 * @param slot
+	 */
+	public BMIMessage(BMIModuleProperties props, int slot) {
+		this.props = props;
+		this.moduleId = df.format(props.getProduct_id());
+		this.version = "" + props.getRevision();
+		this.slot = slot;
+		this.event = EVENT_INSERT;
+	}
 
+	public BMIModuleProperties getBMIModuleProperties() {
+		return props;
+	}
+	
+	public void setBMIModuleProperties(BMIModuleProperties p) {
+		this.props = p;
+	}
+	
 	public int getEvent() {
 		return event;
 	}

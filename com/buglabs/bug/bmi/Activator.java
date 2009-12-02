@@ -46,7 +46,9 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.bmi.pub.BMIMessage;
 import com.buglabs.bug.bmi.pub.Manager;
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
 import com.buglabs.util.StringUtil;
@@ -76,11 +78,11 @@ public class Activator implements BundleActivator, ServiceListener {
 		Manager m = Manager.getManager();
 
 		List modules = getSysFSModules();
-
+		
 		if (modules != null) {
 			for (Iterator i = modules.iterator(); i.hasNext();) {
-				String bmiMessage = (String) i.next();
-				logService.log(LogService.LOG_INFO, "Registering existing module with message: " + bmiMessage);
+				BMIMessage bmiMessage = (BMIMessage) i.next();
+				logService.log(LogService.LOG_INFO, "Registering existing module with message: " + bmiMessage.toString());
 				m.processMessage(bmiMessage);
 			}
 		}
@@ -177,7 +179,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	 * @param driverName
 	 * @return
 	 */
-	private String getModuleIdFromDriver(String driverName) {
+	private String getModuleIdFromDriverDead(String driverName) {
 		// TODO this is bad: hard coding this module driver to name table. This
 		// needs to be refactored such that each module supplies the
 		// association.
@@ -226,6 +228,13 @@ public class Activator implements BundleActivator, ServiceListener {
 			return "000C";
 		}
 		
+		if (driverName.equals("psd_driver")){
+			return "F001"; // This is fictional until we have a regular PB-PSD module
+		}
+		if (driverName.equals("bmi_gsm")){
+			return "000B"; 
+		}
+		
 		logService.log(LogService.LOG_ERROR, "Unable to map " + driverName + " to a module ID.");
 
 		return null;
@@ -250,39 +259,65 @@ public class Activator implements BundleActivator, ServiceListener {
 		List slots = null;
 
 		for (int i = 1; i < 5; ++i) {
-			String cmd = "/bin/ls -al /sys/devices/conn-m" + i + "/driver/module";
+			File prodFile = new File("/sys/devices/conn-m" + i + "/product");
+			
+			if (!prodFile.exists()) {
+				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
+				continue;
+			}
+			
+			// Lazily create data structure. If no modules then not needed.
+			if (slots == null) {
+				slots = new ArrayList();
+			}
+			
+			BMIModuleProperties props = BMIModuleProperties.createFromSYSDirectory(prodFile.getParentFile());
+
+			BMIMessage m = new BMIMessage(props, i - 1);
+			
+			slots.add(m);
+		}
+
+		return slots;
+	}
+	
+	// TODO: This is very unpleasant but it should go away when we have a real PB module
+/*	private List getUSBPBModules() throws IOException {
+		List slots = null;
+
+		for (int i = 0; i < 1; ++i) {
+			String cmd = "/bin/ls -ald /sys/class/usb/psd" + i;
 			String response = null;
 			
 			try {
 				response = execute(cmd);
 			} catch (IOException e) {
-				logService.log(LogService.LOG_ERROR, "Error occurred while discovering modules.", e);
+				logService.log(LogService.LOG_ERROR, "Error occurred while discovering PB modules.", e);
 				continue;
 			}
 
 			if (response.trim().length() == 0) {
-				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
+				logService.log(LogService.LOG_DEBUG, "No PB module was found in 'slot' " + i);
 				continue;
 			}
 
 			logService.log(LogService.LOG_DEBUG, "Response: " + response);
 
-			String[] elems = StringUtil.split(response, "/");
-			String driverName = elems[elems.length - 1];
+			final String driverName = "psd_driver";
 
 			// Lazily create data structure. If no modules then not needed.
 			if (slots == null) {
 				slots = new ArrayList();
 			}
 
-			String bmiMessage = new String(getModuleIdFromDriver(driverName.trim()) + " " + getModuleVersion() + " " + (i - 1) + " ADD");
+			String bmiMessage = new String(getModuleIdFromDriver(driverName.trim()) + " " + getModuleVersion() + " " + i + " ADD");
 			logService.log(LogService.LOG_DEBUG, "Sending BMI ColdPlug message: " + bmiMessage);
 			
 			slots.add(bmiMessage);
 		}
 
 		return slots;
-	}
+	}*/
 
 	private boolean isEmpty(String element) {
 		return element == null || element.length() == 0;
