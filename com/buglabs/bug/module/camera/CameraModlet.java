@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -49,6 +50,7 @@ import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.camera.pub.ICameraButtonEventProvider;
 import com.buglabs.bug.module.camera.pub.ICameraDevice;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
@@ -72,6 +74,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	private static final String DEVNODE_INPUT_DEVICE = "/dev/input/bmi_cam";
 	private static final String CAMERA_DEVICE_NODE = "/dev/v4l/video0";
 	private static final String CAMERA_CONTROL_DEVICE_NODE = "/dev/bug_camera_control";
+	private static boolean suspended = false;
 
 	private ServiceTracker wsTracker;
 
@@ -85,7 +88,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 
 	private final String moduleName;
 
-	private ServiceRegistration moduleControl;
+	private ServiceRegistration moduleRef;
 
 	private ServiceRegistration cameraService;
 
@@ -94,6 +97,8 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	private LogService logService;
 
 	private Camera camera;
+	
+	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 
 	private String moduleId;
 
@@ -129,6 +134,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	private InputEventProvider bep;
 	private ServiceRegistration ledRef;
 	private String serviceName = "Picture";
+	private BMIModuleProperties properties;
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -137,6 +143,12 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		this.moduleName = "CAMERA";
 		// TODO See if we can get this from the Camera driver.
 		this.megapixels = 2;
+		this.properties = null;
+	}
+
+	public CameraModlet(BundleContext context, int slotId, String moduleId, BMIModuleProperties properties) {
+		this(context, slotId, moduleId);
+		this.properties = properties;
 	}
 
 	public String getModuleId() {
@@ -149,6 +161,8 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 
 	public void setup() throws Exception {
 		logService = LogServiceUtil.getLogService(context);
+		// Display the camera icon
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	public void start() throws Exception {
@@ -175,22 +189,37 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 			throw e;
 		}
 		cameraControl = new CameraModuleControl(cc);
-		cameraControlRef = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createRemotableProperties(null));
-		moduleControl = context.registerService(IModuleControl.class.getName(), this, null);
-		cameraService = context.registerService(ICameraDevice.class.getName(), this, createRemotableProperties(null));
-		ledRef = context.registerService(IModuleLEDController.class.getName(), cameraControl, createRemotableProperties(null));
+		cameraControlRef = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
+		Properties modProperties = createBasicServiceProperties();
+		modProperties.put("Power State", suspended ? "Suspended": "Active");
+		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
+		cameraService = context.registerService(ICameraDevice.class.getName(), this, createBasicServiceProperties());
+		ledRef = context.registerService(IModuleLEDController.class.getName(), cameraControl, createBasicServiceProperties());
 
 		bep = new CameraInputEventProvider(DEVNODE_INPUT_DEVICE, logService);
 		bep.start();
 
 		bepReg = context.registerService(ICameraButtonEventProvider.class.getName(), bep, createRemotableProperties(getButtonServiceProperties()));
-		// Display the camera icon
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 
 		List wsProviders = new ArrayList();
 		wsProviders.add(this);
 
 		wsTracker = PublicWSAdminTracker.createTracker(context, wsProviders);
+	}
+
+	private Properties createBasicServiceProperties() {
+		Properties p = new Properties();
+		p.put("Provider", this.getClass().getName());
+		p.put("Slot", Integer.toString(slotId));
+
+		if (properties != null) {
+			p.put("ModuleDescription", properties.getDescription());
+			p.put("ModuleSN", properties.getSerial_num());
+			p.put("ModuleVendorID", "" + properties.getVendor());
+			p.put("ModuleRevision", "" + properties.getRevision());
+		}
+		
+		return p;
 	}
 
 	/**
@@ -205,12 +234,20 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 
 		return ht;
 	}
+	
+	private void updateIModuleControlProperties(){
+		if (moduleRef!=null){
+			Properties modProperties = createBasicServiceProperties();
+			modProperties.put("Power State", suspended ? "Suspended": "Active");
+			moduleRef.setProperties(modProperties);
+		}
+	}
 
 	public void stop() throws Exception {
 		StatusBarUtils.releaseRegion(context, regionKey);
 		cameraControlRef.unregister();
 		cameraService.unregister();
-		moduleControl.unregister();
+		moduleRef.unregister();
 		ledRef.unregister();
 		bep.tearDown();
 		bepReg.unregister();
@@ -262,11 +299,17 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	public List getModuleProperties() {
 		modProps.clear();
 
-		// Removing...this information needs to come from the device.
-		// modProps.add(new ModuleProperty("MP", "" + megapixels, "Number",
-		// false));
+		modProps.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
 		modProps.add(new ModuleProperty("Slot", "" + slotId));
-
+		modProps.add(new ModuleProperty("Power State", suspended ? "Suspended": "Active", "String", true));
+		
+		if (properties != null) {
+			modProps.add(new ModuleProperty("Module Description", properties.getDescription()));
+			modProps.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			modProps.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
+			modProps.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
+		}
+		
 		return modProps;
 	}
 
@@ -275,7 +318,58 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	}
 
 	public boolean setModuleProperty(IModuleProperty property) {
+		if (!property.isMutable()) {
+			return false;
+		}
+		if (property.getName().equals("Power State")) {
+			if (((String) property.getValue()).equals("Suspend")){
+				try{
+				suspend();
+				}
+			 catch (IOException e) {
+				 LogServiceUtil.logBundleException(logService, e.getMessage(), e);
+			}
+			}
+			else if (((String) property.getValue()).equals("Resume")){
+				
+				try {
+					resume();
+				} catch (IOException e) {
+					LogServiceUtil.logBundleException(logService, e.getMessage(), e);
+				}
+			}
+			
+				
+			
+		}
+		
 		return false;
+	}
+	
+	public int resume() throws IOException {
+		int result = -1;
+
+		result = cc.ioctl_BMI_CAM_RESUME();
+		suspended = false;
+		if (result < 0) {
+			throw new IOException("ioctl BMI_CAM_RESUME failed");
+		}
+		suspended = false;
+		updateIModuleControlProperties();
+		return result;
+	}
+	
+
+	public int suspend() throws IOException {
+		int result = -1;
+
+		result = cc.ioctl_BMI_CAM_SUSPEND();
+		if (result < 0) {
+			throw new IOException("ioctl BMI_CAM_SUSPEND failed");
+		}
+		suspended = true;
+		updateIModuleControlProperties();
+		return result;
 	}
 
 	public byte[] getImage() {
@@ -324,4 +418,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	public void setPublicName(String name) {
 		serviceName = name;
 	}
+
+	
 }

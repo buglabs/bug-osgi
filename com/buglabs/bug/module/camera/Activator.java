@@ -30,12 +30,10 @@ package com.buglabs.bug.module.camera;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.input.pub.InputEventProvider;
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
-import com.buglabs.util.LogServiceUtil;
 
 /**
  * Java API bundle for Camera module.
@@ -47,12 +45,9 @@ public class Activator implements BundleActivator, IModletFactory {
 
 	private BundleContext context;
 	private ServiceRegistration sr;
-	private LogService logService;
-	private InputEventProvider bep;
 
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		logService = LogServiceUtil.getLogService(context);
 
 		sr = context.registerService(IModletFactory.class.getName(), this, null);
 	}
@@ -78,4 +73,11 @@ public class Activator implements BundleActivator, IModletFactory {
 		return (String) context.getBundle().getHeaders().get("Bundle-Version");
 	}
 
+	public String getModuleDriver() {
+		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
+	}
+
+	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
+		return new CameraModlet(context, slotId, getModuleId(), properties);
+	}
 }
