@@ -37,4 +37,8 @@ public class MDACCControl extends CharDevice {
 	public native int ioctl_BMI_MDACC_CTL_GREEN_LED_OFF();
 
 	public native int ioctl_BMI_MDACC_CTL_GREEN_LED_ON();
+	
+	public native int ioctl_BMI_MDACC_CTL_SUSPEND();
+	
+	public native int ioctl_BMI_MDACC_CTL_RESUME();
 }

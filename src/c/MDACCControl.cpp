@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *    - Redistributions of source code must retain the above copyright notice,
@@ -12,7 +12,7 @@
  *    - Neither the name of Bug Labs, Inc. nor the names of its contributors may be
  *      used to endorse or promote products derived from this software without
  *      specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -51,7 +51,7 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_motion_MDACCControl_ioctl_1BMI_1
  */
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_motion_MDACCControl_ioctl_1BMI_1MDACC_1CTL_1RED_1LED_1ON(JNIEnv * env, jobject obj)
 {
-	return ioctl(getFileDescriptorField(env, obj), BMI_MDACC_CTL_RED_LED_ON, 0);	
+	return ioctl(getFileDescriptorField(env, obj), BMI_MDACC_CTL_RED_LED_ON, 0);
 }
 
 /*
@@ -72,4 +72,26 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_motion_MDACCControl_ioctl_1BMI_1
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_motion_MDACCControl_ioctl_1BMI_1MDACC_1CTL_1GREEN_1LED_1ON(JNIEnv * env, jobject obj)
 {
 	return ioctl(getFileDescriptorField(env, obj), BMI_MDACC_CTL_GREEN_LED_ON, 0);
+}
+
+/*
+ * Class:     com_buglabs_bug_jni_motion_MDACCControl
+ * Method:    ioctl_BMI_MDACC_CTL_SUSPEND
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_motion_MDACCControl_ioctl_1BMI_1MDACC_1CTL_1SUSPEND
+(JNIEnv * env, jobject obj)
+{
+	return ioctl(getFileDescriptorField(env, obj), BMI_MDACC_CTL_SUSPEND, 0);
+}
+
+/*
+ * Class:     com_buglabs_bug_jni_motion_MDACCControl
+ * Method:    ioctl_BMI_MDACC_CTL_RESUME
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_motion_MDACCControl_ioctl_1BMI_1MDACC_1CTL_1RESUME
+(JNIEnv * env, jobject obj)
+{
+	return ioctl(getFileDescriptorField(env, obj), BMI_MDACC_CTL_RESUME, 0);
 }
