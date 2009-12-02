@@ -38,6 +38,42 @@ public abstract class AccelerometerSampleStream extends InputStream {
 
 	protected InputStream is;
 
+	public int available() throws IOException {
+		return is.available();
+	}
+
+	public boolean equals(Object obj) {
+		return is.equals(obj);
+	}
+
+	public int hashCode() {
+		return is.hashCode();
+	}
+
+	public void mark(int readlimit) {
+		is.mark(readlimit);
+	}
+
+	public boolean markSupported() {
+		return is.markSupported();
+	}
+
+	public int read(byte[] b, int off, int len) throws IOException {
+		return is.read(b, off, len);
+	}
+
+	public void reset() throws IOException {
+		is.reset();
+	}
+
+	public long skip(long n) throws IOException {
+		return is.skip(n);
+	}
+
+	public String toString() {
+		return is.toString();
+	}
+
 	/**
 	 * AccelerometerSampleInputStream constructor.
 	 * 
@@ -51,7 +87,6 @@ public abstract class AccelerometerSampleStream extends InputStream {
 	}
 
 	public void close() throws IOException {
-		super.close();
 		is.close();
 	}
 
