@@ -41,34 +41,61 @@ import com.buglabs.bug.module.motion.pub.IMotionObserver;
 import com.buglabs.bug.module.motion.pub.IMotionSubject;
 import com.buglabs.module.IModuleLEDController;
 
+/**
+ * 
+ * @author kgilmer
+ *
+ */
 public class MotionSubject extends Thread implements IMotionSubject {
 
+	/**
+	 * Default value for sleep interval between motion detector reads.
+	 */
+	private static final int DEFAULT_SLEEP_INTERVAL = 500;
+	/**
+	 * System property to define sleep between motion detector reads.
+	 */
+	public static final String SLEEP_INTERVAL_PROPERTY_KEY = "bug.motion.sleep_interval";
 	InputStream motionIs;
 	ArrayList observers;
 	private final IModuleLEDController ledController;
 	private final Timer timer = new Timer();
 	private final LogService log;
 	private volatile boolean flashing;
+	private final int sleepInterval;
 
 	MotionSubject(InputStream gpsIs, IModuleLEDController ledController, LogService log) {
 		this.motionIs = gpsIs;
 		this.ledController = ledController;
 		this.log = log;
 		observers = new ArrayList();
+		sleepInterval = getSleepInterval();
+	}
+
+	private int getSleepInterval() {
+		String is = System.getProperty(SLEEP_INTERVAL_PROPERTY_KEY);
+		if (is != null) {
+			return Integer.parseInt(is);
+		}
+		
+		return DEFAULT_SLEEP_INTERVAL;
 	}
 
 	public void run() {
 		byte read = 0;
 		byte expected = Motion.BMI_MOTION_DETECT_ENABLED | Motion.BMI_MOTION_DETECT_DELTA | Motion.BMI_MOTION_DETECT_LATCHED_STATUS | Motion.BMI_MOTION_DETECT_STATUS;
 		try {
-			while (!isInterrupted() && (read = (byte) motionIs.read()) != -1) {
+			while (motionIs != null && !isInterrupted() && (read = (byte) motionIs.read()) != -1) {
 				if (read == expected) {
 					notifyObservers();
 					flashLed();
 				}
+				Thread.sleep(sleepInterval);
 			}
 		} catch (IOException e) {
 			log.log(LogService.LOG_ERROR, "An IOException occured while reading from Motion module.", e);
+		} catch (InterruptedException e) {
+			// Shutdown
 		} finally {
 			if (motionIs != null) {
 				try {

@@ -34,12 +34,17 @@ import com.buglabs.bug.accelerometer.pub.AccelerometerSampleStream;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
 
+/**
+ * Provide Accelerometer samples to clients.
+ * @author kgilmer
+ *
+ */
 public class AccelerometerSampleProvider implements IAccelerometerSampleProvider {
 
-	private IAccelerometerSampleFeed accFeed;
+	private AccelerometerSampleStream is;
 
 	public AccelerometerSampleProvider(IAccelerometerSampleFeed accFeed) {
-		this.accFeed = accFeed;
+		is = accFeed.getSampleInputStream();
 	}
 
 	/**
@@ -48,10 +53,15 @@ public class AccelerometerSampleProvider implements IAccelerometerSampleProvider
 	 * @return an AccelerometerSample.
 	 */
 	public synchronized AccelerometerSample readSample() throws IOException {
-		AccelerometerSampleStream is = accFeed.getSampleInputStream();
-		AccelerometerSample sample = is.readSample();
-		is.close();
+		return is.readSample();
+	}
 
-		return sample;
+	public void close() {
+		if (is != null) {
+			try {
+				is.close();
+			} catch (IOException e) {
+			}
+		}
 	}
 }

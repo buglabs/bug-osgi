@@ -54,19 +54,18 @@ import com.buglabs.bug.module.motion.pub.AccelerationWS;
 import com.buglabs.bug.module.motion.pub.IMDACCModuleControl;
 import com.buglabs.bug.module.motion.pub.IMotionRawFeed;
 import com.buglabs.bug.module.motion.pub.IMotionSubject;
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
-import com.buglabs.util.IStreamMultiplexerListener;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
-import com.buglabs.util.StreamMultiplexerEvent;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
-public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleControl, IStreamMultiplexerListener, IModuleLEDController {
-	// default is 0; make ours +1 since we're btter than BUGview at accelerometer so nyah
+public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleControl, IModuleLEDController {
+	// default is 0; make ours +1 since better than BUGview at accelerometer functionality.
 	private final static int OUR_ACCELEROMETER_SERVICES_RANKING = 1;
 	private BundleContext context;
 
@@ -92,7 +91,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 	private MotionRawFeed motiond;
 
-	private AccelerometerRawFeed acceld;
+	private AccelerometerSimpleRawFeed acceld;
 
 	private Motion motionDevice;
 
@@ -139,23 +138,37 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 	private ServiceRegistration ledRef;
 	private LogService log;
+	private AccelerometerSampleProvider asp;
+	private boolean suspended;
+	private final BMIModuleProperties properties;
 
 	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleName = moduleName;
 		this.moduleId = moduleId;
+		this.properties = null;
+	}
+
+	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIModuleProperties properties) {
+		this.context = context;
+		this.slotId = slotId;
+		this.moduleName = moduleName;
+		this.moduleId = moduleId;
+		this.properties = properties;
 	}
 
 	public void start() throws Exception {
 		log = LogServiceUtil.getLogService(context);
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
-		motiond.start();
+		Properties modProperties = createBasicServiceProperties();
+		modProperties.put("Power State", suspended ? "Suspended": "Active");
+		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
+
 		motionSubject.start();
 
 		motionSubjectRef = context.registerService(IMotionSubject.class.getName(), motionSubject, createBasicServiceProperties());
 		motionRawFeedRef = context.registerService(IMotionRawFeed.class.getName(), motiond, createBasicServiceProperties());
-		ledRef = context.registerService(IModuleLEDController.class.getName(), this, null);
+		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties());
 
 		MotionWS motionWS = new MotionWS();
 		motionSubject.register(motionWS);
@@ -163,10 +176,8 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 		configureAccelerometer();
 
-		acceld.start();
-		acceld.register(this);
 		accRawFeedRef = context.registerService(IAccelerometerRawFeed.class.getName(), acceld, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
-		IAccelerometerSampleProvider asp = new AccelerometerSampleProvider(acceld);
+		asp = new AccelerometerSampleProvider(acceld);
 		accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), asp, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		accSampleFeedRef = context.registerService(IAccelerometerSampleFeed.class.getName(), acceld, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		accControlRef = context.registerService(IAccelerometerControl.class.getName(), accControl, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
@@ -174,7 +185,6 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
 
 		mdaccRef = context.registerService(IMDACCModuleControl.class.getName(), this, createBasicServiceProperties());
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	private void configureAccelerometer() {
@@ -206,15 +216,13 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		ledRef.unregister();
 
 		motionSubject.interrupt();
-		motiond.interrupt();
 		motionDevice.ioctl_BMI_MDACC_MOTION_DETECTOR_STOP();
 		motionIs.close();
 		motionDevice.close();
 		mdaccControlDevice.close();
 		accControlRef.unregister();
 		accRawFeedRef.unregister();
-		acceld.unregister(this);
-		acceld.interrupt();
+		asp.close();
 		accDevice.ioctl_BMI_MDACC_ACCELEROMETER_STOP();
 		accIs.close();
 	}
@@ -224,6 +232,14 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
 		p.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
+		
+		if (properties != null) {
+			p.put("ModuleDescription", properties.getDescription());
+			p.put("ModuleSN", properties.getSerial_num());
+			p.put("ModuleVendorID", "" + properties.getVendor());
+			p.put("ModuleRevision", "" + properties.getRevision());
+		}
+		
 		return p;
 	}
 	
@@ -232,26 +248,62 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		p.put(Constants.SERVICE_RANKING, new Integer(serviceRanking));
 		return p;
 	}
+	private void updateIModuleControlProperties(){
+		if (moduleRef!=null){
+			Properties modProperties = createBasicServiceProperties();
+			modProperties.put("Power State", suspended ? "Suspended": "Active");
+			moduleRef.setProperties(modProperties);
+		}
+	}
 
 	public List getModuleProperties() {
-		List properties = new ArrayList();
+		List mprops = new ArrayList();
 
-		properties.add(new ModuleProperty("Slot", "" + slotId));
-		properties.add(new ModuleProperty("State", Boolean.toString(deviceOn), "Boolean", true));
-
-		return properties;
+		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
+		mprops.add(new ModuleProperty("Slot", "" + slotId));
+		mprops.add(new ModuleProperty("State", Boolean.toString(deviceOn), "Boolean", true));
+		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended": "Active", "String", true));
+		
+		if (properties != null) {
+			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
+			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
+			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
+		}
+		
+		return mprops;
 	}
 
 	public boolean setModuleProperty(IModuleProperty property) {
 		if (!property.isMutable()) {
 			return false;
 		}
-
 		if (property.getName().equals("State")) {
 			deviceOn = Boolean.valueOf((String) property.getValue()).booleanValue();
 			return true;
 		}
-
+		if (property.getName().equals("Power State")) {
+			if (((String) property.getValue()).equals("Suspend")){
+				try{
+				suspend();
+				}
+			 catch (IOException e) {
+				e.printStackTrace();
+			}
+			}
+			else if (((String) property.getValue()).equals("Resume")){
+				
+				try {
+					resume();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+				
+			
+		}
+		
 		return false;
 	}
 
@@ -267,7 +319,35 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		return slotId;
 	}
 
+	public int resume() throws IOException {
+		int result = -1;
+
+		result = mdaccControlDevice.ioctl_BMI_MDACC_CTL_RESUME();
+		if (result < 0) {
+			throw new IOException("ioctl BMI_MDACC_CTL_RESUME failed");
+		}
+		suspended = false;
+		updateIModuleControlProperties();
+		return result;
+	}
+	
+
+	public int suspend() throws IOException {
+		int result = -1;
+
+		result = mdaccControlDevice.ioctl_BMI_MDACC_CTL_SUSPEND();
+
+		if (result < 0) {
+			throw new IOException("ioctl BMI_MDACC_CTL_SUSPEND failed");
+		}
+		suspended = true;
+		updateIModuleControlProperties();
+		return result;
+	}
+
+
 	public void setup() throws Exception {
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		int slot = slotId + 1;
 		String devnode_motion = "/dev/bmi_mdacc_mot_m" + slot;
 		String devnode_acc = "/dev/bmi_mdacc_acc_m" + slot;
@@ -284,8 +364,9 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		CharDeviceUtils.openDeviceWithRetry(accDevice, devnode_acc, 2);
 
 		accIs = new CharDeviceInputStream(accDevice);
+		
 		accControl = new AccelerometerControl(accDevice);
-		acceld = new AccelerometerRawFeed(accIs, accControl);
+		acceld = new AccelerometerSimpleRawFeed(accIs, accControl);
 
 		mdaccControlDevice = new MDACCControl();
 		CharDeviceUtils.openDeviceWithRetry(mdaccControlDevice, devnode_mdacc_control, 2);
@@ -312,23 +393,6 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 			return mdaccControlDevice.ioctl_BMI_MDACC_CTL_RED_LED_ON();
 		} else {
 			return mdaccControlDevice.ioctl_BMI_MDACC_CTL_RED_LED_OFF();
-		}
-	}
-
-	public void streamNotification(StreamMultiplexerEvent event) {
-		switch (event.type) {
-		case StreamMultiplexerEvent.EVENT_STREAM_ADDED:
-			if (event.numberOfStreams == 1) {
-				// accDevice.ioctl_BMI_MDACC_ACCELEROMETER_RUN();
-			}
-			break;
-		case StreamMultiplexerEvent.EVENT_STREAM_REMOVED:
-			if (event.numberOfStreams == 0) {
-				// accDevice.ioctl_BMI_MDACC_ACCELEROMETER_STOP();
-			}
-			break;
-		default:
-			break;
 		}
 	}
 }
