@@ -54,6 +54,7 @@ import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerInputStreamProvider;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerSampleProvider;
 import com.buglabs.bug.module.motion.pub.AccelerationWS;
+import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
@@ -117,16 +118,30 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private LogService log;
 	private LCDControl lcdcontrol;
 	private Hashtable props;
-
+	private boolean suspended;
+	protected static final String PROPERTY_MODULE_NAME = "moduleName";
+	private final BMIModuleProperties properties;
+	
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
+		this.properties = null;
+		this.moduleName = "LCD";
+		this.log = LogServiceUtil.getLogService(context);
+	}
+
+	public LCDModlet(BundleContext context, int slotId, String moduleId, BMIModuleProperties properties) {
+		this.context = context;
+		this.slotId = slotId;
+		this.moduleId = moduleId;
+		this.properties = properties;
 		this.moduleName = "LCD";
 		this.log = LogServiceUtil.getLogService(context);
 	}
 
 	public void setup() throws Exception {
+		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		String devnode_control = "/dev/bmi_lcd_ctl_m" + (slotId + 1);
 
 		lcdcontrol = new LCDControl();
@@ -138,12 +153,15 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			accIs = new CharDeviceInputStream(accel);
 			lcd_acc_is_prov = new LCDAccelerometerInputStreamProvider(accIs);
 		} catch (IOException e) {
-			log.log(LogService.LOG_ERROR, e.getMessage());
+			LogServiceUtil.logBundleException(log, "Failed to access LCD control device.", e);
 		}
 	}
 
 	public void start() throws Exception {
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, null);
+		Properties modProperties = createBasicServiceProperties();
+		modProperties.put("Power State", suspended ? "Suspended": "Active");
+		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
+		
 		lcdRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
 		props = new Hashtable();
 		props.put("width", new Integer(LCD_WIDTH));
@@ -156,7 +174,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			lcd_acc_is_prov.start();
 			accIsProvRef = context.registerService(IAccelerometerSampleFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
 			accRawFeedProvRef = context.registerService(IAccelerometerRawFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
-
+			
 			LCDAccelerometerSampleProvider accsp = new LCDAccelerometerSampleProvider(lcd_acc_is_prov);
 
 			accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), accsp, createRemotableProperties(createBasicServiceProperties()));
@@ -165,8 +183,6 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		} else {
 			log.log(LogService.LOG_ERROR, "Unable to access the accelerometer device.");
 		}
-
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		
 		if (calibFileExists()) {
 			// Calibration has occurred so we know the screen is usable.
@@ -246,25 +262,108 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		Properties p = new Properties();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
+		
+		if (properties != null) {
+			p.put("ModuleDescription", properties.getDescription());
+			p.put("ModuleSN", properties.getSerial_num());
+			p.put("ModuleVendorID", "" + properties.getVendor());
+			p.put("ModuleRevision", "" + properties.getRevision());
+		}
+		
 		return p;
+	}
+	
+	private void updateIModuleControlProperties(){
+		if (moduleRef!=null){
+			Properties modProperties = createBasicServiceProperties();
+			modProperties.put("Power State", suspended ? "Suspended": "Active");
+			moduleRef.setProperties(modProperties);
+		}
 	}
 
 	public List getModuleProperties() {
-		List properties = new ArrayList();
-
-		properties.add(new ModuleProperty("Slot", "" + slotId));
-		properties.add(new ModuleProperty("Width", "" + LCD_WIDTH));
-		properties.add(new ModuleProperty("Height", "" + LCD_HEIGHT));
-
-		return properties;
+		List mprops = new ArrayList();
+		mprops.add(new ModuleProperty("Slot", "" + slotId));
+		mprops.add(new ModuleProperty("Width", "" + LCD_WIDTH));
+		mprops.add(new ModuleProperty("Height", "" + LCD_HEIGHT));
+		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
+		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended": "Active", "String", true));
+		
+		if (properties != null) {
+			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
+			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
+			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
+		}
+		
+		return mprops;
 	}
 
 	public boolean setModuleProperty(IModuleProperty property) {
+		if (!property.isMutable()) {
+			return false;
+		}
+		if (property.getName().equals("State")) {
+			return true;
+		}
+		if (property.getName().equals("Power State")) {
+			if (((String) property.getValue()).equals("Suspend")){
+				
+				try{
+				suspend();
+				}
+			 catch (IOException e) {
+				 LogServiceUtil.logBundleException(log,  "An error occured while changing suspend state.", e);
+			}
+			}
+			else if (((String) property.getValue()).equals("Resume")){
+				
+				try {
+					resume();
+					
+				} catch (IOException e) {
+					 LogServiceUtil.logBundleException(log,  "An error occured while changing suspend state.", e);
+				}
+			}
+			
+				
+			
+		}
+		
 		return false;
 	}
 
 	public int getSlotId() {
 		return slotId;
+	}
+
+	public int resume() throws IOException {
+		int result = -1;
+
+		result = lcdcontrol.ioctl_BMI_LCD_RESUME(slotId);
+
+		if (result < 0) {
+			throw new IOException("ioctl BMI_LCD_RESUME failed");
+		}
+
+		suspended = false;
+		updateIModuleControlProperties();
+		return result;
+	}
+	
+
+	public int suspend() throws IOException {
+		int result = -1;
+
+		result = lcdcontrol.ioctl_BMI_LCD_SUSPEND(slotId);
+
+		if (result < 0) {
+			throw new IOException("ioctl BMI_LCD_SUSPEND failed");
+		}
+		
+		suspended = true;
+		updateIModuleControlProperties();
+		return result;
 	}
 
 	public Frame getFrame() {
