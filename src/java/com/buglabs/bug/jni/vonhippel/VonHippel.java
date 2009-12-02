@@ -109,4 +109,18 @@ public class VonHippel extends CharDevice {
 	 * 
 	 */
 	public native int ioctl_BMI_VH_WRITE_SPI(int control);
+	
+	/*
+	 * Suspends VH Module
+	 * 
+	 * 
+	 */
+	public native int ioctl_BMI_VH_SUSPEND();
+	
+	/*
+	 * Resumes VH Module
+	 * 
+	 * 
+	 */
+	public native int ioctl_BMI_VH_RESUME();
 }

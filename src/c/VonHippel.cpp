@@ -183,4 +183,25 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1
 	ioctl(getFileDescriptorField(env, jobj), BMI_VH_WRITE_SPI, &spi_xfer);
 }
 
+/*
+ * Class:     com_buglabs_bug_jni_vonhippel_VonHippel
+ * Method:    ioctl_BMI_VH_SUSPEND
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1SUSPEND
+(JNIEnv * env, jobject jobj) {
+	return ioctl(getFileDescriptorField(env, jobj), BMI_VH_SUSPEND, 0);
+
+}
+
+/*
+ * Class:     com_buglabs_bug_jni_vonhippel_VonHippel
+ * Method:    ioctl_BMI_VH_RESUME
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_vonhippel_VonHippel_ioctl_1BMI_1VH_1RESUME
+(JNIEnv * env, jobject jobj) {
+	return ioctl(getFileDescriptorField(env, jobj), BMI_VH_RESUME, 0);
+
+}
 
