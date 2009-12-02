@@ -84,7 +84,11 @@ public class InputEventProvider extends Thread implements IButtonEventProvider {
 
 						while (iter.hasNext()) {
 							IButtonEventListener l = (IButtonEventListener) iter.next();
-							l.buttonEvent(b);
+							try {
+								l.buttonEvent(b);
+							} catch (Exception e) {
+								log.log(LogService.LOG_ERROR, "Button event client threw an exception.", e);
+							}
 						}
 					}
 				}
