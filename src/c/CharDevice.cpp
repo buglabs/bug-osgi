@@ -31,6 +31,7 @@
 #include <fstream>
 #include <sys/ioctl.h>
 #include <errno.h>
+#include <stdlib.h>
 #include "CharDevice.h"
 
 #include <iostream>
