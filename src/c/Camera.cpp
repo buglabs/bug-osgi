@@ -33,6 +33,7 @@
 #include <linux/fb.h>
 #include <sys/ioctl.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/mman.h>
 #include "CharDevice.h"
