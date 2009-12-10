@@ -64,7 +64,7 @@
 			<checkout url="${svn.url.bug}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.program" destPath="${checkout.dir}/com.buglabs.bug.program" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.menu" destPath="${checkout.dir}/com.buglabs.bug.menu" />
-			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />	
 			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.bluetooth" destPath="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />			
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.base" destPath="${checkout.dir}/com.buglabs.bug.emulator.base" />
@@ -84,6 +84,7 @@
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.obr" destPath="${checkout.dir}/com.buglabs.osgi.obr" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.update" destPath="${checkout.dir}/com.buglabs.bug.update" />
 			<checkout url="${svn.url.bug}/com.sun.javax.servlet" destPath="${checkout.dir}/com.sun.javax.servlet" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.sewing" destPath="${checkout.dir}/com.buglabs.osgi.sewing" />			
 		</svn>
 	</target>
 
@@ -98,7 +99,7 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.event" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.program" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.menu" />
-		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.service" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.service" />		
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.nmea" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.bluetooth" />		
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.emulator.base" />
@@ -118,6 +119,7 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.obr" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.update" />
 		<ant antfile="build.xml" target="build.jars" dir="${checkout.dir}/com.sun.javax.servlet" />
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.sewing" />		
                 <ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/net.contentobjects.jnotify" />
 	</target>
 

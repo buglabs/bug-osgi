@@ -63,7 +63,7 @@
 				<checkout url="${svn.url.dragonfly}/com.buglabs.phoneme.personal" destPath="${checkout.dir}/com.buglabs.phoneme.personal" />
 	        	<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 			
-	        	<checkout url="${svn.url.bug}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" />
+	        	<!-- checkout url="${svn.url.bug}/ch.ethz.iks.slp" destPath="${checkout.dir}/ch.ethz.iks.slp" / -->
 			
     		</svn>
 		<!-- checkout slp from cvs for now -->
