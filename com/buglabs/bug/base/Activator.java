@@ -27,7 +27,6 @@
  *******************************************************************************/
 package com.buglabs.bug.base;
 
-import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
@@ -46,22 +45,13 @@ import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-
 import com.buglabs.application.IServiceProvider;
 import com.buglabs.application.RunnableWithServices;
 import com.buglabs.application.ServiceTrackerHelper;
+import com.buglabs.bug.base.pub.IBUG20BaseControl;
 import com.buglabs.bug.base.pub.IBaseAudioPlayer;
-import com.buglabs.bug.base.pub.IBUGBaseControl;
 import com.buglabs.bug.base.pub.IShellService;
 import com.buglabs.bug.base.pub.ITimeProvider;
-import com.buglabs.bug.base.pub.IToneGenerator;
-import com.buglabs.bug.input.pub.InputEventProvider;
-import com.buglabs.bug.jni.base.BUGNavControl;
-import com.buglabs.bug.jni.common.FCNTL_H;
-import com.buglabs.device.IBaseDisplay;
-import com.buglabs.device.IButtonEventProvider;
-import com.buglabs.menu.IMenuProvider;
-import com.buglabs.status.IStatusBarProvider;
 import com.buglabs.support.SupportInfoTextFormatter;
 import com.buglabs.support.SupportInfoXMLFormatter;
 import com.buglabs.util.LogServiceUtil;
@@ -73,46 +63,23 @@ import com.buglabs.util.LogServiceUtil;
  * @author kgilmer
  * 
  */
-public class Activator implements BundleActivator, ITimeProvider, RunnableWithServices {
+public class Activator implements BundleActivator, ITimeProvider {
 
 	private static final String BUG_BASE_VERSION_KEY = "bug.base.version";
-
-	private static final String BUG_13_ONLY_FILE = "/sys/bus/sdio/devices/mmc1:0001:1";
 
 	private static final String INFO_SERVLET_PATH = "/support";
 	
 	private static final String INFO_SERVLET_HTML_PATH = "/support.html";
 
-	private static final String DEVNODE_BASECONTROL = "/dev/bugnavcntl";
-
-	private static final String DEVNODE_BUGNAV = "/dev/input/bugnav";
-
 	private ServiceRegistration timeReg;
-
-	private ServiceTracker sbTracker;
-
-	private InputEventProvider bep;
-
-	private ServiceRegistration bepReg;
-
-	private ServiceRegistration bdReg;
 
 	private ServiceRegistration audioReg;
 
-	private ServiceRegistration toneGenReg;
-
-	private BaseDisplay bd;
-
-	private ToneGenerator tonegen;
-
 	private ServiceTracker menuTracker;
 
-	private IMenuProvider menu;
 	private LogService logService;
 
 	private BUGBaseControl bbc;
-
-	private BUGNavControl bugnavcontrol;
 
 	private ServiceRegistration baseControlReg;
 
@@ -123,27 +90,6 @@ public class Activator implements BundleActivator, ITimeProvider, RunnableWithSe
 	private ServiceRegistration btReg;
 
 	private ServiceRegistration sr;
-
-	public void allServicesAvailable(IServiceProvider serviceProvider) {
-		menu = (IMenuProvider) serviceProvider.getService(IMenuProvider.class);
-		menu.registerMenu("Settings", new AboutMenuAdapter(logService));
-		menu.registerMenu("Settings", new ShutdownSystemMenuNode(logService));
-		menu.registerMenu("Settings", new SuspendSystemSystemMenuNode(logService));
-		menu.registerMenu("Settings", new RemovePointerCalMenuNode(logService));
-		menu.registerMenu("Settings.About", new IPAddressMenuNode(logService));
-	}
-
-	/**
-	 * @return a dictionary of properties for the IButtonEventProvider service.
-	 */
-	private Dictionary getButtonServiceProperties() {
-		Dictionary props = new Hashtable();
-
-		props.put("ButtonEventProvider", this.getClass().getName());
-		props.put("ButtonsProvided", "Base");
-
-		return props;
-	}
 
 	public Date getTime() {
 		return Calendar.getInstance().getTime();
@@ -156,10 +102,7 @@ public class Activator implements BundleActivator, ITimeProvider, RunnableWithSe
 	 */
 	private void registerServices(BundleContext context) {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
-		bepReg = context.registerService(IButtonEventProvider.class.getName(), bep, getButtonServiceProperties());
-		bdReg = context.registerService(IBaseDisplay.class.getName(), bd, null);
-		toneGenReg = context.registerService(IToneGenerator.class.getName(), tonegen, null);
-		baseControlReg = context.registerService(IBUGBaseControl.class.getName(), bbc, getBaseControlServiceProperties());
+		baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
 		audioReg = context.registerService(IBaseAudioPlayer.class.getName(), soundplayer, null);
 		try {
 			btReg = context.registerService(LocalDevice.class.getName(), LocalDevice.getLocalDevice(), null);
@@ -186,12 +129,7 @@ public class Activator implements BundleActivator, ITimeProvider, RunnableWithSe
 	 * @return version of BUG base this code is running on.
 	 */
 	private String getBaseVersion() {
-		File f = new File(BUG_13_ONLY_FILE);
-		return f.exists() ? "1.3" : "1.2";
-	}
-
-	public void serviceUnavailable(IServiceProvider serviceProvider, ServiceReference sr, Object service) {
-		menu.unregisterMenu("Settings");
+		return "2.0";
 	}
 
 	public void start(final BundleContext context) throws Exception {
@@ -199,31 +137,9 @@ public class Activator implements BundleActivator, ITimeProvider, RunnableWithSe
 
 		// Set base version property.
 		System.setProperty(BUG_BASE_VERSION_KEY, getBaseVersion());
-
-		bep = new InputEventProvider(DEVNODE_BUGNAV, logService);
-		bep.start();
-
-		bd = new BaseDisplay();
-		tonegen = new ToneGenerator();
 		soundplayer = new SoundPlayer("hw:0,0");
 
-		bugnavcontrol = new BUGNavControl();
-		bbc = new BUGBaseControl(bugnavcontrol);
-
 		registerServices(context);
-
-		// Show a clock if the system date is greater than 1970
-
-		sbTracker = new ServiceTracker(context, IStatusBarProvider.class
-				.getName(), new StatusBarCustomizer(context, this));
-		sbTracker.open();
-		
-
-		menuTracker = ServiceTrackerHelper.createAndOpen(context, new String[] { IMenuProvider.class.getName() }, this);
-
-		if (bugnavcontrol.open(DEVNODE_BASECONTROL, FCNTL_H.O_RDWR) < 0) {
-			throw new Exception("Unable to open " + DEVNODE_BASECONTROL);
-		}
 
 		// Create a ST for the HTTP Service, create the 'info' servlet when
 		// available.
@@ -286,21 +202,12 @@ public class Activator implements BundleActivator, ITimeProvider, RunnableWithSe
 	public void stop(BundleContext context) throws Exception {
 		sr.unregister();
 		httpTracker.close();
-		sbTracker.close();
 		menuTracker.close();
 		unregisterServices(context);
-		bugnavcontrol.close();
-		bep.tearDown();
-		bd.dispose();
-		tonegen.dispose();
-
 	}
 
 	private void unregisterServices(BundleContext context) {
 		timeReg.unregister();
-		bepReg.unregister();
-		bdReg.unregister();
-		toneGenReg.unregister();
 		baseControlReg.unregister();
 		audioReg.unregister();
 		btReg.unregister();

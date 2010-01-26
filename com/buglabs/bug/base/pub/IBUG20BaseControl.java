@@ -27,14 +27,54 @@
  *******************************************************************************/
 package com.buglabs.bug.base.pub;
 
-/**
- * Describes a provider of battery information.
- * 
- * @author kgilmer
- * 
- */
-public interface IBatteryInfoProvider {
-	public String getId();
+import java.io.IOException;
 
-	public double getValue();
+/**
+ * Provides control of BUGbase LEDs.
+ * 
+ * @author aroman
+ *
+ */
+//TODO: adapt this to BUG2.0 hw
+public interface IBUG20BaseControl {
+	public static final int HOTKEY_LED_1 = 0;
+	public static final int HOTKEY_LED_2 = 1;
+	public static final int HOTKEY_LED_3 = 2;
+	public static final int HOTKEY_LED_4 = 3;
+	
+	/**
+	 * 
+	 * @param index A number between 0 and 3 specifying which LED to set.
+	 * 
+	 * @throws IOException when underlying native call fails.
+	 */
+	public void clearLED(int index) throws IOException;
+	
+	/**
+	 * clear base unit LEDs
+	 * 
+	 * @param leds The bitmask of which LEDs to clear. Specifically,
+	 * the 4 LSBs.
+	 * 
+	 * @return value of lower level ioctl call.
+	 */
+	public void clearLEDs(int leds) throws IOException;
+	
+	/**
+	 * 
+	 * @param index A number between 0 and 3 specifying which LED to set.
+	 * 
+	 * @throws IOException when underlying native call fails.
+	 */
+	public void setLED(int index) throws IOException;
+	
+	/**
+	 * set base unit LEDs
+	 * 
+	 * @param leds The bitmask of which LEDs to turn on. Specifically,
+	 * the 4 LSBs.
+	 * 
+	 * @return value of lower level ioctl call.
+	 */
+	public void setLEDs(int leds) throws IOException;
 }

@@ -29,11 +29,11 @@ package com.buglabs.bug.base;
 
 import java.io.IOException;
 
-import com.buglabs.bug.base.pub.IBUGBaseControl;
+import com.buglabs.bug.base.pub.IBUG20BaseControl;
 import com.buglabs.bug.jni.base.BUGNavControl;
 
 
-public class BUGBaseControl implements IBUGBaseControl {
+public class BUGBaseControl implements IBUG20BaseControl {
 	
 	BUGNavControl control;
 	
