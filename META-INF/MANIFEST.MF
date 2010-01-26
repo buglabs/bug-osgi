@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG Base Services
+Bundle-Activator: com.buglabs.bug.base.Activator
+Bundle-SymbolicName: com.buglabs.bug.base
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.bug.base.pub
+Import-Package: com.buglabs.status,
+ com.buglabs.bug.jni.common,
+ com.buglabs.bug.jni.input,
+ com.buglabs.bug.jni.base,
+ com.buglabs.bug.jni.basedisplay,
+ com.buglabs.bug.jni.bugbeep,
+ com.buglabs.bug.input.pub,
+ com.buglabs.device,
+ com.buglabs.application,
+ com.buglabs.menu,
+ com.buglabs.bug.menu.pub,
+ com.buglabs.support,
+ org.osgi.service.log,
+ com.buglabs.util,
+ org.osgi.util.tracker,
+ org.thenesis.midpath.sound,
+ org.thenesis.midpath.sound.codec,
+ org.thenesis.midpath.sound.backend.alsa,
+ javax.servlet,
+ javax.servlet.http,
+ org.osgi.service.http,
+ javax.bluetooth
+ 
