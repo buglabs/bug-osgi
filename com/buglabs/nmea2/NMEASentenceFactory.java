@@ -30,16 +30,17 @@ package com.buglabs.nmea2;
 import com.buglabs.nmea.sentences.NMEAParserException;
 
 /**
- * This factory will return a valid NMEA object based on a NMEA string, or null if no match is available.
+ * This factory will return a valid NMEA object based on a NMEA string, or null
+ * if no match is available.
  * 
  * @author kgilmer
- *
+ * 
  */
 public class NMEASentenceFactory {
 	/**
-	 *  An array of supported message types.
+	 * An array of supported message types.
 	 */
-	public static final String [] SENTENCE_TYPES = {"$PTTK", "$GPGGA", "$GPRMC", "$GPGSV"};
+	public static final String[] SENTENCE_TYPES = { "$PTTK", "$GPGGA", "$GPRMC", "$GPGSV" };
 
 	/**
 	 * @param gpsData
@@ -50,23 +51,29 @@ public class NMEASentenceFactory {
 		if (gpsData == null) {
 			throw new NMEAParserException("Input data is NULL.");
 		}
-		
-		if (gpsData.startsWith(SENTENCE_TYPES[0])) {
-			return new PTTK(gpsData);
+
+		try {
+
+			if (gpsData.startsWith(SENTENCE_TYPES[0])) {
+				return new PTTK(gpsData);
+			}
+
+			if (gpsData.startsWith(SENTENCE_TYPES[1])) {
+				return new GGA(gpsData);
+			}
+
+			if (gpsData.startsWith(SENTENCE_TYPES[2])) {
+				return new RMC(gpsData);
+			}
+
+			if (gpsData.startsWith(SENTENCE_TYPES[3])) {
+				return new GSV(gpsData);
+			}
+		} catch (RuntimeException e) {
+			//Convert unchecked exceptions into parse exceptions.
+			throw new NMEAParserException(e.getMessage());
 		}
-		
-		if (gpsData.startsWith(SENTENCE_TYPES[1])) {
-			return new GGA(gpsData);
-		}
-		
-		if (gpsData.startsWith(SENTENCE_TYPES[2])) {
-			return new RMC(gpsData);
-		}
-		
-		if (gpsData.startsWith(SENTENCE_TYPES[3])) {
-			return new GSV(gpsData);
-		}
-		
+
 		return null;
 	}
 }
