@@ -27,6 +27,7 @@
  *******************************************************************************/
 package com.buglabs.bug.base;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
@@ -68,7 +69,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 	private static final String BUG_BASE_VERSION_KEY = "bug.base.version";
 
 	private static final String INFO_SERVLET_PATH = "/support";
-	
+
 	private static final String INFO_SERVLET_HTML_PATH = "/support.html";
 
 	private ServiceRegistration timeReg;
@@ -103,7 +104,11 @@ public class Activator implements BundleActivator, ITimeProvider {
 	private void registerServices(BundleContext context) {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
 		baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
-		audioReg = context.registerService(IBaseAudioPlayer.class.getName(), soundplayer, null);
+		
+		if (soundplayer != null) {
+			audioReg = context.registerService(IBaseAudioPlayer.class.getName(), soundplayer, null);
+		}
+		
 		try {
 			btReg = context.registerService(LocalDevice.class.getName(), LocalDevice.getLocalDevice(), null);
 			// I'm also going to need to figure out whether hci0 is the base
@@ -137,8 +142,9 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 		// Set base version property.
 		System.setProperty(BUG_BASE_VERSION_KEY, getBaseVersion());
-		soundplayer = new SoundPlayer("hw:0,0");
 
+		soundplayer = new SoundPlayer("hw:0,0");
+	
 		registerServices(context);
 
 		// Create a ST for the HTTP Service, create the 'info' servlet when
@@ -147,16 +153,11 @@ public class Activator implements BundleActivator, ITimeProvider {
 			public void allServicesAvailable(IServiceProvider serviceProvider) {
 				try {
 					logService.log(LogService.LOG_INFO, "Registering info service.");
-					HttpService httpService = 
-						(HttpService) serviceProvider.getService(HttpService.class);
+					HttpService httpService = (HttpService) serviceProvider.getService(HttpService.class);
 					// register xml version
-					httpService.registerServlet(INFO_SERVLET_PATH, 
-							new SupportServlet(new BUGSupportInfo(context), new SupportInfoXMLFormatter()), 
-							null, null);
+					httpService.registerServlet(INFO_SERVLET_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoXMLFormatter()), null, null);
 					// register html version
-					httpService.registerServlet(INFO_SERVLET_HTML_PATH, 
-							new SupportServlet(new BUGSupportInfo(context), new SupportInfoTextFormatter()), 
-							null, null);
+					httpService.registerServlet(INFO_SERVLET_HTML_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
 				} catch (ServletException e) {
 					logService.log(LogService.LOG_ERROR, "An error occurred launching Info servlet: " + e.getMessage());
 				} catch (NamespaceException e) {
@@ -169,7 +170,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 			}
 
 		});
-		
+
 		sr = context.registerService(IShellService.class.getName(), new ShellService(), null);
 
 		signalStartup();
