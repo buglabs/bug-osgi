@@ -71,7 +71,7 @@ public class NMEASentenceFactory {
 			}
 		} catch (RuntimeException e) {
 			//Convert unchecked exceptions into parse exceptions.
-			throw new NMEAParserException(e.getMessage());
+			throw new NMEAParserException("Runtime exception occurred: " + e.getMessage(), e);
 		}
 
 		return null;
