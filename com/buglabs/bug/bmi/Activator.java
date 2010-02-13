@@ -73,6 +73,53 @@ public class Activator implements BundleActivator, ServiceListener {
 	private Map activeModlets;
 
 	private BundleContext context;
+	
+
+	public void start(BundleContext context) throws Exception {
+		this.context = context;
+		Activator.ref = this;
+
+		modletFactories = new Hashtable();
+		activeModlets = new Hashtable();
+		ServiceReference sr = context.getServiceReference(LogService.class.getName());
+		if (sr != null) {
+			logService = (LogService) context.getService(sr);
+		}
+
+		context.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
+
+		registerExistingServices(context);
+
+		pipeFilename = context.getProperty("com.buglabs.pipename");
+
+		if (pipeFilename == null || pipeFilename.length() == 0) {
+			pipeFilename = DEFAULT_PIPE_FILENAME;
+		}
+
+		logService.log(LogService.LOG_INFO, "Creating pipe " + pipeFilename);
+		createPipe(pipeFilename);
+		pipeReader = new PipeReader(pipeFilename, Manager.getManager(context, logService, modletFactories, activeModlets), logService);
+
+		logService.log(LogService.LOG_INFO, "Initializing existing modules");
+
+		coldPlug();
+
+		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
+
+		pipeReader.start();
+	}
+
+	public void stop(BundleContext context) throws Exception {
+		context.removeServiceListener(this);
+		stopModlets(activeModlets);
+		if (pipeReader != null) {
+			pipeReader.cancel();
+			pipeReader.interrupt();
+			logService.log(LogService.LOG_INFO, "Deleting pipe " + pipeFilename);
+			destroyPipe(new File(pipeFilename));
+		}
+		modletFactories.clear();
+	}
 
 	private void coldPlug() throws IOException {
 		Manager m = Manager.getManager();
@@ -175,80 +222,6 @@ public class Activator implements BundleActivator, ServiceListener {
 	}
 
 	/**
-	 * This will be going away once we can retrieve the PRODUCT_ID from the sys filesystem.
-	 * @param driverName
-	 * @return
-	 */
-	private String getModuleIdFromDriverDead(String driverName) {
-		// TODO this is bad: hard coding this module driver to name table. This
-		// needs to be refactored such that each module supplies the
-		// association.
-		logService.log(LogService.LOG_DEBUG, "Driver Name: " + driverName);
-		if (driverName.equals("bmi_lcd_core")) {
-			return "0003";
-		}
-
-		if (driverName.equals("bmi_mdacc")) {
-			return "0002";
-		}
-
-		if (driverName.equals("bmi_camera")) {
-			return "0004";
-		}
-
-		if (driverName.equals("bmi_camera_vs6624")) {
-			return "0004";
-		}
-		
-		if (driverName.equals("bmi_camera_ov2640")) {
-			return "0005";
-		}
-
-		if (driverName.equals("bmi_gps")) {
-			return "0001";
-		}
-		
-		if (driverName.equals("bmi_vh")) {
-			return "0007";
-		}
-		
-		if (driverName.equals("bmi_audio")) {
-			return "000A";
-		}
-		
-		if (driverName.equals("libertas_bmi")){
-			return "0008";
-		}
-		
-		if (driverName.equals("bmi_zb")){
-			return "0009";
-		}
-
-		if (driverName.equals("bmi_sensor")){
-			return "000C";
-		}
-		
-		if (driverName.equals("psd_driver")){
-			return "F001"; // This is fictional until we have a regular PB-PSD module
-		}
-		if (driverName.equals("bmi_gsm")){
-			return "000B"; 
-		}
-		
-		logService.log(LogService.LOG_ERROR, "Unable to map " + driverName + " to a module ID.");
-
-		return null;
-	}
-
-	/**
-	 * @return
-	 */
-	private String getModuleVersion() {
-		// TODO determine appropriate version information.
-		return "0";
-	}
-
-	/**
 	 * Get a list of BMIMessage strings for existing modules based on entries in
 	 * the /sys filesystem.
 	 * 
@@ -281,44 +254,6 @@ public class Activator implements BundleActivator, ServiceListener {
 		return slots;
 	}
 	
-	// TODO: This is very unpleasant but it should go away when we have a real PB module
-/*	private List getUSBPBModules() throws IOException {
-		List slots = null;
-
-		for (int i = 0; i < 1; ++i) {
-			String cmd = "/bin/ls -ald /sys/class/usb/psd" + i;
-			String response = null;
-			
-			try {
-				response = execute(cmd);
-			} catch (IOException e) {
-				logService.log(LogService.LOG_ERROR, "Error occurred while discovering PB modules.", e);
-				continue;
-			}
-
-			if (response.trim().length() == 0) {
-				logService.log(LogService.LOG_DEBUG, "No PB module was found in 'slot' " + i);
-				continue;
-			}
-
-			logService.log(LogService.LOG_DEBUG, "Response: " + response);
-
-			final String driverName = "psd_driver";
-
-			// Lazily create data structure. If no modules then not needed.
-			if (slots == null) {
-				slots = new ArrayList();
-			}
-
-			String bmiMessage = new String(getModuleIdFromDriver(driverName.trim()) + " " + getModuleVersion() + " " + i + " ADD");
-			logService.log(LogService.LOG_DEBUG, "Sending BMI ColdPlug message: " + bmiMessage);
-			
-			slots.add(bmiMessage);
-		}
-
-		return slots;
-	}*/
-
 	private boolean isEmpty(String element) {
 		return element == null || element.length() == 0;
 	}
@@ -381,52 +316,6 @@ public class Activator implements BundleActivator, ServiceListener {
 		ServiceReference sr = event.getServiceReference();
 
 		registerService(sr, event.getType());
-	}
-
-	public void start(BundleContext context) throws Exception {
-		this.context = context;
-		Activator.ref = this;
-
-		modletFactories = new Hashtable();
-		activeModlets = new Hashtable();
-		ServiceReference sr = context.getServiceReference(LogService.class.getName());
-		if (sr != null) {
-			logService = (LogService) context.getService(sr);
-		}
-
-		context.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
-
-		registerExistingServices(context);
-
-		pipeFilename = context.getProperty("com.buglabs.pipename");
-
-		if (pipeFilename == null || pipeFilename.length() == 0) {
-			pipeFilename = DEFAULT_PIPE_FILENAME;
-		}
-
-		logService.log(LogService.LOG_INFO, "Creating pipe " + pipeFilename);
-		createPipe(pipeFilename);
-		pipeReader = new PipeReader(pipeFilename, Manager.getManager(context, logService, modletFactories, activeModlets), logService);
-
-		logService.log(LogService.LOG_INFO, "Initializing existing modules");
-
-		coldPlug();
-
-		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
-
-		pipeReader.start();
-	}
-
-	public void stop(BundleContext context) throws Exception {
-		context.removeServiceListener(this);
-		stopModlets(activeModlets);
-		if (pipeReader != null) {
-			pipeReader.cancel();
-			pipeReader.interrupt();
-			logService.log(LogService.LOG_INFO, "Deleting pipe " + pipeFilename);
-			destroyPipe(new File(pipeFilename));
-		}
-		modletFactories.clear();
 	}
 
 	/**

@@ -75,7 +75,7 @@ public class BMIMessage {
 	 */
 	public BMIMessage(BMIModuleProperties props, int slot) {
 		this.props = props;
-		this.moduleId = df.format(props.getProduct_id());
+		this.moduleId = props.getProduct_id();
 		this.version = "" + props.getRevision();
 		this.slot = slot;
 		this.event = EVENT_INSERT;
