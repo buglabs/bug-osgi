@@ -27,8 +27,6 @@
  *******************************************************************************/
 package com.buglabs.bug.bmi.pub;
 
-import java.text.DecimalFormat;
-
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.util.StringUtil;
 
@@ -43,8 +41,6 @@ public class BMIMessage {
 
 	public static final int EVENT_REMOVE = 1;
 	
-	private static final DecimalFormat df = new DecimalFormat("0000");
-
 	private String raw;
 
 	private int slot;
