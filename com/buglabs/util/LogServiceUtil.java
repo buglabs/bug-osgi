@@ -152,8 +152,7 @@ public class LogServiceUtil {
 	 */
 	public static void logBundleException(LogService logService, String message, BundleException exception) {
 		// Add error handling to be specific about what exactly happened.
-		logService.log(LogService.LOG_ERROR, message + ": " + exception.getMessage());
-		stackTraceToString(exception);
+		logService.log(LogService.LOG_ERROR, message + ": " + exception.getMessage() + "\n" + stackTraceToString(exception));
 	
 		if (exception.getNestedException() != null) {
 			logService.log(LogService.LOG_ERROR, "Nested Exception: " + exception.getNestedException().getMessage() + "\n" + stackTraceToString(exception.getNestedException()));
@@ -168,8 +167,7 @@ public class LogServiceUtil {
 	 */
 	public static void logBundleException(LogService logService, String message, Exception exception) {
 		// Add error handling to be specific about what exactly happened.
-		logService.log(LogService.LOG_ERROR, message + ": " + exception.getMessage());
-		stackTraceToString(exception);
+		logService.log(LogService.LOG_ERROR, message + ": " + exception.getMessage() + "\n" + stackTraceToString(exception));
 	}
 	
 	/**
