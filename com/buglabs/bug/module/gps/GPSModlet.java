@@ -27,7 +27,9 @@
  *******************************************************************************/
 package com.buglabs.bug.module.gps;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -47,7 +49,6 @@ import org.osgi.util.measurement.Unit;
 import org.osgi.util.position.Position;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.bug.jni.common.CharDeviceInputStream;
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.common.FCNTL_H;
 import com.buglabs.bug.jni.gps.GPS;
@@ -75,7 +76,6 @@ import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
 import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.StreamMultiplexer;
 import com.buglabs.util.XmlNode;
 import com.buglabs.util.trackers.PublicWSAdminTracker;
 
@@ -117,10 +117,10 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private final String moduleName;
 
-	private StreamMultiplexer gpsd;
+	//private StreamMultiplexer gpsd;
 	private NMEASentenceProvider nmeaProvider;
 
-	private CharDeviceInputStream gpsis;
+	//private InputStream gpsis;
 
 	private String regionKey;
 
@@ -160,6 +160,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	private boolean suspended;
 
 	private final BMIModuleProperties properties;
+
+	private InputStream gpsIs;
 
 	/**
 	 * @param context
@@ -206,7 +208,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			}
 		} while (retry && count < 10);
 
-		gpsd.start();
+		//gpsd.start();
 		nmeaProvider.start();
 
 		Properties modProperties = createBasicServiceProperties();
@@ -214,7 +216,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties());
 		gpsControlRef = context.registerService(IGPSModuleControl.class.getName(), this, createBasicServiceProperties());
-		nmeaRef = context.registerService(INMEARawFeed.class.getName(), gpsd, createBasicServiceProperties());
+		nmeaRef = context.registerService(INMEARawFeed.class.getName(), new NMEARawFeed(gpsIs), createBasicServiceProperties());
 		nmeaProviderRef = context.registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createBasicServiceProperties());
 		wsTracker = PublicWSAdminTracker.createTracker(context, this);
 
@@ -275,7 +277,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 * @see com.buglabs.bug.module.pub.IModlet#stop()
 	 */
 	public void stop() throws Exception {
-		log.log(LogService.LOG_DEBUG, "GPSModlet stop enter");
 		timer.cancel();
 
 		StatusBarUtils.releaseRegion(context, regionKey);
@@ -291,10 +292,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		positionRef.unregister();
 		nmeaProviderRef.unregister();
 		nmeaProvider.interrupt();
-		gpsd.interrupt();
-		gpsis.close();
+		gpsIs.close();
 		gpscontrol.close();
-		log.log(LogService.LOG_DEBUG, "GPSModlet stop leave");
 	}
 
 	/*
@@ -511,6 +510,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		String devnode_gps = "/dev/ttymxc" + Integer.toString(slotId);
 		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(slotId + 1);
 
+		//Creation and initialization of this device is necessary to access the control device, below.
 		GPS gps = new GPS();
 		CharDeviceUtils.openDeviceWithRetry(gps, devnode_gps, FCNTL_H.O_RDWR | FCNTL_H.O_NONBLOCK, 2);
 
@@ -519,63 +519,12 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			throw new RuntimeException("Unable to initialize gps device: " + devnode_gpscontrol);
 		}
 
-		gpsis = new CharDeviceInputStream(gps);
-		long delay = getReadDelay();
-
-		gpsd = new NMEARawFeed(gpsis, delay);
-		nmeaProvider = new NMEASentenceProvider(gpsd.getInputStream(), context);
-
 		gpscontrol = new GPSControl();
 
 		CharDeviceUtils.openDeviceWithRetry(gpscontrol, devnode_gpscontrol, 2);
-
-	}
-
-	/**
-	 * @return number of millis to wait before polling GPS device.
-	 */
-	private long getReadDelay() {
-		Configuration c = getGPSConfiguration();
-
-		if (c == null) {
-			return DEFAULT_READ_DELAY;
-		}
-
-		try {
-			Object obj = c.getProperties().get(CM_READ_DELAY_KEY);
-			if (obj != null) {
-				return Long.parseLong(obj.toString());
-			} else {
-				c.getProperties().put(CM_READ_DELAY_KEY, Long.toString(DEFAULT_READ_DELAY));
-				c.update(c.getProperties());
-			}
-		} catch (Exception e) {
-			log.log(LogService.LOG_ERROR, "Problem retrieving data from cm.", e);
-		}
-
-		return DEFAULT_READ_DELAY;
-	}
-
-	/**
-	 * @return a reference to a Configuration service or null if not can be
-	 *         found.
-	 */
-	private Configuration getGPSConfiguration() {
-		ServiceReference sr = context.getServiceReference(ConfigurationAdmin.class.getName());
-
-		if (sr != null) {
-			ConfigurationAdmin ca = (ConfigurationAdmin) context.getService(sr);
-
-			if (ca != null) {
-				try {
-					return ca.getConfiguration(getModuleName());
-				} catch (IOException e) {
-					log.log(LogService.LOG_ERROR, "Unable to access CM configuration.", e);
-				}
-			}
-		}
-
-		return null;
+		gps.close();
+		gpsIs = new FileInputStream(devnode_gps);
+		nmeaProvider = new NMEASentenceProvider(gpsIs, context);
 	}
 
 	public LatLon getLatitudeLongitude() {

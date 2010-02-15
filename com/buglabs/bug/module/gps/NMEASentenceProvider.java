@@ -64,7 +64,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	/**
 	 * Default value for sleep interval between GPS reads.
 	 */
-	private static final int DEFAULT_SLEEP_INTERVAL = 1000;
+	private static final int DEFAULT_SLEEP_INTERVAL = 100;
 	/**
 	 * System property to define sleep between GPS reads.
 	 */
@@ -120,7 +120,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		BufferedReader br = null;
 
 		try {
-			br = new BufferedReader(new InputStreamReader(nmeaStream));
+			br = new BufferedReader(new InputStreamReader(nmeaStream, "US-ASCII"));
 			String sentence;
 
 			do {
@@ -130,6 +130,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 					log.log(LogService.LOG_DEBUG, "GPS NMEA DEBUG: " + sentence);
 				} catch (CharConversionException e) {
 					sentence = "";
+					log.log(LogService.LOG_DEBUG, "A conversion error occured while parsing sentence.", e);
 					continue;
 				}
 
