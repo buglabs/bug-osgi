@@ -1,6 +1,7 @@
 package com.buglabs.nmea2;
 
 import com.buglabs.nmea.StringUtil;
+import com.buglabs.nmea.sentences.NMEAParserException;
 
 /**
 * Base class of all NMEA sentences
@@ -24,7 +25,11 @@ public abstract class AbstractNMEASentence {
 				continue;
 			}
 
+			try {
 			parseField(i, fields[i], fields);
+			} catch (RuntimeException e) {
+				throw new NMEAParserException(e.getMessage());
+			}
 		}
 		
 		validate();

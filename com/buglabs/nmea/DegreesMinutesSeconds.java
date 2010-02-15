@@ -98,6 +98,10 @@ public class DegreesMinutesSeconds {
 	 */
 	public double getSeconds() {
 		int i = dms.indexOf(".");
+		
+		if (i == -1) {
+			return 0;
+		}
 
 		String seconds = dms.substring(i);
 
