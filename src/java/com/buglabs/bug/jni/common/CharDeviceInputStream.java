@@ -38,6 +38,42 @@ import java.io.InputStream;
 public class CharDeviceInputStream extends InputStream {
 	private CharDevice cdev;
 
+	public boolean equals(Object obj) {
+		return cdev.equals(obj);
+	}
+
+	public int getFileDescriptor() {
+		return cdev.getFileDescriptor();
+	}
+
+	public String getline() {
+		return cdev.getline();
+	}
+
+	public int hashCode() {
+		return cdev.hashCode();
+	}
+
+	public int ioctl(int request) {
+		return cdev.ioctl(request);
+	}
+
+	public long lseek(long offset, int whence) {
+		return cdev.lseek(offset, whence);
+	}
+
+	public int open(String file, int mode) {
+		return cdev.open(file, mode);
+	}
+
+	public String toString() {
+		return cdev.toString();
+	}
+
+	public long write(byte[] buf, long count) {
+		return cdev.write(buf, count);
+	}
+
 	public CharDeviceInputStream(CharDevice cdev) {
 		this.cdev = cdev;
 	}
