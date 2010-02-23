@@ -25,13 +25,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.module.motion;
+package com.buglabs.bug.module.motion.pub;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import com.buglabs.bug.module.motion.pub.IMotionObserver;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider2;
