@@ -27,7 +27,6 @@
  *******************************************************************************/
 package com.buglabs.bug.base;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
@@ -50,7 +49,6 @@ import com.buglabs.application.IServiceProvider;
 import com.buglabs.application.RunnableWithServices;
 import com.buglabs.application.ServiceTrackerHelper;
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
-import com.buglabs.bug.base.pub.IBaseAudioPlayer;
 import com.buglabs.bug.base.pub.IShellService;
 import com.buglabs.bug.base.pub.ITimeProvider;
 import com.buglabs.support.SupportInfoTextFormatter;
@@ -74,7 +72,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	private ServiceRegistration timeReg;
 
-	private ServiceRegistration audioReg;
+	//private ServiceRegistration audioReg;
 
 	private ServiceTracker menuTracker;
 
@@ -105,9 +103,9 @@ public class Activator implements BundleActivator, ITimeProvider {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
 		baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
 		
-		if (soundplayer != null) {
+		/*if (soundplayer != null) {
 			audioReg = context.registerService(IBaseAudioPlayer.class.getName(), soundplayer, null);
-		}
+		}*/
 		
 		try {
 			btReg = context.registerService(LocalDevice.class.getName(), LocalDevice.getLocalDevice(), null);
@@ -143,7 +141,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 		// Set base version property.
 		System.setProperty(BUG_BASE_VERSION_KEY, getBaseVersion());
 
-		soundplayer = new SoundPlayer("hw:0,0");
+		//soundplayer = new SoundPlayer("hw:0,0");
 	
 		registerServices(context);
 
@@ -210,7 +208,11 @@ public class Activator implements BundleActivator, ITimeProvider {
 	private void unregisterServices(BundleContext context) {
 		timeReg.unregister();
 		baseControlReg.unregister();
-		audioReg.unregister();
+		
+		/*if (audioReg != null) {
+			audioReg.unregister();
+		}*/
+		
 		btReg.unregister();
 	}
 }

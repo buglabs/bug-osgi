@@ -30,12 +30,31 @@ package com.buglabs.bug.base;
 import java.io.IOException;
 
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
-import com.buglabs.bug.jni.base.BUGNavControl;
-
 
 public class BUGBaseControl implements IBUG20BaseControl {
+
+	public void clearLED(int index) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void clearLEDs(int leds) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setLED(int index) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setLEDs(int leds) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
 	
-	BUGNavControl control;
+	//Old code below for reference.
+	/*BUGNavControl control;
 	
 	public BUGBaseControl(BUGNavControl control) {
 		this.control = control;
@@ -71,5 +90,5 @@ public class BUGBaseControl implements IBUG20BaseControl {
 		if(result < 0) {
 			throw new IOException("Unable to set LEDs " + Integer.toBinaryString(leds));
 		}
-	}
+	}*/
 }
