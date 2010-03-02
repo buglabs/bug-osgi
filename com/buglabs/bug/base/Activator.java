@@ -140,7 +140,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 		// Set base version property.
 		System.setProperty(BUG_BASE_VERSION_KEY, getBaseVersion());
-
+		bbc = new BUGBaseControl();
 		//soundplayer = new SoundPlayer("hw:0,0");
 	
 		registerServices(context);
