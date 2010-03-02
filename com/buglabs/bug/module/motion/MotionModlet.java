@@ -49,7 +49,6 @@ import com.buglabs.bug.jni.common.CharDeviceInputStream;
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.motion.MDACCControl;
 import com.buglabs.bug.jni.motion.Motion;
-import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.motion.pub.AccelerationWS;
 import com.buglabs.bug.module.motion.pub.IMDACCModuleControl;
 import com.buglabs.bug.module.motion.pub.IMotionRawFeed;
@@ -106,32 +105,9 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 	private ServiceRegistration accRawFeedRef;
 
-	private String regionKey;
-
 	private MDACCControl mdaccControlDevice;
 
 	private ServiceRegistration accControlRef;
-
-	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, false, false, false, true, true, true, false, false, false, false, false, false, true, false },
-			{ false, true, false, false, false, true, true, true, false, false, false, false, false, false, true, false },
-			{ false, true, false, false, false, true, true, true, false, false, false, false, false, false, true, false },
-			{ false, true, false, false, false, false, true, true, true, false, false, false, false, false, true, false },
-			{ false, true, false, false, false, false, true, true, true, true, true, false, false, false, true, false },
-			{ false, true, false, false, false, false, true, true, true, true, true, true, false, false, true, false },
-			{ false, true, false, false, false, false, true, true, true, true, false, true, true, false, true, false },
-			{ false, true, false, true, true, false, true, true, true, true, false, false, true, false, true, false },
-			{ false, true, false, false, true, true, true, true, true, true, false, false, true, true, true, false },
-			{ false, true, false, false, false, false, false, true, true, true, true, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
 
 	private AccelerometerControl accControl;
 
@@ -198,7 +174,6 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	}
 
 	public void stop() throws Exception {
-		StatusBarUtils.releaseRegion(context, regionKey);
 		if (wsMotionTracker != null) {
 			wsMotionTracker.close();
 		}
@@ -348,7 +323,6 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 
 	public void setup() throws Exception {
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		int slot = slotId + 1;
 		String devnode_motion = "/dev/bmi_mdacc_mot_m" + slot;
 		String devnode_acc = "/dev/bmi_mdacc_acc_m" + slot;
