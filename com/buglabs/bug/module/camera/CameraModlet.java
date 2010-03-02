@@ -46,7 +46,6 @@ import com.buglabs.bug.input.pub.InputEventProvider;
 import com.buglabs.bug.jni.camera.Camera;
 import com.buglabs.bug.jni.camera.CameraControl;
 import com.buglabs.bug.jni.common.CharDeviceUtils;
-import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.camera.pub.ICameraButtonEventProvider;
 import com.buglabs.bug.module.camera.pub.ICameraDevice;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
@@ -78,8 +77,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 
 	private ServiceTracker wsTracker;
 
-	private int megapixels;
-
 	private List modProps;
 
 	private final BundleContext context;
@@ -102,29 +99,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 
 	private String moduleId;
 
-	private String regionKey;
-
-	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, true, true, false, true, false },
-			{ false, true, false, false, true, true, true, true, true, true, true, true, true, false, true, false },
-			{ false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false },
-			{ false, true, false, true, false, false, false, false, true, true, true, true, true, false, true, false },
-			{ false, true, false, true, false, false, true, true, false, true, true, true, true, false, true, false },
-			{ false, true, false, true, false, false, true, true, false, true, true, true, true, false, true, false },
-			{ false, true, false, true, false, true, false, false, true, true, true, true, true, false, true, false },
-			{ false, true, false, true, false, true, true, true, true, true, true, true, true, false, true, false },
-			{ false, true, false, true, true, true, true, true, true, true, true, true, true, false, true, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
-
 	private CameraModuleControl cameraControl;
 
 	private ServiceRegistration cameraControlRef;
@@ -141,8 +115,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		this.slotId = slotId;
 		this.moduleId = moduleId;
 		this.moduleName = "CAMERA";
-		// TODO See if we can get this from the Camera driver.
-		this.megapixels = 2;
 		this.properties = null;
 	}
 
@@ -161,8 +133,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 
 	public void setup() throws Exception {
 		logService = LogServiceUtil.getLogService(context);
-		// Display the camera icon
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 	}
 
 	public void start() throws Exception {
@@ -244,7 +214,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	}
 
 	public void stop() throws Exception {
-		StatusBarUtils.releaseRegion(context, regionKey);
 		cameraControlRef.unregister();
 		cameraService.unregister();
 		moduleRef.unregister();
