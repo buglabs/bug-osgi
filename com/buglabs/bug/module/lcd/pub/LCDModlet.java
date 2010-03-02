@@ -50,7 +50,6 @@ import com.buglabs.bug.jni.common.CharDevice;
 import com.buglabs.bug.jni.common.CharDeviceInputStream;
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.lcd.LCDControl;
-import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerInputStreamProvider;
 import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerSampleProvider;
 import com.buglabs.bug.module.motion.pub.AccelerationWS;
@@ -83,30 +82,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private ServiceRegistration moduleDisplayServReg;
 	private final int LCD_WIDTH = 320;
 	private final int LCD_HEIGHT = 200;
-	private String regionKey;
 	private ServiceRegistration lcdControlServReg;
-
-	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
-			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
-			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
-			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
-			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
-			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
-			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
-			{ false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, false },
-			{ false, true, false, true, false, true, false, true, false, true, false, true, false, false, true, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
-
 	private LCDAccelerometerInputStreamProvider lcd_acc_is_prov;
 	private ServiceRegistration accIsProvRef;
 	private ServiceRegistration accRawFeedProvRef;
@@ -121,7 +97,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private boolean suspended;
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	private final BMIModuleProperties properties;
-	
+
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
 		this.slotId = slotId;
@@ -141,7 +117,6 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public void setup() throws Exception {
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		String devnode_control = "/dev/bmi_lcd_ctl_m" + (slotId + 1);
 
 		lcdcontrol = new LCDControl();
@@ -159,9 +134,9 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 	public void start() throws Exception {
 		Properties modProperties = createBasicServiceProperties();
-		modProperties.put("Power State", suspended ? "Suspended": "Active");
+		modProperties.put("Power State", suspended ? "Suspended" : "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
-		
+
 		lcdRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
 		props = new Hashtable();
 		props.put("width", new Integer(LCD_WIDTH));
@@ -174,7 +149,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			lcd_acc_is_prov.start();
 			accIsProvRef = context.registerService(IAccelerometerSampleFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
 			accRawFeedProvRef = context.registerService(IAccelerometerRawFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
-			
+
 			LCDAccelerometerSampleProvider accsp = new LCDAccelerometerSampleProvider(lcd_acc_is_prov);
 
 			accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), accsp, createRemotableProperties(createBasicServiceProperties()));
@@ -183,7 +158,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		} else {
 			log.log(LogService.LOG_ERROR, "Unable to access the accelerometer device.");
 		}
-		
+
 		if (calibFileExists()) {
 			// Calibration has occurred so we know the screen is usable.
 			moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), this, createRemotableProperties(props));
@@ -220,8 +195,6 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public void stop() throws Exception {
-		StatusBarUtils.releaseRegion(context, regionKey);
-
 		if (lcd_acc_is_prov != null) {
 			log.log(LogService.LOG_DEBUG, "closing accel");
 			lcd_acc_is_prov.interrupt();
@@ -238,7 +211,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		moduleRef.unregister();
 		lcdRef.unregister();
 		if (moduleDisplayServReg != null) {
-			//this could be null if pointercal never completes.
+			// this could be null if pointercal never completes.
 			moduleDisplayServReg.unregister();
 		}
 		lcdControlServReg.unregister();
@@ -252,7 +225,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			ht = new Hashtable();
 			ht.put("Slot", "" + slotId);
 		}
-		
+
 		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
 
 		return ht;
@@ -262,21 +235,21 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		Properties p = new Properties();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
-		
+
 		if (properties != null) {
 			p.put("ModuleDescription", properties.getDescription());
 			p.put("ModuleSN", properties.getSerial_num());
 			p.put("ModuleVendorID", "" + properties.getVendor());
 			p.put("ModuleRevision", "" + properties.getRevision());
 		}
-		
+
 		return p;
 	}
-	
-	private void updateIModuleControlProperties(){
-		if (moduleRef!=null){
+
+	private void updateIModuleControlProperties() {
+		if (moduleRef != null) {
 			Properties modProperties = createBasicServiceProperties();
-			modProperties.put("Power State", suspended ? "Suspended": "Active");
+			modProperties.put("Power State", suspended ? "Suspended" : "Active");
 			moduleRef.setProperties(modProperties);
 		}
 	}
@@ -287,15 +260,15 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		mprops.add(new ModuleProperty("Width", "" + LCD_WIDTH));
 		mprops.add(new ModuleProperty("Height", "" + LCD_HEIGHT));
 		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
-		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended": "Active", "String", true));
-		
+		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended" : "Active", "String", true));
+
 		if (properties != null) {
 			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
 			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
 			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
 			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
 		}
-		
+
 		return mprops;
 	}
 
@@ -307,29 +280,25 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			return true;
 		}
 		if (property.getName().equals("Power State")) {
-			if (((String) property.getValue()).equals("Suspend")){
-				
-				try{
-				suspend();
+			if (((String) property.getValue()).equals("Suspend")) {
+
+				try {
+					suspend();
+				} catch (IOException e) {
+					LogServiceUtil.logBundleException(log, "An error occured while changing suspend state.", e);
 				}
-			 catch (IOException e) {
-				 LogServiceUtil.logBundleException(log,  "An error occured while changing suspend state.", e);
-			}
-			}
-			else if (((String) property.getValue()).equals("Resume")){
-				
+			} else if (((String) property.getValue()).equals("Resume")) {
+
 				try {
 					resume();
-					
+
 				} catch (IOException e) {
-					 LogServiceUtil.logBundleException(log,  "An error occured while changing suspend state.", e);
+					LogServiceUtil.logBundleException(log, "An error occured while changing suspend state.", e);
 				}
 			}
-			
-				
-			
+
 		}
-		
+
 		return false;
 	}
 
@@ -350,7 +319,6 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		updateIModuleControlProperties();
 		return result;
 	}
-	
 
 	public int suspend() throws IOException {
 		int result = -1;
@@ -360,7 +328,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		if (result < 0) {
 			throw new IOException("ioctl BMI_LCD_SUSPEND failed");
 		}
-		
+
 		suspended = true;
 		updateIModuleControlProperties();
 		return result;
