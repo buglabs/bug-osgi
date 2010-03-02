@@ -39,10 +39,7 @@ import java.util.Timer;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
@@ -53,7 +50,6 @@ import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.common.FCNTL_H;
 import com.buglabs.bug.jni.gps.GPS;
 import com.buglabs.bug.jni.gps.GPSControl;
-import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.gps.pub.IGPSModuleControl;
 import com.buglabs.bug.module.gps.pub.INMEARawFeed;
 import com.buglabs.bug.module.gps.pub.INMEASentenceProvider;
@@ -108,43 +104,11 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	public static final String MODULE_ID = "0001";
 
-	private static final long DEFAULT_READ_DELAY = 100;
-
-	private static final String CM_READ_DELAY_KEY = "ReadDelay";
-
 	private ServiceRegistration nmeaRef;
 	private ServiceRegistration nmeaProviderRef;
 
 	private final String moduleName;
-
-	//private StreamMultiplexer gpsd;
 	private NMEASentenceProvider nmeaProvider;
-
-	//private InputStream gpsis;
-
-	private String regionKey;
-
-	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, true, true, true, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, false, false, false, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, false, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, false, false, true, false },
-			{ false, true, true, false, false, false, true, false, false, false, true, false, false, false, true, false },
-			{ false, true, false, true, true, true, true, false, true, false, true, false, true, true, true, false },
-			{ false, true, false, true, false, false, true, false, false, false, true, false, false, false, true, false },
-			{ false, true, false, true, true, false, true, false, true, true, true, true, true, false, true, false },
-			{ false, true, true, false, false, false, true, false, true, true, true, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
-
 	private GPSControl gpscontrol;
 
 	private ServiceRegistration gpsControlRef;
@@ -279,7 +243,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	public void stop() throws Exception {
 		timer.cancel();
 
-		StatusBarUtils.releaseRegion(context, regionKey);
 		if (wsTracker != null) {
 			wsTracker.close();
 		}
@@ -506,7 +469,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void setup() throws Exception {
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		String devnode_gps = "/dev/ttymxc" + Integer.toString(slotId);
 		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(slotId + 1);
 
