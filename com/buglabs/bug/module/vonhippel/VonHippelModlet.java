@@ -41,7 +41,6 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.vonhippel.VonHippel;
-import com.buglabs.bug.menu.pub.StatusBarUtils;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
@@ -75,8 +74,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private VonHippel vhDevice;
 
-	private String regionKey;
-
 	private ServiceRegistration vhModuleRef;
 
 	private CommConnection cc;
@@ -90,27 +87,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	private boolean suspended;
 
 	private LogService logService;
-
-	private static boolean icon[][] = { { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, false, true, false, true, false, true, false, true, false, true, false, true, true, false },
-			{ false, true, true, false, true, false, true, false, true, false, true, false, true, false, true, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false },
-			{ false, true, false, true, false, false, false, true, false, true, true, true, true, false, true, false },
-			{ false, true, false, false, true, false, true, false, false, true, false, false, true, false, true, false },
-			{ false, true, false, false, false, true, false, false, false, true, false, false, true, false, true, false },
-			{ false, true, false, false, false, false, false, false, false, false, false, false, false, false, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-			{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false } };
 
 	private final BMIModuleProperties properties;
 
@@ -144,8 +120,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	}
 
 	public void stop() throws Exception {
-		StatusBarUtils.releaseRegion(context, regionKey);
-		
 		//close any open resources
 		if (vhc != null) {
 			vhc.dispose();
@@ -294,7 +268,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	}
 
 	public void setup() throws Exception {
-		regionKey = StatusBarUtils.displayImage(context, icon, this.getModuleName());
 		int slot = slotId + 1;
 		String devnode_vh = "/dev/bmi_vh_control_m" + slot;
 		vhDevice = new VonHippel();
