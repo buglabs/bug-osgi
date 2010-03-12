@@ -230,9 +230,9 @@ public class Activator implements BundleActivator, ServiceListener {
 	private List getSysFSModules() throws IOException {
 		List slots = null;
 
-		for (int i = 1; i < 5; ++i) {
-			File prodFile = new File("/sys/devices/conn-m" + i + "/product");
-			
+		for (int i = 0; i < 4; ++i) {
+			File prodFile = new File("/sys/devices/platform/omap_bmi_slot."+i+"/bmi-"+ i+"/bmi-dev-"+i+"/product");
+			System.out.println("Trying: "+prodFile.getAbsolutePath());			
 			if (!prodFile.exists()) {
 				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
 				continue;
@@ -245,7 +245,7 @@ public class Activator implements BundleActivator, ServiceListener {
 			
 			BMIModuleProperties props = BMIModuleProperties.createFromSYSDirectory(prodFile.getParentFile());
 
-			BMIMessage m = new BMIMessage(props, i - 1);
+			BMIMessage m = new BMIMessage(props, i);
 			
 			slots.add(m);
 		}
