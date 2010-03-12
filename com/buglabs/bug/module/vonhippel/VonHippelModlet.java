@@ -160,10 +160,17 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {
-			p.put("ModuleDescription", properties.getDescription());
-			p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getDescription() != null) {
+				p.put("ModuleDescription", properties.getDescription());
+			}
+			if (properties.getSerial_num() != null) {
+				p.put("ModuleSN", properties.getSerial_num());
+			}
+
 			p.put("ModuleVendorID", "" + properties.getVendor());
+
 			p.put("ModuleRevision", "" + properties.getRevision());
+
 		}
 		
 		return p;
