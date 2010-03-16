@@ -32,8 +32,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import javax.bluetooth.BluetoothStateException;
-import javax.bluetooth.LocalDevice;
 import javax.servlet.ServletException;
 
 import org.osgi.framework.BundleActivator;
@@ -86,7 +84,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	private ServiceTracker httpTracker;
 
-	private ServiceRegistration btReg;
+	//private ServiceRegistration btReg;
 
 	private ServiceRegistration sr;
 
@@ -105,7 +103,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 		
 		/*if (soundplayer != null) {
 			audioReg = context.registerService(IBaseAudioPlayer.class.getName(), soundplayer, null);
-		}*/
+		}
 		
 		try {
 			btReg = context.registerService(LocalDevice.class.getName(), LocalDevice.getLocalDevice(), null);
@@ -115,6 +113,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 		} catch (BluetoothStateException e) {
 			logService.log(LogService.LOG_INFO, "No Bluetooth Device found.  Not registering javax.bluetooth.LocalDevice as a service");
 		}
+		*/
 	}
 
 	/**
@@ -213,6 +212,6 @@ public class Activator implements BundleActivator, ITimeProvider {
 			audioReg.unregister();
 		}*/
 		
-		btReg.unregister();
+		//btReg.unregister();
 	}
 }
