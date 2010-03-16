@@ -94,7 +94,7 @@ public class PipeReader extends Thread {
 						BMIMessage m = new BMIMessage(sb.toString());
 						if (m.parse()) {
 							if (m.getEvent() == BMIMessage.EVENT_INSERT) {
-								m.setBMIModuleProperties(BMIModuleProperties.createFromSYSDirectory(sysDirectory(m.getSlot() + 1)));
+								m.setBMIModuleProperties(BMIModuleProperties.createFromSYSDirectory(sysDirectory(m.getSlot())));
 							}
 							manager.processMessage(m);
 						} else {
