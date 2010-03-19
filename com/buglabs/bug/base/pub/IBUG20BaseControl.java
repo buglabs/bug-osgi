@@ -30,51 +30,35 @@ package com.buglabs.bug.base.pub;
 import java.io.IOException;
 
 /**
- * Provides control of BUGbase LEDs.
+ * Provides control of BUGbase 20 LEDs.
  * 
- * @author aroman
- *
  */
-//TODO: adapt this to BUG2.0 hw
 public interface IBUG20BaseControl {
-	public static final int HOTKEY_LED_1 = 0;
-	public static final int HOTKEY_LED_2 = 1;
-	public static final int HOTKEY_LED_3 = 2;
-	public static final int HOTKEY_LED_4 = 3;
+	public static int COLOR_BLUE = 0;
+	public static int COLOR_RED = 1;
+	public static int COLOR_GREEN = 2;
+
+	public static int LED_BATTERY = 0;
+	public static int LED_POWER = 1;
+	public static int LED_WLAN = 2;
+	public static int LED_BLUETOOTH = 3;
 	
 	/**
+	 * Turn on or off a specific color on a multi color LED.
 	 * 
-	 * @param index A number between 0 and 3 specifying which LED to set.
-	 * 
-	 * @throws IOException when underlying native call fails.
+	 * @param led IBUGBaseControl.LED_*
+	 * @param color  IBUGBaseControl.COLOR_*
+	 * @param on TRUE if LED is to be on, false otherwise.
+	 * @throws IOException is thrown if invalid LED or color value is passed
 	 */
-	public void clearLED(int index) throws IOException;
+	public void setLEDColor(int led, int color, boolean on) throws IOException;
 	
 	/**
-	 * clear base unit LEDs
+	 * Set brightness level for PWM-controlled LED.
 	 * 
-	 * @param leds The bitmask of which LEDs to clear. Specifically,
-	 * the 4 LSBs.
-	 * 
-	 * @return value of lower level ioctl call.
+	 * @param led IBUGBaseControl.LED_*
+	 * @param brightness 0 - 255
+	 * @throws IOException is thrown if invalid LED value is passed.
 	 */
-	public void clearLEDs(int leds) throws IOException;
-	
-	/**
-	 * 
-	 * @param index A number between 0 and 3 specifying which LED to set.
-	 * 
-	 * @throws IOException when underlying native call fails.
-	 */
-	public void setLED(int index) throws IOException;
-	
-	/**
-	 * set base unit LEDs
-	 * 
-	 * @param leds The bitmask of which LEDs to turn on. Specifically,
-	 * the 4 LSBs.
-	 * 
-	 * @return value of lower level ioctl call.
-	 */
-	public void setLEDs(int leds) throws IOException;
+	public void setLEDBrightness(int led, int brightness) throws IOException;
 }

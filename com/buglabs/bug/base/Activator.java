@@ -181,14 +181,11 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 			public void run() {
 				try {
-					for (int i = 0; i < 4; ++i) {
-						bbc.setLED(i);
-						Thread.sleep(300);
-					}
-					Thread.sleep(500);
-					for (int i = 0; i < 4; ++i) {
-						bbc.clearLED(i);
-					}
+					bbc.setLEDColor(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_RED, true);
+					Thread.sleep(300);
+					bbc.setLEDColor(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_GREEN, true);
+					Thread.sleep(300);
+					bbc.setLEDColor(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_BLUE, true);
 				} catch (Exception e) {
 				}
 			}
