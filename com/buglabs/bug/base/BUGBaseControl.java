@@ -51,7 +51,7 @@ public class BUGBaseControl implements IBUG20BaseControl {
 	private static final String BATTERY_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:blue:battery" + BRIGHTNESS;
 	private static final String BATTERY_RED_CONTROL_FILE = LED_ROOT + "omap3bug:red:battery" + BRIGHTNESS;
 	private static final String BATTERY_GREEN_CONTROL_FILE = LED_ROOT + "omap3bug:green:battery" + BRIGHTNESS;
-	private static final String POWER_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:green:power" + BRIGHTNESS;
+	private static final String POWER_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:blue:power" + BRIGHTNESS;
 	private static final String WLAN_GREEN_CONTROL_FILE = LED_ROOT + "omap3bug:green:wlan" + BRIGHTNESS;
 	private static final String WLAN_RED_CONTROL_FILE = LED_ROOT + "omap3bug:red:wlan" + BRIGHTNESS;
 	private static final String WLAN_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:blue:wlan" + BRIGHTNESS;
