@@ -27,6 +27,7 @@
  *******************************************************************************/
 package com.buglabs.bug.base;
 
+import java.io.FileNotFoundException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
@@ -99,7 +100,10 @@ public class Activator implements BundleActivator, ITimeProvider {
 	 */
 	private void registerServices(BundleContext context) {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
-		baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
+		
+		if (bbc != null) {
+			baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
+		}
 		
 		/*if (soundplayer != null) {
 			audioReg = context.registerService(IBaseAudioPlayer.class.getName(), soundplayer, null);
@@ -139,7 +143,11 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 		// Set base version property.
 		System.setProperty(BUG_BASE_VERSION_KEY, getBaseVersion());
-		bbc = new BUGBaseControl();
+		try {
+			bbc = new BUGBaseControl();
+		} catch (FileNotFoundException e) {
+			logService.log(LogService.LOG_ERROR, "Unable to initialize LEDs.  " + e.getMessage());
+		}
 		//soundplayer = new SoundPlayer("hw:0,0");
 	
 		registerServices(context);
