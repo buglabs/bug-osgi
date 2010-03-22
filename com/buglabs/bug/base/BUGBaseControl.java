@@ -76,7 +76,7 @@ public class BUGBaseControl implements IBUG20BaseControl {
 		wlanFH[COLOR_RED] = new FileOutputStream(WLAN_RED_CONTROL_FILE);
 		wlanFH[COLOR_GREEN] = new FileOutputStream(WLAN_GREEN_CONTROL_FILE);
 
-		btFH = new FileOutputStream[0];
+		btFH = new FileOutputStream[1];
 		btFH[COLOR_BLUE] = new FileOutputStream(BT_BLUE_CONTROL_FILE);
 	}
 	
