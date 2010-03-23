@@ -34,20 +34,37 @@ package com.buglabs.device;
  * 
  */
 public class ButtonEvent {
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_HOTKEY_1 = 258;
-
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_HOTKEY_2 = 259;
-
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_HOTKEY_3 = 260;
-
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_HOTKEY_4 = 261;
-
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_LEFT = 263;
-
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_RIGHT = 262;
-
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_UP = 264;
-
+	/**
+	 * @deprecated This button only available on BUG 1.3 hardware.
+	 */
 	public static final int BUTTON_DOWN = 265;
 
 	public static final int BUTTON_CAMERA_ZOOM_IN = 258;
@@ -73,6 +90,11 @@ public class ButtonEvent {
 
 	// see above
 	public static final int BUTTON_AUDIO_VOLDOWN_PRESSED_ACTION = 16;
+	
+	/**
+	 * User button on BUG 2.0.
+	 */
+	public static final int BUTTON_BUG20_USER = 242;
 
 	public static final int KEY_DOWN = 1;
 
