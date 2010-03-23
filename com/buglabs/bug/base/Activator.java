@@ -50,6 +50,8 @@ import com.buglabs.application.ServiceTrackerHelper;
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
 import com.buglabs.bug.base.pub.IShellService;
 import com.buglabs.bug.base.pub.ITimeProvider;
+import com.buglabs.bug.input.pub.InputEventProvider;
+import com.buglabs.device.IButtonEventProvider;
 import com.buglabs.support.SupportInfoTextFormatter;
 import com.buglabs.support.SupportInfoXMLFormatter;
 import com.buglabs.util.LogServiceUtil;
@@ -68,6 +70,8 @@ public class Activator implements BundleActivator, ITimeProvider {
 	private static final String INFO_SERVLET_PATH = "/support";
 
 	private static final String INFO_SERVLET_HTML_PATH = "/support.html";
+	
+	private static final String DEVNODE_BUGNAV = "/dev/input/event0";
 
 	private ServiceRegistration timeReg;
 
@@ -89,6 +93,10 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	private ServiceRegistration sr;
 
+	private InputEventProvider bep;
+
+	private ServiceRegistration bepReg;
+
 	public Date getTime() {
 		return Calendar.getInstance().getTime();
 	}
@@ -100,7 +108,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 	 */
 	private void registerServices(BundleContext context) {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
-		
+		bepReg = context.registerService(IButtonEventProvider.class.getName(), bep, null);
 		if (bbc != null) {
 			baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
 		}
@@ -150,6 +158,9 @@ public class Activator implements BundleActivator, ITimeProvider {
 		}
 		//soundplayer = new SoundPlayer("hw:0,0");
 	
+		bep = new InputEventProvider(DEVNODE_BUGNAV, logService);
+		bep.start();
+		
 		registerServices(context);
 
 		// Create a ST for the HTTP Service, create the 'info' servlet when
@@ -212,7 +223,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 	private void unregisterServices(BundleContext context) {
 		timeReg.unregister();
 		baseControlReg.unregister();
-		
+		bepReg.unregister();
 		/*if (audioReg != null) {
 			audioReg.unregister();
 		}*/
