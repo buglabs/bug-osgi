@@ -67,6 +67,7 @@ public class InputEventProvider extends Thread implements IButtonEventProvider {
 	}
 
 	public void run() {
+		log.log(LogService.LOG_DEBUG, this.getClass().getName() + ": Opening input device: " + inputDevice);
 		InputDevice dev = new InputDevice();
 		if (dev.open(inputDevice, FCNTL_H.O_RDWR) < 0) {
 			log.log(LogService.LOG_ERROR, "Unable to open input device: " + inputDevice);
@@ -81,7 +82,8 @@ public class InputEventProvider extends Thread implements IButtonEventProvider {
 
 					for (int i = 0; i < inputEvents.length; ++i) {
 						ButtonEvent b = new ButtonEvent(inputEvents[i].code, 0, inputEvents[i].code, convertButtonAction(inputEvents[i].value), this.getClass().toString());
-
+						log.log(LogService.LOG_DEBUG, this.getClass().getName() + ": Input event: " + inputEvents[i].code);
+						
 						while (iter.hasNext()) {
 							IButtonEventListener l = (IButtonEventListener) iter.next();
 							try {
