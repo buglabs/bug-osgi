@@ -30,7 +30,6 @@ package com.buglabs.bug.module.vonhippel.pub;
 import java.io.IOException;
 import java.util.List;
 
-import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.module.vonhippel.VonHippelModuleControl;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;

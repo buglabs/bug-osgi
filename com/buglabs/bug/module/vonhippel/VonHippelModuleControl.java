@@ -28,11 +28,6 @@
 package com.buglabs.bug.module.vonhippel;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.microedition.io.CommConnection;
-import javax.microedition.io.Connector;
 
 import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
