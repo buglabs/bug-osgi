@@ -19,7 +19,8 @@ Import-Package: org.osgi.util.position,
  com.buglabs.util,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.vonhippel,
- com.buglabs.bug.menu.pub
+ com.buglabs.bug.menu.pub,
+ gnu.io
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0007
 Bug-Module-Driver-Id: bmi_vh

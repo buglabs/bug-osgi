@@ -27,6 +27,14 @@
  *******************************************************************************/
 package com.buglabs.bug.module.vonhippel;
 
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.RXTXPort;
+import gnu.io.SerialPort;
+import gnu.io.UnsupportedCommOperationException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +52,6 @@ import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
-import com.buglabs.bug.module.vonhippel.pub.IVonHippelSerialPort;
 import com.buglabs.bug.module.vonhippel.pub.VonHippelWS;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
@@ -90,6 +97,10 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private final BMIModuleProperties properties;
 
+	private SerialPort serialPort;
+
+	private String devNode;
+
 	public VonHippelModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
@@ -113,7 +124,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
-		vhSerialRef = context.registerService(IVonHippelSerialPort.class.getName(), vhc, createBasicServiceProperties());
+		vhSerialRef = context.registerService(SerialPort.class.getName(),serialPort , createBasicServiceProperties());
 		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhc);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
@@ -121,9 +132,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	public void stop() throws Exception {
 		//close any open resources
-		if (vhc != null) {
-			vhc.dispose();
-		}
+
 		
 		if (wsMotionTracker != null) {
 			wsMotionTracker.close();
@@ -280,6 +289,18 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		vhDevice = new VonHippel();
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
 		vhc = new VonHippelModuleControl(vhDevice, slotId);
+		
+		//this may have to eventually change if we want to use other names (which i think is a good idea)
+		this.devNode = "/dev/ttyS" + slot;
+		// initialize the serial port
+		CommPortIdentifier portIdentifier = CommPortIdentifier
+				.getPortIdentifier(devNode);
+		CommPort commPort = portIdentifier
+				.open(this.getClass().getName(), 2000);
+		serialPort = (SerialPort) commPort;
+		serialPort.setSerialPortParams(38400, SerialPort.DATABITS_8,
+				SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+
 	}
 
 }
