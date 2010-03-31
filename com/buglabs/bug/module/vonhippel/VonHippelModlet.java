@@ -29,18 +29,12 @@ package com.buglabs.bug.module.vonhippel;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.RXTXPort;
 import gnu.io.SerialPort;
-import gnu.io.UnsupportedCommOperationException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import javax.microedition.io.CommConnection;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -82,8 +76,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	private VonHippel vhDevice;
 
 	private ServiceRegistration vhModuleRef;
-
-	private CommConnection cc;
 
 	private VonHippelModuleControl vhc;
 
@@ -158,9 +150,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 			vhSerialRef.unregister();
 		}
 		
-		if (cc != null) {
-			cc.close();
-		}
 	}
 
 	private Properties createBasicServiceProperties() {
