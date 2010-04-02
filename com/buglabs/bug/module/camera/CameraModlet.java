@@ -114,7 +114,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
-		this.moduleName = "CAMERA";
+		this.moduleName = "Camera";
 		this.properties = null;
 	}
 
