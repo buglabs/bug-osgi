@@ -50,7 +50,7 @@ public class GPSFIXLEDStatusTask extends TimerTask {
 
 	public void run() {
 		int status = 0;
-		int delay = 1;
+		int delay = 10;
 		try {
 			status = control.getStatus();
 

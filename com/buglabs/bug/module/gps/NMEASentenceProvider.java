@@ -176,6 +176,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 			for (Iterator i = subscribers.iterator(); i.hasNext();) {
 				Object subscriber = i.next();
 				
+				try {
 				if (subscriber instanceof INMEASentenceSubscriber) {
 					INMEASentenceSubscriber sub = (INMEASentenceSubscriber) subscriber;
 					sub.sentenceReceived(objSentence);
@@ -183,13 +184,15 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 					IPositionSubscriber sub = (IPositionSubscriber) subscriber;
 					sub.positionUpdate(calculatePosition((RMC) objSentence));
 				}
+				} catch (RuntimeException e) {
+					LogServiceUtil.logBundleException(log, "GPS Position subscriber threw an unchecked exception in sentenceRecieved()", e);
 			}
 		}
 	}
+	}
 	
 	private Position calculatePosition(RMC rmc) {
-		return new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS()
-				.toDecimalDegrees()
+		return new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS().toDecimalDegrees()
 				* Math.PI / 180.0, Unit.rad), new Measurement(0.0d, Unit.m), null, null);
 	}
 

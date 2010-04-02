@@ -27,6 +27,9 @@
  *******************************************************************************/
 package com.buglabs.bug.module.gps;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -41,19 +44,25 @@ public class Activator implements BundleActivator, IModletFactory {
 
 	private static Activator instance;
 
-	public Activator() {
-		instance = this;
-	}
-
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		sr = context.registerService(IModletFactory.class.getName(), this, null);
+		instance = this;
+		sr = context.registerService(IModletFactory.class.getName(), this, getModletSvcProperties());
 	}
 
 	public void stop(BundleContext context) throws Exception {
 		sr.unregister();
 	}
 
+	private Dictionary getModletSvcProperties() {
+		Hashtable ht = new Hashtable();
+		
+		ht.put("Source", this.getClass().getName());
+		ht.put("Bug-Module-Id", getModuleId());
+		
+		return ht;
+	}
+	
 	public IModlet createModlet(BundleContext context, int slotId) {
 		GPSModlet modlet = new GPSModlet(context, slotId, getModuleId(), "GPS");
 
@@ -76,7 +85,7 @@ public class Activator implements BundleActivator, IModletFactory {
 		return context;
 	}
 
-	public static Activator getInstance() {
+	public static Activator getInstance() {		
 		return instance;
 	}
 

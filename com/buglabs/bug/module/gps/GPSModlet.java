@@ -482,9 +482,10 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		gpscontrol = new GPSControl();
-
+		log.log(LogService.LOG_DEBUG, "Opening GPS control port: " + devnode_gpscontrol);
 		CharDeviceUtils.openDeviceWithRetry(gpscontrol, devnode_gpscontrol, 2);
 		gps.close();
+		log.log(LogService.LOG_DEBUG, "Opening GPS data port: " + devnode_gps);
 		gpsIs = new FileInputStream(devnode_gps);
 		nmeaProvider = new NMEASentenceProvider(gpsIs, context);
 	}
