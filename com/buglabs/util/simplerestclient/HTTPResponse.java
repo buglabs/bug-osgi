@@ -37,7 +37,8 @@ import java.net.HttpURLConnection;
 
 /**
  * Class for wrapping the response connection.
- * Create HTTPResponse objects via HTTPRequest methods
+ * This is returned when calling get/post/put/delete/head on an HttpRequest object
+ * Use this object to check status code and get data from request
  * 
  * @author Brian
  * 
@@ -159,6 +160,12 @@ public class HTTPResponse {
     	return status;
 	}
 	
+	/**
+	 * Gets a header value from the http response
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public String getHeaderField(String key) {
 		return _connection.getHeaderField(key);
 	}

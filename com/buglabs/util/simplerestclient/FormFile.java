@@ -27,6 +27,12 @@
  *******************************************************************************/
 package com.buglabs.util.simplerestclient;
 
+/**
+ * default implementation of IFormFile
+ * 
+ * @author bballantine
+ *
+ */
 public class FormFile implements IFormFile {
 	private String filename;
 	private String content_type;

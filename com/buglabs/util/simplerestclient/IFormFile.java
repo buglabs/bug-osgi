@@ -27,6 +27,14 @@
  *******************************************************************************/
 package com.buglabs.util.simplerestclient;
 
+/**
+ * interface to encapsulate a file to be POSTed to a restful web service
+ * use in conjunction with HttpRequest.postMultipart();
+ * 
+ * 
+ * @author bballantine
+ *
+ */
 public interface IFormFile {
 	
 	public String getFilename();

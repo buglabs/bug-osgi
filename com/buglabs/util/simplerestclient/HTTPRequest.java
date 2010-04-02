@@ -44,6 +44,11 @@ import com.buglabs.util.Base64;
 /**
  * class for dealing RESTfully with HTTP Requests
  * 
+ * Example Usage:
+ * HttpRequest req = new HttpRequest(myConnectionProvider)
+ * HttpResponse resp = req.get("http://some.url")
+ * System.out.println(resp.getString());
+ * 
  * @author Brian
  * 
  * Revisions
@@ -66,6 +71,7 @@ public class HTTPRequest {
 	
 	/**
 	 * constructor where client provides connectionProvider
+	 * 	
 	 */
 	public HTTPRequest(IConnectionProvider connectionProvider) {
 		_connectionProvider = connectionProvider;
@@ -92,7 +98,7 @@ public class HTTPRequest {
 	}
 	
     /**
-     * Do an authenticated HTTP POST to url
+     * Do an HTTP POST to url
      * 
      * @param url   String URL to connect to
      * @param data  String data to post 
@@ -102,6 +108,15 @@ public class HTTPRequest {
 		return post(url, data, null);
 	}
 
+	/**
+	 * Do an HTTP POST to url w/ extra http headers
+	 * 
+	 * @param url
+	 * @param data
+	 * @param headers
+	 * @return
+	 * @throws IOException
+	 */
 	public HTTPResponse post(String url, String data, Map headers) throws IOException {
 		HttpURLConnection conn = _connectionProvider.getConnection(url);
 		if (headers != null) {
@@ -121,7 +136,7 @@ public class HTTPRequest {
 	}
 	
     /**
-     * Do an authenticated HTTP POST to url
+     * Do an HTTP POST to url
      * 
      * @param url       String URL to connect to
      * @param stream    InputStream data to post 
@@ -150,6 +165,14 @@ public class HTTPRequest {
 	}
 
 	
+	/**
+	 * Post byte data to a url
+	 * 
+	 * @param url
+	 * @param data
+	 * @return
+	 * @throws IOException
+	 */
 	public HTTPResponse post(String url, byte[] data) throws IOException {
 		HttpURLConnection conn = _connectionProvider.getConnection(url);
 		conn.setRequestProperty("Content-Length", String.valueOf(data.length));
@@ -161,10 +184,12 @@ public class HTTPRequest {
 	}
 	
 	/**
-	 * 
-	 * if you're posting files, use this one
+	 * Does a multipart post which is different than a regular post
+	 * mostly use this one if you're posting files
 	 * 
 	 * @param url
+	 * @param parameters
+	 * 	Key-Value pairs in map.  Keys are always string.  Values can be string or IFormFile
 	 * @param properties
 	 * @return
 	 */
@@ -216,7 +241,7 @@ public class HTTPRequest {
 	
 	
 	/**
-	 * Do an authenticated HTTP PUT to url
+	 * Do an HTTP PUT to url
 	 * 
 	 * @param url  String URL to connect to
 	 * @param data String data to post 
@@ -226,6 +251,15 @@ public class HTTPRequest {
 		return put(url, data, null);
 	}
 
+	/**
+	 * Do an HTTP PUT to url with extra headers
+	 * 
+	 * @param url
+	 * @param data
+	 * @param headers
+	 * @return
+	 * @throws IOException
+	 */
 	public HTTPResponse put(String url, String data, Map headers) throws IOException{
 		HttpURLConnection connection = _connectionProvider.getConnection(url);
 		if (headers != null) {
@@ -246,7 +280,7 @@ public class HTTPRequest {
 	}
 	
 	/**
-     * Do an authenticated HTTP PUT to url
+     * Do an HTTP PUT to url
      * 
      * @param url       String URL to connect to
      * @param stream    InputStream data to put 
@@ -258,7 +292,13 @@ public class HTTPRequest {
 		return put(url, data);		
 	}	
 	
-	
+	/**
+	 * Do an HTTP DELETE to url
+	 * 
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
 	public HTTPResponse delete(String url) throws IOException {
 		HttpURLConnection connection = _connectionProvider.getConnection(url);
 		connection.setDoInput(true);
@@ -267,7 +307,7 @@ public class HTTPRequest {
 	}	
 
 	/**
-	 * Posts a Map of key, value pair properties, like a web form
+	 * Puts a Map of key, value pair properties, like a web form
 	 * 
 	 * @param url
 	 * @param properties
@@ -282,7 +322,7 @@ public class HTTPRequest {
 	}	
 
     /**
-     * Do an authenticated HTTP HEAD to url
+     * Do an HTTP HEAD to url
      * 
      * @param url       String URL to connect to 
      * @return          HttpURLConnection ready with response data
@@ -344,6 +384,11 @@ public class HTTPRequest {
 		return propstr;
 	}
 	
+	/**
+	 * helper to create multipart form boundary
+	 * 
+	 * @return
+	 */
 	private static String createMultipartBoundary() {
 		StringBuffer buf = new StringBuffer();
         buf.append("---------------------------");

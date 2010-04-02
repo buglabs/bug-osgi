@@ -29,6 +29,13 @@ package com.buglabs.util.simplerestclient;
 
 import java.io.IOException;
 
+/**
+ * A special kind of IOException that contains an HTTP Error Code
+ * For a list of codes see HTTPResponse
+ * 
+ * @author bballantine
+ *
+ */
 public class HTTPException extends IOException {
 	private static final long serialVersionUID = -4526324236776240815L;
 	private int _httpErrorCode;
