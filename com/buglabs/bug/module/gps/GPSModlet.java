@@ -469,7 +469,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void setup() throws Exception {
-		String devnode_gps = "/dev/ttymxc" + Integer.toString(slotId);
+		String devnode_gps = "/dev/ttyBMI" + Integer.toString(slotId);
 		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(slotId + 1);
 
 		//Creation and initialization of this device is necessary to access the control device, below.
