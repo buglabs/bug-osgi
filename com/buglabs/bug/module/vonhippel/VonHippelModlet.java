@@ -29,10 +29,15 @@ package com.buglabs.bug.module.vonhippel;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
+import gnu.io.RXTXCommDriver;
+import gnu.io.RXTXPort;
 import gnu.io.SerialPort;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -89,7 +94,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private final BMIModuleProperties properties;
 
-	private SerialPort serialPort;
+	private RXTXPort serialPort;
 
 	private String devNode;
 
@@ -116,7 +121,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
-		vhSerialRef = context.registerService(SerialPort.class.getName(),serialPort , createBasicServiceProperties());
+		vhSerialRef = context.registerService(RXTXPort.class.getName(),serialPort , createBasicServiceProperties());
 		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhc);
 		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
@@ -279,16 +284,26 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
 		vhc = new VonHippelModuleControl(vhDevice, slotId);
 		
+		Enumeration ports = CommPortIdentifier.getPortIdentifiers();
+        
+        
+		try{
 		//this may have to eventually change if we want to use other names (which i think is a good idea)
-		this.devNode = "/dev/ttyS" + slot;
+		this.devNode = "/dev/ttyBMI" + slotId;
+		
 		// initialize the serial port
 		CommPortIdentifier portIdentifier = CommPortIdentifier
 				.getPortIdentifier(devNode);
+		System.out.println("Got port identifier");
 		CommPort commPort = portIdentifier
 				.open(this.getClass().getName(), 2000);
-		serialPort = (SerialPort) commPort;
+		serialPort = (RXTXPort) commPort;
 		serialPort.setSerialPortParams(38400, SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 
 	}
 
