@@ -22,8 +22,7 @@ Import-Package: org.osgi.framework;version="1.3.0",
  com.buglabs.nmea.sentences,
  com.buglabs.nmea2,
  com.buglabs.bug.menu.pub,
- org.osgi.service.cm,
- javax.bluetooth
+ org.osgi.service.cm
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0001
 Bug-Module-Driver-Id: bmi_gps
