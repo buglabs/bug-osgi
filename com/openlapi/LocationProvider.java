@@ -211,10 +211,7 @@ public abstract class LocationProvider {
 		} else if ("LMS".equals(mode)) {
 			// random entry from the LandmarkStore
 			return new LocationProviderLMS(criteria, null);
-		} else if ("BTGPS".equals(mode)) {
-			// random entry from the LandmarkStore
-			return new LocationProviderBTGPS(criteria);
-		}
+		} 
 		try {
 			// name not recognised, allow reflection to have a go
 			// this allows people to create their own implementations
