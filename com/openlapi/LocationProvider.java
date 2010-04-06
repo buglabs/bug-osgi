@@ -180,7 +180,7 @@ public abstract class LocationProvider {
 	 * <p>
 	 * This method may, depending on the implementation, return the same LocationProvider
 	 * instance as has been returned previously from this method to the calling
-	 * application, if the same instance can be used to fulfil both defined criteria. Note
+	 * application, if the same instance can be used to fulfill both defined criteria. Note
 	 * that there can be only one LocationListener associated with a LocationProvider
 	 * instance.
 	 * 
@@ -203,13 +203,15 @@ public abstract class LocationProvider {
 			TTUtils.log(e.getMessage());
 		}
 
-		if (mode == null || "NMEA".equals(mode)) {
-			// GPS over Bluetooth
+		//We'll default to BUG mode, which will try to access the first OSGi INMEARawFeed available in the Service Registry.
+		if (mode == null || "BUG".equals(mode)) {
+			return new LocationProviderBUG(criteria);
+		} else if ("NMEA".equals(mode)) {
 			return new LocationProviderNMEA(criteria, "/tmp/nmea.log");
 		} else if ("LMS".equals(mode)) {
 			// random entry from the LandmarkStore
 			return new LocationProviderLMS(criteria, null);
-		} else if ("NMEA".equals(mode)) {
+		} else if ("BTGPS".equals(mode)) {
 			// random entry from the LandmarkStore
 			return new LocationProviderBTGPS(criteria);
 		}
@@ -359,7 +361,7 @@ public abstract class LocationProvider {
 	private static String getMode() throws IOException {
 		// if we got here, the variable wasn't defined in the jar file
 		InputStream in =
-			LocationProvider.class.getResourceAsStream("/OpenLAPI-mode.txt");
+			LocationProvider.class.getResourceAsStream("/tmp/OpenLAPI-mode.txt");
 		if (in != null) {
 			try {
 				String line = TTUtils.readLine(in);
@@ -368,6 +370,13 @@ public abstract class LocationProvider {
 				in.close();
 			}
 		}
+		
+		//Try to load a system property.
+		if (System.getProperties().get("com.openlapi.mode") != null) {
+			return (String) System.getProperties().get("com.openlapi.mode");
+		}
+		
+		//Failed, assume default.
 		return null;
 	}
 
