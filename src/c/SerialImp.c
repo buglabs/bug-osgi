@@ -5786,9 +5786,6 @@ int is_device_locked( const char *port_filename )
 
 		if( kill( (pid_t) pid, 0 ) && errno==ESRCH )
 		{
-			sprintf( message,
-				"RXTX Warning:  Removing stale lock file. %s\n",
-				file );
 			report_warning( message );
 			if( unlink( file ) != 0 )
 			{
