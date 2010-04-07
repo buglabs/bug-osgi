@@ -29,15 +29,11 @@ package com.buglabs.bug.module.vonhippel;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.RXTXCommDriver;
 import gnu.io.RXTXPort;
 import gnu.io.SerialPort;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -142,7 +138,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		if (wsAccTracker != null) {
 			wsAccTracker.close();
 		}
-		// TODO: Throw exception at some point if we encounter a failure
 		if (moduleRef != null) {
 			moduleRef.unregister();
 		}
@@ -284,7 +279,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
 		vhc = new VonHippelModuleControl(vhDevice, slotId);
 		
-		Enumeration ports = CommPortIdentifier.getPortIdentifiers();
         
         
 		try{
@@ -294,7 +288,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		// initialize the serial port
 		CommPortIdentifier portIdentifier = CommPortIdentifier
 				.getPortIdentifier(devNode);
-		System.out.println("Got port identifier");
 		CommPort commPort = portIdentifier
 				.open(this.getClass().getName(), 2000);
 		serialPort = (RXTXPort) commPort;
