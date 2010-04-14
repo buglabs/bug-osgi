@@ -72,6 +72,8 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	public static final String MODULE_ID = "0007";
 
+	private static final int SERIAL_WAIT_TO_OPEN_TIME = 4000;  //ms to wait before trying to open the serial port.
+
 	private final String moduleName;
 
 	private VonHippel vhDevice;
@@ -289,7 +291,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		CommPortIdentifier portIdentifier = CommPortIdentifier
 				.getPortIdentifier(devNode);
 		CommPort commPort = portIdentifier
-				.open(this.getClass().getName(), 2000);
+				.open(this.getClass().getName(), SERIAL_WAIT_TO_OPEN_TIME);
 		serialPort = (RXTXPort) commPort;
 		serialPort.setSerialPortParams(38400, SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
