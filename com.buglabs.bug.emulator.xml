@@ -1,26 +1,10 @@
 <project name="build-com.buglabs.bug.emulator" default="publish">
-    <property file="./../system.${build.level}.properties" />
+    <import file="common.xml"/>
+    
 	<property name="meta.project" value="com.buglabs.bug.emulator" />
 	<property name="meta.distDirectory" location="${checkout.dir}/${meta.project}/dist" />
 	<property name="distDirectory" location="${meta.distDirectory}" />
-
-	<!-- Setup ant-contrib libraties -->
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
-		<classpath>
-			<pathelement location="/usr/share/ant/lib/ant-contrib-0.6.jar" />
-		</classpath>
-	</taskdef>
-
-	<!-- add SVN task -->
-	<path id="svnant.classpath"  >
-		<fileset dir="/usr/share/ant/lib/svn/" >
-        		<include name="*.jar" />
-		</fileset>
-	</path>
-
-	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
-
-
+    
 	<!-- ===================================================================== -->
 	<!-- Build properties setup -->
 	<!-- Depending on how this script is executed build properties are either generated or inhereted from calling script -->
@@ -41,17 +25,12 @@
 			<echo message="[Build type]: Running full SDK component build..."/>
 			<property name="project.version" value="${bug.version}.${full.sdk.build.id}"/>
 		</else>
-    	</if>
+    </if>
 
-        <property name="artifactDirectory" location="../artifacts/${build.level}/${meta.project}" />
-	<property name="toolbox.dir" location="../toolbox" />
 	<property name="externalDirectory" location="${checkout.dir}/com.buglabs.bug.kernel.external" />
-	<property name="base.build.dir" location="${basedir}/.." />
 	<tstamp/>
 	
 	<target name="checkout" description="Checks out projects from svn" depends="clean,makeDirs">
-		<!-- checkout slp from cvs for now -->
-		<!--<cvs cvsroot="${cvs.public}" package="ch.ethz.iks.slp" command="co" tag="${build.level}" dest="${checkout.dir}" />-->
 		<svn>
 			<checkout url="${svn.url.bug}/net.contentobjects.jnotify" destPath="${checkout.dir}/net.contentobjects.jnotify" />
 			<checkout url="${svn.url.bug}/edu.oswego.cs.dl.util.concurrent" destPath="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
@@ -80,7 +59,6 @@
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.module.sensor" destPath="${checkout.dir}/com.buglabs.bug.emulator.module.sensor" />			
 			<checkout url="${svn.url.bug}/com.buglabs.bug.tests.common" destPath="${checkout.dir}/com.buglabs.bug.tests.common" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.emulator.awt" destPath="${checkout.dir}/com.buglabs.bug.emulator.awt" />
-			<!-- checkout url="${svn.url.bug}/com.buglabs.bug.slp" destPath="${checkout.dir}/com.buglabs.bug.slp" / -->
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.obr" destPath="${checkout.dir}/com.buglabs.osgi.obr" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.update" destPath="${checkout.dir}/com.buglabs.bug.update" />
 			<checkout url="${svn.url.bug}/com.sun.javax.servlet" destPath="${checkout.dir}/com.sun.javax.servlet" />

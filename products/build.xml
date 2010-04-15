@@ -1,7 +1,0 @@
-<project name="com.buglabs.full.build" default="build">
-	<target name="build">
-		<ant antfile="com.buglabs.bug.emulator.xml" target="publish" />
-		<ant antfile="com.buglabs.osgi.concierge.xml" target="publish" />
-		<ant antfile="com.buglabs.dragonfly.xml" target="publish" />
-	</target>
-</project>

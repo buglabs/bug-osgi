@@ -1,8 +1,0 @@
-com.buglabs.osgi.concierge.core
-com.buglabs.osgi.concierge.devtools
-com.buglabs.osgi.concierge.doc
-com.buglabs.osgi.concierge.feature
-com.buglabs.osgi.concierge.runtime
-com.buglabs.osgi.concierge.tests
-com.buglabs.osgi.concierge.ui
-com.buglabs.osgi.concierge.updatesite
