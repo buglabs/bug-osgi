@@ -293,7 +293,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		CommPort commPort = portIdentifier
 				.open(this.getClass().getName(), SERIAL_WAIT_TO_OPEN_TIME);
 		serialPort = (RXTXPort) commPort;
-		serialPort.setSerialPortParams(38400, SerialPort.DATABITS_8,
+		serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8,
 				SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 		}
 		catch(Exception e){
