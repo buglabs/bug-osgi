@@ -3,14 +3,6 @@ ifdef LTIB_ROOTFS
 PHONEME_HOME=$(LTIB_ROOTFS)/tmp/phoneme-advanced/cdc/build/linux-arm-mx31
 endif
 
-empty :=
-space := $(empty) $(empty)
-tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
-target := $(word $(words $(tmpdirs)),$(tmpdirs))
-tokens := $(subst -,$(space),$(target))
-OS := $(word 1,$(tokens))
-ARCH := $(word 2,$(tokens))
-
 LIB_DIR = ../../lib/
 
 INCLUDE = -I./include/
