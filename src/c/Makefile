@@ -1,20 +1,25 @@
 JAVAH = javah
 
-empty :=
-space := $(empty) $(empty)
-tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
-target := $(word $(words $(tmpdirs)),$(tmpdirs))
-tokens := $(subst -,$(space),$(target))
-OS := $(word 1,$(tokens))
-ARCH := $(word 2,$(tokens))
+#empty :=
+#space := $(empty) $(empty)
+#tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
+#target := $(word $(words $(tmpdirs)),$(tmpdirs))
+#tokens := $(subst -,$(space),$(target))
+#OS := $(word 1,$(tokens))
+#ARCH := $(word 2,$(tokens))
 
-INCLUDE = -Iinclude/
-INCLUDE += -I$(PHONEME_HOME)/../../src/share
+INCLUDE = -I./include/
+ifdef USE_PHONEME
+echo "USE_PHONEME is somehow defined" "monkies"
+INCLUDE += -I$(PHONEME_HOME)/../../src/share/
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(ARCH)
-INCLUDE += -I$(PHONEME_HOME)/../../src
+INCLUDE += -I$(PHONEME_HOME)/../../src/
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
+endif
+INCLUDE += -I$(CLASSPATH_INCDIR)
+INCLUDE += -I$(BUG_LINUX_SRC)/include/
 
 ALL_CXXFLAGS += $(INCLUDE) $(CXXFLAGS)
 JNI_CLASSES = com.buglabs.bug.jni.common.CharDevice
