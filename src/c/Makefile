@@ -8,15 +8,19 @@ tokens := $(subst -,$(space),$(target))
 OS := $(word 1,$(tokens))
 ARCH := $(word 2,$(tokens))
 
-INCLUDE = -Iinclude/
-INCLUDE += -I$(STAGING_BUG_INCDIR)
+INCLUDE = -I./include/
+ifdef USE_PHONEME
+echo "USE_PHONEME is somehow defined" "monkies"
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(ARCH)
 INCLUDE += -I$(PHONEME_HOME)/../../src/
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
-INCLUDE += -I${BUG_LINUX_SRC}/include
+endif
+INCLUDE += -I$(STAGING_BUG_INCDIR)
+INCLUDE += -I$(CLASSPATH_INCDIR)
+INCLUDE += -I$(BUG_LINUX_SRC)/include/
 
 LD_FLAGS = -L${STAGING_LIBDIR}/bug
 LD_FLAGS += -lCommon
