@@ -13,14 +13,19 @@ ARCH := $(word 2,$(tokens))
 
 LIB_DIR = ../../lib/
 
-INCLUDE = -Iinclude/
-INCLUDE += -I$(STAGING_BUG_INCDIR)
+INCLUDE = -I./include/
+ifdef USE_PHONEME
+echo "USE_PHONEME is somehow defined" "monkies"
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(ARCH)
 INCLUDE += -I$(PHONEME_HOME)/../../src/
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
+endif
+INCLUDE += -I$(STAGING_BUG_INCDIR)
+INCLUDE += -I$(CLASSPATH_INCDIR)
+INCLUDE += -I$(BUG_LINUX_SRC)/include/
 
 ifndef BUG_LINUX_SRC
 	BUG_LINUX_SRC=$(CHECKOUT_DIR)/com.freescale.ltib2/rpm/BUILD/linux-2.6.19.2
