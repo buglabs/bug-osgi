@@ -1,13 +1,5 @@
 JAVAH = javah
 
-empty :=
-space := $(empty) $(empty)
-tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
-target := $(word $(words $(tmpdirs)),$(tmpdirs))
-tokens := $(subst -,$(space),$(target))
-OS := $(word 1,$(tokens))
-ARCH := $(word 2,$(tokens))
-
 INCLUDE = -I./include/
 ifdef USE_PHONEME
 echo "USE_PHONEME is somehow defined" "monkies"
