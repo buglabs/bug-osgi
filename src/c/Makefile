@@ -4,13 +4,13 @@ JAVAH = javah
 #PHONEME_HOME=$(LTIB_ROOTFS)/tmp/phoneme-advanced/cdc/build/linux-arm-mx31
 #endif
 
-empty :=
-space := $(empty) $(empty)
-tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
-target := $(word $(words $(tmpdirs)),$(tmpdirs))
-tokens := $(subst -,$(space),$(target))
-OS := $(word 1,$(tokens))
-ARCH := $(word 2,$(tokens))
+#empty :=
+#space := $(empty) $(empty)
+#tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
+#target := $(word $(words $(tmpdirs)),$(tmpdirs))
+#tokens := $(subst -,$(space),$(target))
+#OS := $(word 1,$(tokens))
+#ARCH := $(word 2,$(tokens))
 
 LIB_DIR = ../../lib/
 
@@ -18,16 +18,18 @@ LIB_DIR = ../../lib/
 #	BUG_LINUX_SRC=$(CHECKOUT_DIR)/com.freescale.ltib2/rpm/BUILD/linux-2.6.19.2
 #endif
 
-INCLUDE = -Iinclude/
-#INCLUDE += -I$(STAGING_BUG_INCDIR)
-INCLUDE += -I../../../com.buglabs.bug.jni.common/src/c/include
+
+INCLUDE = -I./include/
+ifdef USE_PHONEME
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(ARCH)
 INCLUDE += -I$(PHONEME_HOME)/../../src/
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
-INCLUDE += -I$(BUG_LINUX_SRC)/include
+endif
+INCLUDE += -I$(CLASSPATH_INCDIR)
+INCLUDE += -I$(BUG_LINUX_SRC)/include/
 
 #LD_FLAGS = -L$(CHECKOUT_DIR)/com.buglabs.bug.jni.common/lib
 LD_FLAGS = -L../../../com.buglabs.bug.jni.common/lib
