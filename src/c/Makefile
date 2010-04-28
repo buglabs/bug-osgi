@@ -14,7 +14,7 @@ endif
 
 LIB_DIR = ../../lib/
 
-NCLUDE = -I./include/
+INCLUDE = -I./include/
 ifdef USE_PHONEME
 INCLUDE += -I$(PHONEME_HOME)/../../src/share/
 INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
