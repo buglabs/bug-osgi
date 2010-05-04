@@ -1,0 +1,33 @@
+This package contains the scripts for building Bug Labs java end-user tools.
+
+com.buglabs.bug.emulator.xml
+	The Virtual Bug and module emulation packages
+
+com.buglabs.dragonfly.xml
+	The BUG SDK Eclipse plug-in. 
+	Depends on com.buglabs.bug.emulator and will build it if it doesn't find it.
+	
+com.buglabs.osgi.concierge.xml
+	Concierge, the light OSGi runtime for BUG
+	
+com.buglabs.sdk.xml
+	The all of the above wrapped up with Eclipse for instant install.
+	Currently uses Eclipse 3.5 and builds for all platforms, linux, windows, mac
+	NOTE: This build requires versions of eclipse in a certain format (zipped) 
+		in certain folders on the build machine, usually the builder's home dir.
+		Please see the "get_eclipse" target to see where it looks
+		
+		
+Other Prerequisites
+
+* linux build machine
+* eclipse v3.5 as a tarball file called eclipse-lin.tar.gz in ~/com.eclipse.sdk/ on build machine
+* other versions of eclipse for full sdk build.  See notes under com.buglabs.sdk.xml.
+* ant-contrib & svnant -- See common.xml where it loads these tasks to see where it looks.
+
+
+How to build:
+* Check out build project: svn co svn://svn.buglabs.net/dragonfly/trunk/com.buglabs.build and cd into the dir
+* run and like this: ant -Dbuild.level=[integration, testing, or production] -f [build.xml file]
+** For Example: ant -Dbuild.level=integration -f com.buglabs.sdk.xml
+* build files are created in the artifacts directory
