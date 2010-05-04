@@ -3,15 +3,17 @@
     <!-- properties cannot be changed, so load this first,
         which overrides values in the default.properties file -->
     <property file="system.${build.level}.properties" />
-    <property file="default.properties"/>
-	<property name="base.build.dir" location="${basedir}" />
+    <property file="default.properties"/> 
+    <property name="base.build.dir" location="${basedir}" />
+    <property name="checkout.dir" location="${user.home}/checkout-${build.level}" />
     
 	<!-- Setup ant-contrib libraries -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
-	    <!-- uncomment if ant-contrib is not already on classpath -->
-		<!-- classpath>
+<!--
+		<classpath>
 			<pathelement location="/usr/share/ant/lib/ant-contrib-0.6.jar" />
-		</classpath -->
+		</classpath>
+-->
 	</taskdef>
     
     <!-- add SVN task -->
