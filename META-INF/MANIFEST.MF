@@ -22,6 +22,5 @@ Import-Package: com.buglabs.status,
  org.thenesis.midpath.sound.backend.alsa,
  javax.servlet,
  javax.servlet.http,
- org.osgi.service.http,
- javax.bluetooth
+ org.osgi.service.http
  
