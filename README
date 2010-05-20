@@ -33,6 +33,9 @@ You must do a couple of things in the dragonfly bundles to prepare for a new bui
 ** Modify com.buglabs.feature/feature.xml, com.buglabs.dragonfly.ui/META-INF/MANIFEST.MF, and com.buglabs.dragonfly.updatesite/site.xml
 ** The easiest way to find where to update the version number is to do a search for the current version on all the files in eclipse.
 ** Change build number the default.properties file, see below  
+* Modify about.properties in com.buglabs.dragonfly.ui
+** Set correct version number to M.m
+** Update the release notes link
 * Modify the properties files in the com.buglabs.build (this) project
 ** Modify default.properties to set the correct version number for the different components you are building against
 ** Modify the system.<build.level>.properties file for the build level you are working on
