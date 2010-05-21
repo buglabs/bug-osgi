@@ -45,6 +45,7 @@ build_types.each do |bt|
     ["lin", "mac", "win"].each do |plat|
       link = current_dest + "/dragonfly-" + plat + ".zip"
       latest_dest = current_dest + "/" + latest_str + "/full/dragonfly-" + plat + "-" + latest_str + ".zip"
+      FileUtils.rm(link)
       FileUtils.ln_s(latest_dest, link, :verbose=>true)
     end
   end
