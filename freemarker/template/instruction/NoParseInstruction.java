@@ -52,7 +52,9 @@ public final class NoParseInstruction implements UnparsedInstruction, Serializab
 	 * Serialized noparse block as a String object. This means that for the 1.2
 	 * series of JVMs, the serialized noparse block cannot be larger than 64kB.
 	 * 
-	 * @serialField textValue String the <code>String</code> value of this text
+	 * @serialField
+	 *                  textValue String the <code>String</code> value of this
+	 *                  text
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("textValue", String.class) };
 

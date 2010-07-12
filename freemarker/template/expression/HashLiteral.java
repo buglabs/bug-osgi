@@ -58,9 +58,11 @@ public final class HashLiteral implements Expression, Serializable {
 	 * be evaluated as values. This is done primarily for type correctness, and
 	 * avoids serializing a Map object.
 	 * 
-	 * @serialField names Expression[] an array of name expressions
-	 * @serialField values Expression[] an array of value expressions associated
-	 *              with the names
+	 * @serialField
+	 *                  names Expression[] an array of name expressions
+	 * @serialField
+	 *                  values Expression[] an array of value expressions
+	 *                  associated with the names
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("names", Expression[].class), new ObjectStreamField("values", Expression[].class) };
 

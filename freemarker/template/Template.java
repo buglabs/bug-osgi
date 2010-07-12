@@ -97,11 +97,14 @@ public class Template extends AbstractTemplate implements FunctionTemplateProces
 	 * functions to be evaluated at runtime if any functions are called. This is
 	 * done primarily for type correctness, and avoids serializing a Map object.
 	 * 
-	 * @serialField compiledTemplate TemplateProcessor object holding the entire
-	 *              compiled template parse tree
-	 * @serialField functionNames String[] an array of function names
-	 * @serialField functions TemplateFunctionModel[] an array of function
-	 *              models associated with the names
+	 * @serialField
+	 *                  compiledTemplate TemplateProcessor object holding the
+	 *                  entire compiled template parse tree
+	 * @serialField
+	 *                  functionNames String[] an array of function names
+	 * @serialField
+	 *                  functions TemplateFunctionModel[] an array of function
+	 *                  models associated with the names
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("compiledTemplate", TemplateProcessor.class),
 			new ObjectStreamField("functionNames", String[].class), new ObjectStreamField("functions", TemplateFunctionModel[].class) };

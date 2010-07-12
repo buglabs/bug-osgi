@@ -2,8 +2,11 @@ package com.buglabs.osgi.sewing.pub.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.osgi.service.log.LogService;
+
 import com.buglabs.osgi.sewing.LogManager;
 
 /**
@@ -22,30 +25,30 @@ public class RequestReader {
 
 	public static String read(HttpServletRequest req) throws IOException {
 		StringBuffer sbuf = new StringBuffer();
-		
+
 		int contentLength = MAX_BYTES;
 		try {
-			contentLength = 
-				Integer.parseInt(req.getHeader(CONTENT_LENGTH));
+			contentLength = Integer.parseInt(req.getHeader(CONTENT_LENGTH));
 		} catch (NumberFormatException e) {
-			LogManager.log(LogService.LOG_DEBUG, 
-					"Unable to get content length of multipart body.", e);
+			LogManager.log(LogService.LOG_DEBUG, "Unable to get content length of multipart body.", e);
 		}
-		
+
 		InputStream istream = req.getInputStream();
-		int r, tries =0, numread = 0;
-		while (tries < MAX_TRIES && numread<contentLength) {
+		int r, tries = 0, numread = 0;
+		while (tries < MAX_TRIES && numread < contentLength) {
 			if ((r = istream.read()) >= 0) {
 				sbuf.append((char) r);
 				++numread;
 				tries = 0;
 			} else {
-				try { Thread.sleep(MILLISECONDS_WAIT); } 
-				catch (InterruptedException e) {}
+				try {
+					Thread.sleep(MILLISECONDS_WAIT);
+				} catch (InterruptedException e) {
+				}
 				++tries;
 			}
 		}
-		
+
 		return sbuf.toString();
 	}
 

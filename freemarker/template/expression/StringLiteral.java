@@ -51,8 +51,9 @@ public final class StringLiteral implements Expression, Serializable {
 	 * Serialized form is a single String object. This is primarily for
 	 * compactness and avoids having to serialize a TemplateModel object.
 	 * 
-	 * @serialField stringValue String the string value that this
-	 *              <code>StringLiteral</code> represents
+	 * @serialField
+	 *                  stringValue String the string value that this
+	 *                  <code>StringLiteral</code> represents
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("stringValue", String.class) };
 

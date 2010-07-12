@@ -64,12 +64,15 @@ public class SimpleScalar implements TemplateScalarModel, Serializable {
 	 * more verbose than required, but backward compatibility means we do it
 	 * this way.
 	 * 
-	 * @serialField stringValue String the <code>String</code> value of this
-	 *              scalar
-	 * @serialField booleanValue boolean the <code>boolean</code> value of this
-	 *              scalar
-	 * @serialField useBoolean boolean for backward compatibility, do we use the
-	 *              String or the boolean value?
+	 * @serialField
+	 *                  stringValue String the <code>String</code> value of this
+	 *                  scalar
+	 * @serialField
+	 *                  booleanValue boolean the <code>boolean</code> value of
+	 *                  this scalar
+	 * @serialField
+	 *                  useBoolean boolean for backward compatibility, do we use
+	 *                  the String or the boolean value?
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("stringValue", String.class), new ObjectStreamField("booleanValue", Boolean.TYPE),
 			new ObjectStreamField("useBoolean", Boolean.TYPE) };

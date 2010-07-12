@@ -65,10 +65,12 @@ public final class IfElseInstruction implements Instruction, TemplateProcessor, 
 	 * Serialized text block as an array of one or more if instructions,
 	 * followed by an optional else instruction.
 	 * 
-	 * @serialField ifInstructions IfInstruction[] an array of all if and elseif
-	 *              instructions
-	 * @serialField elseInstruction ElseInstruction a single, optional else
-	 *              instruction
+	 * @serialField
+	 *                  ifInstructions IfInstruction[] an array of all if and
+	 *                  elseif instructions
+	 * @serialField
+	 *                  elseInstruction ElseInstruction a single, optional else
+	 *                  instruction
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("ifInstructions", IfInstruction[].class),
 			new ObjectStreamField("elseInstruction", ElseInstruction.class) };

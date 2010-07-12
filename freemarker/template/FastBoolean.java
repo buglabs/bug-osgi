@@ -73,8 +73,9 @@ public final class FastBoolean implements TemplateScalarModel, TemplateNumberMod
 	/**
 	 * Serialize as a single boolean value, for compactness.
 	 * 
-	 * @serialField booleanValue boolean the boolean value that this
-	 *              <code>FastBoolean</code> represents
+	 * @serialField
+	 *                  booleanValue boolean the boolean value that this
+	 *                  <code>FastBoolean</code> represents
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("booleanValue", Boolean.TYPE) };
 

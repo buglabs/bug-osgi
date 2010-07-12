@@ -57,8 +57,9 @@ public final class ListLiteral implements Expression, Serializable {
 	 * primarily for type correctness and avoids having to serialize a List
 	 * object.
 	 * 
-	 * @serialField values Expression[] an array of Expression objects that will
-	 *              be evaluated as template models at run time
+	 * @serialField
+	 *                  values Expression[] an array of Expression objects that
+	 *                  will be evaluated as template models at run time
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("values", Expression[].class) };
 

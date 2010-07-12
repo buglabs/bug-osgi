@@ -57,8 +57,9 @@ public class SimpleNumber implements TemplateNumberModel, Serializable {
 	 * This makes serialized form easy, and deals with the empty value
 	 * conveniently.
 	 * 
-	 * @serialField numberValue Long the <code>Long</code> value of this number,
-	 *              or <code>null</code> if the number is empty
+	 * @serialField
+	 *                  numberValue Long the <code>Long</code> value of this
+	 *                  number, or <code>null</code> if the number is empty
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("numberValue", Long.class) };
 

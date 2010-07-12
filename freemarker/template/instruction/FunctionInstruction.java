@@ -79,12 +79,15 @@ public final class FunctionInstruction extends GenericStartInstruction implement
 	 * indicating the scope of assigned variables. This is primarily for type
 	 * correctness and avoids having to serialize a List object.
 	 * 
-	 * @serialField name Identifier the name of the function
-	 * @serialField arguments Identifier[] a list of arguments to be supplied to
-	 *              the function
-	 * @serialField scope a boolean indicating whether function variables should
-	 *              be in local scope (<code>true</code>) or global scope (
-	 *              <code>false</code>)
+	 * @serialField
+	 *                  name Identifier the name of the function
+	 * @serialField
+	 *                  arguments Identifier[] a list of arguments to be
+	 *                  supplied to the function
+	 * @serialField
+	 *                  scope a boolean indicating whether function variables
+	 *                  should be in local scope (<code>true</code>) or global
+	 *                  scope ( <code>false</code>)
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("name", Identifier.class), new ObjectStreamField("arguments", Identifier[].class),
 			new ObjectStreamField("scope", Boolean.TYPE) };

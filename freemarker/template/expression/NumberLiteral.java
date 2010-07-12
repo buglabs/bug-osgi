@@ -51,8 +51,9 @@ public final class NumberLiteral implements Expression, Serializable {
 	 * Serialized form is a single long value. Since a number literal cannot be
 	 * empty, we don't attempt a special case for it.
 	 * 
-	 * @serialField numberValue long the long value that this
-	 *              <code>NumberLiteral</code> represents
+	 * @serialField
+	 *                  numberValue long the long value that this
+	 *                  <code>NumberLiteral</code> represents
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("numberValue", Long.TYPE) };
 

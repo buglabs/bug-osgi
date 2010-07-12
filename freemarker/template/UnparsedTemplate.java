@@ -80,8 +80,9 @@ public class UnparsedTemplate extends AbstractTemplate implements Serializable {
 	 * 1.2 series of JVMs, the serialized unparsed template cannot be larger
 	 * than 64kB.
 	 * 
-	 * @serialField textValue String the <code>String</code> value of this
-	 *              template
+	 * @serialField
+	 *                  textValue String the <code>String</code> value of this
+	 *                  template
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("textValue", String.class) };
 

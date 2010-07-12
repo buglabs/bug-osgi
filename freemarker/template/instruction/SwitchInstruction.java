@@ -61,12 +61,15 @@ public final class SwitchInstruction implements Instruction, TemplateProcessor, 
 	 * Serialized form is a switch expression, an array of zero or more case
 	 * instructions, and an optional default instruction.
 	 * 
-	 * @serialField switchExpression Expression the switch expression to test
-	 *              case instructions against
-	 * @serialField caseInstructions CaseInstruction[] an array of case
-	 *              instructions to test against the switch expression
-	 * @serialField defaultInstruction DefaultCaseInstruction an optional
-	 *              default instruction
+	 * @serialField
+	 *                  switchExpression Expression the switch expression to
+	 *                  test case instructions against
+	 * @serialField
+	 *                  caseInstructions CaseInstruction[] an array of case
+	 *                  instructions to test against the switch expression
+	 * @serialField
+	 *                  defaultInstruction DefaultCaseInstruction an optional
+	 *                  default instruction
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("switchExpression", Expression.class),
 			new ObjectStreamField("caseInstructions", CaseInstruction[].class), new ObjectStreamField("defaultInstruction", DefaultCaseInstruction.class) };

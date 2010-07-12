@@ -51,7 +51,9 @@ public final class TextBlockInstruction implements Instruction, TemplateProcesso
 	 * Serialized text block as a String object. This means that for the 1.2
 	 * series of JVMs, the serialized text block cannot be larger than 64kB.
 	 * 
-	 * @serialField textValue String the <code>String</code> value of this text
+	 * @serialField
+	 *                  textValue String the <code>String</code> value of this
+	 *                  text
 	 */
 	private static final ObjectStreamField[] serialPersistentFields = { new ObjectStreamField("textValue", String.class) };
 
