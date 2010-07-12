@@ -56,59 +56,46 @@
  * This source code implements specifications defined by the Java
  * Community Process. In order to remain compliant with the specification
  * DO NOT add / change / or delete method signatures!
- */ 
-
+ */
 
 package javax.servlet.http;
 
 import java.util.Enumeration;
 
 /**
- *
- * @author		Various
- * @version		$Version$
- *
- * @deprecated		As of Java(tm) Servlet API 2.1
- *			for security reasons, with no replacement.
- *			This interface will be removed in a future
- *			version of this API.
- *
- * @see			HttpSession
- * @see			HttpSessionBindingEvent
- * @see			HttpSessionBindingListener
- *
+ * 
+ * @author Various
+ * @version $Version$
+ * 
+ * @deprecated As of Java(tm) Servlet API 2.1 for security reasons, with no
+ *             replacement. This interface will be removed in a future version
+ *             of this API.
+ * 
+ * @see HttpSession
+ * @see HttpSessionBindingEvent
+ * @see HttpSessionBindingListener
+ * 
  */
-
 
 public interface HttpSessionContext {
 
-    /**
-     *
-     * @deprecated 	As of Java Servlet API 2.1 with
-     *			no replacement. This method must 
-     *			return null and will be removed in
-     *			a future version of this API.
-     *
-     */
+	/**
+	 * 
+	 * @deprecated As of Java Servlet API 2.1 with no replacement. This method
+	 *             must return null and will be removed in a future version of
+	 *             this API.
+	 * 
+	 */
 
-    public HttpSession getSession(String sessionId);
-    
-    
-    
-  
-    /**
-     *
-     * @deprecated	As of Java Servlet API 2.1 with
-     *			no replacement. This method must return 
-     *			an empty <code>Enumeration</code> and will be removed
-     *			in a future version of this API.
-     *
-     */
+	public HttpSession getSession(String sessionId);
 
-    public Enumeration getIds();
+	/**
+	 * 
+	 * @deprecated As of Java Servlet API 2.1 with no replacement. This method
+	 *             must return an empty <code>Enumeration</code> and will be
+	 *             removed in a future version of this API.
+	 * 
+	 */
+
+	public Enumeration getIds();
 }
-
-
-
-
-

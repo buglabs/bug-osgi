@@ -61,25 +61,25 @@
 package javax.servlet;
 
 /**
- * Ensures that servlets handle
- * only one request at a time. This interface has no methods.
- *
- * <p>If a servlet implements this interface, you are <i>guaranteed</i>
- * that no two threads will execute concurrently in the
- * servlet's <code>service</code> method. The servlet container
- * can make this guarantee by synchronizing access to a single
- * instance of the servlet, or by maintaining a pool of servlet
+ * Ensures that servlets handle only one request at a time. This interface has
+ * no methods.
+ * 
+ * <p>
+ * If a servlet implements this interface, you are <i>guaranteed</i> that no two
+ * threads will execute concurrently in the servlet's <code>service</code>
+ * method. The servlet container can make this guarantee by synchronizing access
+ * to a single instance of the servlet, or by maintaining a pool of servlet
  * instances and dispatching each new request to a free servlet.
- *
- * <p>This interface does not prevent
- * synchronization problems that result from servlets accessing shared
- * resources such as static class variables or classes outside
- * the scope of the servlet.
- *
- *
- * @author	Various
- * @version	$Version$
- *
+ * 
+ * <p>
+ * This interface does not prevent synchronization problems that result from
+ * servlets accessing shared resources such as static class variables or classes
+ * outside the scope of the servlet.
+ * 
+ * 
+ * @author Various
+ * @version $Version$
+ * 
  */
 
 public interface SingleThreadModel {
