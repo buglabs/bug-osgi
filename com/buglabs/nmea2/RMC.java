@@ -3,11 +3,11 @@ package com.buglabs.nmea2;
 import com.buglabs.nmea.DegreesMinutesSeconds;
 import com.buglabs.nmea.sentences.NMEAParserException;
 
-
 /**
  * Contains RMC type NMEA sentences.
+ * 
  * @author kgilmer
- *
+ * 
  */
 public final class RMC extends AbstractNMEASentence {
 
@@ -23,7 +23,7 @@ public final class RMC extends AbstractNMEASentence {
 	protected RMC(String sentence) {
 		super(sentence);
 	}
-	
+
 	protected void initialize() {
 		magneticVariation = "";
 		timeOfFix = "";
@@ -36,40 +36,40 @@ public final class RMC extends AbstractNMEASentence {
 	}
 
 	protected void parseField(int index, String field, String fields[]) {
-			switch (index) {
-			case 1:
-				timeOfFix = field;
-				break;
-			case 2:
-				dataStatus = field;
-				break;
-			case 3:
-				latitude = field + "," + fields[index + 1];
-				break;
-			case 5:
-				longitude = field + "," + fields[index + 1];
-				break;
-			case 7:
-				groundSpeed = field;
-				break;
-			case 8:
-				trackMadeGood = field;
-				break;
-			case 9:
-				dateStamp = field;
-				break;
-			case 10:
-				if (fields.length > 11) {
-					magneticVariation = field + "," + fields[index + 1];
-					if (magneticVariation.length() == 1) {
-						magneticVariation = "";
-					}
+		switch (index) {
+		case 1:
+			timeOfFix = field;
+			break;
+		case 2:
+			dataStatus = field;
+			break;
+		case 3:
+			latitude = field + "," + fields[index + 1];
+			break;
+		case 5:
+			longitude = field + "," + fields[index + 1];
+			break;
+		case 7:
+			groundSpeed = field;
+			break;
+		case 8:
+			trackMadeGood = field;
+			break;
+		case 9:
+			dateStamp = field;
+			break;
+		case 10:
+			if (fields.length > 11) {
+				magneticVariation = field + "," + fields[index + 1];
+				if (magneticVariation.length() == 1) {
+					magneticVariation = "";
 				}
-				break;
-			default:
-				break;
 			}
-		
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	protected void validate() {
@@ -112,10 +112,10 @@ public final class RMC extends AbstractNMEASentence {
 	public String getLongitude() {
 		return longitude;
 	}
-	
 
 	/**
 	 * Calculate latitude in degrees minutes seconds units.
+	 * 
 	 * @return
 	 */
 	public DegreesMinutesSeconds getLatitudeAsDMS() {
@@ -123,16 +123,16 @@ public final class RMC extends AbstractNMEASentence {
 	}
 
 	/**
-	 *  Calculate longitude in degrees minutes seconds units.
+	 * Calculate longitude in degrees minutes seconds units.
+	 * 
 	 * @return
 	 */
 	public DegreesMinutesSeconds getLongitudeAsDMS() {
 		return new DegreesMinutesSeconds(longitude);
 	}
 
-
 	/**
-	 * @return Ground Speed 
+	 * @return Ground Speed
 	 */
 	public String getGroundSpeed() {
 		return groundSpeed;

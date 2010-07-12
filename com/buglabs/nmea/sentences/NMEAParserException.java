@@ -29,8 +29,9 @@ package com.buglabs.nmea.sentences;
 
 /**
  * An unchecked exception for NMEA parsing errors.
+ * 
  * @author aroman
- *
+ * 
  */
 public class NMEAParserException extends RuntimeException {
 
@@ -39,7 +40,7 @@ public class NMEAParserException extends RuntimeException {
 	public NMEAParserException(String msg, Throwable e) {
 		super(msg, e);
 	}
-	
+
 	public NMEAParserException(String msg) {
 		super(msg);
 	}

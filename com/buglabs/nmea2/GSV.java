@@ -7,8 +7,9 @@ import com.buglabs.nmea.SV;
 
 /**
  * Contains GSV type NMEA sentence.
+ * 
  * @author kgilmer
- *
+ * 
  */
 public final class GSV extends AbstractNMEASentence {
 

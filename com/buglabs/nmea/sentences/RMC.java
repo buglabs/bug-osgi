@@ -59,7 +59,7 @@ public class RMC extends PositionSentence {
 		this.setLatitude(newRMC.getLatitude());
 		this.setLongitude(newRMC.getLongitude());
 	}
-	
+
 	public Object parse(String sentence) {
 		magneticVariation = "";
 
@@ -144,8 +144,9 @@ public class RMC extends PositionSentence {
 	public String getMagneticVaration() {
 		return magneticVariation;
 	}
-	
+
 	public String toString() {
-		return "timeOfFix: " + timeOfFix + "  dataStatus: " + dataStatus + "  groundSpeed: " + groundSpeed + " trackMadeGood: " + trackMadeGood + " dateStamp: " + dateStamp + " magneticVariation: " + magneticVariation + "  " + super.toString();
+		return "timeOfFix: " + timeOfFix + "  dataStatus: " + dataStatus + "  groundSpeed: " + groundSpeed + " trackMadeGood: " + trackMadeGood + " dateStamp: " + dateStamp
+				+ " magneticVariation: " + magneticVariation + "  " + super.toString();
 	}
 }

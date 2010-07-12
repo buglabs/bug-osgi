@@ -31,8 +31,9 @@ import com.buglabs.nmea.sentences.NMEAParserException;
 
 /**
  * A class for PTTK type NMEA sentences.
+ * 
  * @author kgilmer
- *
+ * 
  */
 public final class PTTK extends AbstractNMEASentence {
 

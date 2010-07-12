@@ -75,7 +75,7 @@ public class StringUtil {
 		}
 		return str_array;
 	}
-	
+
 	/**
 	 * custom string splitting function as CDC/Foundation does not include
 	 * String.split();
