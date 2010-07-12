@@ -31,6 +31,7 @@ package com.buglabs.services.ws;
  * This interface is a base interface for Bug services.
  * 
  * use PublicWSProvider2, this interface maintained for compatibility.
+ * 
  * @author ken
  * 
  */

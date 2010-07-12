@@ -32,8 +32,8 @@ package com.buglabs.util;
  * RemoteOSGiService provides transparent access to services on remote service
  * platforms. It uses SLP as underlying discovery protocol. Local services can
  * be registered for remoting, applications can register listeners for
- * <code>ServiceTypes</code> to be informed whenever matching services have
- * been discovered.
+ * <code>ServiceTypes</code> to be informed whenever matching services have been
+ * discovered.
  * </p>
  * <p>
  * As soon as a service has been discovered and the listener has been informed,
@@ -119,9 +119,9 @@ public interface RemoteOSGiServiceConstants {
 	 * property for registration of a service UI component that gived the user a
 	 * presentation of the service. The value of the property in the service
 	 * property dictionary has to be a name of a class implementing
-	 * <code>org.service.proposition.remote.ServiceUIComponent</code>. When
-	 * this property is set, the presentation is injected into the bundle and
-	 * the R-OSGi ServiceUI can display the presentation when the service is
+	 * <code>org.service.proposition.remote.ServiceUIComponent</code>. When this
+	 * property is set, the presentation is injected into the bundle and the
+	 * R-OSGi ServiceUI can display the presentation when the service is
 	 * discovered.
 	 * 
 	 * @since 0.5

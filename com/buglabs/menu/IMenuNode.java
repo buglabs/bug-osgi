@@ -50,17 +50,15 @@ public interface IMenuNode {
 
 	/**
 	 * @return <code>true</code> if the children should be sorted, and <code>
-	 * false</code>
-	 *         if they should not be.
+	 * false</code> if they should not be.
 	 */
 	public boolean sortChildren();
 
 	/**
-	 * @return The Comparator to sort by if <code>sortChildren()</code>
-	 *         returns <code>true</code>. If <code>null</code> is returned,
-	 *         and <code>sortChildren()</code> returns true, the natural
-	 *         ordering, taken from the <code>compareTo()</code> method, will
-	 *         be used.
+	 * @return The Comparator to sort by if <code>sortChildren()</code> returns
+	 *         <code>true</code>. If <code>null</code> is returned, and
+	 *         <code>sortChildren()</code> returns true, the natural ordering,
+	 *         taken from the <code>compareTo()</code> method, will be used.
 	 */
 	public Comparator getComparator();
 
@@ -77,8 +75,8 @@ public interface IMenuNode {
 	 * not busy after the thread completes. This way, the menu system will not
 	 * block.
 	 * 
-	 * @return <code>true</code> if the node is busy and <code>false</code>
-	 *         if the node is not busy.
+	 * @return <code>true</code> if the node is busy and <code>false</code> if
+	 *         the node is not busy.
 	 */
 	public boolean isBusy();
 
@@ -141,8 +139,8 @@ public interface IMenuNode {
 
 	/**
 	 * 
-	 * @return <code>true</code> if this node should currently display an
-	 *         error, <code>false</code> otherwise.
+	 * @return <code>true</code> if this node should currently display an error,
+	 *         <code>false</code> otherwise.
 	 */
 	public abstract boolean isError();
 

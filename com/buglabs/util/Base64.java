@@ -200,8 +200,9 @@ public class Base64 {
 	 * Encodes up to the first three bytes of array <var>threeBytes</var> and
 	 * returns a four-byte array in Base64 notation. The actual number of
 	 * significant bytes in your array is given by <var>numSigBytes</var>. The
-	 * array <var>threeBytes</var> needs only be as big as <var>numSigBytes</var>.
-	 * Code can reuse a byte array by passing a four-byte array as <var>b4</var>.
+	 * array <var>threeBytes</var> needs only be as big as
+	 * <var>numSigBytes</var>. Code can reuse a byte array by passing a
+	 * four-byte array as <var>b4</var>.
 	 * 
 	 * @param b4
 	 *            A reusable byte array to reduce array instantiation
@@ -715,7 +716,7 @@ public class Base64 {
 		catch (java.io.UnsupportedEncodingException uee) {
 			bytes = s.getBytes();
 		} // end catch
-		// </change>
+			// </change>
 
 		// Decode
 		bytes = decode(bytes, 0, bytes.length);
@@ -977,8 +978,8 @@ public class Base64 {
 
 	/**
 	 * A {@link Base64.Base64InputStream} will read data from another
-	 * <tt>java.io.InputStream</tt>, given in the constructor, and
-	 * encode/decode to/from Base64 notation on the fly.
+	 * <tt>java.io.InputStream</tt>, given in the constructor, and encode/decode
+	 * to/from Base64 notation on the fly.
 	 * 
 	 * @see Base64
 	 * @since 1.3
@@ -1002,8 +1003,7 @@ public class Base64 {
 		 * Constructs a {@link Base64.Base64InputStream} in DECODE mode.
 		 * 
 		 * @param in
-		 *            the <tt>java.io.InputStream</tt> from which to read
-		 *            data.
+		 *            the <tt>java.io.InputStream</tt> from which to read data.
 		 * @since 1.3
 		 */
 		public Base64InputStream(java.io.InputStream in) {
@@ -1028,8 +1028,7 @@ public class Base64 {
 		 * 
 		 * 
 		 * @param in
-		 *            the <tt>java.io.InputStream</tt> from which to read
-		 *            data.
+		 *            the <tt>java.io.InputStream</tt> from which to read data.
 		 * @param options
 		 *            Specified options
 		 * @see Base64#ENCODE

@@ -73,8 +73,8 @@ public interface IMenuProvider {
 	/**
 	 * 
 	 * @param path
-	 * @return <code>true</code> if path is the current node,
-	 *         <code>false</code> otherwise.
+	 * @return <code>true</code> if path is the current node, <code>false</code>
+	 *         otherwise.
 	 */
 	public boolean isCurrentNode(String path);
 

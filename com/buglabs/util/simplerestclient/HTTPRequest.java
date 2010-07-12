@@ -40,70 +40,71 @@ import java.util.Map;
 
 import com.buglabs.util.Base64;
 
-
 /**
  * class for dealing RESTfully with HTTP Requests
  * 
- * Example Usage:
- * HttpRequest req = new HttpRequest(myConnectionProvider)
+ * Example Usage: HttpRequest req = new HttpRequest(myConnectionProvider)
  * HttpResponse resp = req.get("http://some.url")
  * System.out.println(resp.getString());
  * 
  * @author Brian
  * 
- * Revisions
- * 09-03-2008 AK added a Map header parameter to "put" and "post" to support http header 
+ *         Revisions 09-03-2008 AK added a Map header parameter to "put" and
+ *         "post" to support http header
  * 
  * 
  */
 public class HTTPRequest {
 	////////////////////////////////////////////////  HTTP REQUEST METHODS	
-	
-	private static final String HEADER_TYPE  = "Content-Type";
-    private static final String HEADER_PARA  = "Content-Disposition: form-data";
-    private static final String CONTENT_TYPE = "multipart/form-data";
-    private static final String LINE_ENDING  = "\r\n";
-    private static final String BOUNDARY     = "boundary=";
-    private static final String PARA_NAME    = "name";
-    private static final String FILE_NAME    = "filename";
-	
+
+	private static final String HEADER_TYPE = "Content-Type";
+	private static final String HEADER_PARA = "Content-Disposition: form-data";
+	private static final String CONTENT_TYPE = "multipart/form-data";
+	private static final String LINE_ENDING = "\r\n";
+	private static final String BOUNDARY = "boundary=";
+	private static final String PARA_NAME = "name";
+	private static final String FILE_NAME = "filename";
+
 	private IConnectionProvider _connectionProvider;
-	
+
 	/**
 	 * constructor where client provides connectionProvider
-	 * 	
+	 * 
 	 */
 	public HTTPRequest(IConnectionProvider connectionProvider) {
 		_connectionProvider = connectionProvider;
 	}
-	
+
 	/**
 	 * constructor that uses default connection provider
 	 */
 	public HTTPRequest() {
 		_connectionProvider = new DefaultConnectionProvider();
 	}
-	
-    /**
-     * Do an authenticated HTTP GET from url
-     * 
-     * @param url   String URL to connect to
-     * @return      HttpURLConnection ready with response data
-     */
+
+	/**
+	 * Do an authenticated HTTP GET from url
+	 * 
+	 * @param url
+	 *            String URL to connect to
+	 * @return HttpURLConnection ready with response data
+	 */
 	public HTTPResponse get(String url) throws IOException {
 		HttpURLConnection conn = _connectionProvider.getConnection(url);
 		conn.setDoInput(true);
 		conn.setDoOutput(false);
 		return connect(conn);
 	}
-	
-    /**
-     * Do an HTTP POST to url
-     * 
-     * @param url   String URL to connect to
-     * @param data  String data to post 
-     * @return      HttpURLConnection ready with response data
-     */
+
+	/**
+	 * Do an HTTP POST to url
+	 * 
+	 * @param url
+	 *            String URL to connect to
+	 * @param data
+	 *            String data to post
+	 * @return HttpURLConnection ready with response data
+	 */
 	public HTTPResponse post(String url, String data) throws IOException {
 		return post(url, data, null);
 	}
@@ -120,13 +121,13 @@ public class HTTPRequest {
 	public HTTPResponse post(String url, String data, Map headers) throws IOException {
 		HttpURLConnection conn = _connectionProvider.getConnection(url);
 		if (headers != null) {
-			Iterator iterator = headers.keySet().iterator();  
-			String key; 
-			while(iterator.hasNext()) {
-				key = iterator.next().toString(); 
-				conn.setRequestProperty(key, headers.get(key).toString()); 
+			Iterator iterator = headers.keySet().iterator();
+			String key;
+			while (iterator.hasNext()) {
+				key = iterator.next().toString();
+				conn.setRequestProperty(key, headers.get(key).toString());
 			}
-		}		
+		}
 		conn.setDoOutput(true);
 		OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream());
 		osr.write(data);
@@ -134,21 +135,22 @@ public class HTTPRequest {
 		osr.close();
 		return connect(conn);
 	}
-	
-    /**
-     * Do an HTTP POST to url
-     * 
-     * @param url       String URL to connect to
-     * @param stream    InputStream data to post 
-     * @return          HttpURLConnection ready with response data
-     */
+
+	/**
+	 * Do an HTTP POST to url
+	 * 
+	 * @param url
+	 *            String URL to connect to
+	 * @param stream
+	 *            InputStream data to post
+	 * @return HttpURLConnection ready with response data
+	 */
 	public HTTPResponse post(String url, InputStream stream) throws IOException {
 		byte[] buff = streamToByteArray(stream);
 		String data = Base64.encodeBytes(buff);
 		return post(url, data);
-	}	
-	
-	
+	}
+
 	/**
 	 * Posts a Map of key, value pair properties, like a web form
 	 * 
@@ -159,12 +161,11 @@ public class HTTPRequest {
 	 */
 	public HTTPResponse post(String url, Map properties) throws IOException {
 		String data = propertyString(properties);
-		HashMap headers = new HashMap(); 
-		headers.put("Content-Type", "application/x-www-form-urlencoded");		
+		HashMap headers = new HashMap();
+		headers.put("Content-Type", "application/x-www-form-urlencoded");
 		return post(url, data, headers);
 	}
 
-	
 	/**
 	 * Post byte data to a url
 	 * 
@@ -182,14 +183,15 @@ public class HTTPRequest {
 		os.write(data);
 		return connect(conn);
 	}
-	
+
 	/**
-	 * Does a multipart post which is different than a regular post
-	 * mostly use this one if you're posting files
+	 * Does a multipart post which is different than a regular post mostly use
+	 * this one if you're posting files
 	 * 
 	 * @param url
 	 * @param parameters
-	 * 	Key-Value pairs in map.  Keys are always string.  Values can be string or IFormFile
+	 *            Key-Value pairs in map. Keys are always string. Values can be
+	 *            string or IFormFile
 	 * @param properties
 	 * @return
 	 */
@@ -197,55 +199,56 @@ public class HTTPRequest {
 		HttpURLConnection conn = _connectionProvider.getConnection(url);
 		conn.setRequestMethod("POST");
 		String boundary = createMultipartBoundary();
-		conn.setRequestProperty(HEADER_TYPE, CONTENT_TYPE +"; "+ BOUNDARY + boundary);
-        conn.setDoOutput(true);		
-		
-		// write things out to connection
-        OutputStream os = conn.getOutputStream();
-        
-		// add parameters
-        Object [] elems = parameters.keySet().toArray();
-        StringBuffer buf; // lil helper
-        IFormFile file;
-	    for (int i=0; i < elems.length; i++) {
-	    	String key = (String)elems[i];
-	    	Object obj = parameters.get(key);
-	    	//System.out.println("--" + key);
+		conn.setRequestProperty(HEADER_TYPE, CONTENT_TYPE + "; " + BOUNDARY + boundary);
+		conn.setDoOutput(true);
 
-	    	buf = new StringBuffer();
-	    	if (obj instanceof IFormFile) {
-	    		file = (IFormFile)obj;
-	    		buf.append("--"+ boundary+LINE_ENDING);
-	    		buf.append(HEADER_PARA);
-	    		buf.append("; "+ PARA_NAME +"=\""+ key +"\"");
-	    		buf.append("; "+ FILE_NAME +"=\""+ file.getFilename() +"\""+ LINE_ENDING);
-	    		buf.append(HEADER_TYPE + ": " + file.getContentType() + ";");
-	    		buf.append(LINE_ENDING);
-	    		buf.append(LINE_ENDING);
-	    		os.write(buf.toString().getBytes());
-		    	os.write(file.getBytes());	    		
-	    	} else if (obj != null) {
-		    	buf.append("--"+ boundary+LINE_ENDING);
-		    	buf.append(HEADER_PARA);
-		    	buf.append("; "+ PARA_NAME +"=\""+ key +"\"");
-		    	buf.append(LINE_ENDING);
-		    	buf.append(LINE_ENDING);
-		    	buf.append(obj.toString());
-		    	os.write(buf.toString().getBytes());
-	    	}
-	    	os.write(LINE_ENDING.getBytes());
-	    }
-	    os.write(("--"+ boundary+"--"+LINE_ENDING).getBytes());	
+		// write things out to connection
+		OutputStream os = conn.getOutputStream();
+
+		// add parameters
+		Object[] elems = parameters.keySet().toArray();
+		StringBuffer buf; // lil helper
+		IFormFile file;
+		for (int i = 0; i < elems.length; i++) {
+			String key = (String) elems[i];
+			Object obj = parameters.get(key);
+			//System.out.println("--" + key);
+
+			buf = new StringBuffer();
+			if (obj instanceof IFormFile) {
+				file = (IFormFile) obj;
+				buf.append("--" + boundary + LINE_ENDING);
+				buf.append(HEADER_PARA);
+				buf.append("; " + PARA_NAME + "=\"" + key + "\"");
+				buf.append("; " + FILE_NAME + "=\"" + file.getFilename() + "\"" + LINE_ENDING);
+				buf.append(HEADER_TYPE + ": " + file.getContentType() + ";");
+				buf.append(LINE_ENDING);
+				buf.append(LINE_ENDING);
+				os.write(buf.toString().getBytes());
+				os.write(file.getBytes());
+			} else if (obj != null) {
+				buf.append("--" + boundary + LINE_ENDING);
+				buf.append(HEADER_PARA);
+				buf.append("; " + PARA_NAME + "=\"" + key + "\"");
+				buf.append(LINE_ENDING);
+				buf.append(LINE_ENDING);
+				buf.append(obj.toString());
+				os.write(buf.toString().getBytes());
+			}
+			os.write(LINE_ENDING.getBytes());
+		}
+		os.write(("--" + boundary + "--" + LINE_ENDING).getBytes());
 		return connect(conn);
 	}
-	
-	
+
 	/**
 	 * Do an HTTP PUT to url
 	 * 
-	 * @param url  String URL to connect to
-	 * @param data String data to post 
-	 * @return     HttpURLConnection ready with response data
+	 * @param url
+	 *            String URL to connect to
+	 * @param data
+	 *            String data to post
+	 * @return HttpURLConnection ready with response data
 	 */
 	public HTTPResponse put(String url, String data) throws IOException {
 		return put(url, data, null);
@@ -260,14 +263,14 @@ public class HTTPRequest {
 	 * @return
 	 * @throws IOException
 	 */
-	public HTTPResponse put(String url, String data, Map headers) throws IOException{
+	public HTTPResponse put(String url, String data, Map headers) throws IOException {
 		HttpURLConnection connection = _connectionProvider.getConnection(url);
 		if (headers != null) {
-			Iterator iterator = headers.keySet().iterator();  
-			String key; 
-			while(iterator.hasNext()) {
-				key = iterator.next().toString(); 
-				connection.setRequestProperty(key, headers.get(key).toString()); 
+			Iterator iterator = headers.keySet().iterator();
+			String key;
+			while (iterator.hasNext()) {
+				key = iterator.next().toString();
+				connection.setRequestProperty(key, headers.get(key).toString());
 			}
 		}
 		connection.setDoOutput(true);
@@ -276,22 +279,24 @@ public class HTTPRequest {
 		osr.write(data);
 		osr.flush();
 		osr.close();
-		return connect(connection);		
+		return connect(connection);
 	}
-	
+
 	/**
-     * Do an HTTP PUT to url
-     * 
-     * @param url       String URL to connect to
-     * @param stream    InputStream data to put 
-     * @return          HttpURLConnection ready with response data
-     */	
+	 * Do an HTTP PUT to url
+	 * 
+	 * @param url
+	 *            String URL to connect to
+	 * @param stream
+	 *            InputStream data to put
+	 * @return HttpURLConnection ready with response data
+	 */
 	public HTTPResponse put(String url, InputStream stream) throws IOException {
 		byte[] buff = streamToByteArray(stream);
 		String data = Base64.encodeBytes(buff);
-		return put(url, data);		
-	}	
-	
+		return put(url, data);
+	}
+
 	/**
 	 * Do an HTTP DELETE to url
 	 * 
@@ -304,7 +309,7 @@ public class HTTPRequest {
 		connection.setDoInput(true);
 		connection.setRequestMethod("DELETE");
 		return connect(connection);
-	}	
+	}
 
 	/**
 	 * Puts a Map of key, value pair properties, like a web form
@@ -316,28 +321,27 @@ public class HTTPRequest {
 	 */
 	public HTTPResponse put(String url, Map properties) throws IOException {
 		String data = propertyString(properties);
-		HashMap headers = new HashMap(); 
+		HashMap headers = new HashMap();
 		headers.put("Content-Type", "application/x-www-form-urlencoded");
 		return put(url, data, headers);
-	}	
+	}
 
-    /**
-     * Do an HTTP HEAD to url
-     * 
-     * @param url       String URL to connect to 
-     * @return          HttpURLConnection ready with response data
-     */ 
+	/**
+	 * Do an HTTP HEAD to url
+	 * 
+	 * @param url
+	 *            String URL to connect to
+	 * @return HttpURLConnection ready with response data
+	 */
 	public HTTPResponse head(String url) throws IOException {
 		HttpURLConnection connection = _connectionProvider.getConnection(url);
 		connection.setDoOutput(true);
 		connection.setRequestMethod("HEAD");
 		return connect(connection);
 	}
-	
-	
+
 	////////////////////////////////////////////////////////////// THESE HELP
 
-    
 	/**
 	 * Connect to server, check the status, and return the new HTTPResponse
 	 */
@@ -346,14 +350,14 @@ public class HTTPRequest {
 		response.checkStatus();
 		return response;
 	}
-	
 
-    /**
-     * A simple helper function
-     * 
-     * @param in    InputStream to turn into a byte array 
-     * @return      byte array (byte[]) w/ contents of input stream
-     */ 
+	/**
+	 * A simple helper function
+	 * 
+	 * @param in
+	 *            InputStream to turn into a byte array
+	 * @return byte array (byte[]) w/ contents of input stream
+	 */
 	public static byte[] streamToByteArray(InputStream in) throws IOException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		int read = 0;
@@ -366,10 +370,10 @@ public class HTTPRequest {
 			e1.printStackTrace();
 		}
 		return os.toByteArray();
-	}	
+	}
 
 	/**
-	 *  turns a map into a key=value property string for sending to bugnet
+	 * turns a map into a key=value property string for sending to bugnet
 	 */
 	private static String propertyString(Map props) throws IOException {
 		String propstr = new String();
@@ -383,7 +387,7 @@ public class HTTPRequest {
 		}
 		return propstr;
 	}
-	
+
 	/**
 	 * helper to create multipart form boundary
 	 * 
@@ -391,19 +395,19 @@ public class HTTPRequest {
 	 */
 	private static String createMultipartBoundary() {
 		StringBuffer buf = new StringBuffer();
-        buf.append("---------------------------");
-        
-        for (int i=0; i < 15; i++) {
-        	double rand = Math.random() * 35;
-        	if (rand < 10) {
-        		buf.append((int)rand);
-        	} else {
-        		int ascii = 87 + (int)rand;
-        		char symbol = (char)ascii;
-        		buf.append(symbol);
-        	}
-        }
-        return buf.toString();
+		buf.append("---------------------------");
+
+		for (int i = 0; i < 15; i++) {
+			double rand = Math.random() * 35;
+			if (rand < 10) {
+				buf.append((int) rand);
+			} else {
+				int ascii = 87 + (int) rand;
+				char symbol = (char) ascii;
+				buf.append(symbol);
+			}
+		}
+		return buf.toString();
 	}
-	
+
 }

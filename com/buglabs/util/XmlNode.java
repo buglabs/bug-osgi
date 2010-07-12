@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * This class represents an XML Node. Any DOM document is a tree of type
@@ -246,51 +245,45 @@ public class XmlNode {
 
 		parentNode = parent;
 	}
-	
-	public static String makeSafeXML(String string){
+
+	public static String makeSafeXML(String string) {
 		//garbage in, garbage out
-		if (string == null){
+		if (string == null) {
 			return null;
 		}
 		//no occurences of any bad chars, don't spend the time examining every char
-		if (string.indexOf('&') == -1 && string.indexOf('\'') == -1 && string.indexOf('"') == -1 && string.indexOf('<') == -1 &&
-				string.indexOf('>') == -1 ){
+		if (string.indexOf('&') == -1 && string.indexOf('\'') == -1 && string.indexOf('"') == -1 && string.indexOf('<') == -1 && string.indexOf('>') == -1) {
 			return string;
 		}
-		
-		String temp = ""; 
-		for (int index = 0; index<string.length(); index++){
-			if (string.charAt(index) == '&'){
-				if (index+4 < string.length() && string.substring(index+1, index+4)=="amp;"){
+
+		String temp = "";
+		for (int index = 0; index < string.length(); index++) {
+			if (string.charAt(index) == '&') {
+				if (index + 4 < string.length() && string.substring(index + 1, index + 4) == "amp;") {
+					continue;
+				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5) == "apos;") {
+					continue;
+				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5) == "quot;") {
+					continue;
+				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3) == "lt;") {
+					continue;
+				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3) == "gt;") {
 					continue;
 				}
-				else if (index+5 < string.length() && string.substring(index+1, index+5)=="apos;"){
-					continue;
-				}
-				else if (index+5 < string.length() && string.substring(index+1, index+5)=="quot;"){
-					continue;
-				}
-				else if (index+3 < string.length() && string.substring(index+1, index+3)=="lt;"){
-					continue;
-				}
-				else if (index+3 < string.length() && string.substring(index+1, index+3)=="gt;"){
-					continue;
-				}
-				temp+="&amp;";
-			}
-			else if (string.charAt(index) == '"')
-				temp+="&quot;";
+				temp += "&amp;";
+			} else if (string.charAt(index) == '"')
+				temp += "&quot;";
 			else if (string.charAt(index) == '\'')
-				temp+="&apos;";
+				temp += "&apos;";
 			else if (string.charAt(index) == '<')
-				temp+="&lt;";
+				temp += "&lt;";
 			else if (string.charAt(index) == '>')
-				temp+="&gt;";
-			else temp+=string.charAt(index);
+				temp += "&gt;";
+			else
+				temp += string.charAt(index);
 		}
-			
-			
+
 		return temp;
-		
+
 	}
 }

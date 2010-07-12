@@ -58,7 +58,7 @@ public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer
 	private LogService logService;
 
 	private String trackerName;
-	
+
 	private SortedMap servicePropertiesMap = null;
 
 	public AbstractServiceTracker(BundleContext context) {
@@ -198,8 +198,8 @@ public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer
 	}
 
 	/**
-	 * Helps set up the serviceProperties map
-	 * created to make generated code simpler
+	 * Helps set up the serviceProperties map created to make generated code
+	 * simpler
 	 * 
 	 * @param serviceName
 	 * @param properties
@@ -208,17 +208,16 @@ public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer
 		Map propMap = new HashMap();
 		for (int i = 0; i < properties.length; i++) {
 			propMap.put(properties[i][0], properties[i][1]);
-		} 
+		}
 		getServicePropertiesMap().put(serviceName, propMap);
-		
+
 		// also add it to the services list
 		getServices().add(serviceName);
 	}
-	
+
 	/**
-	 * returns the map of services and properties that represent
-	 * the service dependencies for this tracker
-	 * the map, in pseudo-generic code, is:
+	 * returns the map of services and properties that represent the service
+	 * dependencies for this tracker the map, in pseudo-generic code, is:
 	 * Map<String serviceName, Map<String propertyKey, String propertyVal>>
 	 * 
 	 * @return
@@ -228,8 +227,8 @@ public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer
 			servicePropertiesMap = new TreeMap();
 		}
 		return servicePropertiesMap;
-	}		
-	
+	}
+
 	/**
 	 * Used to retrieve a list of qualified service names. If you want your
 	 * application to depend on another service, simply add the fully qualified

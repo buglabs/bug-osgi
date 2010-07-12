@@ -41,6 +41,7 @@ import org.osgi.framework.BundleContext;
 public interface ICommand {
 	/**
 	 * Command initialization.
+	 * 
 	 * @param arguments
 	 * @param out
 	 * @param err
@@ -50,12 +51,13 @@ public interface ICommand {
 
 	/**
 	 * Execute the command
+	 * 
 	 * @throws Exception
 	 */
 	public void execute() throws Exception;
 
 	/**
-	 * @return true if the command and parameters are valid.  
+	 * @return true if the command and parameters are valid.
 	 */
 	public boolean isValid();
 

@@ -90,7 +90,7 @@ public class ButtonEvent {
 
 	// see above
 	public static final int BUTTON_AUDIO_VOLDOWN_PRESSED_ACTION = 16;
-	
+
 	/**
 	 * User button on BUG 2.0.
 	 */

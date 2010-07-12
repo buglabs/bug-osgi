@@ -42,10 +42,11 @@ import org.osgi.service.log.LogService;
  * 
  */
 public class LogServiceUtil {
-	
+
 	/**
 	 * @param context
-	 *		if context is null, it will return a log service that uses stdout. 
+	 *            if context is null, it will return a log service that uses
+	 *            stdout.
 	 * @return Either the first LogService available in the runtime if available
 	 *         or a SysoutLogService.
 	 */
@@ -65,7 +66,7 @@ public class LogServiceUtil {
 			String quiet = null;
 			if (context != null)
 				quiet = context.getProperty("ch.ethz.iks.concierge.log.quiet");
-			
+
 			// Determine if quiet operation is desired.
 			if (quiet == null || quiet.equals("false")) {
 				// Return a log service that outputs to stout and sterr.
@@ -143,9 +144,10 @@ public class LogServiceUtil {
 
 		return logService;
 	}
-	
+
 	/**
 	 * Log a bundle exception and print nested exception if it exists.
+	 * 
 	 * @param logService
 	 * @param message
 	 * @param exception
@@ -154,14 +156,15 @@ public class LogServiceUtil {
 		// Add error handling to be specific about what exactly happened.
 		logService.log(LogService.LOG_ERROR, message + ": " + exception.getMessage() + "\n" + stackTraceToString(exception));
 		stackTraceToString(exception);
-	
+
 		if (exception.getNestedException() != null) {
 			logService.log(LogService.LOG_ERROR, "Nested Exception: " + exception.getNestedException().getMessage() + "\n" + stackTraceToString(exception.getNestedException()));
 		}
 	}
-	
+
 	/**
 	 * Log an exception and print nested exception if it exists.
+	 * 
 	 * @param logService
 	 * @param message
 	 * @param exception
@@ -170,7 +173,7 @@ public class LogServiceUtil {
 		// Add error handling to be specific about what exactly happened.
 		logService.log(LogService.LOG_ERROR, message + ": " + exception.getMessage() + "\n" + stackTraceToString(exception));
 	}
-	
+
 	/**
 	 * @param t
 	 * @return A stack trace as a string.

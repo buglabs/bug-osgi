@@ -49,8 +49,8 @@ public interface IStatusBarProvider {
 	 *            required height for status bitmap
 	 * @param width
 	 *            required width for status bitmap
-	 * @return A key associated with requested region or <code>null</code> if
-	 *         no region can be allocated.
+	 * @return A key associated with requested region or <code>null</code> if no
+	 *         region can be allocated.
 	 */
 	public String acquireRegion(int height, int width);
 
@@ -59,33 +59,35 @@ public interface IStatusBarProvider {
 	 * 
 	 * @param clientId
 	 * @param length
-	 * @return A key associated with requested region or <code>null</code> if
-	 *         no region can be allocated.
+	 * @return A key associated with requested region or <code>null</code> if no
+	 *         region can be allocated.
 	 */
 	public String acquireRegion(int length);
 
 	/**
-	 * This method is used to get access to the entire LCD device.  Only
-	 * one client per JVM session may have access to display at one time.
-	 * Client will have entire display until releaseDisplay() is called.
-	 * During time of allocation no statusbar information will reach the display.
+	 * This method is used to get access to the entire LCD device. Only one
+	 * client per JVM session may have access to display at one time. Client
+	 * will have entire display until releaseDisplay() is called. During time of
+	 * allocation no statusbar information will reach the display.
 	 * 
 	 * @return Key to display.
 	 */
 	public String acquireDisplay();
-	
+
 	/**
 	 * Release screen from SB and menu use.
+	 * 
 	 * @param key
 	 */
 	public void releaseDisplay(String key);
-	
+
 	/**
 	 * @param key
-	 * @return The framebuffer device for a client that has allocated entire display.
+	 * @return The framebuffer device for a client that has allocated entire
+	 *         display.
 	 */
 	public IFramebufferDevice getDisplay(String key);
-	
+
 	/**
 	 * Write a bitmap to the status screen. Must successfully aquire region
 	 * before calling this method.
@@ -106,9 +108,9 @@ public interface IStatusBarProvider {
 
 	/**
 	 * Deallocate a SB region
+	 * 
 	 * @param key
 	 */
 	public void releaseRegion(String key);
-	
-	
+
 }

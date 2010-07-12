@@ -10,21 +10,18 @@ public class SupportInfoXMLFormatter implements ISupportInfoFormatter {
 
 	public String getContentType() {
 		return "text/xml";
-	}	
-	
-	public String buildResponse(String description, String kernelVersion,
-			String rootfsVersion, Map jvmProperties, Map bundleVersions) {
-		
+	}
+
+	public String buildResponse(String description, String kernelVersion, String rootfsVersion, Map jvmProperties, Map bundleVersions) {
+
 		XmlNode responseXml = new XmlNode("support");
 		try {
 			responseXml.addChildElement(new XmlNode("description", description));
 			responseXml.addChildElement(new XmlNode("kernel_version", kernelVersion));
-			responseXml.addChildElement(new XmlNode(
-					"rootfs_version", "<![CDATA[" + rootfsVersion + "]]>"));
+			responseXml.addChildElement(new XmlNode("rootfs_version", "<![CDATA[" + rootfsVersion + "]]>"));
 
 			// JVM Properties
-			XmlNode jvmPropertiesNode = 
-				responseXml.addChildElement(new XmlNode("jvm_properties"));
+			XmlNode jvmPropertiesNode = responseXml.addChildElement(new XmlNode("jvm_properties"));
 			Iterator itr = jvmProperties.keySet().iterator();
 			String key;
 			XmlNode helper;
@@ -34,11 +31,9 @@ public class SupportInfoXMLFormatter implements ISupportInfoFormatter {
 				helper.addAttribute("key", key);
 				helper.addAttribute("value", (String) jvmProperties.get(key));
 			}
-	
-	
+
 			// JVM Properties
-			XmlNode bundleVersionsNode = 
-				responseXml.addChildElement(new XmlNode("bundle_versions"));
+			XmlNode bundleVersionsNode = responseXml.addChildElement(new XmlNode("bundle_versions"));
 			itr = bundleVersions.keySet().iterator();
 			while (itr.hasNext()) {
 				key = (String) itr.next();
@@ -47,10 +42,10 @@ public class SupportInfoXMLFormatter implements ISupportInfoFormatter {
 				helper.addAttribute("version", (String) bundleVersions.get(key));
 			}
 		} catch (SelfReferenceException e) {
-			
-		}		
-		
+
+		}
+
 		return responseXml.toString();
 	}
-	
+
 }

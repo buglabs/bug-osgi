@@ -133,7 +133,7 @@ public class StreamMultiplexer extends Thread {
 			while (!isInterrupted()) {
 				//Detect InterruptedExceptions.
 				Thread.sleep(10);
-				
+
 				if (outputStreamWriters.size() > 0) {
 					read = is.read(buff);
 					if (read == -1) {
@@ -171,7 +171,7 @@ public class StreamMultiplexer extends Thread {
 			if (log != null) {
 				log.log(LogService.LOG_WARNING, "An IOException was generated", e1);
 			}
-		} catch (InterruptedException e) {		
+		} catch (InterruptedException e) {
 			log.log(LogService.LOG_INFO, this.getClass().getName() + " is shutting down.");
 		} finally {
 			// If we are going down, close all streams.
@@ -228,7 +228,9 @@ public class StreamMultiplexer extends Thread {
 	}
 
 	/**
-	 * Warning: this method is misnamed.  This method creates a new inputstream on each call.
+	 * Warning: this method is misnamed. This method creates a new inputstream
+	 * on each call.
+	 * 
 	 * @return
 	 */
 	public InputStream getInputStream() {

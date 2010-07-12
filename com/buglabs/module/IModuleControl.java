@@ -62,14 +62,14 @@ public interface IModuleControl {
 	 * @return
 	 */
 	public boolean setModuleProperty(IModuleProperty property);
-	
+
 	/**
 	 * Suspend the module.
 	 * 
 	 * @throws IOException
 	 */
 	public int suspend() throws IOException;
-	
+
 	/**
 	 * Resume the module.
 	 * 

@@ -110,40 +110,41 @@ public class StringUtil {
 		buffer.append(targetChars, copyFrom, targetChars.length - copyFrom);
 		return buffer.toString();
 	}
-	
-	
+
 	/**
-	 * Joins elements in {@link List} with a delimiter {@link String} 
+	 * Joins elements in {@link List} with a delimiter {@link String}
+	 * 
 	 * @param list
 	 * @param delimiter
 	 * @return
 	 */
 	public static String join(List list, String delimiter) {
-		String out = ""; 
-		for (int i=0; i<list.size(); i++) {
-			out += list.get(i); 
-			if (i < list.size()-1) {
-				out += delimiter; 
+		String out = "";
+		for (int i = 0; i < list.size(); i++) {
+			out += list.get(i);
+			if (i < list.size() - 1) {
+				out += delimiter;
 			}
 		}
-		return out; 
+		return out;
 	}
 
 	/**
 	 * Remove extra white spaces
+	 * 
 	 * @param source
 	 * @return
 	 */
 	public static String squeeze(String source) {
-		char[] arr = source.toCharArray(); 
-		String out = ""; 
-		char prev = ' '; 
-		for (int i=0; i<arr.length; i++) {
+		char[] arr = source.toCharArray();
+		String out = "";
+		char prev = ' ';
+		for (int i = 0; i < arr.length; i++) {
 			if (!(prev == ' ' && arr[i] == ' ')) {
-				out += arr[i]; 
+				out += arr[i];
 			}
-			prev = arr[i];  
+			prev = arr[i];
 		}
-		return out; 
-	}	
+		return out;
+	}
 }

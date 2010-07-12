@@ -34,19 +34,20 @@ import java.net.HttpURLConnection;
 import com.buglabs.util.Base64;
 
 /**
- * A connection provider to use HTTP Basic Authentication
- * Create this and pass it into the HTTPRequest construction when creating it
- * 	to use basic authenticatioin:
+ * A connection provider to use HTTP Basic Authentication Create this and pass
+ * it into the HTTPRequest construction when creating it to use basic
+ * authenticatioin:
  * 
- * HettpRequest req = HTTPRequest(new BasicAuthenticationConnectionProvider("foo", "bar"));
+ * HettpRequest req = HTTPRequest(new
+ * BasicAuthenticationConnectionProvider("foo", "bar"));
  * 
  * @author bballantine
- *
+ * 
  */
 public class BasicAuthenticationConnectionProvider extends DefaultConnectionProvider {
 
 	String credentials;
-	
+
 	public BasicAuthenticationConnectionProvider(String username, String password) {
 		String rawCreds = username + ":" + password;
 		credentials = Base64.encodeBytes(rawCreds.getBytes());
