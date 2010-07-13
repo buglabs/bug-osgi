@@ -1,7 +1,6 @@
 package com.buglabs.util;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
 /**
@@ -16,7 +15,7 @@ public class OSGiServiceLoader {
 	 *
 	 */
 	public interface IServiceLoader {
-		public void load(Object service);
+		public void load(Object service) throws Exception;
 	}
 	
 	/**
@@ -25,9 +24,9 @@ public class OSGiServiceLoader {
 	 * @param clazz
 	 * @param filter
 	 * @param loader
-	 * @throws InvalidSyntaxException
+	 * @throws Exception 
 	 */
-	public static void loadServices(BundleContext context, String clazz, String filter, IServiceLoader loader) throws InvalidSyntaxException {
+	public static void loadServices(BundleContext context, String clazz, String filter, IServiceLoader loader) throws Exception {
 		ServiceReference[] sr = context.getServiceReferences(clazz, filter);
 		
 		if (sr != null) {
