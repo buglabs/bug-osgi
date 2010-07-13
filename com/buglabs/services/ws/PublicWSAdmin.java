@@ -32,6 +32,7 @@ package com.buglabs.services.ws;
  * themselves (as PublicWSProviders) with this service.
  * 
  * @author ken
+ * @deprecated This API is deprecated.  Register PublicWSProviders with the OSGi service registry and they will be picked up by the PublicWSAdmin.
  * 
  */
 public interface PublicWSAdmin {
