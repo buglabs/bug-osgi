@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3.8.1"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/phoneME Advanced Personal"/>
 	<classpathentry kind="con" path="com.buglabs.osgi.concierge.jdt.ConciergeClasspathContainerInitializer"/>
 	<classpathentry kind="con" path="com.buglabs.osgi.concierge.jdt.OSGiBundleClassPathContainerInitializer"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
