@@ -115,11 +115,11 @@ libs:
 	make $(LIBRARY_RAW)
 	make $(LIBRARY_PARALLEL)
 	make $(LIBRARY_RS485)
-	mv $(LIBRARY_SERIAL) $(LIB_DIR)
-	mv $(LIBRARY_I2C)  $(LIB_DIR)
-	mv $(LIBRARY_RAW)  $(LIB_DIR) 
-	mv $(LIBRARY_PARALLEL)  $(LIB_DIR)
-	mv $(LIBRARY_RS485)  $(LIB_DIR)
+	cp $(LIBRARY_SERIAL) $(LIB_DIR)
+	cp $(LIBRARY_I2C)  $(LIB_DIR)
+	cp $(LIBRARY_RAW)  $(LIB_DIR) 
+	cp $(LIBRARY_PARALLEL)  $(LIB_DIR)
+	cp $(LIBRARY_RS485)  $(LIB_DIR)
 	
 
 clean:
