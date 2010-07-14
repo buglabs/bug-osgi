@@ -37,7 +37,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.accelerometer.pub.AccelerometerConfiguration;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerControl;
@@ -60,9 +59,9 @@ import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
+import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
-import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleControl, IModuleLEDController {
 	// default is 0; make ours +1 since better than BUGview at accelerometer functionality.
@@ -80,8 +79,6 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	private ServiceRegistration motionRawFeedRef;
 	private ServiceRegistration accSampleProvRef;
 	private ServiceRegistration mdaccRef;
-
-	private ServiceTracker wsMotionTracker, wsAccTracker;
 
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 
@@ -118,6 +115,8 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	private AccelerometerSampleProvider asp;
 	private boolean suspended;
 	private final BMIModuleProperties properties;
+	private ServiceRegistration motionWSReg;
+	private ServiceRegistration accelWSReg;
 
 	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
@@ -149,7 +148,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 		MotionWS motionWS = new MotionWS();
 		motionSubject.register(motionWS);
-		wsMotionTracker = PublicWSAdminTracker.createTracker(context, motionWS);
+		motionWSReg = context.registerService(PublicWSProvider.class.getName(), motionWS, null);		
 
 		configureAccelerometer();
 
@@ -159,8 +158,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		accSampleFeedRef = context.registerService(IAccelerometerSampleFeed.class.getName(), acceld, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		accControlRef = context.registerService(IAccelerometerControl.class.getName(), accControl, createServicePropertiesWithRanking(OUR_ACCELEROMETER_SERVICES_RANKING));
 		AccelerationWS accWs = new AccelerationWS(asp, log);
-		wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
-
+		accelWSReg = context.registerService(PublicWSProvider.class.getName(), accWs, null);
 		mdaccRef = context.registerService(IMDACCModuleControl.class.getName(), this, createBasicServiceProperties());
 	}
 
@@ -174,13 +172,8 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	}
 
 	public void stop() throws Exception {
-		if (wsMotionTracker != null) {
-			wsMotionTracker.close();
-		}
-
-		if (wsAccTracker != null) {
-			wsAccTracker.close();
-		}
+		motionWSReg.unregister();
+		accelWSReg.unregister();
 
 		// TODO: Throw exception at some point if we encounter a failure
 		moduleRef.unregister();
