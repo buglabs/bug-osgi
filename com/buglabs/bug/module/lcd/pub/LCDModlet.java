@@ -41,7 +41,6 @@ import java.util.TimerTask;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.accelerometer.pub.IAccelerometerRawFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleFeed;
@@ -59,9 +58,9 @@ import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
+import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
-import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 /**
  * LCD Modlet class for 1x LCD module.
@@ -87,7 +86,6 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private ServiceRegistration accIsProvRef;
 	private ServiceRegistration accRawFeedProvRef;
 	private ServiceRegistration accSampleProvRef;
-	private ServiceTracker wsAccTracker;
 	private CharDevice accel;
 	private CharDeviceInputStream accIs;
 	private ServiceRegistration lcdRef;
@@ -97,6 +95,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private boolean suspended;
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	private final BMIModuleProperties properties;
+	private ServiceRegistration wsReg;
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -154,7 +153,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 			accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), accsp, createRemotableProperties(createBasicServiceProperties()));
 			AccelerationWS accWs = new AccelerationWS(accsp, LogServiceUtil.getLogService(context));
-			wsAccTracker = PublicWSAdminTracker.createTracker(context, accWs);
+			wsReg = context.registerService(PublicWSProvider.class.getName(), accWs, null);
 		} else {
 			log.log(LogService.LOG_ERROR, "Unable to access the accelerometer device.");
 		}
@@ -198,7 +197,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		if (lcd_acc_is_prov != null) {
 			log.log(LogService.LOG_DEBUG, "closing accel");
 			lcd_acc_is_prov.interrupt();
-			wsAccTracker.close();
+			wsReg.unregister();
 			accIsProvRef.unregister();
 			accRawFeedProvRef.unregister();
 			accSampleProvRef.unregister();
