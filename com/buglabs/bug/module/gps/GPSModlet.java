@@ -44,7 +44,6 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
 import org.osgi.util.position.Position;
-import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.common.FCNTL_H;
@@ -67,13 +66,13 @@ import com.buglabs.nmea.DegreesMinutesSeconds;
 import com.buglabs.nmea2.RMC;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
+import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
 import com.buglabs.util.SelfReferenceException;
 import com.buglabs.util.XmlNode;
-import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 /**
  * The Modlet exports the hardware-level services to the OSGi runtime.
@@ -92,8 +91,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	private ServiceRegistration moduleRef;
 
 	private ServiceRegistration positionRef;
-
-	private ServiceTracker wsTracker;
 
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	protected static final String PROPERTY_IOX = "IOX";
@@ -126,6 +123,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	private final BMIModuleProperties properties;
 
 	private InputStream gpsIs;
+
+	private ServiceRegistration wsReg;
 
 	/**
 	 * @param context
@@ -182,7 +181,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		gpsControlRef = context.registerService(IGPSModuleControl.class.getName(), this, createBasicServiceProperties());
 		nmeaRef = context.registerService(INMEARawFeed.class.getName(), new NMEARawFeed(gpsIs), createBasicServiceProperties());
 		nmeaProviderRef = context.registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createBasicServiceProperties());
-		wsTracker = PublicWSAdminTracker.createTracker(context, this);
+		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
 
 		timer = new Timer();
 		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
@@ -242,10 +241,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 */
 	public void stop() throws Exception {
 		timer.cancel();
-
-		if (wsTracker != null) {
-			wsTracker.close();
-		}
+		wsReg.unregister();
 
 		context.removeServiceListener(nmeaProvider);
 		moduleRef.unregister();
