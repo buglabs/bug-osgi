@@ -7,4 +7,5 @@ Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.bmi.pub
 Import-Package: com.buglabs.util,
  org.osgi.framework,
+ org.osgi.service.log,
  com.buglabs.bug.module.pub
