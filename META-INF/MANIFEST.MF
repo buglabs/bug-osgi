@@ -12,14 +12,12 @@ Import-Package: org.osgi.util.position,
  com.buglabs.module,
  org.osgi.service.log,
  org.osgi.util.tracker,
- com.buglabs.util.trackers,
  com.buglabs.services.ws,
  com.buglabs.status,
  com.buglabs.bug.module.pub,
  com.buglabs.util,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.vonhippel,
- com.buglabs.bug.menu.pub,
  gnu.io
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0007
