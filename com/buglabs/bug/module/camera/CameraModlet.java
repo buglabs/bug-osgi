@@ -40,7 +40,6 @@ import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.input.pub.InputEventProvider;
 import com.buglabs.bug.jni.camera.Camera;
@@ -57,11 +56,11 @@ import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
+import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
-import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 /**
  * 
@@ -74,8 +73,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	private static final String CAMERA_DEVICE_NODE = "/dev/v4l/video0";
 	private static final String CAMERA_CONTROL_DEVICE_NODE = "/dev/bug_camera_control";
 	private static boolean suspended = false;
-
-	private ServiceTracker wsTracker;
 
 	private List modProps;
 
@@ -109,6 +106,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	private ServiceRegistration ledRef;
 	private String serviceName = "Picture";
 	private BMIModuleProperties properties;
+	private ServiceRegistration wsReg;
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -170,11 +168,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		bep.start();
 
 		bepReg = context.registerService(ICameraButtonEventProvider.class.getName(), bep, createRemotableProperties(getButtonServiceProperties()));
-
-		List wsProviders = new ArrayList();
-		wsProviders.add(this);
-
-		wsTracker = PublicWSAdminTracker.createTracker(context, wsProviders);
+		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
 	}
 
 	private Properties createBasicServiceProperties() {
@@ -220,7 +214,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		ledRef.unregister();
 		bep.tearDown();
 		bepReg.unregister();
-		wsTracker.close();
+		wsReg.unregister();
 		camera.close();
 		cc.close();
 	}
