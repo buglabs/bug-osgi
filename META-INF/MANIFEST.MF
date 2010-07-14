@@ -16,8 +16,6 @@ Import-Package: org.osgi.framework,
  com.buglabs.util,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.lcd,
- com.buglabs.util.trackers,
- com.buglabs.bug.menu.pub,
  com.buglabs.bug.module.motion.pub,
  com.buglabs.bug.accelerometer.pub,
  org.osgi.service.log
