@@ -5,6 +5,5 @@ Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: com.buglabs.bug.jni.common
 Export-Package: com.buglabs.bug.jni.gps
-Bundle-NativeCode: /lib/libGPS.so;
- osname=linux
-
+Bundle-NativeCode: lib/libGPS.so;
+ osname=linux; processor=armv7l
