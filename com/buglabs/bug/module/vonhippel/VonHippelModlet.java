@@ -40,7 +40,6 @@ import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.vonhippel.VonHippel;
@@ -52,8 +51,8 @@ import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
+import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 public class VonHippelModlet implements IModlet, IModuleControl {
 
@@ -66,7 +65,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	private final String moduleId;
 
 	private ServiceRegistration moduleRef;
-	private ServiceTracker wsMotionTracker, wsAccTracker;
 
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 
@@ -96,6 +94,8 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private String devNode;
 
+	private ServiceRegistration wsRef;
+
 	public VonHippelModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
 		this.context = context;
 		this.slotId = slotId;
@@ -122,24 +122,18 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		vhSerialRef = context.registerService(RXTXPort.class.getName(),serialPort , createBasicServiceProperties());
 		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhc);
-		wsMotionTracker = PublicWSAdminTracker.createTracker(context, vhWS);
+		wsRef = context.registerService(PublicWSProvider.class.getName(), vhWS, null);
 	}
 
 	public void stop() throws Exception {
 		//close any open resources
 
+		wsRef.unregister();
 		
-		if (wsMotionTracker != null) {
-			wsMotionTracker.close();
-		}
-
 		if (vhLedRef != null) {
 			vhLedRef.unregister();
 		}
 		
-		if (wsAccTracker != null) {
-			wsAccTracker.close();
-		}
 		if (moduleRef != null) {
 			moduleRef.unregister();
 		}
