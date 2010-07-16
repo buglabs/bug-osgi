@@ -69,7 +69,7 @@ public class StringUtil {
 				break;
 			}
 			token = s.substring(index_a, index_b);
-			token.trim();
+			
 			if (token.length() >= 0) {
 				tokens.add(token);
 			}
