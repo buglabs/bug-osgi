@@ -77,7 +77,6 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	//private ServiceRegistration audioReg;
 
-	private ServiceTracker menuTracker;
 
 	private LogService logService;
 
@@ -216,7 +215,6 @@ public class Activator implements BundleActivator, ITimeProvider {
 	public void stop(BundleContext context) throws Exception {
 		sr.unregister();
 		httpTracker.close();
-		menuTracker.close();
 		unregisterServices(context);
 	}
 
