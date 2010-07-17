@@ -5,6 +5,6 @@ Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: com.buglabs.bug.jni.common
 Export-Package: gnu.io
-Bundle-NativeCode: lib/librxtxI2C.so; lib/librxtxParallel.so; lib/librxtxRS485.so; lib/librxtxRaw.so; lib/librxtxSerial.so
+Bundle-NativeCode: lib/librxtxI2C.so; lib/librxtxParallel.so; lib/librxtxRS485.so; lib/librxtxRaw.so; lib/librxtxSerial.so;
  osname=linux; processor=armv7l
  
