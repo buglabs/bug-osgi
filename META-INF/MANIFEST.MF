@@ -8,7 +8,7 @@ Export-Package: com.buglabs.bug.base.pub
 Import-Package: com.buglabs.status,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.input,
-  com.buglabs.bug.input.pub,
+ com.buglabs.bug.input.pub,
  com.buglabs.device,
  com.buglabs.application,
  com.buglabs.support,
@@ -20,4 +20,6 @@ Import-Package: com.buglabs.status,
  org.thenesis.midpath.sound.backend.alsa,
  javax.servlet,
  javax.servlet.http,
- org.osgi.service.http
+ org.osgi.service.http,
+ org.osgi.framework
+
