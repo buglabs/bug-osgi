@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<project name="com.buglabs.bug.event" basedir=".">
+	<!-- PROJECT CONSTANTS -->
+	<property name="project" value="com.buglabs.bug.event" />
+
+	<!-- PROJECT IMPORTS -->
+	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
+	<import file="${common.ant.file}" />
+
+	
+</project>
