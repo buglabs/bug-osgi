@@ -1,39 +1,84 @@
 <project name="build-com.buglabs.bug.emulator" default="publish">
-    <import file="common.xml"/>
-    
+	<import file="common.xml" />
+
 	<property name="meta.project" value="com.buglabs.bug.emulator" />
 	<property name="meta.distDirectory" location="${checkout.dir}/${meta.project}/dist" />
 	<property name="distDirectory" location="${meta.distDirectory}" />
-    
+	<property name="eclipse.default.file" value="${eclipse.dir}/eclipse-lin.tar.gz" />
+	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
+
 	<!-- ===================================================================== -->
 	<!-- Build properties setup -->
 	<!-- Depending on how this script is executed build properties are either generated or inhereted from calling script -->
 	<!-- ===================================================================== -->
 	<if>
 		<not>
-      			<isset property="full.sdk.build.id"/>
+			<isset property="full.sdk.build.id" />
 		</not>
-      		<then>
-			<echo message="[Build type]: Running individual component build..."/>
+		<then>
+			<echo message="[Build type]: Running individual component build..." />
 
 			<tstamp />
 			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 			<property name="build.id" value="v${timestamp}_${build.letter}" />
 			<property name="project.version" value="${bug.version}${build.id}" />
-      		</then>
+		</then>
 		<else>
-			<echo message="[Build type]: Running full SDK component build..."/>
-			<property name="project.version" value="${bug.version}.${full.sdk.build.id}"/>
+			<echo message="[Build type]: Running full SDK component build..." />
+			<property name="project.version" value="${bug.version}.${full.sdk.build.id}" />
 		</else>
-    </if>
+	</if>
 
+	<!--
 	<property name="externalDirectory" location="${checkout.dir}/com.buglabs.bug.kernel.external" />
-	<tstamp/>
-	
+	-->
+
+
+	<tstamp />
+
 	<target name="checkout" description="Checks out projects from svn" depends="clean,makeDirs">
+		<echo message="Exctracting Eclipse SDK..." />
+		<if>
+			<and>
+				<isset property="eclipse.file" />
+				<available file="${eclipse.file}" type="file" />
+			</and>
+			<then>
+				<echo message="${eclipse.file} exists, copying..." />
+				<copy tofile="${checkout.dir}/com.eclipse.sdk/eclipse-lin.tar.gz">
+					<fileset file="${eclipse.file}" />
+				</copy>
+			</then>
+
+			<elseif>
+				<available file="${eclipse.default.file}" type="file" />
+				<then>
+					<echo message="${eclipse.default.file} exists, copying..." />
+					<copy tofile="${checkout.dir}/com.eclipse.sdk/eclipse-lin.tar.gz">
+						<fileset file="${eclipse.default.file}" />
+					</copy>
+				</then>
+			</elseif>
+
+			<else>
+				<echo message="Unable to find ${eclipse.file} or ${eclipse.default.file}, please add files or update the eclipse.file property" />
+			</else>
+		</if>
+
+		<exec dir="${checkout.dir}/com.eclipse.sdk" executable="tar">
+			<arg line="xfzv eclipse-lin.tar.gz" />
+		</exec>
+
+		<copy todir="${checkout.dir}/libs">
+			<fileset file="${checkout.dir}/com.eclipse.sdk/eclipse/plugins/javax.servlet_*" />
+			<fileset file="${checkout.dir}/com.eclipse.sdk/eclipse/plugins/org.eclipse.osgi_*" />
+			<fileset file="${checkout.dir}/com.eclipse.sdk/eclipse/plugins/org.eclipse.osgi.services_*" />
+		</copy>
+
+		<property name="externalDirectory" location="${checkout.dir}/libs" />
+
 		<svn>
 			<checkout url="${svn.url.bug}/edu.oswego.cs.dl.util.concurrent" destPath="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
-			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.kernel.external" destPath="${checkout.dir}/com.buglabs.bug.kernel.external" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.shell" destPath="${checkout.dir}/com.buglabs.osgi.shell" />
@@ -41,11 +86,11 @@
 			<checkout url="${svn.url.bug}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.program" destPath="${checkout.dir}/com.buglabs.bug.program" />
-			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />	
+			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
 			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
-			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />			
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />
 			<checkout url="${svn.url.bug}/com.sun.javax.servlet" destPath="${checkout.dir}/com.sun.javax.servlet" />
-			<checkout url="${svn.url.bug}/com.buglabs.osgi.sewing" destPath="${checkout.dir}/com.buglabs.osgi.sewing" />			
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.sewing" destPath="${checkout.dir}/com.buglabs.osgi.sewing" />
 		</svn>
 	</target>
 
@@ -58,11 +103,11 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.module" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.event" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.program" />
-		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.service" />		
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.service" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.nmea" />
-		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.simulator" />		
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.simulator" />
 		<ant antfile="build.xml" target="build.jars" dir="${checkout.dir}/com.sun.javax.servlet" />
-		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.sewing" />		
+		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.sewing" />
 	</target>
 
 	<!-- 
@@ -70,18 +115,18 @@
 		file names
 	-->
 	<target name="publish" depends="build">
-		<echo message="Publishing ${meta.project}..."/>
-        <mkdir dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}" />
+		<echo message="Publishing ${meta.project}..." />
+		<mkdir dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}" />
 
-        <copy todir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}">
+		<copy todir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}">
 			<fileset dir="${checkout.dir}/${meta.project}/dist" />
 		</copy>
 
-        <exec dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/" executable="rm">
+		<exec dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/" executable="rm">
 			<arg line="current" />
 		</exec>
 
-        <symlink link="${base.build.dir}/artifacts/${build.level}/${meta.project}/current" resource="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}"/>
+		<symlink link="${base.build.dir}/artifacts/${build.level}/${meta.project}/current" resource="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}" />
 	</target>
 
 	<target name="clean">
