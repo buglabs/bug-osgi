@@ -36,6 +36,7 @@ import java.util.List;
  * (executing).
  * 
  * @author ken
+ * @deprecated The menu system is not used in BUG 2.0.  API present for compatibility.
  * 
  */
 public interface IMenuNode {

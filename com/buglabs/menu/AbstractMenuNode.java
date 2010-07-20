@@ -34,6 +34,7 @@ import java.util.List;
  * Implements common functionality for a menu node.
  * 
  * @author kgilmer
+ * @deprecated The menu system is not used in BUG 2.0.
  * 
  */
 public abstract class AbstractMenuNode implements IMenuNode, Comparable {
