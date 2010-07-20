@@ -41,7 +41,6 @@
 			<checkout url="${svn.url.bug}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.program" destPath="${checkout.dir}/com.buglabs.bug.program" />
-			<checkout url="${svn.url.bug}/com.buglabs.bug.menu" destPath="${checkout.dir}/com.buglabs.bug.menu" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />	
 			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />			
@@ -59,7 +58,6 @@
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.module" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.event" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.program" />
-		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.menu" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.service" />		
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.nmea" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.bug.simulator" />		
