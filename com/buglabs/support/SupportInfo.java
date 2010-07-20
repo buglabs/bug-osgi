@@ -12,7 +12,7 @@ import org.osgi.service.log.LogService;
 import com.buglabs.util.LogServiceUtil;
 
 /**
- * This class is meant to be subclassed by a virtual bug or real bug version it
+ * This class is meant to be subclassed by a BUG Simulator or real bug version it
  * is to facilitate the gathering of bug information currently for the use of
  * the /support web service (which is in com.buglabs.bug.emulator.base &
  * com.buglabs.bug.base)
