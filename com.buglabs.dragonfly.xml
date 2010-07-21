@@ -68,7 +68,7 @@
 		</copy>
 	</target>
 
-	<target name="build" depends="checkEmulator,clean,setup,prepareBuildDirectories">
+	<target name="build" depends="clean,checkEmulator,setup,prepareBuildDirectories">
 		<echo message="#########################" />
 		<echo message="Building Dragonfly SDK..." />
 		<echo message="#########################" />
@@ -132,11 +132,13 @@
 		</ant>
 
 		<!-- Copy BUG Simulator jars to the SDK location -->
+		<!--
 		<property name="virtualBugJarTargetDir" value="${checkout.dir}/com.buglabs.dragonfly.simulator/bundles" />
-		<echo message="Copying emulator jars from directory: ${virtualBugJarTargetDir} to: ${base.build.dir}/artifacts/${build.level}/com.buglabs.bug.emulator/current/" />
+		<echo message="Copying emulator jars to directory: ${virtualBugJarTargetDir} from: ${base.build.dir}/artifacts/${build.level}/com.buglabs.bug.emulator/current/" />
 		<copy todir="${virtualBugJarTargetDir}">
-			<fileset dir="${base.build.dir}/artifacts/${build.level}/com.buglabs.bug.emulator/current/" />
+			<fileset dir="${base.build.dir}/artifacts/${build.level}/com.buglabs.bug.emulator/current/" includes="*.jar"/>
 		</copy>
+		-->
 	</target>
 
 	<!-- 
