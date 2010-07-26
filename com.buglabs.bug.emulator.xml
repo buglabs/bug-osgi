@@ -16,16 +16,16 @@
 			<isset property="full.sdk.build.id" />
 		</not>
 		<then>
-			<echo message="[Build type]: Running individual component build..." />
-
 			<tstamp />
 			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
-			<property name="build.id" value="v${timestamp}_${build.letter}" />
+			<property name="build.id" value="3.0.${timestamp}" />
+			<property name="bundle.version" value="2.0.${DSTAMP}" />
 			<property name="project.version" value="${bug.version}${build.id}" />
+			<echo message="[Build type]: Running individual component build version ${bundle.version}..." />
 		</then>
 		<else>
-			<echo message="[Build type]: Running full SDK component build..." />
 			<property name="project.version" value="${bug.version}.${full.sdk.build.id}" />
+			<echo message="[Build type]: Running full SDK component build version ${project.version}..." />
 		</else>
 	</if>
 

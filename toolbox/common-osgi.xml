@@ -40,7 +40,7 @@
 			<classpath refid="bin.classpath" />
 		</javac>
 		<manifest file="META-INF/MANIFEST.MF" mode="update">
-			<attribute name="Bundle-Version" value="${meta.project.version}" />
+			<attribute name="Bundle-Version" value="${bundle.version}" />
 			<attribute name="Build-Level" value="${build.level}" />
 			<attribute name="Built-On" value="${env.COMPUTERNAME} ${TODAY} ${TSTAMP}" />
 		</manifest>
