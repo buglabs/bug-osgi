@@ -38,6 +38,7 @@
 		<svn>
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly" destPath="${checkout.dir}/com.buglabs.dragonfly" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.simulator" destPath="${checkout.dir}/com.buglabs.dragonfly.simulator" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.felix" destPath="${checkout.dir}/com.buglabs.dragonfly.felix" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.feature" destPath="${checkout.dir}/com.buglabs.dragonfly.feature" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.generators" destPath="${checkout.dir}/com.buglabs.dragonfly.generators" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.ui" destPath="${checkout.dir}/com.buglabs.dragonfly.ui" />
