@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-Name: JAVA DBUS BUNDLE
+Bundle-SymbolicName: com.buglabs.bug.jni.libmatthew
+Bundle-Version: 2.5.1
+Bundle-Vendor: Bug Labs, Inc.
+Import-Package: cx.ath.matthew.io
+Export-Package: org.freedesktop.dbus
+
+
