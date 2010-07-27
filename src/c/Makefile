@@ -15,9 +15,6 @@ endif
 #OS := $(word 1,$(tokens))
 #ARCH := $(word 2,$(tokens))
 
-LD_FLAGS += -lasound
-LD_FLAGS += -lCommon
-
 LIB_DIR = ../../lib/
 
 INCLUDE = -I./include/
