@@ -6,6 +6,7 @@
 	<property name="meta.project" value="com.buglabs.dragonfly" />
 	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
 	<property name="eclipse.default.file" value="${eclipse.dir}/eclipse-lin.tar.gz" />
+	<property name="felix.download.url" value="http://www.eng.lsu.edu/mirrors/apache/felix/" />
 
 	<!-- ===================================================================== -->
 	<!-- Build properties setup -->
@@ -67,6 +68,18 @@
 		<copy todir="${checkout.dir}/${project.feature}/build/features/${project.feature}">
 			<fileset dir="${checkout.dir}/${project.feature}" excludes="**/build/**" />
 		</copy>
+
+		<!-- get Felix jars -->
+		<echo message="Downloading Felix artifacts from ${felix.download.url}" />
+		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/framework" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.framework-3.0.1.jar" />
+		</exec>
+		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.gogo.commands-0.4.0.jar" />
+		</exec>
+		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.gogo.runtime-0.6.0.jar" />
+		</exec>
 	</target>
 
 	<target name="build" depends="clean,checkEmulator,setup,prepareBuildDirectories">
@@ -111,35 +124,9 @@
 
 	<!-- force a build of the emulator if it's not there -->
 	<target name="checkEmulator">
-		<!--
-		<if>
-			<not>
-				<available file="${base.build.dir}/artifacts/${build.level}/com.buglabs.bug.emulator/current/" />
-			</not>
-			<then>
-				<echo message="Cannot find com.buglabs.bug.emulator which is required to build dragonfly." />
-				<echo message="Forcing build of com.buglabs.bug.emulator now." />
-				<ant antfile="com.buglabs.bug.emulator.xml" target="publish">
-					<property name="meta.project" value="com.buglabs.bug.emulator" />
-				</ant>
-			</then>
-			<else>
-				<echo message="com.buglabs.bug.emulator found, no need to build!" />
-			</else>
-		</if>
-		-->
 		<ant antfile="com.buglabs.bug.emulator.xml" target="publish">
 			<property name="meta.project" value="com.buglabs.bug.emulator" />
 		</ant>
-
-		<!-- Copy BUG Simulator jars to the SDK location -->
-		<!--
-		<property name="virtualBugJarTargetDir" value="${checkout.dir}/com.buglabs.dragonfly.simulator/bundles" />
-		<echo message="Copying emulator jars to directory: ${virtualBugJarTargetDir} from: ${base.build.dir}/artifacts/${build.level}/com.buglabs.bug.emulator/current/" />
-		<copy todir="${virtualBugJarTargetDir}">
-			<fileset dir="${base.build.dir}/artifacts/${build.level}/com.buglabs.bug.emulator/current/" includes="*.jar"/>
-		</copy>
-		-->
 	</target>
 
 	<!-- 
