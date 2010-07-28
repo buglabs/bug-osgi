@@ -35,7 +35,7 @@ INCLUDE += -I$(BUG_LINUX_SRC)/include/
 
 
 
-ALL_CXXFLAGS += $(INCLUDE) $(CXXFLAGS)
+ALL_CXXFLAGS += $(INCLUDE) $(CXXFLAGS) -std=c99
 
 UNIX_JNI_CLASSES+=cx.ath.matthew.unix.UnixServerSocket
 UNIX_JNI_CLASSES+=cx.ath.matthew.unix.UnixSocket
