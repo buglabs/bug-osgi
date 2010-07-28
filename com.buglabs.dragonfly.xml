@@ -48,6 +48,18 @@
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 		</svn>
 
+		<!-- get Felix jars -->
+		<echo message="Downloading Felix artifacts from ${felix.download.url}" />
+		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/framework" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.framework-3.0.1.jar" />
+		</exec>
+		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.gogo.commands-0.4.0.jar" />
+		</exec>
+		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.gogo.runtime-0.6.0.jar" />
+		</exec>
+
 
 		<!-- Add the BUG API Version to the Dragonfly Plugin Manifest -->
 		<manifest file="${checkout.dir}/com.buglabs.dragonfly/META-INF/MANIFEST.MF" mode="update">
@@ -68,18 +80,6 @@
 		<copy todir="${checkout.dir}/${project.feature}/build/features/${project.feature}">
 			<fileset dir="${checkout.dir}/${project.feature}" excludes="**/build/**" />
 		</copy>
-
-		<!-- get Felix jars -->
-		<echo message="Downloading Felix artifacts from ${felix.download.url}" />
-		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/framework" executable="wget">
-			<arg line="${felix.download.url}org.apache.felix.framework-3.0.1.jar" />
-		</exec>
-		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
-			<arg line="${felix.download.url}org.apache.felix.gogo.commands-0.4.0.jar" />
-		</exec>
-		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
-			<arg line="${felix.download.url}org.apache.felix.gogo.runtime-0.6.0.jar" />
-		</exec>
 	</target>
 
 	<target name="build" depends="clean,checkEmulator,setup,prepareBuildDirectories">
