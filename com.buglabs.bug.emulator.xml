@@ -24,6 +24,9 @@
 			<echo message="[Build type]: Running individual component build version ${bundle.version}..." />
 		</then>
 		<else>
+			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
+			<property name="build.id" value="3.0.${timestamp}" />
+			<property name="bundle.version" value="2.0.${DSTAMP}" />
 			<property name="project.version" value="${bug.version}.${full.sdk.build.id}" />
 			<echo message="[Build type]: Running full SDK component build version ${project.version}..." />
 		</else>
