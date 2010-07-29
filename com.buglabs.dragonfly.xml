@@ -51,7 +51,7 @@
 		<!-- get Felix jars -->
 		<echo message="Downloading Felix artifacts from ${felix.download.url}" />
 		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/framework" executable="wget">
-			<arg line="${felix.download.url}org.apache.felix.framework-3.0.1.jar" />
+			<arg line="${felix.download.url}org.apache.felix.main-3.0.1.jar" />
 		</exec>
 		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
 			<arg line="${felix.download.url}org.apache.felix.gogo.commands-0.4.0.jar" />
