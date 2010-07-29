@@ -54,12 +54,8 @@
 			<arg line="${felix.download.url}org.apache.felix.main-3.0.1.jar" />
 		</exec>
 		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
-			<arg line="${felix.download.url}org.apache.felix.gogo.commands-0.4.0.jar" />
+			<arg line="${felix.download.url}org.apache.felix.log-1.0.0.jar" />
 		</exec>
-		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
-			<arg line="${felix.download.url}org.apache.felix.gogo.runtime-0.6.0.jar" />
-		</exec>
-
 
 		<!-- Add the BUG API Version to the Dragonfly Plugin Manifest -->
 		<manifest file="${checkout.dir}/com.buglabs.dragonfly/META-INF/MANIFEST.MF" mode="update">
