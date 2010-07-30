@@ -31,7 +31,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import com.buglabs.bug.module.lcd.pub.LCDModlet;
+import com.buglabs.bug.module.video.pub.VideoModlet;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
@@ -61,7 +61,7 @@ public class Activator implements BundleActivator, IModletFactory {
 	}
 
 	public IModlet createModlet(BundleContext context, int slotId) {
-		return new LCDModlet(context, slotId, getModuleId());
+		return new VideoModlet(context, slotId, getModuleId());
 	}
 
 	public String getModuleId() {
@@ -85,6 +85,6 @@ public class Activator implements BundleActivator, IModletFactory {
 	}
 
 	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
-		return new LCDModlet(context, slotId, getModuleId(), properties);
+		return new VideoModlet(context, slotId, getModuleId(), properties);
 	}
 }

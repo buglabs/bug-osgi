@@ -44,7 +44,6 @@ import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
-import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
 
@@ -55,8 +54,6 @@ import com.buglabs.util.RemoteOSGiServiceConstants;
  * 
  */
 public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl, IModuleDisplay {
-
-	private static final int FILE_SCAN_MILLIS = 2000;
 	private final BundleContext context;
 	private final int slotId;
 	private final String moduleId;
@@ -66,14 +63,12 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	
 	private ServiceRegistration moduleRef;
 	private ServiceRegistration moduleDisplayServReg;
-	private ServiceRegistration videoControlServReg;
 	private LogService log;
 	private Hashtable props;
 	private boolean suspended;
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	private final BMIModuleProperties properties;
-	private ServiceRegistration wsReg;
-
+	
 	public VideoModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
 		this.slotId = slotId;
@@ -143,6 +138,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		return p;
 	}
 
+	/*
 	private void updateIModuleControlProperties() {
 		if (moduleRef != null) {
 			Properties modProperties = createBasicServiceProperties();
@@ -150,6 +146,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 			moduleRef.setProperties(modProperties);
 		}
 	}
+	*/
 
 	public List getModuleProperties() {
 		List mprops = new ArrayList();
