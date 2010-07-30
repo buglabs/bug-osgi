@@ -63,6 +63,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	
 	private ServiceRegistration moduleRef;
 	private ServiceRegistration moduleDisplayServReg;
+	private ServiceRegistration videoControlServReg;
 	private LogService log;
 	private Hashtable props;
 	private boolean suspended;
