@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG VIDEO
+Bundle-SymbolicName: com.buglabs.bug.module.video
+Bundle-Version: 1.0.0
+Bundle-Activator: com.buglabs.bug.module.video.Activator
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.bug.module.video.pub
+Import-Package: org.osgi.framework,
+ com.buglabs.device,
+ org.osgi.util.tracker,
+ com.buglabs.bug.module.pub,
+ com.buglabs.module,
+ com.buglabs.services.ws,
+ com.buglabs.status,
+ com.buglabs.util,
+ org.osgi.service.log
+Bug-Bundle-Type: Module
+Bug-Module-Id: 000D
+Bug-Module-Driver-Id: bmi_video
