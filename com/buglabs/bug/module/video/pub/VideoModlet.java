@@ -58,6 +58,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	private final int slotId;
 	private final String moduleId;
 	private final String moduleName;
+	// TODO requires driver (or something else?)to expose size before we can ditch the hardcoded frame size
 	private final int LCD_WIDTH = 320;
 	private final int LCD_HEIGHT = 240;
 	
@@ -130,6 +131,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {
+			
 			p.put("ModuleDescription", properties.getDescription());
 			p.put("ModuleSN", properties.getSerial_num());
 			p.put("ModuleVendorID", "" + properties.getVendor());
@@ -158,8 +160,13 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended" : "Active", "String", true));
 
 		if (properties != null) {
-			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
-			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			if (properties.getDescription() != null) {
+				p.put("ModuleDescription", properties.getDescription());
+			}
+			if (properties.getSerial_num() != null) {
+				p.put("ModuleSN", properties.getSerial_num());
+			}
+			
 			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
 			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
 		}
@@ -202,6 +209,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 
 	public int resume() throws IOException {
+		// TODO requires driver to expose this feature
 		/*
 		int result = -1;
 
@@ -219,6 +227,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 
 	public int suspend() throws IOException {
+		// TODO requires driver to expose this feature
 		/*
 		int result = -1;
 
