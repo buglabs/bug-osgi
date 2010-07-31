@@ -131,9 +131,12 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {
-			
-			p.put("ModuleDescription", properties.getDescription());
-			p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getDescription() != null) {
+				p.put("ModuleDescription", properties.getDescription());
+			}
+			if (properties.getSerial_num() != null) {
+				p.put("ModuleSN", properties.getSerial_num());
+			}
 			p.put("ModuleVendorID", "" + properties.getVendor());
 			p.put("ModuleRevision", "" + properties.getRevision());
 		}
@@ -161,10 +164,10 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 
 		if (properties != null) {
 			if (properties.getDescription() != null) {
-				p.put("ModuleDescription", properties.getDescription());
+				mprops.add(new ModuleProperty("ModuleDescription", properties.getDescription()));
 			}
 			if (properties.getSerial_num() != null) {
-				p.put("ModuleSN", properties.getSerial_num());
+				mprops.add(new ModuleProperty("ModuleSN", properties.getSerial_num()));
 			}
 			
 			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
