@@ -121,7 +121,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	 * @throws IOException
 	 */
 	private void notifySubscriber(Subscriber s, String message) throws IOException {
-		logService.log(LogService.LOG_DEBUG, "Notifying " + s.getUrl() + " with message: " + message);
+		logService.log(LogService.LOG_DEBUG, "Notifying " + s.getUrl() + " of model update.");
 
 		URL url = new URL(s.getUrl());
 		URLConnection conn = url.openConnection();
