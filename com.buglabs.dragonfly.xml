@@ -63,8 +63,11 @@
 		</manifest>
 
 		<!-- call CTE's target to checkout needed projects -->
+		<!--
 		<ant antfile="com.buglabs.osgi.concierge.xml" target="checkout" />
 
+		-->
+		
 		<mkdir dir="${checkout.dir}/${project.feature}/build" />
 		<mkdir dir="${checkout.dir}/${project.feature}/build/plugins" />
 		<mkdir dir="${checkout.dir}/${project.feature}/build/features" />
