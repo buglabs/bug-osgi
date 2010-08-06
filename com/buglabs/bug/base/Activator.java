@@ -220,7 +220,9 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	private void unregisterServices(BundleContext context) {
 		timeReg.unregister();
-		baseControlReg.unregister();
+		if (baseControlReg !=null){
+			baseControlReg.unregister();
+		}
 		bepReg.unregister();
 		/*if (audioReg != null) {
 			audioReg.unregister();
