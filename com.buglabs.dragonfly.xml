@@ -46,10 +46,14 @@
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.ui" destPath="${checkout.dir}/com.buglabs.dragonfly.ui" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.updatesite" destPath="${checkout.dir}/com.buglabs.dragonfly.updatesite" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.help" destPath="${checkout.dir}/com.buglabs.dragonfly.help" />
-			
+
 			<!-- bug bundles -->
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
+			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
 		</svn>
 
 		<!-- get Felix jars -->
@@ -71,7 +75,7 @@
 		<ant antfile="com.buglabs.osgi.concierge.xml" target="checkout" />
 
 		-->
-		
+
 		<mkdir dir="${checkout.dir}/${project.feature}/build" />
 		<mkdir dir="${checkout.dir}/${project.feature}/build/plugins" />
 		<mkdir dir="${checkout.dir}/${project.feature}/build/features" />
