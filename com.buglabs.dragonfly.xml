@@ -54,6 +54,9 @@
 			<checkout url="${svn.url.bug}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
 			<checkout url="${svn.url.bug}/com.buglabs.nmea" destPath="${checkout.dir}/com.buglabs.nmea" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.shell" destPath="${checkout.dir}/com.buglabs.osgi.shell" />
+			<checkout url="${svn.url.bug}/com.buglabs.osgi.sewing" destPath="${checkout.dir}/com.buglabs.osgi.sewing" />
 		</svn>
 
 		<!-- get Felix jars -->
