@@ -37,6 +37,7 @@
 	<target name="prepareBuildDirectories">
 		<echo message="Checking out projects from svn and preparing directories..." />
 		<svn>
+			<!-- plugins -->
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly" destPath="${checkout.dir}/com.buglabs.dragonfly" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.simulator" destPath="${checkout.dir}/com.buglabs.dragonfly.simulator" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.felix" destPath="${checkout.dir}/com.buglabs.dragonfly.felix" />
@@ -45,7 +46,10 @@
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.ui" destPath="${checkout.dir}/com.buglabs.dragonfly.ui" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.updatesite" destPath="${checkout.dir}/com.buglabs.dragonfly.updatesite" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.help" destPath="${checkout.dir}/com.buglabs.dragonfly.help" />
+			
+			<!-- bug bundles -->
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
+			<checkout url="${svn.url.bug}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />
 		</svn>
 
 		<!-- get Felix jars -->
