@@ -49,7 +49,7 @@
 
 			<!-- bug bundles -->
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
-			<checkout url="${svn.url.bug}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.service" destPath="${checkout.dir}/com.buglabs.bug.service" />
