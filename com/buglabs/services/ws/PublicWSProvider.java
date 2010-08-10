@@ -49,7 +49,7 @@ public interface PublicWSProvider {
 	/**
 	 * @param operation
 	 *            HTTP operation. See IPublicServiceProvider.GET, etc.
-	 * @return The description of what the service requires and provides.
+	 * @return The description of what the service requires and provides, or null of service does not support the passed operation.
 	 */
 	public PublicWSDefinition discover(int operation);
 
