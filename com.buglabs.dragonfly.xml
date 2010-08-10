@@ -47,6 +47,9 @@
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.updatesite" destPath="${checkout.dir}/com.buglabs.dragonfly.updatesite" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.help" destPath="${checkout.dir}/com.buglabs.dragonfly.help" />
 
+			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.dm" destPath="${checkout.dir}/com.buglabs.dragonfly.dm" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.dm.feature" destPath="${checkout.dir}/com.buglabs.dragonfly.dm.feature" />
+
 			<!-- bug bundles -->
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />
