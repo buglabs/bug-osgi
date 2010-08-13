@@ -50,6 +50,11 @@
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.dm" destPath="${checkout.dir}/com.buglabs.dragonfly.dm" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.dm.feature" destPath="${checkout.dir}/com.buglabs.dragonfly.dm.feature" />
 
+			<!--
+			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.cdt" destPath="${checkout.dir}/com.buglabs.dragonfly.cdt" />
+			<checkout url="${svn.url.dragonfly}/com.buglabs.dragonfly.cdt.feature" destPath="${checkout.dir}/com.buglabs.dragonfly.cdt.feature" />
+			-->
+			
 			<!-- bug bundles -->
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 			<checkout url="${svn.url.dragonfly}/com.buglabs.bug.simulator" destPath="${checkout.dir}/com.buglabs.bug.simulator" />
@@ -78,7 +83,8 @@
 
 		<!-- call device management target to checkout needed projects -->
 		<ant antfile="com.buglabs.dragonfly.dm.xml" target="prepareBuildDirectories" />
-
+		<ant antfile="com.buglabs.dragonfly.cdt.xml" target="prepareBuildDirectories" />
+		
 		<mkdir dir="${checkout.dir}/${project.feature}/build" />
 		<mkdir dir="${checkout.dir}/${project.feature}/build/plugins" />
 		<mkdir dir="${checkout.dir}/${project.feature}/build/features" />
@@ -87,7 +93,6 @@
 			<fileset dir="${checkout.dir}" excludes="**/${project.feature}/**" />
 		</copy>
 
-		<echo message="KGTEST: before copy... ${checkout.dir}/${project.feature}/build/features/${project.feature}" />
 		<copy todir="${checkout.dir}/${project.feature}/build/features/${project.feature}">
 			<fileset dir="${checkout.dir}/${project.feature}" excludes="**/build/**" />
 		</copy>
@@ -97,7 +102,10 @@
 			<fileset dir="${checkout.dir}/com.buglabs.dragonfly.dm.feature" />
 		</copy>
 		
-		<echo message="KGTEST: after copy...  ${checkout.dir}/com.buglabs.dragonfly.dm.feature" />
+		<mkdir dir="${checkout.dir}/${project.feature}/build/features/com.buglabs.dragonfly.cdt.feature" />
+		<copy todir="${checkout.dir}/${project.feature}/build/features/com.buglabs.dragonfly.cdt.feature">
+			<fileset dir="${checkout.dir}/com.buglabs.dragonfly.cdt.feature" />
+		</copy>
 	</target>
 
 	<target name="build" depends="clean,checkEmulator,setup,prepareBuildDirectories">
