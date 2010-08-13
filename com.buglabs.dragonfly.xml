@@ -76,11 +76,8 @@
 			<attribute name="BUG-API-Version" value="${bug.version}" />
 		</manifest>
 
-		<!-- call CTE's target to checkout needed projects -->
-		<!--
-		<ant antfile="com.buglabs.osgi.concierge.xml" target="checkout" />
-
-		-->
+		<!-- call device management target to checkout needed projects -->
+		<ant antfile="com.buglabs.dragonfly.dm.xml" target="prepareBuildDirectories" />
 
 		<mkdir dir="${checkout.dir}/${project.feature}/build" />
 		<mkdir dir="${checkout.dir}/${project.feature}/build/plugins" />
@@ -90,9 +87,17 @@
 			<fileset dir="${checkout.dir}" excludes="**/${project.feature}/**" />
 		</copy>
 
+		<echo message="KGTEST: before copy... ${checkout.dir}/${project.feature}/build/features/${project.feature}" />
 		<copy todir="${checkout.dir}/${project.feature}/build/features/${project.feature}">
 			<fileset dir="${checkout.dir}/${project.feature}" excludes="**/build/**" />
 		</copy>
+		
+		<mkdir dir="${checkout.dir}/${project.feature}/build/features/com.buglabs.dragonfly.dm.feature" />
+		<copy todir="${checkout.dir}/${project.feature}/build/features/com.buglabs.dragonfly.dm.feature">
+			<fileset dir="${checkout.dir}/com.buglabs.dragonfly.dm.feature" />
+		</copy>
+		
+		<echo message="KGTEST: after copy...  ${checkout.dir}/com.buglabs.dragonfly.dm.feature" />
 	</target>
 
 	<target name="build" depends="clean,checkEmulator,setup,prepareBuildDirectories">
