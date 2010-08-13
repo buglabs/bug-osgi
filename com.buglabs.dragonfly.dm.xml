@@ -70,7 +70,7 @@
 
 	<target name="build" depends="clean,setup,prepareBuildDirectories">
 		<echo message="###############" />
-		<echo message="Building CTE..." />
+		<echo message="Building ${project.feature}..." />
 		<echo message="###############" />
 		<!-- check if eclipse binary exists, if it does, copy to tmp otherwise get it -->
 		<if>
