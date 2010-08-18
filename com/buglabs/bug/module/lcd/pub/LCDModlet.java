@@ -28,7 +28,9 @@
 package com.buglabs.bug.module.lcd.pub;
 
 import java.awt.Frame;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -42,16 +44,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.accelerometer.pub.IAccelerometerRawFeed;
-import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleFeed;
-import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
-import com.buglabs.bug.jni.common.CharDevice;
-import com.buglabs.bug.jni.common.CharDeviceInputStream;
-import com.buglabs.bug.jni.common.CharDeviceUtils;
-import com.buglabs.bug.jni.lcd.LCDControl;
-import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerInputStreamProvider;
-import com.buglabs.bug.module.lcd.accelerometer.LCDAccelerometerSampleProvider;
-import com.buglabs.bug.module.motion.pub.AccelerationWS;
+
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
@@ -82,20 +75,18 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private final int LCD_WIDTH = 320;
 	private final int LCD_HEIGHT = 200;
 	private ServiceRegistration lcdControlServReg;
-	private LCDAccelerometerInputStreamProvider lcd_acc_is_prov;
 	private ServiceRegistration accIsProvRef;
 	private ServiceRegistration accRawFeedProvRef;
 	private ServiceRegistration accSampleProvRef;
-	private CharDevice accel;
-	private CharDeviceInputStream accIs;
 	private ServiceRegistration lcdRef;
 	private LogService log;
-	private LCDControl lcdcontrol;
 	private Hashtable props;
 	private boolean suspended;
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	private final BMIModuleProperties properties;
 	private ServiceRegistration wsReg;
+	
+	private final String BRIGHTNESS_SYSFS = "/sys/class/backlight/omap-backlight/brightness";
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -116,19 +107,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public void setup() throws Exception {
-		String devnode_control = "/dev/bmi_lcd_ctl_m" + (slotId + 1);
-
-		lcdcontrol = new LCDControl();
-		CharDeviceUtils.openDeviceWithRetry(lcdcontrol, devnode_control, 2);
-		String lcd_accel_devnode = "/dev/bmi_lcd_acc_m" + (slotId + 1);
-		accel = new CharDevice();
-		try {
-			CharDeviceUtils.openDeviceWithRetry(accel, lcd_accel_devnode, 2);
-			accIs = new CharDeviceInputStream(accel);
-			lcd_acc_is_prov = new LCDAccelerometerInputStreamProvider(accIs);
-		} catch (IOException e) {
-			LogServiceUtil.logBundleException(log, "Failed to access LCD control device.", e);
-		}
+		//no ioctl's for 2.0.  Perhaps we want to poll sysfs for initial info here?
 	}
 
 	public void start() throws Exception {
@@ -143,29 +122,8 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		props.put("Slot", "" + slotId);
 
 		lcdControlServReg = context.registerService(ILCDModuleControl.class.getName(), this, createRemotableProperties(null));
-
-		if (lcd_acc_is_prov != null) {
-			lcd_acc_is_prov.start();
-			accIsProvRef = context.registerService(IAccelerometerSampleFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
-			accRawFeedProvRef = context.registerService(IAccelerometerRawFeed.class.getName(), lcd_acc_is_prov, createRemotableProperties(createBasicServiceProperties()));
-
-			LCDAccelerometerSampleProvider accsp = new LCDAccelerometerSampleProvider(lcd_acc_is_prov);
-
-			accSampleProvRef = context.registerService(IAccelerometerSampleProvider.class.getName(), accsp, createRemotableProperties(createBasicServiceProperties()));
-			AccelerationWS accWs = new AccelerationWS(accsp, LogServiceUtil.getLogService(context));
-			wsReg = context.registerService(PublicWSProvider.class.getName(), accWs, null);
-		} else {
-			log.log(LogService.LOG_ERROR, "Unable to access the accelerometer device.");
-		}
-
-		if (calibFileExists()) {
-			// Calibration has occurred so we know the screen is usable.
-			moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), this, createRemotableProperties(props));
-		} else {
-			// The calibration program is running. Only register the service
-			// once the the calibration has occurred.
-			scheduleTimer();
-		}
+		
+		//no calibration process for new LCD
 	}
 
 	/**
@@ -194,19 +152,9 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public void stop() throws Exception {
-		if (lcd_acc_is_prov != null) {
-			log.log(LogService.LOG_DEBUG, "closing accel");
-			lcd_acc_is_prov.interrupt();
-			wsReg.unregister();
-			accIsProvRef.unregister();
-			accRawFeedProvRef.unregister();
-			accSampleProvRef.unregister();
-			accIs.close();
-			accel.close();
-			accel = null;
-		}
+		
 
-		lcdcontrol.close();
+		
 		moduleRef.unregister();
 		lcdRef.unregister();
 		if (moduleDisplayServReg != null) {
@@ -308,7 +256,8 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	public int resume() throws IOException {
 		int result = -1;
 
-		result = lcdcontrol.ioctl_BMI_LCD_RESUME(slotId);
+		//this will be done in sysfs
+		//result = lcdcontrol.ioctl_BMI_LCD_RESUME(slotId);
 
 		if (result < 0) {
 			throw new IOException("ioctl BMI_LCD_RESUME failed");
@@ -321,8 +270,9 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 	public int suspend() throws IOException {
 		int result = -1;
-
-		result = lcdcontrol.ioctl_BMI_LCD_SUSPEND(slotId);
+		
+		//this will be done in sysfs
+		//result = lcdcontrol.ioctl_BMI_LCD_SUSPEND(slotId);
 
 		if (result < 0) {
 			throw new IOException("ioctl BMI_LCD_SUSPEND failed");
@@ -350,31 +300,23 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public int setLEDGreen(boolean state) throws IOException {
-		if (state) {
-			return lcdcontrol.ioctl_BMI_LCD_GLEDON(slotId);
-		} else {
-			return lcdcontrol.ioctl_BMI_LCD_GLEDOFF(slotId);
-		}
+		throw new IOException("rev 2.0 LCD does not have LEDs");
 	}
 
 	public int setLEDRed(boolean state) throws IOException {
-		if (state) {
-			return lcdcontrol.ioctl_BMI_LCD_RLEDON(slotId);
-		} else {
-			return lcdcontrol.ioctl_BMI_LCD_RLEDOFF(slotId);
-		}
+		throw new IOException("rev 2.0 LCD does not have LEDs");
 	}
 
 	public int getStatus() throws IOException {
-		return lcdcontrol.ioctl_BMI_LCD_GETSTAT(slotId);
+		throw new IOException("rev 2.0 LCD does not have STAT");
 	}
 
 	public int disable() throws IOException {
-		return lcdcontrol.ioctl_BMI_LCD_SETRST(slotId);
+		throw new IOException("rev 2.0 LCD does not have DISABLE");
 	}
 
 	public int enable() throws IOException {
-		return lcdcontrol.ioctl_BMI_LCD_CLRRST(slotId);
+		throw new IOException("rev 2.0 LCD does not have ENABLE");
 	}
 
 	public int setBlackLight(int val) throws IOException {
@@ -382,6 +324,19 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public int setBackLight(int val) throws IOException {
-		return lcdcontrol.ioctl_BMI_LCD_SET_BL(slotId, val);
+		if (val < 0 || val > 100){
+			throw new IllegalArgumentException();
+		}
+		return writeToSysfs(new File(BRIGHTNESS_SYSFS), String.valueOf(val));
+
+	}
+	
+	private int writeToSysfs(File sysfsEntry, String value) throws IOException {
+		BufferedWriter out;
+
+		out = new BufferedWriter(new FileWriter(sysfsEntry));
+		out.write(String.valueOf(value));
+		out.close();
+		return 1;
 	}
 }

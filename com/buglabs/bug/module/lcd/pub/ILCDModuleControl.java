@@ -30,28 +30,11 @@ package com.buglabs.bug.module.lcd.pub;
 import java.io.IOException;
 
 import com.buglabs.module.IModuleControl;
-import com.buglabs.module.IModuleLEDController;
 
 /**
  * The interface that controls functions of the LCD module.
  */
-public interface ILCDModuleControl extends IModuleControl, IModuleLEDController {
-	/**
-	 * LCD module backlight setting to OFF
-	 */
-	public static final int BACKLIGHT_OFF = 0;
-	/**
-	 * LCD module backlight setting to LOW
-	 */
-	public static final int BACKLIGHT_LOW = 1;
-	/**
-	 * LCD module backlight setting to MED
-	 */
-	public static final int BACKLIGHT_MED = 3;
-	/**
-	 * LCD module backlight setting to HIGH
-	 */
-	public static final int BACKLIGHT_HIGH = 2;
+public interface ILCDModuleControl extends IModuleControl {
 	
 	/**
 	 * @param val
@@ -74,7 +57,6 @@ public interface ILCDModuleControl extends IModuleControl, IModuleLEDController 
 	 * @return The stat of IOX. The 3 LSBs reprersent the state of the
 	 *         backlight.
 	 */
-	public int getStatus() throws IOException; // Get IOX state
 
 	public int disable() throws IOException; // Power down module
 

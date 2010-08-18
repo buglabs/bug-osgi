@@ -15,9 +15,6 @@ Import-Package: org.osgi.framework,
  com.buglabs.status,
  com.buglabs.util,
  com.buglabs.bug.jni.common,
- com.buglabs.bug.jni.lcd,
- com.buglabs.bug.module.motion.pub,
- com.buglabs.bug.accelerometer.pub,
  org.osgi.service.log
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0003
