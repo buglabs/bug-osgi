@@ -124,24 +124,10 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		lcdControlServReg = context.registerService(ILCDModuleControl.class.getName(), this, createRemotableProperties(null));
 		
 		//no calibration process for new LCD
+		moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), LCDModlet.this, createRemotableProperties(props));
 	}
 
-	/**
-	 * Create a timer task to monitor the status of a file.
-	 */
-	private void scheduleTimer() {
-		final Timer t = new Timer();
-		t.schedule(new TimerTask() {
 
-			public void run() {
-				if (calibFileExists()) {
-					t.cancel();
-					moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), LCDModlet.this, createRemotableProperties(props));
-				}
-			}
-
-		}, FILE_SCAN_MILLIS, FILE_SCAN_MILLIS);
-	}
 
 	/**
 	 * @return true if lcd calibration file exists
@@ -184,14 +170,22 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {
-			p.put("ModuleDescription", properties.getDescription());
-			p.put("ModuleSN", properties.getSerial_num());
-			p.put("ModuleVendorID", "" + properties.getVendor());
-			p.put("ModuleRevision", "" + properties.getRevision());
-		}
+			if (properties.getDescription() != null) {
+				p.put("ModuleDescription", properties.getDescription());
+			}
+			if (properties.getSerial_num() != null) {
+				p.put("ModuleSN", properties.getSerial_num());
+			}
 
+			p.put("ModuleVendorID", "" + properties.getVendor());
+
+			p.put("ModuleRevision", "" + properties.getRevision());
+
+		}
+		
 		return p;
 	}
+
 
 	private void updateIModuleControlProperties() {
 		if (moduleRef != null) {
