@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>com.buglabs.bug.module.lcd</name>
+	<name>com.buglabs.bug.module.module</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -20,9 +20,14 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.pde.SchemaBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>com.buglabs.osgi.concierge.natures.ConciergeProjectNature</nature>
 	</natures>
 </projectDescription>
