@@ -10,6 +10,7 @@ Import-Package: com.buglabs.application,
  javax.servlet.http,
  org.osgi.framework,
  org.osgi.service.http,
+ org.osgi.service.log,
  org.osgi.util.tracker
 Export-Package: com.buglabs.osgi.sewing.pub,
  com.buglabs.osgi.sewing.pub.util,
