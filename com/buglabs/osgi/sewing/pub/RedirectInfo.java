@@ -1,9 +1,8 @@
-package com.buglabs.osgi.sewing;
+package com.buglabs.osgi.sewing.pub;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.buglabs.osgi.sewing.pub.SewingHttpServlet;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 
 public class RedirectInfo {

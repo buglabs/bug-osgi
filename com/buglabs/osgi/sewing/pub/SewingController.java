@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.log.LogService;
 
 import com.buglabs.osgi.sewing.LogManager;
-import com.buglabs.osgi.sewing.RedirectInfo;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 
 import freemarker.template.TemplateModelRoot;
@@ -53,14 +52,18 @@ import freemarker.template.TemplateModelRoot;
  * this, the controller will still use the url to map to the template. To use a
  * different template, override getTemplateName() in your SewingController.
  * 
- * 
  * @author bballantine
  * 
+ * UPDATES:
+ * 2010-08-17 AK Added support for before filter
  */
 public abstract class SewingController {
 
-	private boolean pending_redirect = false;
-	private RedirectInfo pending_redirect_info = null;
+	private boolean 		pending_redirect = false;
+	private RedirectInfo 	pending_redirect_info = null;
+	protected boolean 		skip_action = false; 
+	
+	public boolean getSkipAction() { return this.skip_action; }
 
 	/**
 	 * Override this method to handle get requests
@@ -115,7 +118,7 @@ public abstract class SewingController {
 	 * 
 	 * @return
 	 */
-	public final boolean doRedirect() {
+	public boolean doRedirect() {
 		return pending_redirect;
 	}
 
@@ -133,6 +136,20 @@ public abstract class SewingController {
 	public void clearRedirect() {
 		pending_redirect = false;
 		pending_redirect_info = null;
+	}
+	
+	/**
+	 * Override this method if you want to add pre-processing code before a GET request
+	 */
+	public void beforeGet(RequestParameters params, HttpServletRequest req, HttpServletResponse resp) {
+		// implemented by subclass
+	}
+	
+	/**
+	 * Override this method if you want to add pre-processing code before a POST request
+	 */
+	public void beforePost(RequestParameters params, HttpServletRequest req, HttpServletResponse resp) {
+		// implemented by subclass
 	}
 
 	/**
