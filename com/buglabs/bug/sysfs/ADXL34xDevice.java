@@ -132,7 +132,6 @@ public class ADXL34xDevice extends SysfsNode {
 	 */
 	private static class ADXLDeviceFilenameFilter implements FilenameFilter {
 
-		@Override
 		public boolean accept(File dir, String name) {
 			return name.endsWith("-001d");
 		}
