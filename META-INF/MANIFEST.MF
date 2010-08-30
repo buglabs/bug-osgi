@@ -22,6 +22,4 @@ Import-Package: com.buglabs.status,
  javax.servlet,
  javax.servlet.http,
  org.osgi.service.http,
- org.osgi.framework,
- 
-
+ org.osgi.framework
