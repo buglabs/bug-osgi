@@ -84,11 +84,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	private ServiceRegistration baseControlReg;
 
-	private SoundPlayer soundplayer;
-
 	private ServiceTracker httpTracker;
-
-	//private ServiceRegistration btReg;
 
 	private ServiceRegistration sr;
 
@@ -155,7 +151,6 @@ public class Activator implements BundleActivator, ITimeProvider {
 		} catch (FileNotFoundException e) {
 			logService.log(LogService.LOG_ERROR, "Unable to initialize LEDs.  " + e.getMessage());
 		}
-		//soundplayer = new SoundPlayer("hw:0,0");
 	
 		bep = new InputEventProvider(DEVNODE_BUGNAV, logService);
 		bep.start();

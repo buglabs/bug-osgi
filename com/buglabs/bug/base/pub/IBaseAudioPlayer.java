@@ -30,6 +30,10 @@ package com.buglabs.bug.base.pub;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * @deprecated
+ *
+ */
 public interface IBaseAudioPlayer {
 	/**
 	 * Plays a wave InputStream at the specified location.

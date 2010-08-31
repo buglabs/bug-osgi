@@ -7,19 +7,14 @@ Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.base.pub,
  com.buglabs.bug.sysfs
 Import-Package: com.buglabs.status,
- com.buglabs.bug.jni.common,
- com.buglabs.bug.jni.input,
- com.buglabs.bug.input.pub,
  com.buglabs.device,
  com.buglabs.application,
  com.buglabs.support,
  org.osgi.service.log,
  com.buglabs.util,
  org.osgi.util.tracker,
- org.thenesis.midpath.sound,
- org.thenesis.midpath.sound.codec,
- org.thenesis.midpath.sound.backend.alsa,
  javax.servlet,
  javax.servlet.http,
  org.osgi.service.http,
- org.osgi.framework
+ org.osgi.framework,
+ com.buglabs.bug.input.pub

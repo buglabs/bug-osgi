@@ -27,24 +27,25 @@
  *******************************************************************************/
 package com.buglabs.bug.base;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
+import com.buglabs.bug.sysfs.SysfsNode;
 
 /**
- * Impl of IBUG20BaseControl that uses sysfs file API to controle BUGbase LEDs.
+ * Impl of IBUG20BaseControl that uses sysfs file API to control BUGbase LEDs.
  * @author kgilmer
  *
  */
-public class BUGBaseControl implements IBUG20BaseControl {
+public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 	/*
-	 * LEDs in sysfs look like this:
-	 * omap3bug:blue:battery omap3bug:blue:wlan omap3bug:red:battery
-	 * omap3bug:blue:bt omap3bug:green:battery omap3bug:red:wlan
-	 * omap3bug:blue:power omap3bug:green:wlan
+	 * LEDs in /sys/class/leds look like this:
+	 * omap3bug:blue:battery  omap3bug:blue:power  omap3bug:green:battery  omap3bug:red:wlan
+	 * omap3bug:blue:bt       omap3bug:blue:wlan   omap3bug:green:wlan
 	 */
 	private static final String LED_ROOT = "/sys/class/leds/";
 	private static final String BRIGHTNESS = "/brightness";
@@ -62,7 +63,12 @@ public class BUGBaseControl implements IBUG20BaseControl {
 	private FileOutputStream wlanFH[];
 	private FileOutputStream btFH[];
 
+	/**
+	 * @throws FileNotFoundException
+	 */
 	public BUGBaseControl() throws FileNotFoundException {
+		super(new File(LED_ROOT));
+		
 		batteryFH = new FileOutputStream[3];
 		batteryFH[COLOR_BLUE] = new FileOutputStream(BATTERY_BLUE_CONTROL_FILE);
 		batteryFH[COLOR_RED] = new FileOutputStream(BATTERY_RED_CONTROL_FILE);
@@ -80,6 +86,9 @@ public class BUGBaseControl implements IBUG20BaseControl {
 		btFH[COLOR_BLUE] = new FileOutputStream(BT_BLUE_CONTROL_FILE);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#setLEDBrightness(int, int)
+	 */
 	public void setLEDBrightness(int led, int brightness) throws IOException {
 		if (brightness > 255 || led > 3) {
 			throw new IOException("Invalid LED or brightness parameter value.");
@@ -94,6 +103,9 @@ public class BUGBaseControl implements IBUG20BaseControl {
 		writeBrightness(os[0], brightness);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#setLEDColor(int, int, boolean)
+	 */
 	public void setLEDColor(int led, int color, boolean on) throws IOException {
 		if (color < 0 || color > 3) {
 			throw new IOException("Color " + color + " is not valid.");
@@ -108,11 +120,22 @@ public class BUGBaseControl implements IBUG20BaseControl {
 		writeBrightness(os[color], on ? 1 : 0);
 	}
 
+	/**
+	 * Write a brightness value to a LED.
+	 * @param outputStream
+	 * @param i
+	 * @throws IOException
+	 */
 	private void writeBrightness(OutputStream outputStream, int i) throws IOException {
 		outputStream.write(("" + i).getBytes());
 		outputStream.flush();
 	}
 
+	/**
+	 * @param index
+	 * @return the output stream for a given LED
+	 * @throws IOException
+	 */
 	private OutputStream[] getOutputStream(int index) throws IOException {
 		switch (index) {
 		case 0:
