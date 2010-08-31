@@ -2,8 +2,11 @@ package com.buglabs.bug.sysfs;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.cert.CRL;
 
 /**
  * An abstract class for files within sysfs.  This class has helper methods in dealing with the files.
@@ -13,6 +16,7 @@ import java.io.IOException;
 public abstract class SysfsNode {
 
 	protected final File root;
+	private static final String CRLF = System.getProperty("line.separator");
 
 	public SysfsNode(File root) {
 		if (!root.exists() || !root.isDirectory()) {
@@ -108,6 +112,22 @@ public abstract class SysfsNode {
 			//Just ignore errors and return null;
 			return null;
 		}
+	}
 	
+
+	/**
+	 * Write a line to a file.
+	 * @param file
+	 * @param line
+	 * @throws IOException
+	 */
+	protected void println(File file, String line) throws IOException {
+		//TODO consider caching here.
+		FileOutputStream fos = new FileOutputStream(file);
+		
+		fos.write(line.getBytes());
+		fos.write(CRLF.getBytes());
+		
+		fos.close();
 	}
 }

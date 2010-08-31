@@ -28,6 +28,7 @@
 package com.buglabs.bug.base.pub;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Provides control of BUGbase 20 LEDs.
@@ -54,6 +55,38 @@ public interface IBUG20BaseControl {
 	public void setLEDColor(int led, int color, boolean on) throws IOException;
 	
 	/**
+	 * @param led
+	 * @param color
+	 * @throws IOException
+	 */
+	public int getLEDBrightness(int led, int color) throws IOException;
+	
+	/**
+	 * Set the trigger for a given LED and Color
+	 * @param led
+	 * @param color
+	 * @param trigger
+	 * @throws IOException
+	 */
+	public void setLEDTrigger(int led, int color, String trigger) throws IOException;
+	
+	/**
+	 * @param led
+	 * @param color
+	 * @return The trigger a given light is currently set to.
+	 * @throws IOException
+	 */
+	public String getLEDTrigger(int led, int color) throws IOException;
+	
+	/**
+	 * @param led
+	 * @param color
+	 * @return A list of string names of triggers that can be set for LEDs.
+	 * @throws IOException
+	 */
+	public String[] getLEDTriggers(int led, int color) throws IOException;
+	
+	/**
 	 * Set brightness level for PWM-controlled LED.
 	 * 
 	 * @param led IBUGBaseControl.LED_*
@@ -61,4 +94,9 @@ public interface IBUG20BaseControl {
 	 * @throws IOException is thrown if invalid LED value is passed.
 	 */
 	public void setLEDBrightness(int led, int brightness) throws IOException;
+	
+	/**
+	 * @return A list of LEDDevices controllable on BUG 2.0 base.
+	 */
+	public List getLEDDevices();
 }

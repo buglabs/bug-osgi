@@ -29,106 +29,87 @@ package com.buglabs.bug.base;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
+import com.buglabs.bug.sysfs.LEDDevice;
 import com.buglabs.bug.sysfs.SysfsNode;
 
 /**
  * Impl of IBUG20BaseControl that uses sysfs file API to control BUGbase LEDs.
+ * 
  * @author kgilmer
- *
+ * 
  */
 public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 	/*
-	 * LEDs in /sys/class/leds look like this:
-	 * omap3bug:blue:battery  omap3bug:blue:power  omap3bug:green:battery  omap3bug:red:wlan
-	 * omap3bug:blue:bt       omap3bug:blue:wlan   omap3bug:green:wlan
+	 * LEDs in /sys/class/leds look like this: omap3bug:blue:battery
+	 * omap3bug:blue:power omap3bug:green:battery omap3bug:red:wlan
+	 * omap3bug:blue:bt omap3bug:blue:wlan omap3bug:green:wlan
 	 */
 	private static final String LED_ROOT = "/sys/class/leds/";
-	private static final String BRIGHTNESS = "/brightness";
-	private static final String BATTERY_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:blue:battery" + BRIGHTNESS;
-	private static final String BATTERY_RED_CONTROL_FILE = LED_ROOT + "omap3bug:red:battery" + BRIGHTNESS;
-	private static final String BATTERY_GREEN_CONTROL_FILE = LED_ROOT + "omap3bug:green:battery" + BRIGHTNESS;
-	private static final String POWER_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:blue:power" + BRIGHTNESS;
-	private static final String WLAN_GREEN_CONTROL_FILE = LED_ROOT + "omap3bug:green:wlan" + BRIGHTNESS;
-	private static final String WLAN_RED_CONTROL_FILE = LED_ROOT + "omap3bug:red:wlan" + BRIGHTNESS;
-	private static final String WLAN_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:blue:wlan" + BRIGHTNESS;
-	private static final String BT_BLUE_CONTROL_FILE = LED_ROOT + "omap3bug:blue:bt" + BRIGHTNESS;
 
-	private OutputStream batteryFH[];
-	private OutputStream powerFH[];
-	private FileOutputStream wlanFH[];
-	private FileOutputStream btFH[];
+	private LEDDevice batteryLED;
+	private LEDDevice wlanLED;
+	private LEDDevice powerLED;
+	private LEDDevice btLED;
 
 	/**
 	 * @throws FileNotFoundException
 	 */
 	public BUGBaseControl() throws FileNotFoundException {
 		super(new File(LED_ROOT));
-		
-		batteryFH = new FileOutputStream[3];
-		batteryFH[COLOR_BLUE] = new FileOutputStream(BATTERY_BLUE_CONTROL_FILE);
-		batteryFH[COLOR_RED] = new FileOutputStream(BATTERY_RED_CONTROL_FILE);
-		batteryFH[COLOR_GREEN] = new FileOutputStream(BATTERY_GREEN_CONTROL_FILE);
 
-		powerFH = new FileOutputStream[1];
-		powerFH[COLOR_BLUE] = new FileOutputStream(POWER_BLUE_CONTROL_FILE);
-
-		wlanFH = new FileOutputStream[3];
-		wlanFH[COLOR_BLUE] = new FileOutputStream(WLAN_BLUE_CONTROL_FILE);
-		wlanFH[COLOR_RED] = new FileOutputStream(WLAN_RED_CONTROL_FILE);
-		wlanFH[COLOR_GREEN] = new FileOutputStream(WLAN_GREEN_CONTROL_FILE);
-
-		btFH = new FileOutputStream[1];
-		btFH[COLOR_BLUE] = new FileOutputStream(BT_BLUE_CONTROL_FILE);
+		batteryLED = new LEDDevice(root, "battery");
+		wlanLED = new LEDDevice(root, "wifi");
+		powerLED = new LEDDevice(root, "power", "blue");
+		btLED = new LEDDevice(root, "bt", "blue");
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#setLEDBrightness(int, int)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#setLEDBrightness(int,
+	 * int)
 	 */
 	public void setLEDBrightness(int led, int brightness) throws IOException {
 		if (brightness > 255 || led > 3) {
 			throw new IOException("Invalid LED or brightness parameter value.");
 		}
-		
-		OutputStream [] os = getOutputStream(led);
-		
-		if (os.length > 1) {
-			throw new IOException("LED " + led + " does not support brightness");
+
+		LEDDevice ld = getLEDDevice(led);
+
+		if (ld.getType() == LEDDevice.TYPE_MONO_COLOR) {
+			ld.setBrightness(LEDDevice.COLOR_MONO, brightness);
+		} else {
+			ld.setBrightness(LEDDevice.COLOR_RED, brightness);
+			ld.setBrightness(LEDDevice.COLOR_GREEN, brightness);
+			ld.setBrightness(LEDDevice.COLOR_BLUE, brightness);
 		}
-		
-		writeBrightness(os[0], brightness);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#setLEDColor(int, int, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#setLEDColor(int, int,
+	 * boolean)
 	 */
 	public void setLEDColor(int led, int color, boolean on) throws IOException {
 		if (color < 0 || color > 3) {
 			throw new IOException("Color " + color + " is not valid.");
 		}
-		
-		OutputStream [] os = getOutputStream(led);
-		
-		if (os.length != 3) {
+
+		LEDDevice ld = getLEDDevice(led);
+
+		if (ld.getType() == LEDDevice.COLOR_MONO) {
 			throw new IOException("LED " + led + " does not allow color to be set.");
 		}
 
-		writeBrightness(os[color], on ? 1 : 0);
-	}
+		int value = on ? 128 : 0;
 
-	/**
-	 * Write a brightness value to a LED.
-	 * @param outputStream
-	 * @param i
-	 * @throws IOException
-	 */
-	private void writeBrightness(OutputStream outputStream, int i) throws IOException {
-		outputStream.write(("" + i).getBytes());
-		outputStream.flush();
+		ld.setBrightness(color, value);
 	}
 
 	/**
@@ -136,18 +117,51 @@ public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 	 * @return the output stream for a given LED
 	 * @throws IOException
 	 */
-	private OutputStream[] getOutputStream(int index) throws IOException {
+	private LEDDevice getLEDDevice(int index) throws IOException {
 		switch (index) {
 		case 0:
-			return batteryFH;
+			return batteryLED;
 		case 1:
-			return powerFH;
+			return powerLED;
 		case 2:
-			return wlanFH;
+			return wlanLED;
 		case 3:
-			return btFH;
+			return btLED;
 		default:
 			throw new IOException("LED index out of bounds: " + index);
 		}
+	}
+
+	public int getLEDBrightness(int led, int color) throws IOException {
+		LEDDevice ld = getLEDDevice(led);
+
+		if (ld.getType() == LEDDevice.TYPE_MONO_COLOR && color != LEDDevice.COLOR_MONO) {
+			throw new IOException("This LED device doesn't support color: " + color);
+		}
+
+		return ld.getBrightness(color);
+	}
+
+	public void setLEDTrigger(int led, int color, String trigger) throws IOException {
+
+		LEDDevice ld = getLEDDevice(led);
+
+		ld.setTrigger(color, trigger);
+	}
+
+	public String getLEDTrigger(int led, int color) throws IOException {
+		LEDDevice ld = getLEDDevice(led);
+
+		return ld.getLEDTrigger(color);
+	}
+
+	public String[] getLEDTriggers(int led, int color) throws IOException {
+		LEDDevice ld = getLEDDevice(led);
+
+		return ld.getLEDTriggers(color);
+	}
+
+	public List getLEDDevices() {
+		return Arrays.asList(new LEDDevice[] {batteryLED, wlanLED, btLED, powerLED});
 	}
 }
