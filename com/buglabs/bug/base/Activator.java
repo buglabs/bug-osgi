@@ -73,6 +73,8 @@ public class Activator implements BundleActivator, ITimeProvider {
 	
 	private static final String DEVNODE_BUGNAV = "/dev/input/event0";
 
+	private static Activator ref;
+
 	private ServiceRegistration timeReg;
 
 	//private ServiceRegistration audioReg;
@@ -91,6 +93,8 @@ public class Activator implements BundleActivator, ITimeProvider {
 	private InputEventProvider bep;
 
 	private ServiceRegistration bepReg;
+
+	private BundleContext context;
 
 	public Date getTime() {
 		return Calendar.getInstance().getTime();
@@ -142,6 +146,8 @@ public class Activator implements BundleActivator, ITimeProvider {
 	}
 
 	public void start(final BundleContext context) throws Exception {
+		this.context = context;
+		ref = this;
 		logService = LogServiceUtil.getLogService(context);
 
 		// Set base version property.
@@ -224,5 +230,13 @@ public class Activator implements BundleActivator, ITimeProvider {
 		}*/
 		
 		//btReg.unregister();
+	}
+
+	public static Activator getDefault() {
+		return ref;
+	}
+
+	public BundleContext getBundleContext() {
+		return context;
 	}
 }
