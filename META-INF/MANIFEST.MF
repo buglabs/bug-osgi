@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-Name: JAVA DBUS BUNDLE
-Bundle-SymbolicName: com.buglabs.bug.jni.libmatthew
+Bundle-SymbolicName: org.freedesktop.dbus
 Bundle-Version: 2.5.1
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: cx.ath.matthew.io
