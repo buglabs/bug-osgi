@@ -29,7 +29,7 @@ public class BMIDevice extends SysfsNode {
 	private int powerCharging;
 	private String serialNum;
 	
-	protected BMIDevice(File root, int slot) {
+	public BMIDevice(File root, int slot) {
 		super(root);
 		this.slot = slot;
 		this.description = getFirstLineofFile(new File(root, "description"));
