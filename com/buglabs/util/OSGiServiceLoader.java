@@ -1,5 +1,8 @@
 package com.buglabs.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
@@ -34,5 +37,25 @@ public class OSGiServiceLoader {
 				loader.load(context.getService(sr[i]));
 			}
 		}
+	}
+	
+	/**
+	 * @param context
+	 * @param clazz
+	 * @param filter
+	 * @return A list of service instances that match the input parameters.
+	 * @throws Exception
+	 */
+	public static List getServices(BundleContext context, String clazz, String filter) throws Exception {
+		final List svcList = new ArrayList();
+		
+		loadServices(context, clazz, filter, new IServiceLoader() {
+			
+			public void load(Object service) throws Exception {
+				svcList.add(service);
+			}
+		});
+		
+		return svcList;
 	}
 }
