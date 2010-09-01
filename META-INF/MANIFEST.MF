@@ -3,6 +3,9 @@ Bundle-Name: JAVA DBUS BUNDLE
 Bundle-SymbolicName: org.freedesktop.dbus
 Bundle-Version: 2.5.1
 Bundle-Vendor: Bug Labs, Inc.
-Import-Package: cx.ath.matthew.io,
+Import-Package: 
+ cx.ath.matthew.io,
+ cx.ath.matthew.unix,
+ cx.ath.matthew.utils,
  cx.ath.matthew.debug
 Export-Package: org.freedesktop.dbus
