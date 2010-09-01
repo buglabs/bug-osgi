@@ -4,7 +4,8 @@ Bundle-SymbolicName: com.buglabs.bug.jni.libmatthew
 Bundle-Version: 0.7.1
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: cx.ath.matthew.io,
- cx.ath.matthew.unix
+ cx.ath.matthew.unix,
+ cx.ath.matthew.debug
 Bundle-NativeCode: lib/libcgi-java.so; lib/libunix-java.so;
  osname=linux; processor=armv7l
 
