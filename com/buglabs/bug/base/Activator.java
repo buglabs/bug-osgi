@@ -154,6 +154,9 @@ public class Activator implements BundleActivator, ITimeProvider {
 		System.setProperty(BUG_BASE_VERSION_KEY, getBaseVersion());
 		try {
 			bbc = new BUGBaseControl();
+			//see http://redmine.buglabs.net/issues/show/1424
+			bbc.setLEDTrigger(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_BLUE, "none");
+			bbc.setLEDBrightness(IBUG20BaseControl.LED_POWER, 255);
 		} catch (FileNotFoundException e) {
 			logService.log(LogService.LOG_ERROR, "Unable to initialize LEDs.  " + e.getMessage());
 		}
