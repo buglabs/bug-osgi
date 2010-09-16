@@ -27,9 +27,7 @@
  *******************************************************************************/
 package com.buglabs.bug.jni.camera;
 
-import com.buglabs.bug.jni.common.CharDevice;
-
-public class CameraControl extends CharDevice {
+public class CameraControl {
 
 	public native int ioctl_BMI_CAM_FLASH_HIGH_BEAM();
 
@@ -52,10 +50,15 @@ public class CameraControl extends CharDevice {
 	 * 
 	 * @param slot
 	 *            The slot of the camera to be selected.
+	 * @deprecated
 	 * @return
 	 */
 	public native int ioctl_BMI_CAM_SELECT(int slot);
 
+	/**
+	 * 
+	 * @return the number of the slot the selected camera is in
+	 */
 	public native int ioctl_BMI_CAM_GET_SELECTED();
 	
 	public native int ioctl_BMI_CAM_SUSPEND();

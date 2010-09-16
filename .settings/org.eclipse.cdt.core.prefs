@@ -1,5 +1,22 @@
-#Wed Oct 15 16:18:40 GMT-04:00 2008
+#Wed Sep 08 08:09:09 EDT 2010
 eclipse.preferences.version=1
-environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528=<?xml version\="1.0"?>\n<environment append\="true" appendContributed\="true">\n  <variable name\="COMMON_CLASSPATH" value\="${CHECKOUT_DIR}/com.buglabs.bug.jni.common/bin" operation\="replace" delimiter\=";"/>\n  <variable name\="CXXFLAGS" value\="-B ${ROOTFS_STAGING}/lib/ -B ${ROOTFS_STAGING}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp" operation\="replace" delimiter\=";"/>\n  <variable name\="CXX" value\="arm-poky-linux-gnueabi-g++" operation\="replace" delimiter\=";"/>\n  <variable name\="JAVAH_CLASSPATH" value\="../../bin" operation\="append" delimiter\=";"/>\n</environment>
-indexerId=org.eclipse.cdt.core.fastIndexer
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528=
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/value=arm-angstrom-linux-gnueabi-gcc
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/COMMON_CLASSPATH/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/COMMON_CLASSPATH/operation=replace
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/COMMON_CLASSPATH/value=${CHECKOUT_DIR}/com.buglabs.bug.jni.common/bin
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXX/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXX/operation=replace
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXX/value=arm-angstrom-linux-gnueabi-g++
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXXFLAGS/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXXFLAGS/operation=replace
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXXFLAGS/value=-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/JAVAH_CLASSPATH/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/JAVAH_CLASSPATH/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/JAVAH_CLASSPATH/value=../../bin
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/append=true
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/appendContributed=true
 indexer/indexerId=org.eclipse.cdt.core.fastIndexer
+indexerId=org.eclipse.cdt.core.fastIndexer

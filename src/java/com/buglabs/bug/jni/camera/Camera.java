@@ -30,22 +30,29 @@ package com.buglabs.bug.jni.camera;
 import com.buglabs.bug.jni.common.CharDevice;
 
 public class Camera extends CharDevice {
-
 	static {
 		System.loadLibrary("Camera");
 	}
+			
+	public native int bug_camera_open(final String media_node,
+			int slot_num,
+			int raw_height,
+			int raw_width,
+			int resize_height,
+			int resize_width);
+	public native int bug_camera_close();
 
-	public native int init();
+	// start acquiring frames (typically for preview mode)
+	// camera must have been opened first
+	public native int bug_camera_start();
+	
+	// stop acquiring frames (typically for preview mode)
+	// camera may be closed one it' stopped
+	public native int bug_camera_stop();
 
-	public native int initExt(int sizeX, int sizeY, int format, boolean highQuality);
-
-	public native int overlayinit(int left, int top, int width, int height);
-
-	public native int overlaystart();
-
-	public native int overlaystop();
-
-	public native byte[] grabFrame();
-
-	public native byte[] grabFrameExt(int sizeX, int sizeY, int format, boolean highQuality);
+	// grab a preview-sized image as RGB
+	public native byte[] bug_camera_grab_preview();
+	
+	// grab a raw-sized image as JPEG
+	public native byte[] bug_camera_grab_raw();
 }

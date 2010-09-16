@@ -25,430 +25,301 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-#include <iostream>
-#include <jni.h>
-#include "jni/com_buglabs_bug_jni_camera_Camera.h"
-#include <fcntl.h>
-#include <linux/videodev.h>
-#include <linux/fb.h>
-#include <sys/ioctl.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/mman.h>
-#include "CharDevice.h"
-#include "Camera.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <linux/videodev2.h>
 extern "C" {
 #include "jpeglib.h"
+#include "bug_v4l.h"
 }
+#include "jni/com_buglabs_bug_jni_camera_Camera.h"
 
-#define TFAIL -1
-#define TPASS 0
+class JStringWrapper {
+public:
+	JStringWrapper(JNIEnv *jenv, jstring js);
+	~JStringWrapper();
 
-using namespace std;
+	operator const char *() const;
 
-size_t compressUYVY(int fd, unsigned char * buff, int length, int sizeX, int sizeY) {
-	int bytesPerPixel = 2;
-	int byteSize = sizeX * sizeY * bytesPerPixel;
-	unsigned char * data = 0;
-	unsigned char * realdata = (unsigned char *) malloc(byteSize);
-	memset(realdata, 0, byteSize);
-	data = realdata;
-	
-	int result = read(fd, data, byteSize);
-	
-	if(result < 0) {
-		perror("Unable to read device\n");
-	}
-	
-	if(result < byteSize) {
-		//TODO: Throw exception
-		perror("Unable to read complete file");
-	}
-	
-	  int i = 0;
-	  
-	  FILE * out = fmemopen(buff, length, "w");
-
-	  struct jpeg_compress_struct comp;
-	  struct jpeg_error_mgr error;
-	  
-	  comp.err = jpeg_std_error(&error);
-	  jpeg_create_compress(&comp);
-	  jpeg_stdio_dest(&comp, out);
-	  comp.image_width = sizeX;
-	  comp.image_height = sizeY;
-	  comp.input_components = 3;
-	  comp.in_color_space = JCS_YCbCr;
-	  jpeg_set_defaults(&comp);
-	  jpeg_set_quality(&comp, 90, TRUE);
-	  jpeg_start_compress(&comp, TRUE);
-
-
-	  unsigned char * yuvBuf = (unsigned char *) calloc(sizeX, 3);
-	  
-	  if(yuvBuf < 0) {
-	    return FALSE;
-	  }
-
-	  for (i = 0; i < sizeY; ++i) {
-	    //convert a scanline from CbYCrY to YCbCr
-	    unsigned char * yuvPtr = yuvBuf;
-	    unsigned char * uyvyPtr = data;
-
-	    while(yuvPtr < (unsigned char *) (yuvBuf + (sizeX * 3))) {
-	      yuvPtr[0] = uyvyPtr[1];
-	      yuvPtr[1] = uyvyPtr[0];
-	      yuvPtr[2] = uyvyPtr[2];
-	      yuvPtr[3] = uyvyPtr[3];
-	      yuvPtr[4] = uyvyPtr[0];
-	      yuvPtr[5] = uyvyPtr[2];
-	      
-	      uyvyPtr = uyvyPtr + 4;
-	      yuvPtr = yuvPtr + 6;
-	    }
-
-	    jpeg_write_scanlines(&comp, &yuvBuf, 1);
-	    data += (sizeX * 2);
-	  }
-	 
-	  free(yuvBuf);
-	  free(realdata);
-	  jpeg_finish_compress(&comp);
-	  fflush(out);
-	  
-	  size_t dataWritten = ftell(out);
-	  
-	  fclose(out);
-	  jpeg_destroy_compress(&comp);
-	 
-	  lseek(fd, 0, SEEK_SET);
-	  
-	  return dataWritten; 
-}
-
-int camera_overlay_setup(int fd_v4l, struct v4l2_format *fmt, int disp_lcd, int sens_width, int sens_height, int cam_rotate, int cam_framerate)
+private:
+	JNIEnv *m_jenv;
+	const jstring m_jstring;
+	const char *m_cstring;
+	jboolean m_isCopy;
+};
+JStringWrapper::JStringWrapper(JNIEnv *jenv, jstring js)
+: m_jenv(jenv),
+  m_jstring(js),
+  m_cstring(jenv->GetStringUTFChars(js, &m_isCopy))
 {
-        struct v4l2_streamparm parm;
-        v4l2_std_id id;
-        struct v4l2_control ctl;
-        struct v4l2_crop crop;
-
-        if (ioctl(fd_v4l, VIDIOC_S_OUTPUT, &disp_lcd) < 0)
-        {
-                printf("VIDIOC_S_OUTPUT failed\n");
-                return TFAIL;
-        } 
-
-        ctl.id = V4L2_CID_PRIVATE_BASE;
-		ctl.value = cam_rotate;
-        if (ioctl(fd_v4l, VIDIOC_S_CTRL, &ctl) < 0)
-        {
-                printf("set control failed\n");
-                return TFAIL;
-        } 
-
-        crop.type = V4L2_BUF_TYPE_VIDEO_OVERLAY;
-        crop.c.left = 0;
-        crop.c.top = 0;
-        crop.c.width = sens_width;
-        crop.c.height = sens_height;
-        if (ioctl(fd_v4l, VIDIOC_S_CROP, &crop) < 0)
-        {
-                printf("set cropping failed\n");
-                return TFAIL;
-        } 
-
-        if (ioctl(fd_v4l, VIDIOC_S_FMT, fmt) < 0)
-        {
-                printf("set format failed\n");
-                return TFAIL;
-        } 
-
-        if (ioctl(fd_v4l, VIDIOC_G_FMT, fmt) < 0)
-        {
-                printf("get format failed\n");
-                return TFAIL;
-        } 
-
-        if (ioctl(fd_v4l, VIDIOC_G_STD, &id) < 0)
-        {
-                printf("VIDIOC_G_STD failed\n");
-                return TFAIL;
-        } 
-
-        parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        parm.parm.capture.timeperframe.numerator = 1;
-        parm.parm.capture.timeperframe.denominator = cam_framerate;
-        parm.parm.capture.capturemode = 0;
-         
-        if (ioctl(fd_v4l, VIDIOC_S_PARM, &parm) < 0)
-        {
-                printf("VIDIOC_S_PARM failed\n");
-                return TFAIL;
-        } 
-
-        parm.parm.capture.timeperframe.numerator = 0;
-        parm.parm.capture.timeperframe.denominator = 0;
-
-        if (ioctl(fd_v4l, VIDIOC_G_PARM, &parm) < 0)
-        {
-                printf("get frame rate failed\n");
-                return TFAIL;
-        } 
-
-        printf("frame_rate is %d\n", parm.parm.capture.timeperframe.denominator);
-        return TPASS;
 }
 
-JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_initExt(JNIEnv * env, jobject jobj,
-								      jint sizeX, jint sizeY,
-								      jint pixelFormat, jboolean highQuality)
+JStringWrapper::~JStringWrapper()
 {
-	struct v4l2_format format;
-	struct v4l2_streamparm parm;
-	struct v4l2_crop crop;
-	
-	memset(&format, 0, sizeof(format));
-	memset(&parm, 0, sizeof(parm));
-	memset(&crop, 0, sizeof(crop));
-	
-	format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	
-	if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_G_FMT, &format) == -1) {
-		perror(strcat("unable to set format", strerror(errno)));
-		return -1;
-	}
-	
-	format.fmt.pix.width = sizeX;
-	format.fmt.pix.height = sizeY;
-	format.fmt.pix.pixelformat = pixelFormat;
-	format.fmt.pix.sizeimage = sizeX * sizeY * 16 / 8;
-	format.fmt.pix.bytesperline = sizeY * 16 / 8;
-	
-	if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_S_FMT, &format) == -1) {
-		perror(strcat("Unable to set video format", strerror(errno)));
-		return errno;
-	}
+	m_jenv->ReleaseStringUTFChars(m_jstring, m_cstring);
+}
 
-	//set crop parameters 
-	crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	crop.c.left = 0;
-	crop.c.top = 0;
-	crop.c.width = sizeX;
-	crop.c.height = sizeY;
-	
-	if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_S_CROP, &crop) < 0)
-	{
-		perror(strcat("Unable to set crop\n", strerror(errno)));
-	    return errno;
-	}
+JStringWrapper::operator const char *() const
+{
+	return m_cstring;
+}
 
-	//set capture parameters
-		parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-		parm.parm.capture.timeperframe.numerator = 1;
-		parm.parm.capture.timeperframe.denominator = 5;
-		parm.parm.capture.capturemode = highQuality ? V4L2_MODE_HIGHQUALITY : 0;
-		
-		if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_S_PARM, &parm) < 0) {
-			perror(strcat("Unable to set capture parameters", strerror(errno)));
-			return errno;
+//#define CAMLOG(x)
+#define CAMLOG(x) {x; printf("\n"); fflush(stdout);}
+
+
+// TODO: these should be in the class
+static const int BYTES_PER_PIXEL = 3;
+static int current_dev_node = -1;
+static unsigned char *jpeg_buffer = NULL;
+static size_t jpeg_buffer_size = 0;
+static unsigned char *rgb_buffer = NULL;
+static v4l2_pix_format raw_fmt;
+static v4l2_pix_format resize_fmt;
+static bool half_size = false;
+
+
+static size_t yuv2jpeg(const struct bug_img *yuv_img)
+{
+	CAMLOG(printf("yuv2jpeg()"));
+	if (jpeg_buffer_size < (yuv_img->length * 3 / 2)) {
+		jpeg_buffer_size = yuv_img->length * 3 / 2;
+		jpeg_buffer = (unsigned char *) realloc(jpeg_buffer, jpeg_buffer_size);
+		if (jpeg_buffer == NULL) {
+			CAMLOG(printf("Failed to allocate memory for jpeg_buffer"));
+			return 0;
+		} else {
+			CAMLOG(printf("jpeg_buffer now %lu", jpeg_buffer_size));
 		}
-	
-	return 0;
-}
-
-JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_init(JNIEnv * env, jobject jobj)
-{
-  return Java_com_buglabs_bug_jni_camera_Camera_initExt(env, jobj,
-							DEFAULT_WIDTH, DEFAULT_HEIGHT,
-							V4L2_PIX_FMT_UYVY, true);
-}
-
-JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrameExt(JNIEnv * env, jobject jobj,
-										 jint sizeX, jint sizeY,
-										 jint format, jboolean highQuality)
-{
-	int fd = getFileDescriptorField(env, jobj);
-	
-	unsigned char * buff = 0;
-	struct v4l2_streamparm parm;
-	
-	//workaround for driver
-	Java_com_buglabs_bug_jni_camera_Camera_initExt(env, jobj, sizeX, sizeY, format, highQuality);
-	
-	struct v4l2_format fmt;
-	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	if(ioctl(fd, VIDIOC_G_FMT, &fmt) < 0) {
-		perror("IOCTL Failed: VIDIOC_G_FMT \n");
 	}
 
-	buff = (unsigned char *) malloc(fmt.fmt.pix.sizeimage);
-	
-	memset(buff, 0, fmt.fmt.pix.sizeimage);
-	
-	
-	//int bytesRead = read(getFileDescriptorField(env, jobj), buff, fmt.fmt.pix.sizeimage);
-	//printf("Read: %i bytes\n", bytesRead);
-	
-	
-	size_t jpegsize = compressUYVY(fd, buff, fmt.fmt.pix.sizeimage, sizeX, sizeY);
-	
-	//workaround for driver
-		parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-		parm.parm.capture.timeperframe.numerator = 1;
-		parm.parm.capture.timeperframe.denominator = 30;
-		parm.parm.capture.capturemode = 0;
-			
-		if(ioctl(getFileDescriptorField(env, jobj), VIDIOC_S_PARM, &parm) < 0) {
-					perror(strcat("Unable to set reset parameters", strerror(errno)));
-		}
-			
-		
-		
-	jbyteArray dirbuff = env->NewByteArray(jpegsize);
-	
-	if(dirbuff != NULL) {
-		env->SetByteArrayRegion(dirbuff, 0, jpegsize, (jbyte *) buff);
-	}
-	
-	free(buff);
-	
-	return dirbuff;
-}
-
-
-JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_grabFrame(JNIEnv * env, jobject jobj)
-{
-  return Java_com_buglabs_bug_jni_camera_Camera_grabFrameExt(env, jobj,
-							     DEFAULT_WIDTH, DEFAULT_HEIGHT,
-							     V4L2_PIX_FMT_UYVY, true);
-}
-
-JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_overlayinit(JNIEnv * env, jobject jobj, jint left, jint top, jint width, jint height)
-{
-	struct v4l2_format fmt;
-    struct v4l2_framebuffer fb_v4l2;
- 
-    int fd_v4l;
-    int fd_fb = 0;
-    struct fb_fix_screeninfo fix;
-    struct fb_var_screeninfo var;
-    
-    fd_v4l = getFileDescriptorField(env, jobj);
-    fmt.type = V4L2_BUF_TYPE_VIDEO_OVERLAY;
-    fmt.fmt.win.w.top =  top;	//g_display_top ;
-    fmt.fmt.win.w.left = left;	//g_display_left;
-    fmt.fmt.win.w.width = width;	//g_display_width;
-    fmt.fmt.win.w.height = height;	//g_display_height;
-    if (camera_overlay_setup(fd_v4l, &fmt, 1, 1600, 1200, 7, 0) < 0) {
-    	printf("Setup overlay failed.\n");
-        return TFAIL;
-	}
-
-    memset(&fb_v4l2, 0, sizeof(fb_v4l2)); 
-  
-    if (ioctl(fd_v4l, VIDIOC_G_FBUF, &fb_v4l2) < 0) {
-    	printf("Get framebuffer failed\n");
-        return TFAIL;
+    FILE *out = fmemopen(jpeg_buffer, jpeg_buffer_size, "w");
+    if (out == NULL) {
+    	CAMLOG(printf("Failed to open jpeg_buffer output stream"));
+    	return 0;
     }
-    fb_v4l2.flags = V4L2_FBUF_FLAG_OVERLAY;
-    if (ioctl(fd_v4l, VIDIOC_S_FBUF, &fb_v4l2) < 0) {
-    	printf("Set framebuffer failed\n");
-        return TFAIL;
-    } 
 
-    if (ioctl(fd_v4l, VIDIOC_G_FBUF, &fb_v4l2) < 0) {
-        printf("Get framebuffer failed\n");
-        return TFAIL;
+    struct jpeg_compress_struct comp;
+    struct jpeg_error_mgr error;
+
+    comp.err = jpeg_std_error(&error);
+    jpeg_create_compress(&comp);
+    jpeg_stdio_dest(&comp, out);
+    comp.image_width = yuv_img->width;
+    comp.image_height = yuv_img->height;
+    comp.input_components = BYTES_PER_PIXEL;
+    comp.in_color_space = JCS_RGB;
+    jpeg_set_defaults(&comp);
+    jpeg_set_quality(&comp, 90, TRUE);
+
+    jpeg_start_compress(&comp, TRUE);
+
+    const size_t line_length = yuv_img->width * BYTES_PER_PIXEL;
+
+    unsigned char *yuv_ptr = rgb_buffer;
+    for (int i = 0; i < yuv_img->height; ++i, yuv_ptr += line_length) {
+        jpeg_write_scanlines(&comp, &yuv_ptr, 1);
     }
-    return TPASS;
+
+    jpeg_finish_compress(&comp);
+    fflush(out);
+
+    size_t dataWritten = ftell(out);
+    fclose(out);
+    jpeg_destroy_compress(&comp);
+
+    CAMLOG(printf("yuv2jpg returning %lu", dataWritten));
+    return dataWritten;
 }
 
-JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_overlaystart(JNIEnv * env, jobject jobj)
+static jbyteArray grab_frame(JNIEnv *env, int dev_node, bool convert_to_jpeg)
 {
-	int i;
-	int overlay = 1;
-	struct v4l2_control ctl;
-	int fd_v4l = getFileDescriptorField(env, jobj);
-	
-	
-	//camera_overlay_setup(...);
-	
-	if (ioctl(fd_v4l, VIDIOC_OVERLAY, &overlay) < 0)
-	{
-		printf("VIDIOC_OVERLAY start failed\n");
-		return TFAIL;
-	} 
-	
-	ctl.id = V4L2_CID_PRIVATE_BASE + 1;
-    if (ioctl(fd_v4l, VIDIOC_S_CTRL, &ctl) < 0)
-    {
-    	printf("set ctl failed\n");
-        return TFAIL;
+	CAMLOG(printf("grab_frame(dev_node: %d, %s)", dev_node, convert_to_jpeg ? "JPEG" : "RGB"));
+
+	int ret = 0;
+	if (current_dev_node != dev_node) {
+		CAMLOG(printf("switching to %d", dev_node));
+		ret = bug_camera_switch_to_dev(dev_node);
+		if (ret != 0) {
+			CAMLOG(printf("Failed to switch mode: ret=%d", ret));
+			return NULL;
+		}
+	}
+
+	struct bug_img yuv_img;
+	CAMLOG(printf("bug_camera_grab()"));
+	ret = bug_camera_grab(&yuv_img);
+	if (ret != 0) {
+		CAMLOG(printf("failed to grab image: ret=%d", ret));
+	}
+
+	size_t rgb_size = 0;
+    size_t return_size = 0;
+    jbyte *return_buffer = NULL;
+
+	rgb_size = yuv_img.length * 3 / 2;
+    rgb_buffer = (unsigned char*) realloc(rgb_buffer, rgb_size);
+    if (rgb_buffer == NULL) {
+    	CAMLOG(printf("Failed to realloc rgb buffer to %lu", rgb_size));
+    	return NULL;
     }
-    return TPASS;
-/*       if (g_camera_color == 1) {
-                ctl.id = V4L2_CID_BRIGHTNESS;
-                for (i = 0; i < 0xff; i+=0x20) {
-		            ctl.value = i;
-                	printf("change the brightness %d\n", i);
-                    ioctl(fd_v4l, VIDIOC_S_CTRL, &ctl);
-		            sleep(1);
-                } 
-		}
-		else if (g_camera_color == 2) {
-                ctl.id = V4L2_CID_SATURATION;
-                for (i = 25; i < 150; i+= 25) {
-		            ctl.value = i;
-	                printf("change the color saturation %d\n", i);
-                    ioctl(fd_v4l, VIDIOC_S_CTRL, &ctl);
-		            sleep(5);
-                } 
-		}
-		else if (g_camera_color == 3) {
-                ctl.id = V4L2_CID_RED_BALANCE;
-                for (i = 0; i < 0xff; i+=0x20) {
-		            ctl.value = i;
-	                printf("change the red balance %d\n", i);
-                    ioctl(fd_v4l, VIDIOC_S_CTRL, &ctl);
-		            sleep(1);
-                } 
-		}
-		else if (g_camera_color == 4) {
-                ctl.id = V4L2_CID_BLUE_BALANCE;
-                for (i = 0; i < 0xff; i+=0x20) {
-		            ctl.value = i;
-                	printf("change the blue balance %d\n", i);
-                    ioctl(fd_v4l, VIDIOC_S_CTRL, &ctl);
-		            sleep(1);
-                } 
-		}
-		else if (g_camera_color == 5) {
-                ctl.id = V4L2_CID_BLACK_LEVEL;
-                for (i = 0; i < 4; i++) {
-		            ctl.value = i;
-                	printf("change the black balance %d\n", i);
-                    ioctl(fd_v4l, VIDIOC_S_CTRL, &ctl);
-		            sleep(5);
-                } 
-        } 
-        else {
-		        sleep(timeout);
-        }
-*/    
+
+    CAMLOG(printf("yuv2rgb, rgb size=%lu, half_size=%d", rgb_size, half_size));
+    yuv2rgb(&yuv_img, rgb_buffer, half_size);
+
+    if (convert_to_jpeg) {
+        CAMLOG(printf("converting to jpeg"));
+    	return_size = yuv2jpeg(&yuv_img);
+    	return_buffer = (jbyte*) jpeg_buffer;
+    } else {
+    	return_size = rgb_size;
+    	return_buffer = (jbyte*) rgb_buffer;
+    }
+
+    jbyteArray java_buffer = env->NewByteArray(return_size);
+    if (java_buffer == NULL) {
+    	CAMLOG(printf("failed to create java buffer for %lu", return_size));
+    	return NULL;
+    }
+
+    CAMLOG(printf("Giving back %lu to java", return_size));
+    env->SetByteArrayRegion(java_buffer, 0, return_size, return_buffer);
+    return java_buffer;
 }
 
-JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_overlaystop(JNIEnv * env, jobject jobj)
-{		
-        int overlay = 0;
-        int fd_v4l = getFileDescriptorField(env, jobj);
-        
-        if (ioctl(fd_v4l, VIDIOC_OVERLAY, &overlay) < 0)
-        {
-                printf("VIDIOC_OVERLAY stop failed\n");
-                return TFAIL;
-        }
-        return TPASS;
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
+  (JNIEnv *env,
+		  jobject jobj,
+		  jstring jmedia_node,
+		  jint slot_num,
+		  jint raw_width,
+		  jint raw_height,
+		  jint resize_width,
+		  jint resize_height)
+{
+	JStringWrapper media_node(env, jmedia_node);
+
+	raw_fmt.width = raw_width;
+	raw_fmt.height = raw_height;
+	raw_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
+
+	// TODO: I think this only really works if they ask for 320x240
+	if (resize_width < 640) {
+		// resizer can't go that low so half it afterwards
+		half_size = true;
+		resize_width = resize_width * 2;
+		resize_height = resize_height * 2;
+	} else {
+		half_size = false;
+	}
+	resize_fmt.width = resize_width;
+	resize_fmt.height = resize_height;
+	resize_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
+
+	// we'll start in preview mode
+	// (note that we don't use V4L2_DEVNODE_PREVIEW -
+	// it is the output of the color processing hardware built into the OMAP
+	// and we're using a sensor with color processing built-in)
+	current_dev_node = V4L2_DEVNODE_RESIZER;
+	CAMLOG(printf("bug_camera_open(media: %s, dev_node: %d, slot_num: %d, "
+			"raw.width=%d, raw.height=%d, raw.format=%d, resize.width=%d, resize.height=%d, resize.format=%d)",
+			(const char*) media_node,
+			current_dev_node,
+			slot_num,
+			raw_fmt.width,
+			raw_fmt.height,
+			raw_fmt.pixelformat,
+			resize_fmt.width,
+			resize_fmt.height,
+			resize_fmt.pixelformat));
+	return bug_camera_open(media_node, current_dev_node, slot_num, &raw_fmt, &resize_fmt);
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1close
+  (JNIEnv *, jobject)
+{
+	// seems like a good point to say we're done with the buffers
+	free(jpeg_buffer);
+	jpeg_buffer = NULL;
+	jpeg_buffer_size = 0;
+
+	free(rgb_buffer);
+	rgb_buffer = NULL;
+
+	CAMLOG(printf("calling bug_camera_close()"));
+	const int ret = bug_camera_close();
+	CAMLOG(printf("bug_camera_close() returned %d", ret));
+	return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1start
+  (JNIEnv *, jobject)
+{
+	CAMLOG(printf("calling bug_camera_start()"));
+	const int ret = bug_camera_start();
+	CAMLOG(printf("bug_camera_start() returned %d", ret));
+	return ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1stop
+  (JNIEnv *, jobject)
+{
+	CAMLOG(printf("calling bug_camera_stop()"));
+	const int ret = bug_camera_stop();
+	CAMLOG(printf("bug_camera_stop() returned %d", ret));
+	return ret;
+}
+
+JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1preview
+  (JNIEnv *env, jobject)
+{
+	return grab_frame(env, V4L2_DEVNODE_RESIZER, false);
+}
+
+JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1raw
+  (JNIEnv *env, jobject)
+{
+	//return grab_frame(env, V4L2_DEVNODE_RESIZER, true);
+	// TODO: remove this temporary testing code and replace with the one liner
+	// that's commmented out right above
+	raw_fmt.width = 2048;
+	raw_fmt.height = 1536;
+	raw_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
+
+	resize_fmt.width = 640;
+	resize_fmt.height = 480;
+	resize_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
+
+	CAMLOG(printf("NEW GRAB RAW"));
+
+	int ret = bug_camera_open("/dev/media0", V4L2_DEVNODE_RAW, -1, &raw_fmt, &resize_fmt);
+	if (ret != 0) {CAMLOG(printf("bug_camera_open returned %d", ret)); return NULL;}
+	ret = bug_camera_start();
+	if (ret != 0) {CAMLOG(printf("bug_camera_start returned %d", ret)); return NULL;}
+	struct bug_img yuv_img;
+
+	for (int i = 0; i < 10; ++i) {
+		ret = bug_camera_grab(&yuv_img);
+		if (ret != 0) {CAMLOG(printf("bug_camera_grab returned %d", ret)); return NULL;}
+	}
+
+	const size_t rgb_size = yuv_img.length * 3 / 2;
+    rgb_buffer = (unsigned char*) realloc(rgb_buffer, rgb_size);
+	if (rgb_buffer == NULL) {CAMLOG(printf("failed to alloc rgb_buffer of size %lu", rgb_size)); return NULL;}
+    yuv2rgb(&yuv_img, rgb_buffer, 0);
+
+   	const size_t return_size = yuv2jpeg(&yuv_img);
+   	jbyte *return_buffer = (jbyte*) jpeg_buffer;
+
+    jbyteArray java_buffer = env->NewByteArray(return_size);
+	if (java_buffer == NULL) {CAMLOG(printf("failed to alloc java_buffer of size %lu", return_size)); return NULL;}
+    env->SetByteArrayRegion(java_buffer, 0, return_size, return_buffer);
+
+	ret = bug_camera_stop();
+	if (ret != 0) {CAMLOG(printf("bug_camera_stop returned %d", ret)); return NULL;}
+	ret = bug_camera_close();
+	if (ret != 0) {CAMLOG(printf("bug_camera_close returned %d", ret)); return NULL;}
+
+    return java_buffer;
 }

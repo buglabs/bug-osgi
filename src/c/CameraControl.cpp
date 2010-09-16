@@ -26,90 +26,94 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 #include "jni/com_buglabs_bug_jni_camera_CameraControl.h"
-#include "linux/bmi/bmi_camera.h"
-#include "CharDevice.h"
+#include <linux/videodev2.h>
+extern "C" {
+#include "bug_v4l.h"
+}
+
+/*
+  ioctl: VIDIOC_QUERYCTRL  id=0x9a0911 (V4L2_CID_FLASH_STROBE)
+    name    : Flash Strobe
+    id      : 0x9a0911
+    type    : 0x3
+    minimum : 0
+    maximum : 2
+    default : 0
+    flags   : 0x0
+    ioctl   : VIDIOC_QUERYMENU (Flash Strobe)
+      0 : OFF
+      1 : TORCH (LOW BEAM)
+      2 : PULSE (HIGH BEAM)
+    ioctl   : VIDIOC_G_CTRL (Flash Strobe)
+*/
+
+static const int STROBE_OFF = 0;
+static const int STROBE_TORCH_AKA_LOW_BEAM = 1;
+static const int STROBE_PULSE_AKA_HIGH_BEAM = 2;
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1FLASH_1HIGH_1BEAM(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_FLASH_HIGH_BEAM);
+	return set_ctrl(V4L2_CID_FLASH_STROBE, STROBE_PULSE_AKA_HIGH_BEAM);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1FLASH_1LOW_1BEAM(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_FLASH_LOW_BEAM);
+	return set_ctrl(V4L2_CID_FLASH_STROBE, STROBE_TORCH_AKA_LOW_BEAM);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1FLASH_1LED_1OFF(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_FLASH_LED_OFF);
+	set_ctrl(V4L2_CID_FLASH_STROBE, STROBE_OFF);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1FLASH_1LED_1ON(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_FLASH_LED_ON);
+	// TODO: What was the difference  between High or Low Beam and On on the old camera?
+	return JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1FLASH_1LOW_1BEAM(env, jobj);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1RED_1LED_1OFF(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_RED_LED_OFF);
+	return set_red_led(0);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1RED_1LED_1ON(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_RED_LED_ON);
+	return set_red_led(1);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1GREEN_1LED_1OFF(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_GREEN_LED_OFF);
+	return set_green_led(0);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1GREEN_1LED_1ON(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_GREEN_LED_ON);
+	return set_green_led(1);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1SELECT(JNIEnv * env, jobject jobj, jint slot)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_SELECT, slot);
+	printf("NOT IMPLEMENTED\n");return -1;
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1GET_1SELECTED(JNIEnv * env, jobject jobj)
 {
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_GET_SELECTED);
+	return get_input_slot();
 }
 
-/*
- * Class:     com_buglabs_bug_jni_camera_CameraControl
- * Method:    ioctl_BMI_CAM_SUSPEND
- * Signature: ()I
- */
+
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1SUSPEND
   (JNIEnv * env, jobject jobj){
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_SUSPEND);
+	printf("NOT IMPLEMENTED\n");return -1;
+	//int fd = getFileDescriptorField(env, jobj);
+	//return ioctl(fd, BMI_CAM_SUSPEND);
 }
 
-/*
- * Class:     com_buglabs_bug_jni_camera_CameraControl
- * Method:    ioctl_BMI_CAM_RESUME
- * Signature: ()I
- */
+
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_1CAM_1RESUME
 (JNIEnv * env, jobject jobj){
-	int fd = getFileDescriptorField(env, jobj);
-	return ioctl(fd, BMI_CAM_RESUME);
-
+	printf("NOT IMPLEMENTED\n");return -1;
+	//int fd = getFileDescriptorField(env, jobj);
+	//return ioctl(fd, BMI_CAM_RESUME);
 }
-
-
