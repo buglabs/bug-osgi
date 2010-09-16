@@ -27,13 +27,9 @@
  *******************************************************************************/
 package com.buglabs.bug.module.camera;
 
-import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
@@ -41,11 +37,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.input.pub.InputEventProvider;
 import com.buglabs.bug.jni.camera.Camera;
 import com.buglabs.bug.jni.camera.CameraControl;
-import com.buglabs.bug.jni.common.CharDeviceUtils;
-import com.buglabs.bug.module.camera.pub.ICameraButtonEventProvider;
 import com.buglabs.bug.module.camera.pub.ICameraDevice;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
@@ -60,7 +53,6 @@ import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.RemoteOSGiServiceConstants;
 
 /**
  * 
@@ -68,10 +60,7 @@ import com.buglabs.util.RemoteOSGiServiceConstants;
  * 
  */
 public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, IModuleControl {
-	private static final String IMAGE_MIME_TYPE = "image/jpg";
-	private static final String DEVNODE_INPUT_DEVICE = "/dev/input/bmi_cam";
-	private static final String CAMERA_DEVICE_NODE = "/dev/v4l/video0";
-	private static final String CAMERA_CONTROL_DEVICE_NODE = "/dev/bug_camera_control";
+	private static final String JPEG_MIME_TYPE = "image/jpg";
 	private static boolean suspended = false;
 
 	private List modProps;
@@ -85,8 +74,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	private ServiceRegistration moduleRef;
 
 	private ServiceRegistration cameraService;
-
-	private ServiceRegistration bepReg;
 
 	private LogService logService;
 
@@ -102,7 +89,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 
 	private CameraControl cc;
 
-	private InputEventProvider bep;
 	private ServiceRegistration ledRef;
 	private String serviceName = "Picture";
 	private BMIModuleProperties properties;
@@ -137,25 +123,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		modProps = new ArrayList();
 
 		camera = new Camera();
-		// TODO: Change this when we move to linux 2.6.22 or greater since
-		// BMI agent should listen to UDEV ACTION=="online" before starting
-		// modlets
-		try {
-			CharDeviceUtils.openDeviceWithRetry(camera, CAMERA_DEVICE_NODE, 2);
-		} catch (IOException e) {
-			String errormsg = "Unable to open camera device node: " + CAMERA_DEVICE_NODE + "\n trying again...";
-			logService.log(LogService.LOG_ERROR, errormsg);
-			throw e;
-		}
-
 		cc = new CameraControl();
-		try {
-			CharDeviceUtils.openDeviceWithRetry(cc, CAMERA_CONTROL_DEVICE_NODE, 2);
-		} catch (IOException e) {
-			String errormsg = "Unable to open camera device node: " + CAMERA_CONTROL_DEVICE_NODE + "\n trying again...";
-			logService.log(LogService.LOG_ERROR, errormsg);
-			throw e;
-		}
 		cameraControl = new CameraModuleControl(cc);
 		cameraControlRef = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
 		Properties modProperties = createBasicServiceProperties();
@@ -164,10 +132,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		cameraService = context.registerService(ICameraDevice.class.getName(), this, createBasicServiceProperties());
 		ledRef = context.registerService(IModuleLEDController.class.getName(), cameraControl, createBasicServiceProperties());
 
-		bep = new CameraInputEventProvider(DEVNODE_INPUT_DEVICE, logService);
-		bep.start();
-
-		bepReg = context.registerService(ICameraButtonEventProvider.class.getName(), bep, createRemotableProperties(getButtonServiceProperties()));
 		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
 	}
 
@@ -177,28 +141,20 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {
-			p.put("ModuleDescription", properties.getDescription());
-			p.put("ModuleSN", properties.getSerial_num());
-			p.put("ModuleVendorID", "" + properties.getVendor());
+			if (properties.getDescription() != null)
+				p.put("ModuleDescription", properties.getDescription());
+			
+			if (properties.getSerial_num() != null)
+				p.put("ModuleSN", properties.getSerial_num());
+			
+			// these are ints so don't need a null check
+			p.put("ModuleVendorID", "" + properties.getVendor());			
 			p.put("ModuleRevision", "" + properties.getRevision());
 		}
 		
 		return p;
 	}
 
-	/**
-	 * @return A dictionary with R-OSGi enable property.
-	 */
-	private Dictionary createRemotableProperties(Dictionary ht) {
-		if (ht == null) {
-			ht = new Hashtable();
-		}
-
-		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-
-		return ht;
-	}
-	
 	private void updateIModuleControlProperties(){
 		if (moduleRef!=null){
 			Properties modProperties = createBasicServiceProperties();
@@ -212,23 +168,8 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		cameraService.unregister();
 		moduleRef.unregister();
 		ledRef.unregister();
-		bep.tearDown();
-		bepReg.unregister();
 		wsReg.unregister();
 		camera.close();
-		cc.close();
-	}
-
-	/**
-	 * @return a dictionary of properties for the IButtonEventProvider service.
-	 */
-	private Dictionary getButtonServiceProperties() {
-		Dictionary props = new Hashtable();
-
-		props.put("ButtonEventProvider", this.getClass().getName());
-		props.put("ButtonsProvided", "Camera");
-
-		return props;
 	}
 
 	public PublicWSDefinition discover(int operation) {
@@ -240,7 +181,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 				}
 
 				public String getReturnType() {
-					return IMAGE_MIME_TYPE;
+					return JPEG_MIME_TYPE;
 				}
 			};
 		}
@@ -249,8 +190,29 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	}
 
 	public IWSResponse execute(int operation, String input) {
+		System.out.println("New Picture GET");
 		if (operation == PublicWSProvider2.GET) {
-			return new WSResponse(getImageInputStream(), IMAGE_MIME_TYPE);
+			/*
+			bug_camera_open(ICameraDevice.DEFAULT_MEDIA_NODE,
+					-1,
+					2048,
+					1536,
+					320,
+					240);
+			bug_camera_start();
+			
+			// throw away 3 previews to get the exposure etc right
+			bug_camera_grab_preview();
+			bug_camera_grab_preview();
+			bug_camera_grab_preview();
+			
+			IWSResponse response =  new WSResponse(new ByteArrayInputStream(bug_camera_grab_full()), JPEG_MIME_TYPE);
+			
+			bug_camera_stop();
+			bug_camera_close();
+			return response;
+			*/
+			return new WSResponse(new ByteArrayInputStream(bug_camera_grab_full()), JPEG_MIME_TYPE);
 		}
 		return null;
 	}
@@ -335,43 +297,9 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		return result;
 	}
 
-	public byte[] getImage() {
-		return camera.grabFrame();
-	}
-
-	public byte[] getImage(int sizeX, int sizeY, int format, boolean highQuality) {
-		return camera.grabFrameExt(sizeX, sizeY, format, highQuality);
-	}
-
-	public boolean initOverlay(Rectangle pbounds) {
-
-		if (camera.overlayinit(pbounds.x, pbounds.y, pbounds.width, pbounds.height) < 0)
-			return false;
-		else
-			return true;
-	}
-
-	public boolean startOverlay() {
-		if (camera.overlaystart() < 0)
-			return false;
-		else
-			return true;
-	}
-
-	public boolean stopOverlay() {
-		if (camera.overlaystop() < 0)
-			return false;
-		else
-			return true;
-	}
-
-	public InputStream getImageInputStream() {
-		return new ByteArrayInputStream(camera.grabFrame());
-	}
-
 	public String getFormat() {
 
-		return IMAGE_MIME_TYPE;
+		return JPEG_MIME_TYPE;
 	}
 
 	public String getDescription() {
@@ -381,6 +309,40 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	public void setPublicName(String name) {
 		serviceName = name;
 	}
-
 	
+	public int bug_camera_open(
+			final String media_node,
+			int slot_num,
+			int full_height,
+			int full_width,
+			int preview_height,
+			int preview_width)
+	{
+		return camera.bug_camera_open(media_node, slot_num, full_height, full_width, preview_height, preview_width);
+	}
+
+	public int bug_camera_close()
+	{
+		return camera.bug_camera_close();
+	}
+
+	public int bug_camera_start()
+	{
+		return camera.bug_camera_start();
+	}
+	
+	public int bug_camera_stop()
+	{
+		return camera.bug_camera_stop();
+	}
+
+	public byte[] bug_camera_grab_preview()
+	{
+		return camera.bug_camera_grab_preview();
+	}
+
+	public byte[] bug_camera_grab_full()
+	{
+		return camera.bug_camera_grab_raw();
+	}
 }

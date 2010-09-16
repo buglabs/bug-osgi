@@ -47,23 +47,14 @@ public interface ICameraModuleControl {
 	/**
 	 * Turns Flash LED off
 	 * 
-	 * @return negative value if request was not sucessful.
+	 * @return negative value if request was not successful.
 	 */
 	public int setLEDFlash(boolean state) throws IOException;
 
 	/**
-	 * Selects a camera based on slot number.
-	 * 
-	 * @param slot
-	 *            the slot number of the desired camera.
-	 * @return negative value if request was not sucessful.
-	 */
-	public int setSelectedCamera(int slot) throws IOException;
-
-	/**
 	 * Returns the slot number of the selected camera.
 	 * 
-	 * @return negative value if request was not sucessful.
+	 * @return negative value if request was not successful.
 	 */
 	public int getSelectedCamera() throws IOException;
 }

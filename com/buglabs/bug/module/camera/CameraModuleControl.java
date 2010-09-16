@@ -51,16 +51,6 @@ public class CameraModuleControl implements ICameraModuleControl, IModuleLEDCont
 		return result;
 	}
 
-	public int setSelectedCamera(int slot) throws IOException {
-		int result = cc.ioctl_BMI_CAM_SELECT(slot);
-
-		if (result < 0) {
-			throw new IOException("ioctl BMI_CAM_SELECT failed");
-		}
-
-		return result;
-	}
-
 	public int setFlashBeamIntensity(int intensity) throws IOException {
 
 		int result;

@@ -31,7 +31,7 @@ import com.buglabs.device.IButtonEventProvider;
 
 /**
  * A button provider for the Camera module.
- * 
+ * @deprecated
  * @author kgilmer
  * 
  */

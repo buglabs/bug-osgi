@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * Copyright (c) 2008, 2009, 2010 Bug Labs, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,6 @@
  *******************************************************************************/
 package com.buglabs.bug.module.camera.pub;
 
-import java.awt.Rectangle;
-import java.io.InputStream;
-
 /**
  * An interface for a device that can return images.
  * 
@@ -38,45 +35,60 @@ import java.io.InputStream;
  */
 public interface ICameraDevice {
 	/**
-	 * @return byte array representing image from camera in JPG format.
+	 * The default media node to specify when calling bug_camera_open().
 	 */
-	public byte[] getImage();
+	public final static String DEFAULT_MEDIA_NODE = "/dev/media0";
+	
+	/**
+	 * Opens a connection with a camera module and configure it.
+	 * 
+	 * @param media_node
+	 * @param slot_num the slot number of the camera module to use, or -1 to use the default (if there's only 1)
+	 * @param full_height height in pixels to capture full images at
+	 * @param full_width width in pixels to capture full images at
+	 * @param preview_height height in pixels to capture preview images at
+	 * @param preview_width width in pixels to capture preview images at
+	 * @return 0 if open was successful
+	 */
+	public int bug_camera_open(
+			final String media_node,
+			int slot_num,
+			int full_height,
+			int full_width,
+			int preview_height,
+			int preview_width);
+	
+	/**
+	 * Closes the camera - allowing other processes to access it.
+	 * @return 0 if open was successful
+	 */
+	public int bug_camera_close();
 
 	/**
-	 * @param sizeX preferred X size of image from camera.
-	 * @param sizeY preferred Y size of image from camera.
-	 * @param format preferred format of image from camera.
-	 * @param highQuality quality setting for camera device.
-	 * @return byte array of image from camera.
+	 *  Start acquiring frames.
+	 *  Must be called before the grab methods may be called. 
+	 *  @return 0 if start was successful
 	 */
-	public byte[] getImage(int sizeX, int sizeY, int format, boolean highQuality);
+	public int bug_camera_start();
+	
+	/**
+	 * Stop acquiring frames.
+	 * @return 0 if stop was successful.
+	 */
+	public int bug_camera_stop();
 
 	/**
-	 * Initialize overlay from camera device on LCD with specific bounds.
-	 * @param pbounds
+	 * Grabs a raw RGB-encoded preview image. 
+	 * bug_camera_open() and bug_camera_start() must already have been called.
 	 * @return
 	 */
-	public boolean initOverlay(Rectangle pbounds);
+	public byte[] bug_camera_grab_preview();
+	
 
 	/**
-	 * Start overlay of image from camera to LCD screen.
+	 * Grabs a JPEG-encoded full image. 
+	 * bug_camera_open() and bug_camera_start() must already have been called.
 	 * @return
 	 */
-	public boolean startOverlay();
-
-	/**
-	 * Stop overlay.
-	 * @return
-	 */
-	public boolean stopOverlay();
-
-	/**
-	 * @return inputstream of bytes from Camera device.
-	 */
-	public InputStream getImageInputStream();
-
-	/**
-	 * @return The default format images are presented in.
-	 */
-	public String getFormat();
+	public byte[] bug_camera_grab_full();
 }
