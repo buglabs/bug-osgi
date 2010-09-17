@@ -79,12 +79,13 @@ static v4l2_pix_format raw_fmt;
 static v4l2_pix_format resize_fmt;
 static bool half_size = false;
 
-
-static size_t yuv2jpeg(const struct bug_img *yuv_img)
+size_t compressUYVY2(const struct bug_img &yuv_img)
 {
-	CAMLOG(printf("yuv2jpeg()"));
-	if (jpeg_buffer_size < (yuv_img->length * 3 / 2)) {
-		jpeg_buffer_size = yuv_img->length * 3 / 2;
+	int bytesPerPixel = 2;
+	const unsigned char * data = (unsigned char *) yuv_img.start;
+
+	if (jpeg_buffer_size < (yuv_img.length * 3 / 2)) {
+		jpeg_buffer_size = yuv_img.length * 3 / 2;
 		jpeg_buffer = (unsigned char *) realloc(jpeg_buffer, jpeg_buffer_size);
 		if (jpeg_buffer == NULL) {
 			CAMLOG(printf("Failed to allocate memory for jpeg_buffer"));
@@ -94,6 +95,75 @@ static size_t yuv2jpeg(const struct bug_img *yuv_img)
 		}
 	}
 
+	FILE * out = fmemopen(jpeg_buffer, jpeg_buffer_size, "w");
+
+	  struct jpeg_compress_struct comp;
+	  struct jpeg_error_mgr error;
+
+	  comp.err = jpeg_std_error(&error);
+	  jpeg_create_compress(&comp);
+	  jpeg_stdio_dest(&comp, out);
+	  comp.image_width = yuv_img.width;
+	  comp.image_height = yuv_img.height;
+	  comp.input_components = 3;
+	  comp.in_color_space = JCS_YCbCr;
+	  jpeg_set_defaults(&comp);
+	  jpeg_set_quality(&comp, 90, TRUE);
+	  jpeg_start_compress(&comp, TRUE);
+
+	  unsigned char * yuvBuf = (unsigned char *) malloc(yuv_img.width * 3);
+	  if(yuvBuf < 0) {
+	    return 0;
+	  }
+
+	  for (int i = 0; i < yuv_img.height; ++i) {
+	    //convert a scanline from CbYCrY to YCbCr
+	    unsigned char * yuvPtr = yuvBuf;
+	    const unsigned char * uyvyPtr = data;
+
+	    while(yuvPtr < (unsigned char *) (yuvBuf + (yuv_img.width * 3))) {
+	      yuvPtr[0] = uyvyPtr[1];
+	      yuvPtr[1] = uyvyPtr[0];
+	      yuvPtr[2] = uyvyPtr[2];
+	      yuvPtr[3] = uyvyPtr[3];
+	      yuvPtr[4] = uyvyPtr[0];
+	      yuvPtr[5] = uyvyPtr[2];
+
+	      uyvyPtr = uyvyPtr + 4;
+	      yuvPtr = yuvPtr + 6;
+	    }
+
+	    jpeg_write_scanlines(&comp, &yuvBuf, 1);
+	    data += (yuv_img.width * 2);
+	  }
+
+	  free(yuvBuf);
+	  jpeg_finish_compress(&comp);
+	  fflush(out);
+
+	  size_t dataWritten = ftell(out);
+
+	  fclose(out);
+	  jpeg_destroy_compress(&comp);
+
+	  return dataWritten;
+}
+
+static size_t yuv2jpeg(const struct bug_img &yuv_img)
+{
+	CAMLOG(printf("yuv2jpeg()"));
+	if (jpeg_buffer_size < (yuv_img.length * 3 / 2)) {
+		jpeg_buffer_size = yuv_img.length * 3 / 2;
+		jpeg_buffer = (unsigned char *) realloc(jpeg_buffer, jpeg_buffer_size);
+		if (jpeg_buffer == NULL) {
+			CAMLOG(printf("Failed to allocate memory for jpeg_buffer"));
+			return 0;
+		} else {
+			CAMLOG(printf("jpeg_buffer now %lu", jpeg_buffer_size));
+		}
+	}
+
+	CAMLOG(printf("opening jpeg_buffer %p for %lu", jpeg_buffer, jpeg_buffer_size));
     FILE *out = fmemopen(jpeg_buffer, jpeg_buffer_size, "w");
     if (out == NULL) {
     	CAMLOG(printf("Failed to open jpeg_buffer output stream"));
@@ -106,19 +176,19 @@ static size_t yuv2jpeg(const struct bug_img *yuv_img)
     comp.err = jpeg_std_error(&error);
     jpeg_create_compress(&comp);
     jpeg_stdio_dest(&comp, out);
-    comp.image_width = yuv_img->width;
-    comp.image_height = yuv_img->height;
+    comp.image_width = yuv_img.width;
+    comp.image_height = yuv_img.height;
     comp.input_components = BYTES_PER_PIXEL;
-    comp.in_color_space = JCS_RGB;
+    comp.in_color_space = JCS_YCbCr;
     jpeg_set_defaults(&comp);
     jpeg_set_quality(&comp, 90, TRUE);
 
     jpeg_start_compress(&comp, TRUE);
 
-    const size_t line_length = yuv_img->width * BYTES_PER_PIXEL;
+    const size_t line_length = yuv_img.width * BYTES_PER_PIXEL;
 
-    unsigned char *yuv_ptr = rgb_buffer;
-    for (int i = 0; i < yuv_img->height; ++i, yuv_ptr += line_length) {
+    unsigned char *yuv_ptr = (unsigned char*) yuv_img.start;
+    for (int i = 0; i < yuv_img.height; ++i, yuv_ptr += line_length) {
         jpeg_write_scanlines(&comp, &yuv_ptr, 1);
     }
 
@@ -135,6 +205,9 @@ static size_t yuv2jpeg(const struct bug_img *yuv_img)
 
 static jbyteArray grab_frame(JNIEnv *env, int dev_node, bool convert_to_jpeg)
 {
+	return NULL;
+}
+/*
 	CAMLOG(printf("grab_frame(dev_node: %d, %s)", dev_node, convert_to_jpeg ? "JPEG" : "RGB"));
 
 	int ret = 0;
@@ -276,50 +349,90 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_
 {
 	return grab_frame(env, V4L2_DEVNODE_RESIZER, false);
 }
-
+*/
 JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1raw
   (JNIEnv *env, jobject)
 {
 	//return grab_frame(env, V4L2_DEVNODE_RESIZER, true);
 	// TODO: remove this temporary testing code and replace with the one liner
 	// that's commmented out right above
+	v4l2_pix_format raw_fmt;
 	raw_fmt.width = 2048;
 	raw_fmt.height = 1536;
-	raw_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
+	raw_fmt.pixelformat = V4L2_PIX_FMT_UYVY;
 
+	v4l2_pix_format resize_fmt;
 	resize_fmt.width = 640;
 	resize_fmt.height = 480;
 	resize_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
 
 	CAMLOG(printf("NEW GRAB RAW"));
 
-	int ret = bug_camera_open("/dev/media0", V4L2_DEVNODE_RAW, -1, &raw_fmt, &resize_fmt);
+	int ret = bug_camera_open("/dev/media0", V4L2_DEVNODE_RESIZER, -1, &raw_fmt, &resize_fmt);
 	if (ret != 0) {CAMLOG(printf("bug_camera_open returned %d", ret)); return NULL;}
 	ret = bug_camera_start();
 	if (ret != 0) {CAMLOG(printf("bug_camera_start returned %d", ret)); return NULL;}
+
 	struct bug_img yuv_img;
 
-	for (int i = 0; i < 10; ++i) {
-		ret = bug_camera_grab(&yuv_img);
-		if (ret != 0) {CAMLOG(printf("bug_camera_grab returned %d", ret)); return NULL;}
+	for (int i = 0; i <10; ++i) {
+	CAMLOG(printf("calling bug_camera_grab for resizer %d", i));
+	ret = bug_camera_grab(&yuv_img);
+	if (ret != 0) {CAMLOG(printf("bug_camera_grab returned %d", ret)); return NULL;}
+	CAMLOG(printf("bug_camera_grab returned: start=%p, length=%lu, width=%d, height=%d, code=%d",
+			yuv_img.start,
+			yuv_img.length,
+			yuv_img.width,
+			yuv_img.height,
+			yuv_img.code));
 	}
 
+
+	CAMLOG(printf("switching to RAW"));
+	ret = bug_camera_switch_to_dev(V4L2_DEVNODE_RAW);
+	if (ret != 0) {CAMLOG(printf("Failed to switch mode: ret=%d", ret));return NULL;}
+
+	CAMLOG(printf("calling bug_camera_grab for raw"));
+	ret = bug_camera_grab(&yuv_img);
+	if (ret != 0) {CAMLOG(printf("bug_camera_grab returned %d", ret)); return NULL;}
+	CAMLOG(printf("bug_camera_grab returned: start=%p, length=%lu, width=%d, height=%d, code=%d",
+			yuv_img.start,
+			yuv_img.length,
+			yuv_img.width,
+			yuv_img.height,
+			yuv_img.code));
+
+	/*
 	const size_t rgb_size = yuv_img.length * 3 / 2;
-    rgb_buffer = (unsigned char*) realloc(rgb_buffer, rgb_size);
+	CAMLOG(printf("rgb_size set to %lu", rgb_size));
+
+    unsigned char *rgb_buffer = (unsigned char*) malloc(rgb_size);
 	if (rgb_buffer == NULL) {CAMLOG(printf("failed to alloc rgb_buffer of size %lu", rgb_size)); return NULL;}
-    yuv2rgb(&yuv_img, rgb_buffer, 0);
 
-   	const size_t return_size = yuv2jpeg(&yuv_img);
-   	jbyte *return_buffer = (jbyte*) jpeg_buffer;
+	CAMLOG(printf("Calling yuv2rgb with rgb_buffer %p and half-size=0", rgb_buffer));
+	yuv2rgb(&yuv_img, rgb_buffer, 0);
+	 */
+	const size_t jpeg_size = compressUYVY2(yuv_img);
 
-    jbyteArray java_buffer = env->NewByteArray(return_size);
-	if (java_buffer == NULL) {CAMLOG(printf("failed to alloc java_buffer of size %lu", return_size)); return NULL;}
-    env->SetByteArrayRegion(java_buffer, 0, return_size, return_buffer);
+	CAMLOG(printf("asking for java byte array of size %lu", jpeg_size));
+    jbyteArray java_buffer = env->NewByteArray(jpeg_size);
+	if (java_buffer == NULL) {CAMLOG(printf("failed to alloc java_buffer of size %lu", jpeg_size)); return NULL;}
 
+	CAMLOG(printf("got java_buffer at %p", java_buffer));
+
+
+	CAMLOG(printf("Copying %lu bytes from jpeg_buffer %p to java_buffer %p",
+			jpeg_size, jpeg_buffer, java_buffer));
+    env->SetByteArrayRegion(java_buffer, 0, jpeg_size, (jbyte*) jpeg_buffer);
+
+    CAMLOG(printf("calling bug_camera_stop"));
 	ret = bug_camera_stop();
 	if (ret != 0) {CAMLOG(printf("bug_camera_stop returned %d", ret)); return NULL;}
+
+    CAMLOG(printf("calling bug_camera_close"));
 	ret = bug_camera_close();
 	if (ret != 0) {CAMLOG(printf("bug_camera_close returned %d", ret)); return NULL;}
 
+	CAMLOG(printf("return java_buffer %p", java_buffer));
     return java_buffer;
 }
