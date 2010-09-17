@@ -192,7 +192,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	public IWSResponse execute(int operation, String input) {
 		System.out.println("New Picture GET");
 		if (operation == PublicWSProvider2.GET) {
-			/*
 			bug_camera_open(ICameraDevice.DEFAULT_MEDIA_NODE,
 					-1,
 					2048,
@@ -211,8 +210,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 			bug_camera_stop();
 			bug_camera_close();
 			return response;
-			*/
-			return new WSResponse(new ByteArrayInputStream(bug_camera_grab_full()), JPEG_MIME_TYPE);
 		}
 		return null;
 	}
