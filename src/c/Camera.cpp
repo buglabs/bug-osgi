@@ -203,12 +203,9 @@ static size_t yuv2jpeg(const struct bug_img &yuv_img)
     return dataWritten;
 }
 
-static jbyteArray grab_frame(JNIEnv *env, int dev_node, bool convert_to_jpeg)
+static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
 {
-	return NULL;
-}
-/*
-	CAMLOG(printf("grab_frame(dev_node: %d, %s)", dev_node, convert_to_jpeg ? "JPEG" : "RGB"));
+	CAMLOG(printf("grab_frame(dev_node: %d)", dev_node));
 
 	int ret = 0;
 	if (current_dev_node != dev_node) {
@@ -216,49 +213,18 @@ static jbyteArray grab_frame(JNIEnv *env, int dev_node, bool convert_to_jpeg)
 		ret = bug_camera_switch_to_dev(dev_node);
 		if (ret != 0) {
 			CAMLOG(printf("Failed to switch mode: ret=%d", ret));
-			return NULL;
+			return ret;
 		}
 	}
 
-	struct bug_img yuv_img;
 	CAMLOG(printf("bug_camera_grab()"));
 	ret = bug_camera_grab(&yuv_img);
 	if (ret != 0) {
 		CAMLOG(printf("failed to grab image: ret=%d", ret));
+		return ret;
 	}
 
-	size_t rgb_size = 0;
-    size_t return_size = 0;
-    jbyte *return_buffer = NULL;
-
-	rgb_size = yuv_img.length * 3 / 2;
-    rgb_buffer = (unsigned char*) realloc(rgb_buffer, rgb_size);
-    if (rgb_buffer == NULL) {
-    	CAMLOG(printf("Failed to realloc rgb buffer to %lu", rgb_size));
-    	return NULL;
-    }
-
-    CAMLOG(printf("yuv2rgb, rgb size=%lu, half_size=%d", rgb_size, half_size));
-    yuv2rgb(&yuv_img, rgb_buffer, half_size);
-
-    if (convert_to_jpeg) {
-        CAMLOG(printf("converting to jpeg"));
-    	return_size = yuv2jpeg(&yuv_img);
-    	return_buffer = (jbyte*) jpeg_buffer;
-    } else {
-    	return_size = rgb_size;
-    	return_buffer = (jbyte*) rgb_buffer;
-    }
-
-    jbyteArray java_buffer = env->NewByteArray(return_size);
-    if (java_buffer == NULL) {
-    	CAMLOG(printf("failed to create java buffer for %lu", return_size));
-    	return NULL;
-    }
-
-    CAMLOG(printf("Giving back %lu to java", return_size));
-    env->SetByteArrayRegion(java_buffer, 0, return_size, return_buffer);
-    return java_buffer;
+	return 0;
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
@@ -275,7 +241,7 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
 
 	raw_fmt.width = raw_width;
 	raw_fmt.height = raw_height;
-	raw_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
+	raw_fmt.pixelformat = V4L2_PIX_FMT_UYVY;
 
 	// TODO: I think this only really works if they ask for 320x240
 	if (resize_width < 640) {
@@ -347,71 +313,37 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1stop
 JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1preview
   (JNIEnv *env, jobject)
 {
-	return grab_frame(env, V4L2_DEVNODE_RESIZER, false);
+	struct bug_img yuv_img;
+	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
+
+	const size_t rgb_size = yuv_img.length * 3 / 2;
+    rgb_buffer = (unsigned char*) realloc(rgb_buffer, rgb_size);
+    if (rgb_buffer == NULL) {
+    	CAMLOG(printf("Failed to realloc rgb buffer to %lu", rgb_size));
+    	return NULL;
+    }
+
+    CAMLOG(printf("yuv2rgb, rgb size=%lu, half_size=%d", rgb_size, half_size));
+    yuv2rgb(&yuv_img, rgb_buffer, half_size);
+
+	CAMLOG(printf("asking for java byte array of size %lu", rgb_size));
+    jbyteArray java_buffer = env->NewByteArray(rgb_size);
+	if (java_buffer == NULL) {CAMLOG(printf("failed to alloc java_buffer of size %lu", rgb_size)); return NULL;}
+
+	CAMLOG(printf("got java_buffer at %p", java_buffer));
+	CAMLOG(printf("Copying %lu bytes from rgb_buffer %p to java_buffer %p",
+			rgb_size, rgb_buffer, java_buffer));
+    env->SetByteArrayRegion(java_buffer, 0, rgb_size, (jbyte*) rgb_buffer);
+
+	CAMLOG(printf("return java_buffer %p", java_buffer));
+    return java_buffer;
 }
-*/
+
 JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1raw
   (JNIEnv *env, jobject)
 {
-	//return grab_frame(env, V4L2_DEVNODE_RESIZER, true);
-	// TODO: remove this temporary testing code and replace with the one liner
-	// that's commmented out right above
-	v4l2_pix_format raw_fmt;
-	raw_fmt.width = 2048;
-	raw_fmt.height = 1536;
-	raw_fmt.pixelformat = V4L2_PIX_FMT_UYVY;
-
-	v4l2_pix_format resize_fmt;
-	resize_fmt.width = 640;
-	resize_fmt.height = 480;
-	resize_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
-
-	CAMLOG(printf("NEW GRAB RAW"));
-
-	int ret = bug_camera_open("/dev/media0", V4L2_DEVNODE_RESIZER, -1, &raw_fmt, &resize_fmt);
-	if (ret != 0) {CAMLOG(printf("bug_camera_open returned %d", ret)); return NULL;}
-	ret = bug_camera_start();
-	if (ret != 0) {CAMLOG(printf("bug_camera_start returned %d", ret)); return NULL;}
-
 	struct bug_img yuv_img;
-
-	for (int i = 0; i <10; ++i) {
-	CAMLOG(printf("calling bug_camera_grab for resizer %d", i));
-	ret = bug_camera_grab(&yuv_img);
-	if (ret != 0) {CAMLOG(printf("bug_camera_grab returned %d", ret)); return NULL;}
-	CAMLOG(printf("bug_camera_grab returned: start=%p, length=%lu, width=%d, height=%d, code=%d",
-			yuv_img.start,
-			yuv_img.length,
-			yuv_img.width,
-			yuv_img.height,
-			yuv_img.code));
-	}
-
-
-	CAMLOG(printf("switching to RAW"));
-	ret = bug_camera_switch_to_dev(V4L2_DEVNODE_RAW);
-	if (ret != 0) {CAMLOG(printf("Failed to switch mode: ret=%d", ret));return NULL;}
-
-	CAMLOG(printf("calling bug_camera_grab for raw"));
-	ret = bug_camera_grab(&yuv_img);
-	if (ret != 0) {CAMLOG(printf("bug_camera_grab returned %d", ret)); return NULL;}
-	CAMLOG(printf("bug_camera_grab returned: start=%p, length=%lu, width=%d, height=%d, code=%d",
-			yuv_img.start,
-			yuv_img.length,
-			yuv_img.width,
-			yuv_img.height,
-			yuv_img.code));
-
-	/*
-	const size_t rgb_size = yuv_img.length * 3 / 2;
-	CAMLOG(printf("rgb_size set to %lu", rgb_size));
-
-    unsigned char *rgb_buffer = (unsigned char*) malloc(rgb_size);
-	if (rgb_buffer == NULL) {CAMLOG(printf("failed to alloc rgb_buffer of size %lu", rgb_size)); return NULL;}
-
-	CAMLOG(printf("Calling yuv2rgb with rgb_buffer %p and half-size=0", rgb_buffer));
-	yuv2rgb(&yuv_img, rgb_buffer, 0);
-	 */
+	grab_frame(env, V4L2_DEVNODE_RAW, yuv_img);
 	const size_t jpeg_size = compressUYVY2(yuv_img);
 
 	CAMLOG(printf("asking for java byte array of size %lu", jpeg_size));
@@ -419,19 +351,9 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_
 	if (java_buffer == NULL) {CAMLOG(printf("failed to alloc java_buffer of size %lu", jpeg_size)); return NULL;}
 
 	CAMLOG(printf("got java_buffer at %p", java_buffer));
-
-
 	CAMLOG(printf("Copying %lu bytes from jpeg_buffer %p to java_buffer %p",
 			jpeg_size, jpeg_buffer, java_buffer));
     env->SetByteArrayRegion(java_buffer, 0, jpeg_size, (jbyte*) jpeg_buffer);
-
-    CAMLOG(printf("calling bug_camera_stop"));
-	ret = bug_camera_stop();
-	if (ret != 0) {CAMLOG(printf("bug_camera_stop returned %d", ret)); return NULL;}
-
-    CAMLOG(printf("calling bug_camera_close"));
-	ret = bug_camera_close();
-	if (ret != 0) {CAMLOG(printf("bug_camera_close returned %d", ret)); return NULL;}
 
 	CAMLOG(printf("return java_buffer %p", java_buffer));
     return java_buffer;
