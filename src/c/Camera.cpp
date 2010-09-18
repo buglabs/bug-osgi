@@ -215,6 +215,7 @@ static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
 			CAMLOG(printf("Failed to switch mode: ret=%d", ret));
 			return ret;
 		}
+		current_dev_node = dev_node;
 	}
 
 	CAMLOG(printf("bug_camera_grab()"));
