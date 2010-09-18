@@ -93,6 +93,9 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	private String serviceName = "Picture";
 	private BMIModuleProperties properties;
 	private ServiceRegistration wsReg;
+	
+	private boolean isCameraOpen = false;
+	private boolean isCameraStarted = false;
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -164,6 +167,9 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	}
 
 	public void stop() throws Exception {
+		bug_camera_stop();
+		bug_camera_close();
+
 		cameraControlRef.unregister();
 		cameraService.unregister();
 		moduleRef.unregister();
@@ -190,26 +196,14 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	}
 
 	public IWSResponse execute(int operation, String input) {
-		System.out.println("New Picture GET");
 		if (operation == PublicWSProvider2.GET) {
-			bug_camera_open(ICameraDevice.DEFAULT_MEDIA_NODE,
-					-1,
-					2048,
-					1536,
-					320,
-					240);
+			
+			// open it if we need to
+			bug_camera_open_default();
 			bug_camera_start();
 			
-			// throw away 3 previews to get the exposure etc right
-			bug_camera_grab_preview();
-			bug_camera_grab_preview();
-			bug_camera_grab_preview();
-			
-			IWSResponse response =  new WSResponse(new ByteArrayInputStream(bug_camera_grab_full()), JPEG_MIME_TYPE);
-			
-			bug_camera_stop();
-			bug_camera_close();
-			return response;
+			// we'll leave the camera running
+			return new WSResponse(new ByteArrayInputStream(bug_camera_grab_full()), JPEG_MIME_TYPE);
 		}
 		return null;
 	}
@@ -260,9 +254,6 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 					LogServiceUtil.logBundleException(logService, e.getMessage(), e);
 				}
 			}
-			
-				
-			
 		}
 		
 		return false;
@@ -307,6 +298,11 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		serviceName = name;
 	}
 	
+	public int bug_camera_open_default()
+	{
+		return bug_camera_open(ICameraDevice.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
+	}
+	
 	public int bug_camera_open(
 			final String media_node,
 			int slot_num,
@@ -315,22 +311,45 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 			int preview_height,
 			int preview_width)
 	{
-		return camera.bug_camera_open(media_node, slot_num, full_height, full_width, preview_height, preview_width);
+		if (isCameraOpen) {
+			return 0;
+		}
+		
+		final int ret = camera.bug_camera_open(media_node, slot_num, full_height, full_width, preview_height, preview_width);
+		isCameraOpen = (ret == 0);
+		return ret;
 	}
 
 	public int bug_camera_close()
 	{
-		return camera.bug_camera_close();
+		if (!isCameraOpen) {
+			return 0;
+		}
+		
+		final int ret = camera.bug_camera_close();
+		isCameraOpen = !(ret == 0);
+		return ret;
 	}
 
 	public int bug_camera_start()
 	{
-		return camera.bug_camera_start();
+		if (isCameraStarted) {
+			return 0;
+		}
+		
+		final int ret = camera.bug_camera_start();
+		isCameraStarted = (ret == 0);
+		return ret;
 	}
 	
 	public int bug_camera_stop()
 	{
-		return camera.bug_camera_stop();
+		if (!isCameraStarted) {
+			return 0;
+		}
+		final int ret = camera.bug_camera_stop();
+		isCameraStarted = !(ret == 0);
+		return ret;
 	}
 
 	public byte[] bug_camera_grab_preview()

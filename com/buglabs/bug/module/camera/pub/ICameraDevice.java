@@ -59,6 +59,13 @@ public interface ICameraDevice {
 			int preview_width);
 	
 	/**
+	 * Calls bug_camera_open with reasonable default values.
+	 * (DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240)
+	 * @return 0 if open was successful
+	 */
+	public int bug_camera_open_default();
+	
+	/**
 	 * Closes the camera - allowing other processes to access it.
 	 * @return 0 if open was successful
 	 */
