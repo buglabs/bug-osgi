@@ -532,7 +532,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		if (result < 0) {
-			throw new IOException("ioctl BMI_GPS_GLEDON failed");
+			throw new IOException("ioctl BMI_GPS_RLEDOFF failed");
 		}
 
 		return result;
@@ -574,7 +574,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		if (result < 0) {
-			throw new IOException("ioctl BMI_GPS_GLEDON failed");
+			throw new IOException("ioctl BMI_GPS_ACTIVE_ANT failed");
 		}
 
 		return result;
@@ -588,7 +588,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		if (result < 0) {
-			throw new IOException("ioctl BMI_GPS_GLEDON failed");
+			throw new IOException("ioctl BMI_GPS_PASSIVE_ANT failed");
 		}
 
 		return result;
