@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-#include "jni/com_buglabs_bug_jni_gps_GPS.h"
+#include "jni/com_buglabs_bug_jni_gps_GPSControl.h"
 #include <termios.h>
 #include <string.h>
 #include <stdio.h>
@@ -124,6 +124,7 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1
  */
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_gps_GPSControl_ioctl_1BMI_1GPS_1ACTIVE_1ANT(JNIEnv * env, jobject obj)
 {
+	printf("In the method call");
 	return ioctl(getFileDescriptorField(env, obj), BMI_GPS_ACTIVE_ANT, 0);
 }
 

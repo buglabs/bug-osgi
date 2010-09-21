@@ -69,7 +69,7 @@ jni:
 	$(CXX) $(CXXFLAGS) $(OBJS) $(LD_FLAGS) -o $(LIBRARY) -shared $(LDFLAGS)
 
 %.o: %.cpp
-	$(CXX) $(ALL_CXXFLAGS) -c -v $^ -o $@
+	$(CXX) $(ALL_CXXFLAGS) -c $^ -o $@
 
 libs: $(LIBRARY)
 	cp $(LIBRARY) $(LIB_DIR)

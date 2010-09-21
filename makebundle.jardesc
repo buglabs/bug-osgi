@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="/home/jconnolly/Desktop/com.buglabs.bug.jni.gps.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/com.buglabs.bug.jni.gps/makebundle.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/com.buglabs.bug.jni.gps/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="false" exportJavaFiles="true" exportOutputFolder="true">
+        <file path="/com.buglabs.bug.jni.gps/.cproject"/>
+        <file path="/com.buglabs.bug.jni.gps/.project"/>
+        <folder path="/com.buglabs.bug.jni.gps/META-INF"/>
+        <file path="/com.buglabs.bug.jni.gps/Makefile"/>
+        <file path="/com.buglabs.bug.jni.gps/build.xml"/>
+        <folder path="/com.buglabs.bug.jni.gps/lib"/>
+        <file path="/com.buglabs.bug.jni.gps/.cdtproject"/>
+        <file path="/com.buglabs.bug.jni.gps/.classpath"/>
+    </selectedElements>
+</jardesc>
