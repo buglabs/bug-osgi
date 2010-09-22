@@ -197,12 +197,16 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {
-			p.put("ModuleDescription", properties.getDescription());
-			p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getDescription() != null) {
+				p.put("ModuleDescription", properties.getDescription());
+			}
+			if (properties.getSerial_num() != null) {
+				p.put("ModuleSN", properties.getSerial_num());
+			}
 			p.put("ModuleVendorID", "" + properties.getVendor());
 			p.put("ModuleRevision", "" + properties.getRevision());
 		}
-		
+
 		try {
 			p.put("gps.antenna.external", "" + isAntennaExternal());
 		} catch (IOException e) {
@@ -571,6 +575,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_ACTIVE_ANT();
+			System.out.println("Result: "+result);
 		}
 
 		if (result < 0) {
@@ -585,6 +590,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 		if (gpscontrol != null) {
 			result = gpscontrol.ioctl_BMI_GPS_PASSIVE_ANT();
+			System.out.println("Result: "+result);
 		}
 
 		if (result < 0) {
