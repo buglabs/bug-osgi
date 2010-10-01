@@ -71,7 +71,7 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	private static final String INFO_SERVLET_HTML_PATH = "/support.html";
 	
-	private static final String DEVNODE_BUGNAV = "/dev/input/event0";
+	private static final String DEVNODE_BUGNAV = "/dev/input/event1";
 
 	private static Activator ref;
 
