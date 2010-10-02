@@ -65,8 +65,8 @@ JStringWrapper::operator const char *() const
 	return m_cstring;
 }
 
-//#define CAMLOG(x)
-#define CAMLOG(x) {x; printf("\n"); fflush(stdout);}
+#define CAMLOG(x)
+//#define CAMLOG(x) {x; printf("\n"); fflush(stdout);}
 
 
 // TODO: these should be in the class
@@ -311,33 +311,26 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1stop
 	return ret;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1preview
-  (JNIEnv *env, jobject)
+JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1preview
+  (JNIEnv *env, jobject, jintArray jbuf)
 {
+	if (jbuf == NULL) {
+		CAMLOG(printf("caller didn't give us a buffer"));
+	}
+	jint *buf = env->GetIntArrayElements(jbuf, NULL);
+	if (buf == NULL) {
+		CAMLOG(printf("failed to get elements of caller's buffer"));
+		return false;
+	}
+
 	struct bug_img yuv_img;
 	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
 
-	const size_t rgb_size = yuv_img.length * 3 / 2;
-    rgb_buffer = (unsigned char*) realloc(rgb_buffer, rgb_size);
-    if (rgb_buffer == NULL) {
-    	CAMLOG(printf("Failed to realloc rgb buffer to %lu", rgb_size));
-    	return NULL;
-    }
-
-    CAMLOG(printf("yuv2rgb, rgb size=%lu, half_size=%d", rgb_size, half_size));
-    yuv2rgb(&yuv_img, rgb_buffer, half_size);
-
-	CAMLOG(printf("asking for java byte array of size %lu", rgb_size));
-    jbyteArray java_buffer = env->NewByteArray(rgb_size);
-	if (java_buffer == NULL) {CAMLOG(printf("failed to alloc java_buffer of size %lu", rgb_size)); return NULL;}
-
-	CAMLOG(printf("got java_buffer at %p", java_buffer));
-	CAMLOG(printf("Copying %lu bytes from rgb_buffer %p to java_buffer %p",
-			rgb_size, rgb_buffer, java_buffer));
-    env->SetByteArrayRegion(java_buffer, 0, rgb_size, (jbyte*) rgb_buffer);
-
-	CAMLOG(printf("return java_buffer %p", java_buffer));
-    return java_buffer;
+	CAMLOG(printf("yuv2rgba into caller's buffer"));
+    yuv2rgba(&yuv_img, (unsigned int*) buf, half_size, 255);
+	CAMLOG(printf("conversion done"));
+    env->ReleaseIntArrayElements(jbuf, buf, 0);
+    return true;
 }
 
 JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1raw

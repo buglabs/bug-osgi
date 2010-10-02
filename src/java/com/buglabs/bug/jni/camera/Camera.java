@@ -51,7 +51,7 @@ public class Camera extends CharDevice {
 	public native int bug_camera_stop();
 
 	// grab a preview-sized image as RGB
-	public native byte[] bug_camera_grab_preview();
+	public native boolean bug_camera_grab_preview(int [] pixelBuffer);
 	
 	// grab a raw-sized image as JPEG
 	public native byte[] bug_camera_grab_raw();

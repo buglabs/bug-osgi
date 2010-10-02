@@ -128,7 +128,7 @@ void yuv2rgb(struct bug_img *in, unsigned char *out, int downby2);
  * so the 'out' buffer should be 2 times larger than the 'in' buffer. Set
  * 'alpha' to 255 for no transparency and to 0 for complete transparency.
  */
-void yuv2rgba(struct bug_img *in, unsigned char *out, int downby2, unsigned char alpha);
+void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char alpha);
 
 #endif
 

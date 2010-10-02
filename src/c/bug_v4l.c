@@ -773,11 +773,11 @@ void yuv2rgb(struct bug_img *in, unsigned char *out, int downby2) {
   }
 }
 
-void yuv2rgba(struct bug_img *in, unsigned char *out, int downby2, unsigned char alpha) {
+void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char alpha) {
   int row, col;
   int y0, y1, cr, cb;
   int r, g, b;
-  unsigned int *o = (unsigned int *) out;
+  unsigned int *o = out;
   unsigned char *ibuf = in->start;
 
   if(downby2) {
