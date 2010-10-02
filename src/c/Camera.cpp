@@ -327,7 +327,7 @@ JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1g
 	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
 
 	CAMLOG(printf("yuv2rgba into caller's buffer"));
-    yuv2rgba(&yuv_img, (unsigned int*) buf, half_size, 255);
+    yuv2rgba(&yuv_img, (unsigned int*) buf, half_size, 0);
 	CAMLOG(printf("conversion done"));
     env->ReleaseIntArrayElements(jbuf, buf, 0);
     return true;
