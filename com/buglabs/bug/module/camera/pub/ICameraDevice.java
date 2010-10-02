@@ -87,9 +87,11 @@ public interface ICameraDevice {
 	/**
 	 * Grabs a raw RGB-encoded preview image. 
 	 * bug_camera_open() and bug_camera_start() must already have been called.
-	 * @return
+	 * @param pixelBuffer array of size preview width * preview height from
+	 *        the call to bug_camera_open
+	 * @return true if grab succeeded
 	 */
-	public byte[] bug_camera_grab_preview();
+	public boolean bug_camera_grab_preview(int [] pixelBuffer);
 	
 
 	/**

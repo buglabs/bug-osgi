@@ -352,9 +352,9 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		return ret;
 	}
 
-	public byte[] bug_camera_grab_preview()
+	public boolean bug_camera_grab_preview(int [] pixelBuffer)
 	{
-		return camera.bug_camera_grab_preview();
+		return camera.bug_camera_grab_preview(pixelBuffer);
 	}
 
 	public byte[] bug_camera_grab_full()
