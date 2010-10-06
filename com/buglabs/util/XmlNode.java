@@ -87,13 +87,14 @@ public class XmlNode {
 	}
 
 	/**
-	 * Add an attribute to the current node.
-	 * 
 	 * @param name
 	 * @param value
+	 * @return instance of self
 	 */
-	public void addAttribute(String name, String value) {
+	public XmlNode addAttribute(String name, String value) {
 		this.getAttributes().put(name, value);
+		
+		return this;
 	}
 
 	public void setName(String tagName) {
