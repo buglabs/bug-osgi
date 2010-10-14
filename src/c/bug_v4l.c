@@ -783,22 +783,14 @@ void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char 
     int w = in->width*2;
     for(row=0; row < in->height; row+=2) {
       for(col=0; col < in->width; col+=2) {
-    	  // TODO: figure out why we need to use the 2nd y0cbcr set here
+	   y0 = (((int) *(ibuf+0)) + ((int) *(ibuf+2)) + ((int) *(ibuf+w))  + ((int) *(ibuf+w+2))) / 4;
+	   cb = (((int) *(ibuf+1)) + ((int) *(ibuf+w+1)))/2 - 128;
+	   cr = (((int) *(ibuf+3)) + ((int) *(ibuf+w+3)))/2 - 128;
+	   // the set below works for UYVY
 #if 0
-	y0 = (((int) *(ibuf+0)) + ((int) *(ibuf+2)) + ((int) *(ibuf+w)) + ((int) *(ibuf+w+2))) / 4;
-	
-	cb = (((int) *(ibuf+1)) + ((int) *(ibuf+w+1)))/2 - 128;
-	cr = (((int) *(ibuf+3)) + ((int) *(ibuf+w+3)))/2 - 128;
-#endif
-#if 1
   	   y0 = (((int) *(ibuf+1)) + ((int) *(ibuf+3)) + ((int) *(ibuf+w+1)) + ((int) *(ibuf+w+3))) / 4;
 	   cb = (((int) *(ibuf+0)) + ((int) *(ibuf+w+0)))/2 - 128;
 	   cr = (((int) *(ibuf+2)) + ((int) *(ibuf+w+2)))/2 - 128;
-#endif
-#if 0
-	   y0 = (((int) *(ibuf+1)) + ((int) *(ibuf+3)) + ((int) *(ibuf+w+1)) + ((int) *(ibuf+w+3))) / 4;
-	   cb = (((int) *(ibuf+2)) + ((int) *(ibuf+w+2)))/2 - 128;
-	   cr = (((int) *(ibuf+0)) + ((int) *(ibuf+w+0)))/2 - 128;
 #endif
 	__yuv2rgb(y0, cb, cr, &r, &g, &b);
 	*o++ = ((unsigned int) alpha) << 24 |  (r << 16) | (g << 8) | b;
@@ -810,10 +802,13 @@ void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char 
   } else {
     for(row=0; row < in->height; row++) {
       for(col=0; col < in->width; col+=2) {
+
 	y0 = ((int) *ibuf++);
 	cb = ((int) *ibuf++) - 128;
 	y1 = ((int) *ibuf++);
 	cr = ((int) *ibuf++) - 128;
+
+
 	__yuv2rgb(y0, cb, cr, &r, &g, &b);
 	*o++ = ((unsigned int) alpha) << 24 |  (r << 16) | (g << 8) | b;
 	__yuv2rgb(y1, cb, cr, &r, &g, &b);

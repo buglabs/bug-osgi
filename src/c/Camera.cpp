@@ -79,7 +79,7 @@ static v4l2_pix_format raw_fmt;
 static v4l2_pix_format resize_fmt;
 static bool half_size = false;
 
-size_t compressUYVY2(const struct bug_img &yuv_img)
+size_t compressYUYV(const struct bug_img &yuv_img)
 {
 	int bytesPerPixel = 2;
 	const unsigned char * data = (unsigned char *) yuv_img.start;
@@ -117,20 +117,41 @@ size_t compressUYVY2(const struct bug_img &yuv_img)
 	  }
 
 	  for (int i = 0; i < yuv_img.height; ++i) {
-	    //convert a scanline from CbYCrY to YCbCr
+		  /*
+		   From http://v4l2spec.bytesex.org/spec-single/v4l2.html#V4L2-PIX-FMT-YUYV
+
+		  Example 2-1. V4L2_PIX_FMT_YUYV 4 × 4 pixel image
+
+		  Byte Order. Each cell is one byte.
+
+		  start + 0:	Y'00	Cb00	Y'01	Cr00	Y'02	Cb01	Y'03	Cr01
+		  start + 8:	Y'10	Cb10	Y'11	Cr10	Y'12	Cb11	Y'13	Cr11
+		  start + 16:	Y'20	Cb20	Y'21	Cr20	Y'22	Cb21	Y'23	Cr21
+		  start + 24:	Y'30	Cb30	Y'31	Cr30	Y'32	Cb31	Y'33	Cr31
+
+		  Example 2-1. V4L2_PIX_FMT_UYVY 4 × 4 pixel image
+
+		  Byte Order. Each cell is one byte.
+
+		  start + 0:	Cb00	Y'00	Cr00	Y'01	Cb01	Y'02	Cr01	Y'03
+		  start + 8:	Cb10	Y'10	Cr10	Y'11	Cb11	Y'12	Cr11	Y'13
+		  start + 16:	Cb20	Y'20	Cr20	Y'21	Cb21	Y'22	Cr21	Y'23
+		  start + 24:	Cb30	Y'30	Cr30	Y'31	Cb31	Y'32	Cr31	Y'33
+		  */
+	    //convert a scanline from YUYV to YCbCr
 	    unsigned char * yuvPtr = yuvBuf;
-	    const unsigned char * uyvyPtr = data;
+	    const unsigned char * yuyvPtr = data;
 
 	    while(yuvPtr < (unsigned char *) (yuvBuf + (yuv_img.width * 3))) {
-	      yuvPtr[0] = uyvyPtr[1];
-	      yuvPtr[1] = uyvyPtr[0];
-	      yuvPtr[2] = uyvyPtr[2];
-	      yuvPtr[3] = uyvyPtr[3];
-	      yuvPtr[4] = uyvyPtr[0];
-	      yuvPtr[5] = uyvyPtr[2];
+	      yuvPtr[0] = yuyvPtr[0];
+	      yuvPtr[1] = yuyvPtr[1];
+	      yuvPtr[2] = yuyvPtr[3];
+	      yuvPtr[3] = yuyvPtr[2];
+	      yuvPtr[4] = yuyvPtr[1];
+	      yuvPtr[5] = yuyvPtr[3];
 
-	      uyvyPtr = uyvyPtr + 4;
-	      yuvPtr = yuvPtr + 6;
+	      yuyvPtr += 4;
+	      yuvPtr += 6;
 	    }
 
 	    jpeg_write_scanlines(&comp, &yuvBuf, 1);
@@ -147,60 +168,6 @@ size_t compressUYVY2(const struct bug_img &yuv_img)
 	  jpeg_destroy_compress(&comp);
 
 	  return dataWritten;
-}
-
-static size_t yuv2jpeg(const struct bug_img &yuv_img)
-{
-	CAMLOG(printf("yuv2jpeg()"));
-	if (jpeg_buffer_size < (yuv_img.length * 3 / 2)) {
-		jpeg_buffer_size = yuv_img.length * 3 / 2;
-		jpeg_buffer = (unsigned char *) realloc(jpeg_buffer, jpeg_buffer_size);
-		if (jpeg_buffer == NULL) {
-			CAMLOG(printf("Failed to allocate memory for jpeg_buffer"));
-			return 0;
-		} else {
-			CAMLOG(printf("jpeg_buffer now %lu", jpeg_buffer_size));
-		}
-	}
-
-	CAMLOG(printf("opening jpeg_buffer %p for %lu", jpeg_buffer, jpeg_buffer_size));
-    FILE *out = fmemopen(jpeg_buffer, jpeg_buffer_size, "w");
-    if (out == NULL) {
-    	CAMLOG(printf("Failed to open jpeg_buffer output stream"));
-    	return 0;
-    }
-
-    struct jpeg_compress_struct comp;
-    struct jpeg_error_mgr error;
-
-    comp.err = jpeg_std_error(&error);
-    jpeg_create_compress(&comp);
-    jpeg_stdio_dest(&comp, out);
-    comp.image_width = yuv_img.width;
-    comp.image_height = yuv_img.height;
-    comp.input_components = BYTES_PER_PIXEL;
-    comp.in_color_space = JCS_YCbCr;
-    jpeg_set_defaults(&comp);
-    jpeg_set_quality(&comp, 90, TRUE);
-
-    jpeg_start_compress(&comp, TRUE);
-
-    const size_t line_length = yuv_img.width * BYTES_PER_PIXEL;
-
-    unsigned char *yuv_ptr = (unsigned char*) yuv_img.start;
-    for (int i = 0; i < yuv_img.height; ++i, yuv_ptr += line_length) {
-        jpeg_write_scanlines(&comp, &yuv_ptr, 1);
-    }
-
-    jpeg_finish_compress(&comp);
-    fflush(out);
-
-    size_t dataWritten = ftell(out);
-    fclose(out);
-    jpeg_destroy_compress(&comp);
-
-    CAMLOG(printf("yuv2jpg returning %lu", dataWritten));
-    return dataWritten;
 }
 
 static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
@@ -242,7 +209,8 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
 
 	raw_fmt.width = raw_width;
 	raw_fmt.height = raw_height;
-	raw_fmt.pixelformat = V4L2_PIX_FMT_UYVY;
+	// format needs to be YUYV for the yuv2rgb functions to work properly
+	raw_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
 
 	// TODO: I think this only really works if they ask for 320x240
 	if (resize_width < 640) {
@@ -255,7 +223,7 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
 	}
 	resize_fmt.width = resize_width;
 	resize_fmt.height = resize_height;
-	resize_fmt.pixelformat = V4L2_PIX_FMT_YUYV;
+	resize_fmt.pixelformat = raw_fmt.pixelformat;// this is ignored but we set it to the same just in case
 
 	// we'll start in preview mode
 	// (note that we don't use V4L2_DEVNODE_PREVIEW -
@@ -338,7 +306,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_
 {
 	struct bug_img yuv_img;
 	grab_frame(env, V4L2_DEVNODE_RAW, yuv_img);
-	const size_t jpeg_size = compressUYVY2(yuv_img);
+	const size_t jpeg_size = compressYUYV(yuv_img);
 
 	CAMLOG(printf("asking for java byte array of size %lu", jpeg_size));
     jbyteArray java_buffer = env->NewByteArray(jpeg_size);
