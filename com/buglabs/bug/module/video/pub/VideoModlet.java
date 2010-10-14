@@ -53,7 +53,7 @@ import com.buglabs.util.RemoteOSGiServiceConstants;
  * @author dfindlay
  * 
  */
-public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl, IModuleDisplay {
+public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl, com.buglabs.bug.module.lcd.pub.IModuleDisplay {
 	private final BundleContext context;
 	private final int slotId;
 	private final String moduleId;
@@ -103,7 +103,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		props.put("Slot", "" + slotId);
 
 		videoControlServReg = context.registerService(IVideoModuleControl.class.getName(), this, createRemotableProperties(null));
-		moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), this, createRemotableProperties(props));
+		moduleDisplayServReg = context.registerService(com.buglabs.bug.module.lcd.pub.IModuleDisplay.class.getName(), this, createRemotableProperties(props));
 	}
 
 	public void stop() throws Exception {
