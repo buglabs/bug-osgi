@@ -231,7 +231,8 @@ public class Activator implements BundleActivator, ServiceListener {
 		List slots = null;
 
 		for (int i = 0; i < 4; ++i) {
-			File prodFile = new File("/sys/devices/platform/omap_bmi_slot."+i+"/bmi-"+ i+"/bmi-dev-"+i+"/product");		
+			//this changed as of kernel 7e8ddd053c9a06fefb7e71a944846bdecb25c9ee, Oct 6, 2010
+			File prodFile = new File("/sys/class/bmi/bmi-"+i+"/bmi-dev-"+i+"/product");		
 			if (!prodFile.exists()) {
 				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
 				continue;

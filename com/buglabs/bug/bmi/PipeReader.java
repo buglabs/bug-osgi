@@ -126,6 +126,7 @@ public class PipeReader extends Thread {
 	 */
 	private File sysDirectory(int slot) {
 		
-		return new File("/sys/devices/platform/omap_bmi_slot."+slot+"/bmi-"+ slot+"/bmi-dev-"+slot);
+		/sys/class/bmi/bmi-1/bmi-dev-1/
+		return new File("/sys/class/bmi/bmi-"+slot+"/bmi-dev-"+slot);
 	}
 }
