@@ -125,8 +125,6 @@ public class PipeReader extends Thread {
 	 * @return
 	 */
 	private File sysDirectory(int slot) {
-		
-		/sys/class/bmi/bmi-1/bmi-dev-1/
 		return new File("/sys/class/bmi/bmi-"+slot+"/bmi-dev-"+slot);
 	}
 }
