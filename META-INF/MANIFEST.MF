@@ -15,7 +15,9 @@ Import-Package: org.osgi.framework,
  com.buglabs.status,
  com.buglabs.util,
  com.buglabs.bug.jni.common,
- org.osgi.service.log
+ org.osgi.service.log,
+ com.buglabs.bug.sysfs,
+ com.buglabs.bug.accelerometer.pub
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0003
 Bug-Module-Driver-Id: bmi_lcd
