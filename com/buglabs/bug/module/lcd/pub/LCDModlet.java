@@ -48,7 +48,7 @@ import org.osgi.service.log.LogService;
 
 
 import com.buglabs.bug.module.lcd.AccelerationWS;
-import com.buglabs.bug.module.lcd.IML8953AccelerometerControl;
+import com.buglabs.bug.module.lcd.ML8953AccelerometerImplementation;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
@@ -93,7 +93,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private final String BRIGHTNESS_SYSFS = "/sys/class/backlight/omap-backlight/brightness";
 	private AccelerationWS accelerationWS;
 	private ServiceRegistration accelerationWSReg;
-	private IML8953AccelerometerControl ml8953Control;
+	private ML8953AccelerometerImplementation ml8953Control;
 	private ServiceRegistration ml8953AccelerometerRef;
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
@@ -129,10 +129,10 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		props.put("height", new Integer(LCD_HEIGHT));
 		props.put("Slot", "" + slotId);
 		
-		ml8953Control = new IML8953AccelerometerControl();
+		ml8953Control = new ML8953AccelerometerImplementation();
 		
 		ml8953AccelerometerRef = context.registerService(
-				IML8953AccelerometerControl.class.getName(), ml8953Control,
+				IML8953Accelerometer.class.getName(), ml8953Control,
 				createBasicServiceProperties());
 		
 		createAccelerationWS();
