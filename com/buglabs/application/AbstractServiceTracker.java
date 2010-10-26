@@ -41,6 +41,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import com.buglabs.util.LogServiceUtil;
+
 /**
  * Service tracker for the BugApplication Bundle;
  * 
@@ -88,8 +90,7 @@ public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer
 	 * @return
 	 */
 	private LogService getLogService(BundleContext context) {
-		ServiceReference sr = context.getServiceReference(LogService.class.getName());
-		return (LogService) context.getService(sr);
+		return LogServiceUtil.getLogService(context);
 	}
 
 	/**
