@@ -41,10 +41,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
 
+
+import com.buglabs.bug.module.lcd.AccelerationWS;
+import com.buglabs.bug.module.lcd.IML8953AccelerometerControl;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.module.IModuleControl;
@@ -87,6 +91,10 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private ServiceRegistration wsReg;
 	
 	private final String BRIGHTNESS_SYSFS = "/sys/class/backlight/omap-backlight/brightness";
+	private AccelerationWS accelerationWS;
+	private ServiceRegistration accelerationWSReg;
+	private IML8953AccelerometerControl ml8953Control;
+	private ServiceRegistration ml8953AccelerometerRef;
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -120,6 +128,14 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		props.put("width", new Integer(LCD_WIDTH));
 		props.put("height", new Integer(LCD_HEIGHT));
 		props.put("Slot", "" + slotId);
+		
+		ml8953Control = new IML8953AccelerometerControl();
+		
+		ml8953AccelerometerRef = context.registerService(
+				IML8953AccelerometerControl.class.getName(), ml8953Control,
+				createBasicServiceProperties());
+		
+		createAccelerationWS();
 
 		lcdControlServReg = context.registerService(ILCDModuleControl.class.getName(), this, createRemotableProperties(null));
 		
@@ -148,6 +164,9 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			moduleDisplayServReg.unregister();
 		}
 		lcdControlServReg.unregister();
+		ml8953AccelerometerRef.unregister();
+		destroyAccelerationWS();
+		
 	}
 
 	/**
@@ -245,6 +264,23 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 	public int getSlotId() {
 		return slotId;
+	}
+	
+	private void createAccelerationWS() throws InvalidSyntaxException {
+		final LogService log = (LogService) context
+				.getService(context.getServiceReference(LogService.class
+						.getName()));
+		accelerationWS = new AccelerationWS(ml8953Control, log);
+		accelerationWSReg = context.registerService(
+				PublicWSProvider.class.getName(), accelerationWS, null);
+	}
+	
+	private void destroyAccelerationWS() {
+		accelerationWSReg.unregister();
+
+		if (accelerationWS != null) {
+			accelerationWS = null;
+		}
 	}
 
 	public int resume() throws IOException {
