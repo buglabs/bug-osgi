@@ -7,7 +7,8 @@ import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
 import com.buglabs.bug.module.lcd.pub.IML8953Accelerometer;
 
 /**
- * Exposes sysfs entry for ML3953 devices to Java clients.
+ * Handles fetching parsing, passing back values from sysfs relating to the
+ * ML8953Accelerometer.
  * 
  * @author jconnolly
  * 
