@@ -145,9 +145,11 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		if (vhSerialRef != null) {
 			vhSerialRef.unregister();
 		}
+		// close/unlock /dev/ttyBMI#
 		if (serialPort != null){
 			serialPort.close();
 		}
+		//close /dev/bmi_vh_ctl_m#
 		if (vhDevice != null ){
 			vhDevice.close();
 		}
