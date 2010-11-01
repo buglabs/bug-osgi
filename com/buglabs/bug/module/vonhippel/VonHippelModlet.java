@@ -145,6 +145,9 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		if (vhSerialRef != null) {
 			vhSerialRef.unregister();
 		}
+		if (serialPort != null){
+			serialPort.close();
+		}
 		
 	}
 
