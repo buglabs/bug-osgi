@@ -148,6 +148,9 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		if (serialPort != null){
 			serialPort.close();
 		}
+		if (vhDevice != null ){
+			vhDevice.close();
+		}
 		
 	}
 
