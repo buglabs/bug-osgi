@@ -95,6 +95,11 @@ public class ButtonEvent {
 	 * User button on BUG 2.0.
 	 */
 	public static final int BUTTON_BUG20_USER = 242;
+	
+	/**
+	 * Power button on BUG 2.0.
+	 */
+	public static final int BUTTON_BUG20_POWER = 116;
 
 	public static final int KEY_DOWN = 1;
 
