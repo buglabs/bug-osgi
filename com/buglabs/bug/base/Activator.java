@@ -51,6 +51,8 @@ import com.buglabs.bug.base.pub.IBUG20BaseControl;
 import com.buglabs.bug.base.pub.IShellService;
 import com.buglabs.bug.base.pub.ITimeProvider;
 import com.buglabs.bug.input.pub.InputEventProvider;
+import com.buglabs.device.ButtonEvent;
+import com.buglabs.device.IButtonEventListener;
 import com.buglabs.device.IButtonEventProvider;
 import com.buglabs.support.SupportInfoTextFormatter;
 import com.buglabs.support.SupportInfoXMLFormatter;
@@ -63,7 +65,7 @@ import com.buglabs.util.LogServiceUtil;
  * @author kgilmer
  * 
  */
-public class Activator implements BundleActivator, ITimeProvider {
+public class Activator implements BundleActivator, ITimeProvider, IButtonEventListener {
 
 	private static final String BUG_BASE_VERSION_KEY = "bug.base.version";
 
@@ -72,6 +74,8 @@ public class Activator implements BundleActivator, ITimeProvider {
 	private static final String INFO_SERVLET_HTML_PATH = "/support.html";
 	
 	private static final String DEVNODE_BUGNAV = "/dev/input/user_button";
+
+	private static final String DEVNODE_BUGPOWER = "/dev/input/power_button";
 
 	private static Activator ref;
 
@@ -90,11 +94,15 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	private ServiceRegistration sr;
 
-	private InputEventProvider bep;
+	private InputEventProvider userbep;
 
-	private ServiceRegistration bepReg;
+	private ServiceRegistration userBepReg;
 
 	private BundleContext context;
+
+	private InputEventProvider powerbep;
+
+	private ServiceRegistration powerBepReg;
 
 	public Date getTime() {
 		return Calendar.getInstance().getTime();
@@ -107,7 +115,9 @@ public class Activator implements BundleActivator, ITimeProvider {
 	 */
 	private void registerServices(BundleContext context) {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
-		bepReg = context.registerService(IButtonEventProvider.class.getName(), bep, null);
+		userBepReg = context.registerService(IButtonEventProvider.class.getName(), userbep, null);
+		powerBepReg = context.registerService(IButtonEventProvider.class.getName(), powerbep, null);
+		
 		if (bbc != null) {
 			baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
 		}
@@ -161,8 +171,16 @@ public class Activator implements BundleActivator, ITimeProvider {
 			logService.log(LogService.LOG_ERROR, "Unable to initialize LEDs.  " + e.getMessage());
 		}
 	
-		bep = new InputEventProvider(DEVNODE_BUGNAV, logService);
-		bep.start();
+		userbep = new InputEventProvider(DEVNODE_BUGNAV, logService);
+		userbep.start();
+		
+		powerbep = new InputEventProvider(DEVNODE_BUGPOWER, logService);
+		powerbep.start();
+		
+		//listen for the power button to be hit, then toggle the LED sequence for user feedback.  see
+		//http://redmine.buglabs.net/issues/show/1429#note-4
+		powerbep.addListener(this);
+		
 		
 		registerServices(context);
 
@@ -215,6 +233,22 @@ public class Activator implements BundleActivator, ITimeProvider {
 		});
 		t.start();
 	}
+	
+	private void signalShutdown() {
+		Thread t = new Thread(new Runnable() {
+
+			public void run() {
+				try {
+					logService.log(LogService.LOG_INFO, "Power Button engaged: base bundle signalling via LEDs shutdown sequence initiated");
+					bbc.setLEDTrigger(IBUG20BaseControl.LED_POWER , IBUG20BaseControl.COLOR_BLUE, "heartbeat");
+					
+				} catch (Exception e) {
+				}
+			}
+
+		});
+		t.start();
+	}
 
 	public void stop(BundleContext context) throws Exception {
 		sr.unregister();
@@ -227,12 +261,8 @@ public class Activator implements BundleActivator, ITimeProvider {
 		if (baseControlReg !=null){
 			baseControlReg.unregister();
 		}
-		bepReg.unregister();
-		/*if (audioReg != null) {
-			audioReg.unregister();
-		}*/
-		
-		//btReg.unregister();
+		userBepReg.unregister();
+		powerBepReg.unregister();
 	}
 
 	public static Activator getDefault() {
@@ -241,5 +271,15 @@ public class Activator implements BundleActivator, ITimeProvider {
 
 	public BundleContext getBundleContext() {
 		return context;
+	}
+
+	@Override
+	public void buttonEvent(ButtonEvent event) {
+		
+		if (event.getButton() == 116 && event.getAction() == ButtonEvent.KEY_UP){
+			logService.log(LogService.LOG_DEBUG, "base bundle received Power Button event: "+event.getButton());
+			signalShutdown();
+		}
+		
 	}
 }
