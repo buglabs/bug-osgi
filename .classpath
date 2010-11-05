@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path=""/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.buglabs.bug.base.molly"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/phoneME Advanced Personal"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SDK All"/>
+	<classpathentry kind="src" path=""/>
 	<classpathentry kind="output" path=""/>
 </classpath>

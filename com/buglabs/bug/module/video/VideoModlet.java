@@ -25,14 +25,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.module.video.pub;
+package com.buglabs.bug.module.video;
 
 import java.awt.Frame;
+import java.awt.Point;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
@@ -41,11 +44,22 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
+import com.buglabs.bug.module.video.pub.IVideoModuleControl;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
+import com.buglabs.services.ws.IWSResponse;
+import com.buglabs.services.ws.PublicWSDefinition;
+import com.buglabs.services.ws.PublicWSProvider;
+import com.buglabs.services.ws.PublicWSProviderWithParams;
+import com.buglabs.services.ws.PublicWSProvider2;
+import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.RemoteOSGiServiceConstants;
+import com.buglabs.util.SelfReferenceException;
+import com.buglabs.util.XmlNode;
+import com.buglabs.bug.sysfs.BMIDeviceHelper;
+import com.buglabs.bug.sysfs.VideoOutDevice;
 
 /**
  * Video Modlet class.
@@ -53,11 +67,12 @@ import com.buglabs.util.RemoteOSGiServiceConstants;
  * @author dfindlay
  * 
  */
-public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl, com.buglabs.bug.module.lcd.pub.IModuleDisplay {
+public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl, com.buglabs.bug.module.lcd.pub.IModuleDisplay, PublicWSProviderWithParams {
 	private final BundleContext context;
 	private final int slotId;
 	private final String moduleId;
 	private final String moduleName;
+	private String serviceName = "Video";
 	// TODO requires driver (or something else?)to expose size before we can ditch the hardcoded frame size
 	private final int LCD_WIDTH = 320;
 	private final int LCD_HEIGHT = 240;
@@ -70,14 +85,20 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	private boolean suspended;
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	private final BMIModuleProperties properties;
+	private ServiceRegistration wsReg;
+	
+	private final VideoOutDevice videoOutDevice;
 	
 	public VideoModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
+
 		this.properties = null;
 		this.moduleName = "VIDEO";
 		this.log = LogServiceUtil.getLogService(context);
+		System.out.println("Asking for video out device");
+		this.videoOutDevice = (VideoOutDevice) BMIDeviceHelper.getDevice(slotId);
 	}
 
 	public VideoModlet(BundleContext context, int slotId, String moduleId, BMIModuleProperties properties) {
@@ -87,6 +108,8 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		this.properties = properties;
 		this.moduleName = "VIDEO";
 		this.log = LogServiceUtil.getLogService(context);
+		System.out.println("Asking for video out device");
+		this.videoOutDevice = (VideoOutDevice) BMIDeviceHelper.getDevice(slotId);
 	}
 
 	public void setup() throws Exception {
@@ -104,6 +127,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 
 		videoControlServReg = context.registerService(IVideoModuleControl.class.getName(), this, createRemotableProperties(null));
 		moduleDisplayServReg = context.registerService(com.buglabs.bug.module.lcd.pub.IModuleDisplay.class.getName(), this, createRemotableProperties(props));
+		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
 	}
 
 	public void stop() throws Exception {
@@ -124,7 +148,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 
 		return ht;
 	}
-
+	
 	private Properties createBasicServiceProperties() {
 		Properties p = new Properties();
 		p.put("Provider", this.getClass().getName());
@@ -149,7 +173,8 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		if (moduleRef != null) {
 			Properties modProperties = createBasicServiceProperties();
 			modProperties.put("Power State", suspended ? "Suspended" : "Active");
-			moduleRef.setProperties(modProperties);
+			moduleRef.setProperties(modProperties);	public Point getResolution() {
+
 		}
 	}
 	*/
@@ -201,7 +226,6 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 					LogServiceUtil.logBundleException(log, "An error occured while changing suspend state.", e);
 				}
 			}
-
 		}
 
 		return false;
@@ -212,39 +236,11 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 
 	public int resume() throws IOException {
-		// TODO requires driver to expose this feature
-		/*
-		int result = -1;
-
-		result = lcdcontrol.ioctl_BMI_LCD_RESUME(slotId);
-
-		if (result < 0) {
-			throw new IOException("ioctl BMI_LCD_RESUME failed");
-		}
-
-		suspended = false;
-		updateIModuleControlProperties();
-		return result;
-		*/
-		return 0;
+		return videoOutDevice.resume() ? 1 : 0;
 	}
 
 	public int suspend() throws IOException {
-		// TODO requires driver to expose this feature
-		/*
-		int result = -1;
-
-		result = lcdcontrol.ioctl_BMI_LCD_SUSPEND(slotId);
-
-		if (result < 0) {
-			throw new IOException("ioctl BMI_LCD_SUSPEND failed");
-		}
-
-		suspended = true;
-		updateIModuleControlProperties();
-		return result;
-		*/
-		return 0;
+		return videoOutDevice.suspend() ? 1 : 0;
 	}
 	
 	public Frame getFrame() {
@@ -263,21 +259,106 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		return moduleName;
 	}
 
-	/*
-	public int setLEDGreen(boolean state) throws IOException {
-		if (state) {
-			return lcdcontrol.ioctl_BMI_LCD_GLEDON(slotId);
-		} else {
-			return lcdcontrol.ioctl_BMI_LCD_GLEDOFF(slotId);
-		}
+	public boolean isVGA() {
+		return videoOutDevice.isVGA();
 	}
 
-	public int setLEDRed(boolean state) throws IOException {
-		if (state) {
-			return lcdcontrol.ioctl_BMI_LCD_RLEDON(slotId);
-		} else {
-			return lcdcontrol.ioctl_BMI_LCD_RLEDOFF(slotId);
-		}
+	public boolean isDVI() {
+		return videoOutDevice.isDVI();
 	}
-	*/
+
+	public boolean setVGA() {
+		return videoOutDevice.setVGA();
+	}
+
+	public boolean setDVI() {
+		return videoOutDevice.setDVI();
+	}
+
+	@Override
+	public PublicWSDefinition discover(int operation) {
+		if (operation == PublicWSProvider2.GET) {
+			return new PublicWSDefinition() {
+
+				public List getParameters() {
+					return null;
+				}
+
+				public String getReturnType() {
+					return "text/xml";
+				}
+			};
+		}
+
+		return null;
+	}
+
+	@Override
+	public IWSResponse execute(int operation, String input) {
+		// not called because we implement the extended one below
+		return null;
+	}
+
+	@Override
+	public IWSResponse execute(int operation, String input, Map get, Map post) {
+		if (get.containsKey("suspend")) {
+			videoOutDevice.suspend();
+		}
+		if (get.containsKey("resume")) {
+			videoOutDevice.resume();
+		}
+		if (get.containsKey("dvi")) {
+			videoOutDevice.setDVI();
+		}
+		if (get.containsKey("vga")) {
+			videoOutDevice.setVGA();
+		}
+		
+		for (Object key : get.keySet()) {
+			System.out.println(key + "=" + get.get(key));
+		}
+		System.out.println("post map");
+		for (Object key : post.keySet()) {
+			System.out.println(key + "=" + post.get(key));
+		}
+		
+		if (operation == PublicWSProvider2.GET) {
+			return new WSResponse(getVideoInfoXml(), "text/xml");
+		}
+		return null;
+	}
+
+	@Override
+	public String getPublicName() {
+		return serviceName;
+	}
+
+	@Override
+	public String getDescription() {
+		return "This service can return video display information.";
+
+	}
+
+	@Override
+	public void setPublicName(String name) {
+		serviceName = name;
+	}
+	
+	private String getVideoInfoXml() {
+		XmlNode root = new XmlNode("VideoInfo");
+		try {
+			root.addChildElement(new XmlNode("Mode", isVGA() ? "VGA" : "DVI"));
+			root.addChildElement(new XmlNode("Resolution", getResolution()));
+
+		} catch (SelfReferenceException e) {
+			log.log(LogService.LOG_ERROR, "Xml error", e);
+		}
+		return root.toString();
+	}
+
+	@Override
+	public String getResolution() {
+		return videoOutDevice.getResolution();
+	}
+
 }

@@ -29,12 +29,39 @@ package com.buglabs.bug.module.video.pub;
 
 //import java.io.IOException;
 
+import java.awt.Point;
+
 import com.buglabs.module.IModuleControl;
 
 /**
  * The interface that controls functions of the Video module.
  */
 public interface IVideoModuleControl extends IModuleControl {
-	//public int disable() throws IOException; // Power down module
-	//public int enable() throws IOException; // Power up module
+	/**
+	 * Get the currently selected video resolution.
+	 * @return resolution, e.g. "1280x1024"
+	 */
+	public String getResolution();
+	
+	/**
+	 * @return true if video module is currently in VGA mode
+	 */
+	public boolean isVGA();
+	
+	/**
+	 * @return true if video module is currently in DVI mode
+	 */
+	public boolean isDVI();
+	
+	/**
+	 * Switch video mode to VGA.
+	 * @return true if request was successful.
+	 */
+	public boolean setVGA();
+	
+	/**
+	 * Switch video mode to DVI.
+	 * @return true if request was successful.
+	 */
+	public boolean setDVI();
 }
