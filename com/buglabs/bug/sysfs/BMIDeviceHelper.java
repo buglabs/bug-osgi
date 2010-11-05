@@ -81,7 +81,7 @@ public class BMIDeviceHelper {
 	 * @return
 	 */
 	private static File getBMIDeviceRoot(int i) {
-		return new File("/sys/devices/platform/omap_bmi_slot." + i + "/bmi-" + i + "/bmi-dev-" + i);
+		return new File("/sys/class/bmi/bmi-" + i + "/bmi-dev-" + i);
 	}
 
 

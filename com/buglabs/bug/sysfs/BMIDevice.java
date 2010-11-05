@@ -11,6 +11,8 @@ import java.io.IOException;
  * 
  */
 public class BMIDevice extends SysfsNode {
+	private static final String SUSPEND_FILENAME = "suspend";
+	
 	private String description;
 	private int gpio_usage;
 	private int power_use;
@@ -60,11 +62,11 @@ public class BMIDevice extends SysfsNode {
 		
 		String productId = parseHexInt(getFirstLineofFile(new File(directory, "product")));
 
-		if (productId.equals("bmi_camera")) {
+		if (productId.equals("000F")) {
 			return new CameraDevice(directory, slot);
 		} 
 		
-		if (productId.equals("bmi_video")) {
+		if (productId.equals("000D")) {
 			return new VideoOutDevice(directory, slot);
 		} 
 		
@@ -113,5 +115,25 @@ public class BMIDevice extends SysfsNode {
 
 	public String getSerialNum() {
 		return serial_num;
+	}
+	
+	public boolean suspend() {
+		try {
+			println(new File(root, SUSPEND_FILENAME), "1");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean resume() {
+		try {
+			println(new File(root, SUSPEND_FILENAME), "0");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }
