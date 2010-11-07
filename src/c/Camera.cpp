@@ -81,6 +81,8 @@ static bool half_size = false;
 
 size_t compressYUYV(const struct bug_img &yuv_img)
 {
+	CAMLOG(printf("compressYUYV: yuv_img: start=%p, length=%lu, width=%d, height=%d, code=%d",
+			yuv_img.start, yuv_img.length, yuv_img.width, yuv_img.height, yuv_img.code));
 	int bytesPerPixel = 2;
 	const unsigned char * data = (unsigned char *) yuv_img.start;
 
@@ -191,6 +193,8 @@ static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
 		CAMLOG(printf("failed to grab image: ret=%d", ret));
 		return ret;
 	}
+	CAMLOG(printf("bug_camera_grab returned yuv_img: start=%p, length=%lu, width=%d, height=%d, code=%d",
+			yuv_img.start, yuv_img.length, yuv_img.width, yuv_img.height, yuv_img.code));
 
 	return 0;
 }
@@ -205,6 +209,8 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
 		  jint resize_width,
 		  jint resize_height)
 {
+	CAMLOG(printf("jni bug camera open: slot_num=%d, raw_width=%d, raw_height=%d, resize_width=%d, resize_height=%d",
+			slot_num, raw_width, raw_height, resize_width, resize_height));
 	JStringWrapper media_node(env, jmedia_node);
 
 	raw_fmt.width = raw_width;
@@ -283,20 +289,22 @@ JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1g
   (JNIEnv *env, jobject, jintArray jbuf)
 {
 	if (jbuf == NULL) {
-		CAMLOG(printf("caller didn't give us a buffer"));
+		CAMLOG(printf("jni grab preview: caller didn't give us a buffer"));
 	}
 	jint *buf = env->GetIntArrayElements(jbuf, NULL);
 	if (buf == NULL) {
-		CAMLOG(printf("failed to get elements of caller's buffer"));
+		CAMLOG(printf("jni grab preview: failed to get elements of caller's buffer"));
 		return false;
 	}
 
 	struct bug_img yuv_img;
 	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
 
-	CAMLOG(printf("yuv2rgba into caller's buffer"));
+	CAMLOG(printf("jni grab preview: yuv2rgba into caller's buffer: buf=%p, half_size=%d, 0", buf, half_size));
     yuv2rgba(&yuv_img, (unsigned int*) buf, half_size, 0);
-	CAMLOG(printf("conversion done"));
+	CAMLOG(printf("jni grab preview: conversion done"));
+	CAMLOG(printf("jni grab preview: yuv_img: start=%p, length=%lu, width=%d, height=%d, code=%d",
+			yuv_img.start, yuv_img.length, yuv_img.width, yuv_img.height, yuv_img.code));
     env->ReleaseIntArrayElements(jbuf, buf, 0);
     return true;
 }
@@ -304,6 +312,7 @@ JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1g
 JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1raw
   (JNIEnv *env, jobject)
 {
+	CAMLOG(printf("jni grab raw"));
 	struct bug_img yuv_img;
 	grab_frame(env, V4L2_DEVNODE_RAW, yuv_img);
 	const size_t jpeg_size = compressYUYV(yuv_img);
