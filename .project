@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>com.buglabs.bug.module.module</name>
+	<name>com.buglabs.bug.module.video</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>com.buglabs.osgi.concierge.core.ManifestConsistencyChecker</name>
+			<name>com.buglabs.osgi.concierge.core.ManifestConsistencyChecker
+			</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -27,7 +28,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-                <nature>com.buglabs.dragonfly.BugApplicationNature</nature>
+		<nature>com.buglabs.dragonfly.BugApplicationNature</nature>
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
