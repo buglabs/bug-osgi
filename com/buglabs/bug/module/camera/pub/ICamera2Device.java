@@ -30,10 +30,10 @@ package com.buglabs.bug.module.camera.pub;
 /**
  * An interface for a device that can return images.
  * 
- * @author kgilmer
+ * @author dfindlay
  * 
  */
-public interface ICameraDevice {
+public interface ICamera2Device {
 	/**
 	 * The default media node to specify when calling bug_camera_open().
 	 */

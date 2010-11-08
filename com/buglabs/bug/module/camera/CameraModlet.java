@@ -39,7 +39,7 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.jni.camera.Camera;
 import com.buglabs.bug.jni.camera.CameraControl;
-import com.buglabs.bug.module.camera.pub.ICameraDevice;
+import com.buglabs.bug.module.camera.pub.ICamera2Device;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
@@ -59,7 +59,7 @@ import com.buglabs.util.LogServiceUtil;
  * @author kgilmer
  * 
  */
-public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, IModuleControl {
+public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2, IModuleControl {
 	private static final String JPEG_MIME_TYPE = "image/jpg";
 	private static boolean suspended = false;
 
@@ -132,7 +132,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 		Properties modProperties = createBasicServiceProperties();
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
-		cameraService = context.registerService(ICameraDevice.class.getName(), this, createBasicServiceProperties());
+		cameraService = context.registerService(ICamera2Device.class.getName(), this, createBasicServiceProperties());
 		ledRef = context.registerService(IModuleLEDController.class.getName(), cameraControl, createBasicServiceProperties());
 
 		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
@@ -300,7 +300,7 @@ public class CameraModlet implements IModlet, ICameraDevice, PublicWSProvider2, 
 	
 	public int bug_camera_open_default()
 	{
-		return bug_camera_open(ICameraDevice.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
+		return bug_camera_open(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
 	}
 	
 	public int bug_camera_open(
