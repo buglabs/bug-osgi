@@ -81,7 +81,6 @@
 		<property name="externalDirectory" location="${checkout.dir}/libs" />
 
 		<svn>
-			<checkout url="${svn.url.bug}/edu.oswego.cs.dl.util.concurrent" destPath="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.shell" destPath="${checkout.dir}/com.buglabs.osgi.shell" />
@@ -98,7 +97,6 @@
 	</target>
 
 	<target name="build" depends="checkout">
-		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/edu.oswego.cs.dl.util.concurrent" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.http" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.common" />
 		<ant antfile="build.xml" target="doc.build.jars" dir="${checkout.dir}/com.buglabs.osgi.shell" />
