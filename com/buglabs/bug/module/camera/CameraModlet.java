@@ -300,7 +300,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	
 	public int bug_camera_open_default()
 	{
-		return bug_camera_open(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
+		return bug_camera_open(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 1024, 768, 320, 240);
 	}
 	
 	public int bug_camera_open(
