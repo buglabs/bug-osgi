@@ -270,17 +270,21 @@ static int setup_link(struct media_device *media, struct link_desc *link, struct
   for (i = 0; i < source->info.links; i++) {
     mlink = &source->links[i];
     if (mlink->source == source_pad && mlink->sink == sink_pad) {
-      ret = media_setup_link(media, mlink->source, mlink->sink, link->flags);
-      if(ret < 0)
-	return ret;
+      printf("mlink->flags=0x%x ACTIVE=0x%x\n", mlink->flags, MEDIA_LINK_FLAG_ACTIVE);
+      // check if the link is already active. If not, set it up.
+      if(!(mlink->flags & MEDIA_LINK_FLAG_ACTIVE)) {
+	ret = media_setup_link(media, mlink->source, mlink->sink, link->flags);
+	if(ret < 0)
+	  return ret;
 
-      //setup link sink format
-      ret = set_format(source_pad, format, &link->source_fmt);
-      if(ret < 0)
-	return ret;
-      ret = set_format(sink_pad,   format, &link->sink_fmt);
-      if(ret < 0)
-	return ret;
+	//setup link sink format
+	ret = set_format(source_pad, format, &link->source_fmt);
+	if(ret < 0)
+	  return ret;
+	ret = set_format(sink_pad,   format, &link->sink_fmt);
+	if(ret < 0)
+	  return ret;
+      }
 
       //setup the next link
       ret = setup_link(media, link+1, format);
@@ -294,15 +298,11 @@ static int setup_link(struct media_device *media, struct link_desc *link, struct
   return -EINVAL;
 }
 
-static int setup_links(struct media_device *media, struct v4l2_mbus_framefmt *fmt, char *dev_node, int format) {
-  // For /dev/video2, you can specify a supported V4L format. For others nodes,
-  // the format is ignored.
-
-  struct link_desc *link;
-
-  if(strcmp(dev_node, "/dev/video4") == 0) {
+static struct link_desc* get_links(char *dev_name, int format) {
+  struct link_desc *link = NULL;
+  if(strcmp(dev_name, "OMAP3 ISP preview output") == 0) {
     link = preview_output_links;
-  } else if(strcmp(dev_node, "/dev/video6") == 0) {
+  } else if(strcmp(dev_name, "OMAP3 ISP resizer output") == 0) {
     switch(format) {
     case V4L2_PIX_FMT_YUYV:
       link = resizer_yuyv_output_links;
@@ -313,7 +313,7 @@ static int setup_links(struct media_device *media, struct v4l2_mbus_framefmt *fm
     default:
       link = resizer_yuyv_output_links;
     };
-  } else if(strcmp(dev_node, "/dev/video2") == 0) {
+  } else if(strcmp(dev_name, "OMAP3 ISP CCDC output") == 0) {
     switch(format) {
     case V4L2_PIX_FMT_YUYV:
       link = yuv_output_links;
@@ -340,11 +340,18 @@ static int setup_links(struct media_device *media, struct v4l2_mbus_framefmt *fm
       link = raw_GRBG_output_links;
       break;
     }
-  } else {
-    fprintf(stderr, "Don't know how to link %s\n", dev_node);
+  }
+  return link;
+}
+
+static int setup_links(struct media_device *media, struct v4l2_mbus_framefmt *fmt, char *dev_name, int format) {
+  // For /dev/video2, you can specify a supported V4L format. For others nodes,
+  // the format is ignored.
+  struct link_desc *link = get_links(dev_name, format);
+  if(!link) {
+    fprintf(stderr, "Don't know how to link %s\n", dev_name);
     return -EINVAL;
   }
-
   return setup_link(media, link, fmt);
 }
 
@@ -578,7 +585,7 @@ int bug_camera_open(const char *media_node,
   }
 
   media_reset_links(bug_v4l.media);
-  err = setup_links(bug_v4l.media, &mbus_fmt, dev_node, raw_fmt->pixelformat);
+  err = setup_links(bug_v4l.media, &mbus_fmt, v4l2_devname[dev_code], raw_fmt->pixelformat);
   if(err < 0) {
     fprintf(stderr, "Error setting up media links.\n");
     err = -7;
@@ -666,7 +673,8 @@ int bug_camera_switch_to_dev(int dev_code) {
   mbus_fmt.width  = bug_v4l.raw_width;
   mbus_fmt.height = bug_v4l.raw_height;
   media_reset_links(bug_v4l.media);
-  err = setup_links(bug_v4l.media, &mbus_fmt, dev_node, bug_v4l.raw_pixelformat);
+  //struct link_desc *links = get_links(dev_node, bug_v4l.raw_pixelformat);
+  err = setup_links(bug_v4l.media, &mbus_fmt, v4l2_devname[dev_code], bug_v4l.raw_pixelformat);
   if(err < 0) {
     fprintf(stderr, "Error setting up media links.\n");
     err = -7;
@@ -740,9 +748,10 @@ void yuv2rgb(struct bug_img *in, unsigned char *out, int downby2) {
     int w = in->width*2;
     for(row=0; row < in->height; row+=2) {
       for(col=0; col < in->width; col+=2) {
-  		y0 = (((int) *(ibuf+0)) + ((int) *(ibuf+2)) + ((int) *(ibuf+w)) + ((int) *(ibuf+w+2))) / 4;
-		cb = (((int) *(ibuf+1)) + ((int) *(ibuf+w+1)))/2 - 128;
-		cr = (((int) *(ibuf+3)) + ((int) *(ibuf+w+3)))/2 - 128;
+	y0 = (((int) *(ibuf+0)) + ((int) *(ibuf+2)) + ((int) *(ibuf+w)) + ((int) *(ibuf+w+2))) / 4;
+	
+	cb = (((int) *(ibuf+1)) + ((int) *(ibuf+w+1)))/2 - 128;
+	cr = (((int) *(ibuf+3)) + ((int) *(ibuf+w+3)))/2 - 128;
 	__yuv2rgb(y0, cb, cr, &r, &g, &b);
 	*out++ = r;
 	*out++ = g;
@@ -783,15 +792,10 @@ void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char 
     int w = in->width*2;
     for(row=0; row < in->height; row+=2) {
       for(col=0; col < in->width; col+=2) {
-	   y0 = (((int) *(ibuf+0)) + ((int) *(ibuf+2)) + ((int) *(ibuf+w))  + ((int) *(ibuf+w+2))) / 4;
-	   cb = (((int) *(ibuf+1)) + ((int) *(ibuf+w+1)))/2 - 128;
-	   cr = (((int) *(ibuf+3)) + ((int) *(ibuf+w+3)))/2 - 128;
-	   // the set below works for UYVY
-#if 0
-  	   y0 = (((int) *(ibuf+1)) + ((int) *(ibuf+3)) + ((int) *(ibuf+w+1)) + ((int) *(ibuf+w+3))) / 4;
-	   cb = (((int) *(ibuf+0)) + ((int) *(ibuf+w+0)))/2 - 128;
-	   cr = (((int) *(ibuf+2)) + ((int) *(ibuf+w+2)))/2 - 128;
-#endif
+	y0 = (((int) *(ibuf+0)) + ((int) *(ibuf+2)) + ((int) *(ibuf+w)) + ((int) *(ibuf+w+2))) / 4;
+	
+	cb = (((int) *(ibuf+1)) + ((int) *(ibuf+w+1)))/2 - 128;
+	cr = (((int) *(ibuf+3)) + ((int) *(ibuf+w+3)))/2 - 128;
 	__yuv2rgb(y0, cb, cr, &r, &g, &b);
 	*o++ = ((unsigned int) alpha) << 24 |  (r << 16) | (g << 8) | b;
 	ibuf += 4;
@@ -802,13 +806,10 @@ void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char 
   } else {
     for(row=0; row < in->height; row++) {
       for(col=0; col < in->width; col+=2) {
-
 	y0 = ((int) *ibuf++);
 	cb = ((int) *ibuf++) - 128;
 	y1 = ((int) *ibuf++);
 	cr = ((int) *ibuf++) - 128;
-
-
 	__yuv2rgb(y0, cb, cr, &r, &g, &b);
 	*o++ = ((unsigned int) alpha) << 24 |  (r << 16) | (g << 8) | b;
 	__yuv2rgb(y1, cb, cr, &r, &g, &b);
