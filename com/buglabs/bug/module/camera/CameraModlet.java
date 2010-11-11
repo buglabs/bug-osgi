@@ -40,6 +40,7 @@ import org.osgi.service.log.LogService;
 import com.buglabs.bug.jni.camera.Camera;
 import com.buglabs.bug.jni.camera.CameraControl;
 import com.buglabs.bug.module.camera.pub.ICamera2Device;
+import com.buglabs.bug.module.camera.pub.ICamera2ModuleControl;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
@@ -71,9 +72,9 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	private final String moduleName;
 
-	private ServiceRegistration moduleRef;
+	private ServiceRegistration moduleControlReg;
 
-	private ServiceRegistration cameraService;
+	private ServiceRegistration camera2DeviceReg;
 
 	private LogService logService;
 
@@ -85,14 +86,16 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	private CameraModuleControl cameraControl;
 
-	private ServiceRegistration cameraControlRef;
+	private ServiceRegistration cameraModuleControlReg;
+	private ServiceRegistration camera2ModuleControlReg;
 
 	private CameraControl cc;
 
-	private ServiceRegistration ledRef;
-	private String serviceName = "Picture";
+	private ServiceRegistration moduleLedControllerReg;
+	private String pictureServiceName = "Picture";
 	private BMIModuleProperties properties;
-	private ServiceRegistration wsReg;
+	private ServiceRegistration pictureWSReg;
+	private ServiceRegistration cameraControlWSReg;
 	
 	private boolean isCameraOpen = false;
 	private boolean isCameraStarted = false;
@@ -127,15 +130,16 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 		camera = new Camera();
 		cc = new CameraControl();
-		cameraControl = new CameraModuleControl(cc);
-		cameraControlRef = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
+		cameraControl = new CameraModuleControl(cc, this);
+		cameraModuleControlReg = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
+		camera2ModuleControlReg = context.registerService(ICamera2ModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
 		Properties modProperties = createBasicServiceProperties();
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
-		cameraService = context.registerService(ICamera2Device.class.getName(), this, createBasicServiceProperties());
-		ledRef = context.registerService(IModuleLEDController.class.getName(), cameraControl, createBasicServiceProperties());
-
-		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
+		moduleControlReg = context.registerService(IModuleControl.class.getName(), this, modProperties);
+		camera2DeviceReg = context.registerService(ICamera2Device.class.getName(), this, createBasicServiceProperties());
+		moduleLedControllerReg = context.registerService(IModuleLEDController.class.getName(), cameraControl, createBasicServiceProperties());
+		pictureWSReg = context.registerService(PublicWSProvider.class.getName(), this, null);
+		cameraControlWSReg = context.registerService(PublicWSProvider.class.getName(), cameraControl, null);
 	}
 
 	private Properties createBasicServiceProperties() {
@@ -159,10 +163,10 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	}
 
 	private void updateIModuleControlProperties(){
-		if (moduleRef!=null){
+		if (moduleControlReg!=null){
 			Properties modProperties = createBasicServiceProperties();
 			modProperties.put("Power State", suspended ? "Suspended": "Active");
-			moduleRef.setProperties(modProperties);
+			moduleControlReg.setProperties(modProperties);
 		}
 	}
 
@@ -170,11 +174,13 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		bug_camera_stop();
 		bug_camera_close();
 
-		cameraControlRef.unregister();
-		cameraService.unregister();
-		moduleRef.unregister();
-		ledRef.unregister();
-		wsReg.unregister();
+		cameraModuleControlReg.unregister();
+		camera2ModuleControlReg.unregister();
+		camera2DeviceReg.unregister();
+		moduleControlReg.unregister();
+		moduleLedControllerReg.unregister();
+		pictureWSReg.unregister();
+		cameraControlWSReg.unregister();
 		camera.close();
 	}
 
@@ -209,7 +215,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	}
 
 	public String getPublicName() {
-		return serviceName;
+		return pictureServiceName;
 	}
 
 	public List getModuleProperties() {
@@ -295,7 +301,15 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	}
 
 	public void setPublicName(String name) {
-		serviceName = name;
+		pictureServiceName = name;
+	}
+	
+	public boolean is_camera_open() {
+		return isCameraOpen;
+	}
+	
+	public boolean is_camera_started() {
+		return isCameraStarted;
 	}
 	
 	public int bug_camera_open_default()

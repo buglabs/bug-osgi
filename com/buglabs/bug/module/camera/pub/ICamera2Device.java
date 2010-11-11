@@ -39,6 +39,9 @@ public interface ICamera2Device {
 	 */
 	public final static String DEFAULT_MEDIA_NODE = "/dev/media0";
 	
+	public boolean is_camera_open();
+	public boolean is_camera_started();
+	
 	/**
 	 * Opens a connection with a camera module and configure it.
 	 * 
