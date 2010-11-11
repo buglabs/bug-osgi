@@ -64,6 +64,11 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 		this.camera2Device = camera2Device;
 	}
 	
+	public int setSelectedCamera(int slot) throws IOException {
+		// TODO Not implemented
+		return -1;
+	}
+	
 	public int getSelectedCamera() throws IOException {
 		int result = cc.ioctl_BMI_CAM_GET_SELECTED();
 

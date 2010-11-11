@@ -52,6 +52,15 @@ public interface ICameraModuleControl {
 	public int setLEDFlash(boolean state) throws IOException;
 
 	/**
+	 * Selects a camera based on slot number.
+	 * 
+	 * @param slot
+	 *            the slot number of the desired camera.
+	 * @return negative value if request was not sucessful.
+	 */
+	public int setSelectedCamera(int slot) throws IOException;
+	
+	/**
 	 * Returns the slot number of the selected camera.
 	 * 
 	 * @return negative value if request was not successful.
