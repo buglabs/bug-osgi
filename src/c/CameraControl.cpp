@@ -117,3 +117,74 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_ioctl_1BMI_
 	//int fd = getFileDescriptorField(env, jobj);
 	//return ioctl(fd, BMI_CAM_RESUME);
 }
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_getTestPattern
+  (JNIEnv *, jobject) {
+	int value = 0;
+	const int ret = get_ctrl(V4L2_CID_TEST_PATTERN, &value);
+	printf("get test pattern: ret=%d, value=%d\n", ret, value);fflush(stdout);
+	return (ret == 0) ? value : ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_setTestPattern
+  (JNIEnv *, jobject , jint testPattern) {
+	printf("setting test pattern to %d", testPattern);fflush(stdout);
+	return set_ctrl(V4L2_CID_TEST_PATTERN, testPattern);
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_getColorEffects
+  (JNIEnv *, jobject) {
+	int value = 0;
+	const int ret = get_ctrl(V4L2_CID_COLORFX, &value);
+	printf("get color effects: ret=%d, value=%d\n", ret, value);fflush(stdout);
+	return (ret == 0) ? value : ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_setColorEffects
+  (JNIEnv *, jobject, jint colorEffects) {
+	printf("setting color effects to %d", colorEffects);fflush(stdout);
+	return set_ctrl(V4L2_CID_COLORFX, colorEffects);
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_getVerticalFlip
+  (JNIEnv *, jobject) {
+	int value = 0;
+	const int ret = get_ctrl(V4L2_CID_VFLIP, &value);
+	printf("get vertical flip: ret=%d, value=%d\n", ret, value);fflush(stdout);
+	return (ret == 0) ? value : ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_setVerticalFlip
+  (JNIEnv *, jobject, jint verticalFlip) {
+	printf("setting vertical flip to %d\n", verticalFlip);fflush(stdout);
+	return set_ctrl(V4L2_CID_VFLIP, verticalFlip);
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_getHorizontalMirror
+  (JNIEnv *, jobject) {
+	int value = 0;
+	const int ret = get_ctrl(V4L2_CID_HFLIP, &value);
+	printf("get horizontal mirror: ret=%d, value=%d\n", ret, value);fflush(stdout);
+	return (ret == 0) ? value : ret;
+}
+
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_setHorizontalMirror
+  (JNIEnv *, jobject, jint horizontalMirror) {
+	printf("setting horizontal mirror to %d\n", horizontalMirror);fflush(stdout);
+	return set_ctrl(V4L2_CID_HFLIP, horizontalMirror);
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_getExposureLevel
+  (JNIEnv *, jobject) {
+	int value = 0;
+	const int ret = get_ctrl(V4L2_CID_EXPOSURE, &value);
+	printf("get exposure: ret=%d, value=%d\n", ret, value);fflush(stdout);
+	return (ret == 0) ? value : ret;
+}
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_CameraControl_setExposureLevel
+  (JNIEnv *, jobject, jint exposureLevel) {
+	printf("setting exposure level to %d\n", exposureLevel);fflush(stdout);
+	return set_ctrl(V4L2_CID_EXPOSURE, exposureLevel);
+}

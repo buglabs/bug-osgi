@@ -65,4 +65,15 @@ public class CameraControl {
 	
 	public native int ioctl_BMI_CAM_RESUME();
 
+	// for ICamera2ModuleControl
+	public native int getTestPattern();
+	public native int setTestPattern(int testPattern);
+	public native int getColorEffects();
+	public native int setColorEffects(int colorEffects);
+	public native int getVerticalFlip();
+	public native int setVerticalFlip(int verticalFlip);
+	public native int getHorizontalMirror();
+	public native int setHorizontalMirror(int horizontalMirror);
+	public native int getExposureLevel();
+	public native int setExposureLevel(int exposureLevel);
 }
