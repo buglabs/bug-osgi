@@ -267,12 +267,35 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 		if (operation == PublicWSProvider2.GET) {
 			// allow setting via http://bugip/service/CameraControl?testPattern=2 etc
 
+			String v = (String) get.get("flash");
+			if (v != null) {
+				final int i = Integer.parseInt(v);
+				System.out.println("setting flash " + ((i == 1) ? "ON" : "OFF"));
+				try {
+					setLEDFlash((i == 1) ? true : false);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			v = (String) get.get("flashIntensity");
+			if (v != null) {
+				System.out.println("setting flash intensity to " + v);
+				try {
+					this.setFlashBeamIntensity(Integer.parseInt(v));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
 			if (get.containsKey("cameraOpen")) {
 				System.out.println("opening camera");
 				camera2Device.bug_camera_open_default();
 			}
 
-			String v = (String) get.get("testPattern");
+			v = (String) get.get("testPattern");
 			if (v != null) {
 				System.out.println("Setting test pattern to " + v);
 				setTestPattern(Integer.parseInt(v));
