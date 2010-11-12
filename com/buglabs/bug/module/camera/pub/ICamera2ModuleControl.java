@@ -35,7 +35,7 @@ public interface ICamera2ModuleControl {
 	/**
 	 * Set camera's test pattern:
 	 *
-	 * @param testPattern 0=Disabled, 1=Walking 1's, 2=Solid White, 3=Grey Ramp, 4=Color Bars, 5=Black/White Bars, 6=PseudoRandom
+	 * @param testPattern 0=Disabled, 1=Walking 1's
 	 * @return 0 if successful, negative value otherwise.
 	 */
 	public int setTestPattern(int testPattern);
