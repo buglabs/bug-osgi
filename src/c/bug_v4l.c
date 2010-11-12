@@ -472,6 +472,7 @@ int set_ctrl(int id, int value) {
     .id = id,
     .value = value,
   };
+  printf("set_ctrl:Setting %d to %d\n", ctrl.id, ctrl.value);fflush(stdout);
   return ioctl(bug_v4l.subdev_fd, VIDIOC_S_CTRL, &ctrl);
 }
 
@@ -481,7 +482,7 @@ int get_ctrl(int id, int *value) {
   int ret;
   struct v4l2_control ctrl;
   ctrl.id = id;
-  ret = ioctl(bug_v4l.subdev_fd, VIDIOC_S_CTRL, &ctrl);
+  ret = ioctl(bug_v4l.subdev_fd, VIDIOC_G_CTRL, &ctrl);
   *value = ctrl.value;
   return ret;
 }
