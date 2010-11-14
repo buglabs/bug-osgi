@@ -312,12 +312,12 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return isCameraStarted;
 	}
 	
-	public int bug_camera_open_default()
+	public synchronized int bug_camera_open_default()
 	{
-		return bug_camera_open(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 1024, 768, 320, 240);
+		return bug_camera_open(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
 	}
 	
-	public int bug_camera_open(
+	public synchronized int bug_camera_open(
 			final String media_node,
 			int slot_num,
 			int full_height,
@@ -334,7 +334,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 
-	public int bug_camera_close()
+	public synchronized int bug_camera_close()
 	{
 		if (!isCameraOpen) {
 			return 0;
@@ -345,7 +345,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 
-	public int bug_camera_start()
+	public synchronized int bug_camera_start()
 	{
 		if (isCameraStarted) {
 			return 0;
@@ -356,7 +356,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 	
-	public int bug_camera_stop()
+	public synchronized int bug_camera_stop()
 	{
 		if (!isCameraStarted) {
 			return 0;
@@ -366,12 +366,12 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 
-	public boolean bug_camera_grab_preview(int [] pixelBuffer)
+	public synchronized boolean bug_camera_grab_preview(int [] pixelBuffer)
 	{
 		return camera.bug_camera_grab_preview(pixelBuffer);
 	}
 
-	public byte[] bug_camera_grab_full()
+	public synchronized byte[] bug_camera_grab_full()
 	{
 		return camera.bug_camera_grab_raw();
 	}
