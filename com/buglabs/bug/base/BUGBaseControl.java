@@ -84,9 +84,9 @@ public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 		if (ld.getType() == LEDDevice.TYPE_MONO_COLOR) {
 			ld.setBrightness(LEDDevice.COLOR_MONO, brightness);
 		} else {
-			ld.setBrightness(LEDDevice.COLOR_RED, brightness);
-			ld.setBrightness(LEDDevice.COLOR_GREEN, brightness);
-			ld.setBrightness(LEDDevice.COLOR_BLUE, brightness);
+			ld.setBrightness(IBUG20BaseControl.COLOR_RED, brightness);
+			ld.setBrightness(IBUG20BaseControl.COLOR_GREEN, brightness);
+			ld.setBrightness(IBUG20BaseControl.COLOR_BLUE, brightness);
 		}
 	}
 

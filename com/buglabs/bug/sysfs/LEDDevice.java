@@ -3,6 +3,7 @@ package com.buglabs.bug.sysfs;
 import java.io.File;
 import java.io.IOException;
 
+import com.buglabs.bug.base.pub.IBUG20BaseControl;
 import com.buglabs.bug.sysfs.SysfsNode;
 
 /**
@@ -30,9 +31,6 @@ public class LEDDevice extends SysfsNode {
 	/**
 	 * Color constants for tri color LEDs.
 	 */
-	public static final int COLOR_RED = 0;
-	public static final int COLOR_GREEN = 1;
-	public static final int COLOR_BLUE = 2;
 
 	/**
 	 * Used in the construction of file paths for LED sysfs API in Linux .
@@ -98,24 +96,24 @@ public class LEDDevice extends SysfsNode {
 		this.type = TYPE_TRI_COLOR;
 
 		ledBase = new File[3];
-		ledBase[COLOR_RED] = new File(root, createLEDFilename(name, "red"));
-		ledBase[COLOR_GREEN] = new File(root, createLEDFilename(name, "green"));
-		ledBase[COLOR_BLUE] = new File(root, createLEDFilename(name, "blue"));
+		ledBase[IBUG20BaseControl.COLOR_RED] = new File(root, createLEDFilename(name, "red"));
+		ledBase[IBUG20BaseControl.COLOR_GREEN] = new File(root, createLEDFilename(name, "green"));
+		ledBase[IBUG20BaseControl.COLOR_BLUE] = new File(root, createLEDFilename(name, "blue"));
 
 		ledBrightness = new File[3];
-		ledBrightness[COLOR_RED] = new File(ledBase[COLOR_RED], FILE_BRIGHTNESS);
-		ledBrightness[COLOR_GREEN] = new File(ledBase[COLOR_GREEN], FILE_BRIGHTNESS);
-		ledBrightness[COLOR_BLUE] = new File(ledBase[COLOR_BLUE], FILE_BRIGHTNESS);
+		ledBrightness[IBUG20BaseControl.COLOR_RED] = new File(ledBase[IBUG20BaseControl.COLOR_RED], FILE_BRIGHTNESS);
+		ledBrightness[IBUG20BaseControl.COLOR_GREEN] = new File(ledBase[IBUG20BaseControl.COLOR_GREEN], FILE_BRIGHTNESS);
+		ledBrightness[IBUG20BaseControl.COLOR_BLUE] = new File(ledBase[IBUG20BaseControl.COLOR_BLUE], FILE_BRIGHTNESS);
 		
 		ledMaxBrightness = new File[3];
-		ledMaxBrightness[COLOR_RED] = new File(ledBase[COLOR_RED], FILE_MAX_BRIGHTNESS);
-		ledMaxBrightness[COLOR_GREEN] = new File(ledBase[COLOR_GREEN], FILE_MAX_BRIGHTNESS);
-		ledMaxBrightness[COLOR_BLUE] = new File(ledBase[COLOR_BLUE], FILE_MAX_BRIGHTNESS);
+		ledMaxBrightness[IBUG20BaseControl.COLOR_RED] = new File(ledBase[IBUG20BaseControl.COLOR_RED], FILE_MAX_BRIGHTNESS);
+		ledMaxBrightness[IBUG20BaseControl.COLOR_GREEN] = new File(ledBase[IBUG20BaseControl.COLOR_GREEN], FILE_MAX_BRIGHTNESS);
+		ledMaxBrightness[IBUG20BaseControl.COLOR_BLUE] = new File(ledBase[IBUG20BaseControl.COLOR_BLUE], FILE_MAX_BRIGHTNESS);
 
 		ledTrigger = new File[3];
-		ledTrigger[COLOR_RED] = new File(ledBase[COLOR_RED], FILE_TRIGGER);
-		ledTrigger[COLOR_GREEN] = new File(ledBase[COLOR_GREEN], FILE_TRIGGER);
-		ledTrigger[COLOR_BLUE] = new File(ledBase[COLOR_BLUE], FILE_TRIGGER);
+		ledTrigger[IBUG20BaseControl.COLOR_RED] = new File(ledBase[IBUG20BaseControl.COLOR_RED], FILE_TRIGGER);
+		ledTrigger[IBUG20BaseControl.COLOR_GREEN] = new File(ledBase[IBUG20BaseControl.COLOR_GREEN], FILE_TRIGGER);
+		ledTrigger[IBUG20BaseControl.COLOR_BLUE] = new File(ledBase[IBUG20BaseControl.COLOR_BLUE], FILE_TRIGGER);
 	}
 
 	/**
