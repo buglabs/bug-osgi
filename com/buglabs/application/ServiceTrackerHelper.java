@@ -28,12 +28,17 @@
 package com.buglabs.application;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.buglabs.util.ServiceFilterGenerator;
 
@@ -43,7 +48,143 @@ import com.buglabs.util.ServiceFilterGenerator;
  * @author kgilmer
  * 
  */
-public class ServiceTrackerHelper {
+public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
+
+	private final ManagedRunnable runnable;
+	private final String[] services;
+	private int sc;
+	private final BundleContext bc;
+	private Thread thread;
+	private Map serviceMap;
+
+	/**
+	 * A runnable that provides access to OSGi services passed to
+	 * ServiceTrackerHelper.
+	 * 
+	 * Runnable will be started when all service are available, and interrupted
+	 * if any services become unavailable.
+	 * 
+	 * @author kgilmer
+	 * 
+	 */
+	public interface ManagedRunnable {
+		public abstract void run(Map services);
+	}
+
+	/**
+	 * A Runnable and ServiceTrackerCustomizer that allows for fine-grained
+	 * application behavior based on OSGi service activity. An implementation of
+	 * this can be passed anywhere a ServiceTrackerRunnable is expected and
+	 * behavior will change accordingly.
+	 * 
+	 * Runnable is not started automatically. It is up to the implementor to
+	 * decide when and how to create and start the thread.
+	 * 
+	 * @author kgilmer
+	 * 
+	 */
+	public interface UnmanagedRunnable extends ManagedRunnable, ServiceTrackerCustomizer {
+	}
+
+	/**
+	 * A ManagedRunnable that calls run() in-line with parent thread.  This is useful if the client
+	 * does not need to create a new thread or wants to manage thread creation independently. 
+	 * @author kgilmer
+	 *
+	 */
+	public interface ManagedInlineRunnable extends ManagedRunnable {
+	}
+
+	public ServiceTrackerHelper(BundleContext bc, ManagedRunnable t, String[] services) {
+		this.bc = bc;
+		this.runnable = t;
+		this.services = services;
+		this.serviceMap = new HashMap();
+
+		sc = 0;
+	}
+
+	public Object addingService(ServiceReference arg0) {
+		sc++;
+		Object svc = bc.getService(arg0);
+		serviceMap.put(arg0.getProperty(Constants.OBJECTCLASS), svc);
+
+		if (thread == null && sc == services.length && !(runnable instanceof UnmanagedRunnable)) {
+			if (runnable instanceof ManagedInlineRunnable) {
+				//Client wants to run in same thread, just call method.
+				runnable.run(serviceMap);
+			} else {
+				//Create new thread and pass off to client Runnable implementation.
+				thread = new Thread(new Runnable() {
+
+					public void run() {
+						runnable.run(serviceMap);
+					}
+				});
+				thread.start();
+			}
+		}
+
+		if (runnable instanceof UnmanagedRunnable) {
+			return ((UnmanagedRunnable) runnable).addingService(arg0);
+		}
+
+		return svc;
+	}
+
+	public void modifiedService(ServiceReference arg0, Object arg1) {
+		if (runnable instanceof UnmanagedRunnable) {
+			((UnmanagedRunnable) runnable).modifiedService(arg0, arg1);
+		}
+	}
+
+	public void removedService(ServiceReference arg0, Object arg1) {
+		sc--;
+		if (!(thread == null) && !thread.isInterrupted() && !(runnable instanceof UnmanagedRunnable)) {
+			thread.interrupt();
+			return;
+		}
+
+		if (runnable instanceof UnmanagedRunnable) {
+			((UnmanagedRunnable) runnable).removedService(arg0, arg1);
+		}
+	}
+
+	/**
+	 * Convenience method for creating and opening a
+	 * ServiceTrackerRunnable-based ServiceTracker.
+	 * 
+	 * @param context
+	 * @param services
+	 * @param runnable
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, ManagedRunnable runnable) throws InvalidSyntaxException {
+		ServiceTracker st = new ServiceTracker(context, ServiceFilterGenerator.generateServiceFilter(context, services), new ServiceTrackerHelper(context, runnable, services));
+		st.open();
+
+		return st;
+	}
+
+	/**
+	 * Convenience method for creating and opening a
+	 * ServiceTrackerRunnable-based ServiceTracker.
+	 * 
+	 * @param context
+	 * @param services
+	 * @param filter
+	 * @param runnable
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, Filter filter, ManagedRunnable runnable) throws InvalidSyntaxException {
+		ServiceTracker st = new ServiceTracker(context, filter, new ServiceTrackerHelper(context, runnable, services));
+		st.open();
+
+		return st;
+	}
+
 	/**
 	 * @param context
 	 *            BundleContext
