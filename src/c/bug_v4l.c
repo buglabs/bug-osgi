@@ -270,7 +270,7 @@ static int setup_link(struct media_device *media, struct link_desc *link, struct
   for (i = 0; i < source->info.links; i++) {
     mlink = &source->links[i];
     if (mlink->source == source_pad && mlink->sink == sink_pad) {
-      printf("mlink->flags=0x%x ACTIVE=0x%x\n", mlink->flags, MEDIA_LINK_FLAG_ACTIVE);
+      //printf("mlink->flags=0x%x ACTIVE=0x%x\n", mlink->flags, MEDIA_LINK_FLAG_ACTIVE);
       // check if the link is already active. If not, set it up.
       if(!(mlink->flags & MEDIA_LINK_FLAG_ACTIVE)) {
 	ret = media_setup_link(media, mlink->source, mlink->sink, link->flags);
@@ -402,6 +402,15 @@ static int init_mmap() {
     img->height = bug_v4l.height;
     img->code   = bug_v4l.code;
   }
+  if(bug_v4l.bufcpy.start) {
+    free(bug_v4l.bufcpy.start);
+  }
+  bug_v4l.bufcpy.start  = malloc(bug_v4l.buffers[0].length);
+  bug_v4l.bufcpy.length = bug_v4l.buffers[0].length;
+  bug_v4l.bufcpy.width  = bug_v4l.width;
+  bug_v4l.bufcpy.height = bug_v4l.height;
+  bug_v4l.bufcpy.code   = bug_v4l.code;
+
   return 0;
 }
 
@@ -412,6 +421,10 @@ static void uninit_mmap() {
   free (bug_v4l.buffers);
   bug_v4l.n_buffers = 0;
   bug_v4l.buffers = NULL;
+  if(bug_v4l.bufcpy.start) {
+    free(bug_v4l.bufcpy.start);
+  }
+  bug_v4l.bufcpy.start = NULL;
 }
 
 static int start_stream(void) {
@@ -472,7 +485,6 @@ int set_ctrl(int id, int value) {
     .id = id,
     .value = value,
   };
-  printf("set_ctrl:Setting %d to %d\n", ctrl.id, ctrl.value);fflush(stdout);
   return ioctl(bug_v4l.subdev_fd, VIDIOC_S_CTRL, &ctrl);
 }
 
@@ -482,7 +494,8 @@ int get_ctrl(int id, int *value) {
   int ret;
   struct v4l2_control ctrl;
   ctrl.id = id;
-  ret = ioctl(bug_v4l.subdev_fd, VIDIOC_G_CTRL, &ctrl);
+  ctrl.value=-1;
+  ret = bug_camera_ioctl(VIDIOC_G_CTRL, &ctrl);
   *value = ctrl.value;
   return ret;
 }
@@ -722,7 +735,8 @@ int bug_camera_grab(struct bug_img *img) {
   if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_QBUF, &buf))
     return -1;
   
-  memcpy(img, bug_v4l.buffers + buf.index, sizeof(*img));
+  memcpy(bug_v4l.bufcpy.start, bug_v4l.buffers[buf.index].start, bug_v4l.bufcpy.length);
+  memcpy(img, &(bug_v4l.bufcpy), sizeof(*img));
   return 0;
 }
 
@@ -782,11 +796,11 @@ void yuv2rgb(struct bug_img *in, unsigned char *out, int downby2) {
   }
 }
 
-void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char alpha) {
+void yuv2rgba(struct bug_img *in, int *out, int downby2, unsigned char alpha) {
   int row, col;
   int y0, y1, cr, cb;
   int r, g, b;
-  unsigned int *o = out;
+  int *o = out;
   unsigned char *ibuf = in->start;
 
   if(downby2) {

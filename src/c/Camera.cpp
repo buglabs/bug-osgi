@@ -301,7 +301,7 @@ JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1g
 	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
 
 	CAMLOG(printf("jni grab preview: yuv2rgba into caller's buffer: buf=%p, half_size=%d, 0", buf, half_size));
-    yuv2rgba(&yuv_img, (unsigned int*) buf, half_size, 0);
+    yuv2rgba(&yuv_img, (int*) buf, half_size, 0);
 	CAMLOG(printf("jni grab preview: conversion done"));
 	CAMLOG(printf("jni grab preview: yuv_img: start=%p, length=%lu, width=%d, height=%d, code=%d",
 			yuv_img.start, yuv_img.length, yuv_img.width, yuv_img.height, yuv_img.code));

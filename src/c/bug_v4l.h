@@ -32,6 +32,7 @@ struct bug_v4l {
   int bmi_fd;
   struct bug_img *buffers;
   unsigned int n_buffers;
+  struct bug_img bufcpy;
 
   int running;
   int raw_width;
@@ -66,7 +67,7 @@ int get_input_slot(); // returns slotnum of currently selected camera module
  * state struct. Sets up the media bus based on the selected node and the
  * image format. 
  * @param media_node : set to "/dev/media0"
- * @param dev_node   : set to "/dev/video6"
+ * @param dev_code   : V4L2_DEVNODE_RAW | V4L2_DEVNODE_RESIZER | V4L2_DEVNODE_PREVIEW
  * @param slotnum    : set to -1 to start currently selected slot
  * @raw_fmt          : set to raw image size
  */
@@ -127,8 +128,9 @@ void yuv2rgb(struct bug_img *in, unsigned char *out, int downby2);
  * value of the provided 'alpha'. In this, case each pixel requires 4 bytes,
  * so the 'out' buffer should be 2 times larger than the 'in' buffer. Set
  * 'alpha' to 255 for no transparency and to 0 for complete transparency.
+ * The output buffer in this case is a 32b int.
  */
-void yuv2rgba(struct bug_img *in, unsigned int *out, int downby2, unsigned char alpha);
+void yuv2rgba(struct bug_img *in, int *out, int downby2, unsigned char alpha);
 
 #endif
 
