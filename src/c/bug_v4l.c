@@ -534,6 +534,7 @@ int bug_camera_open(const char *media_node,
 
   bug_camera_close();
 
+  bug_v4l.dev_code = dev_code;
   bug_v4l.raw_width = mbus_fmt.width  = raw_fmt->width;
   bug_v4l.raw_height = mbus_fmt.height = raw_fmt->height;
   bug_v4l.raw_pixelformat = raw_fmt->pixelformat;
@@ -602,6 +603,7 @@ err:
 }
 
 int bug_camera_start() {
+  struct bug_img img;
   int err = init_mmap();
   if(err < 0)
     return err;
@@ -609,6 +611,8 @@ int bug_camera_start() {
   err = start_stream();
   bug_v4l.running = !(err < 0);
   CLEAR (bug_v4l.buf);
+  if(err >= 0)
+    bug_camera_grab(&img);//grab 1st image b/c it comes out zeros. don't know why
   return err;
 }
 
@@ -621,35 +625,6 @@ int bug_camera_stop() {
   return err;
 }
 
-int bug_camera_open_and_start(int width, int height, int format) {
-  int ret;
-  if(format == 0) format = V4L2_PIX_FMT_YUYV;
-  struct v4l2_pix_format raw, resize;
-  if(width >= 1024 || height >= 768) {
-    raw.width  = 2048;
-    raw.height = 1536;
-    raw.pixelformat = format;
-  } else if(width >= 256 || height >= 192) {
-    raw.width = 1024;
-    raw.height = 768;
-    raw.pixelformat = format;
-  } else if(width >= 160 || height >= 120) {
-    raw.width =  640;
-    raw.height = 480;
-    raw.pixelformat = format;
-  } else {
-    fprintf(stderr, "Unsupported right now");
-    return -1;
-  }
-  resize.width = width;
-  resize.height= height;
-  resize.pixelformat = format;
-  ret = bug_camera_open("/dev/media0", V4L2_DEVNODE_RESIZER, -1, &raw, &resize);
-  if(ret < 0) return ret;
-  return bug_camera_start();
-}
-
-/* make sure you have stopped the stream. restart it afterward. */
 int bug_camera_switch_to_dev(int dev_code) {
   struct v4l2_mbus_framefmt mbus_fmt;
   int running = bug_v4l.running;
@@ -680,6 +655,41 @@ int bug_camera_switch_to_dev(int dev_code) {
   media_reset_links(bug_v4l.media);
   //struct link_desc *links = get_links(dev_node, bug_v4l.raw_pixelformat);
   err = setup_links(bug_v4l.media, &mbus_fmt, v4l2_devname[dev_code], bug_v4l.raw_pixelformat);
+  if(err < 0) {
+    fprintf(stderr, "Error setting up media links.\n");
+    err = -7;
+    goto err;
+  }
+  bug_v4l.dev_code = dev_code;
+  if(running)
+    bug_camera_start();
+  return 0;
+err:
+  bug_camera_close();
+  return err;
+}
+
+int bug_camera_change_resizer_to(unsigned int width, unsigned int height) {
+  struct v4l2_mbus_framefmt mbus_fmt;
+
+  int err;
+  if(!bug_v4l.dev_fd) {
+    err = -6;
+    fprintf(stderr, "%s: no device open. Call bug_camera_open() first.", __func__);
+    goto err;
+  }
+
+  int running = bug_v4l.running;
+  if(running)
+    bug_camera_stop();
+
+  mbus_fmt.width  = bug_v4l.raw_width;
+  mbus_fmt.height = bug_v4l.raw_height;
+  bug_v4l.resizer_width = width;
+  bug_v4l.resizer_height = height;
+  media_reset_links(bug_v4l.media);
+  //struct link_desc *links = get_links(dev_node, bug_v4l.raw_pixelformat);
+  err = setup_links(bug_v4l.media, &mbus_fmt, v4l2_devname[bug_v4l.dev_code], bug_v4l.raw_pixelformat);
   if(err < 0) {
     fprintf(stderr, "Error setting up media links.\n");
     err = -7;

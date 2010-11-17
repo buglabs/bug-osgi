@@ -35,7 +35,7 @@ struct bug_v4l {
   struct v4l2_buffer buf;
   fd_set fds;
 
-
+  int dev_code;
   int running;
   int raw_width;
   int raw_height;
@@ -79,20 +79,6 @@ int bug_camera_open(const char *media_node,
 		    struct v4l2_pix_format *raw_fmt, 
 		    struct v4l2_pix_format *resizer_fmt);
 int bug_camera_close();
-
-/*
- * bug_camera_open_and_start() is a helper function to simplify setting up
- * the settings. Simply call this function with the desired 'width' and 
- * 'height' and it will figure out a sensible configuration to accomplish
- * that stream size. After calling this function, then call bug_camera_grab()
- * to start getting images. Images are YUYV format. If you need more fine
- * grained control, then use bug_camera_open() and bug_camera_start()
- * separately with any appropriate ioctl's or control statements between
- * the two. Still need to call bug_camera_stop() and bug_camera_close()
- * when you are done. Use V4L2_PXI_FORMAT_XXXX defined in <linux/videodev2.h>
- * specify the format as either V4L2_PIX_FMT_YUYV or V4L2_PIX_FMT_UYUV.
- */
-int bug_camera_open_and_start(int width, int height, int format);
 int bug_camera_start();
 int bug_camera_stop();
 
@@ -115,6 +101,7 @@ int bug_camera_grab(struct bug_img *img);
  *   bug_camera_stop();
  */
 int bug_camera_switch_to_dev(int dev_code);
+int bug_camera_change_resizer_to(unsigned int width, unsigned int height);
 
 
 /*

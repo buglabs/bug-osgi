@@ -76,7 +76,7 @@ static unsigned char *jpeg_buffer = NULL;
 static size_t jpeg_buffer_size = 0;
 static unsigned char *rgb_buffer = NULL;
 static v4l2_pix_format raw_fmt;
-static v4l2_pix_format resize_fmt;
+static v4l2_pix_format resizer_fmt;
 static bool half_size = false;
 
 size_t compressYUYV(const struct bug_img &yuv_img)
@@ -90,7 +90,7 @@ size_t compressYUYV(const struct bug_img &yuv_img)
 		jpeg_buffer_size = yuv_img.length * 3 / 2;
 		jpeg_buffer = (unsigned char *) realloc(jpeg_buffer, jpeg_buffer_size);
 		if (jpeg_buffer == NULL) {
-			CAMLOG(printf("Failed to allocate memory for jpeg_buffer"));
+			printf("Failed to allocate memory for jpeg_buffer");
 			return 0;
 		} else {
 			CAMLOG(printf("jpeg_buffer now %lu", jpeg_buffer_size));
@@ -178,10 +178,29 @@ static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
 
 	int ret = 0;
 	if (current_dev_node != dev_node) {
-		CAMLOG(printf("switching to %d", dev_node));
+		CAMLOG(printf("switching to %d (sort of)", dev_node));
+		/*
+		 * We used to switch between the RAW and RESIZER nodes.
+		 * It's more stable if we just switch the resolution
+		 * of the RESIZER between the asked-for-at-open-resizing-size
+		 * and the asked-for-at-open-raw-size
+		 *
 		ret = bug_camera_switch_to_dev(dev_node);
 		if (ret != 0) {
-			CAMLOG(printf("Failed to switch mode: ret=%d", ret));
+			printf("Failed to switch mode: ret=%d", ret);
+			return ret;
+		}
+		*/
+		v4l2_pix_format *pFormat = &resizer_fmt;
+		if (dev_node == V4L2_DEVNODE_RAW) {
+			pFormat = &raw_fmt;
+		}
+		ret = bug_camera_change_resizer_to(pFormat->width, pFormat->height);
+		if (ret != 0) {
+			printf("Failed to change resizer to %dx%d: ret=%d",
+				pFormat->width,
+				pFormat->height,
+				ret);
 			return ret;
 		}
 		current_dev_node = dev_node;
@@ -190,7 +209,7 @@ static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
 	CAMLOG(printf("bug_camera_grab()"));
 	ret = bug_camera_grab(&yuv_img);
 	if (ret != 0) {
-		CAMLOG(printf("failed to grab image: ret=%d", ret));
+		printf("failed to grab image: ret=%d", ret);
 		return ret;
 	}
 	CAMLOG(printf("bug_camera_grab returned yuv_img: start=%p, length=%lu, width=%d, height=%d, code=%d",
@@ -227,14 +246,16 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
 	} else {
 		half_size = false;
 	}
-	resize_fmt.width = resize_width;
-	resize_fmt.height = resize_height;
-	resize_fmt.pixelformat = raw_fmt.pixelformat;// this is ignored but we set it to the same just in case
+	resizer_fmt.width = resize_width;
+	resizer_fmt.height = resize_height;
+	resizer_fmt.pixelformat = raw_fmt.pixelformat;// this is ignored but we set it to the same just in case
 
-	// we'll start in preview mode
+	// we'll start in 'preview' mode
 	// (note that we don't use V4L2_DEVNODE_PREVIEW -
 	// it is the output of the color processing hardware built into the OMAP
 	// and we're using a sensor with color processing built-in)
+	// actually we'll just use the RESIZER all the time and switch its size
+	// to the same as RAW's when we want a full-frame (see comment in grab_frame)
 	current_dev_node = V4L2_DEVNODE_RESIZER;
 	CAMLOG(printf("bug_camera_open(media: %s, dev_node: %d, slot_num: %d, "
 			"raw.width=%d, raw.height=%d, raw.format=%d, resize.width=%d, resize.height=%d, resize.format=%d)",
@@ -244,10 +265,10 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1open
 			raw_fmt.width,
 			raw_fmt.height,
 			raw_fmt.pixelformat,
-			resize_fmt.width,
-			resize_fmt.height,
-			resize_fmt.pixelformat));
-	return bug_camera_open(media_node, current_dev_node, slot_num, &raw_fmt, &resize_fmt);
+			resizer_fmt.width,
+			resizer_fmt.height,
+			resizer_fmt.pixelformat));
+	return bug_camera_open(media_node, current_dev_node, slot_num, &raw_fmt, &resizer_fmt);
 }
 
 JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1close
@@ -293,7 +314,7 @@ JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1g
 	}
 	jint *buf = env->GetIntArrayElements(jbuf, NULL);
 	if (buf == NULL) {
-		CAMLOG(printf("jni grab preview: failed to get elements of caller's buffer"));
+		printf("jni grab preview: failed to get elements of caller's buffer");
 		return false;
 	}
 
@@ -319,7 +340,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_
 
 	CAMLOG(printf("asking for java byte array of size %lu", jpeg_size));
     jbyteArray java_buffer = env->NewByteArray(jpeg_size);
-	if (java_buffer == NULL) {CAMLOG(printf("failed to alloc java_buffer of size %lu", jpeg_size)); return NULL;}
+	if (java_buffer == NULL) {printf("failed to alloc java_buffer of size %lu", jpeg_size); return NULL;}
 
 	CAMLOG(printf("got java_buffer at %p", java_buffer));
 	CAMLOG(printf("Copying %lu bytes from jpeg_buffer %p to java_buffer %p",
