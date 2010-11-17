@@ -50,7 +50,9 @@ public class Camera extends CharDevice {
 	// camera may be closed one it' stopped
 	public native int bug_camera_stop();
 
-	// grab a preview-sized image as RGB
+	// grab a preview-sized image as RGB. If pixelBuffer is null the frame
+	// will still be grabbed, but then thrown away - which is useful
+	// on startup to allow the sensor to settle
 	public native boolean bug_camera_grab_preview(int [] pixelBuffer);
 	
 	// grab a raw-sized image as JPEG

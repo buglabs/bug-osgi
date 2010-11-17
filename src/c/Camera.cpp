@@ -309,17 +309,22 @@ JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1stop
 JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1grab_1preview
   (JNIEnv *env, jobject, jintArray jbuf)
 {
+	// we grab before even checking if the caller gave us a buffer,
+	// to allow the case where the caller just wants us to dump
+	// a frame
+	struct bug_img yuv_img;
+	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
+
 	if (jbuf == NULL) {
 		CAMLOG(printf("jni grab preview: caller didn't give us a buffer"));
+		return false;
 	}
+
 	jint *buf = env->GetIntArrayElements(jbuf, NULL);
 	if (buf == NULL) {
 		printf("jni grab preview: failed to get elements of caller's buffer");
 		return false;
 	}
-
-	struct bug_img yuv_img;
-	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
 
 	CAMLOG(printf("jni grab preview: yuv2rgba into caller's buffer: buf=%p, half_size=%d, 0", buf, half_size));
     yuv2rgba(&yuv_img, (int*) buf, half_size, 0);
