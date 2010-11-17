@@ -353,6 +353,17 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		
 		final int ret = camera.bug_camera_start();
 		isCameraStarted = (ret == 0);
+		
+		if (isCameraStarted) {
+			// grab a few frames and ditch them,
+			// to give the camera a chance to
+			// set its exposure etc
+			bug_camera_grab_full();
+			bug_camera_grab_full();
+			bug_camera_grab_full();
+			bug_camera_grab_full();
+			bug_camera_grab_full();
+		}
 		return ret;
 	}
 	
