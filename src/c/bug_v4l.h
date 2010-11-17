@@ -32,7 +32,9 @@ struct bug_v4l {
   int bmi_fd;
   struct bug_img *buffers;
   unsigned int n_buffers;
-  struct bug_img bufcpy;
+  struct v4l2_buffer buf;
+  fd_set fds;
+
 
   int running;
   int raw_width;
@@ -71,7 +73,7 @@ int get_input_slot(); // returns slotnum of currently selected camera module
  * @param slotnum    : set to -1 to start currently selected slot
  * @raw_fmt          : set to raw image size
  */
-int bug_camera_open(const char *media_node,
+int bug_camera_open(const char *media_node, 
 		    int dev_code,
 		    int slotnum,
 		    struct v4l2_pix_format *raw_fmt, 

@@ -402,15 +402,7 @@ static int init_mmap() {
     img->height = bug_v4l.height;
     img->code   = bug_v4l.code;
   }
-  if(bug_v4l.bufcpy.start) {
-    free(bug_v4l.bufcpy.start);
-  }
-  bug_v4l.bufcpy.start  = malloc(bug_v4l.buffers[0].length);
-  bug_v4l.bufcpy.length = bug_v4l.buffers[0].length;
-  bug_v4l.bufcpy.width  = bug_v4l.width;
-  bug_v4l.bufcpy.height = bug_v4l.height;
-  bug_v4l.bufcpy.code   = bug_v4l.code;
-
+  CLEAR (bug_v4l.buf);
   return 0;
 }
 
@@ -421,10 +413,7 @@ static void uninit_mmap() {
   free (bug_v4l.buffers);
   bug_v4l.n_buffers = 0;
   bug_v4l.buffers = NULL;
-  if(bug_v4l.bufcpy.start) {
-    free(bug_v4l.bufcpy.start);
-  }
-  bug_v4l.bufcpy.start = NULL;
+  CLEAR (bug_v4l.buf);
 }
 
 static int start_stream(void) {
@@ -530,7 +519,7 @@ int bug_camera_close() {
   return 0;
 }
 
-int bug_camera_open(const char *media_node,
+int bug_camera_open(const char *media_node, 
 		    int dev_code,
 		    int slotnum,
 		    struct v4l2_pix_format *raw_fmt, 
@@ -619,6 +608,7 @@ int bug_camera_start() {
 
   err = start_stream();
   bug_v4l.running = !(err < 0);
+  CLEAR (bug_v4l.buf);
   return err;
 }
 
@@ -627,6 +617,7 @@ int bug_camera_stop() {
   err = stop_stream();
   uninit_mmap();
   bug_v4l.running = 0;
+  CLEAR (bug_v4l.buf);
   return err;
 }
 
@@ -703,19 +694,24 @@ err:
 }
 
 int bug_camera_grab(struct bug_img *img) {
-  fd_set fds;
   struct timeval tv;
   int ret;
-  struct v4l2_buffer buf;
       
-  FD_ZERO (&fds);
-  FD_SET (bug_v4l.dev_fd, &fds);
-  CLEAR (buf);
+  // requeue the last buffer used if 
+  if(bug_v4l.buf.type) {
+    if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_QBUF, &bug_v4l.buf)) {
+      return -1;
+    }
+  }
+
+  FD_ZERO (&bug_v4l.fds);
+  FD_SET (bug_v4l.dev_fd, &bug_v4l.fds);
 
   tv.tv_sec = 10;   /* Timeout. */
   tv.tv_usec = 0;
 
-  ret = select (bug_v4l.dev_fd + 1, &fds, NULL, NULL, &tv);
+  // get the next available buffer
+  ret = select (bug_v4l.dev_fd + 1, &bug_v4l.fds, NULL, NULL, &tv);
   if (ret < 0) 
     return -1;
 
@@ -724,19 +720,15 @@ int bug_camera_grab(struct bug_img *img) {
     return -1;
   }
 
-  buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  buf.memory = V4L2_MEMORY_MMAP;
-  if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_DQBUF, &buf)) {
+  CLEAR (bug_v4l.buf);
+  bug_v4l.buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  bug_v4l.buf.memory = V4L2_MEMORY_MMAP;
+  if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_DQBUF, &bug_v4l.buf)) {
     return -1;
   }
 
-  assert(buf.index < bug_v4l.n_buffers);
-
-  if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_QBUF, &buf))
-    return -1;
-  
-  memcpy(bug_v4l.bufcpy.start, bug_v4l.buffers[buf.index].start, bug_v4l.bufcpy.length);
-  memcpy(img, &(bug_v4l.bufcpy), sizeof(*img));
+  assert(bug_v4l.buf.index < bug_v4l.n_buffers);
+  memcpy(img, bug_v4l.buffers + bug_v4l.buf.index, sizeof(*img));
   return 0;
 }
 
