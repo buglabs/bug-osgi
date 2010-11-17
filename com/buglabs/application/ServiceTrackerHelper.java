@@ -107,7 +107,8 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	public Object addingService(ServiceReference arg0) {
 		sc++;
 		Object svc = bc.getService(arg0);
-		serviceMap.put(arg0.getProperty(Constants.OBJECTCLASS), svc);
+		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
+		serviceMap.put(key, svc);
 
 		if (thread == null && sc == services.length && !(runnable instanceof UnmanagedRunnable)) {
 			if (runnable instanceof ManagedInlineRunnable) {
