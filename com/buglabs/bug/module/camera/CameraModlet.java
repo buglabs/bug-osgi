@@ -99,6 +99,19 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	
 	private boolean isCameraOpen = false;
 	private boolean isCameraStarted = false;
+	
+	private static final int MIN_PREVIEWS_BEFORE_FULL = 5;
+	
+	private int previewsGrabbed = 0;
+	private int fullsGrabbed = 0;
+	
+	int getPreviewsGrabbed() {
+		return previewsGrabbed;
+	}
+	
+	int getFullsGrabbed() {
+		return fullsGrabbed;
+	}
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -353,22 +366,6 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		
 		final int ret = camera.bug_camera_start();
 		isCameraStarted = (ret == 0);
-		
-		if (isCameraStarted) {
-			/* I don't like doing this - it makes startup slower,
-			 * and I'd rather have dark images in preview more
-			 * quickly
-
-			// grab a few frames and ditch them,
-			// to give the camera a chance to
-			// set its exposure etc
-			bug_camera_grab_full();
-			bug_camera_grab_full();
-			bug_camera_grab_full();
-			bug_camera_grab_full();
-			bug_camera_grab_full();
-			 */
-		}
 		return ret;
 	}
 	
@@ -384,11 +381,18 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	public synchronized boolean bug_camera_grab_preview(int [] pixelBuffer)
 	{
+		previewsGrabbed++;
 		return camera.bug_camera_grab_preview(pixelBuffer);
 	}
 
 	public synchronized byte[] bug_camera_grab_full()
 	{
+		while (previewsGrabbed < MIN_PREVIEWS_BEFORE_FULL) {
+			// it's okay to use null - the JNI can cope with this
+			bug_camera_grab_preview(null);
+		}
+		
+		fullsGrabbed++;
 		return camera.bug_camera_grab_raw();
 	}
 }

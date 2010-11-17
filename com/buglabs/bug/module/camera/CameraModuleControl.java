@@ -57,11 +57,11 @@ import com.buglabs.util.XmlNode;
 public class CameraModuleControl implements ICameraModuleControl, ICamera2ModuleControl, IModuleLEDController, PublicWSProviderWithParams {
 
 	private CameraControl cc;
-	private ICamera2Device camera2Device;
+	private CameraModlet cameraModlet;
 	
-	public CameraModuleControl(CameraControl cameraControl, ICamera2Device camera2Device) {
+	public CameraModuleControl(CameraControl cameraControl, CameraModlet cameraModlet) {
 		this.cc = cameraControl;
-		this.camera2Device = camera2Device;
+		this.cameraModlet = cameraModlet;
 	}
 	
 	public int setSelectedCamera(int slot) throws IOException {
@@ -297,7 +297,7 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 			
 			if (get.containsKey("cameraOpen")) {
 				System.out.println("opening camera");
-				camera2Device.bug_camera_open_default();
+				cameraModlet.bug_camera_open_default();
 			}
 
 			v = (String) get.get("testPattern");
@@ -328,17 +328,17 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 			
 			if (get.containsKey("cameraStart")) {
 				System.out.println("starting camera");
-				camera2Device.bug_camera_start();
+				cameraModlet.bug_camera_start();
 			}
 			
 			if (get.containsKey("cameraStop")) {
 				System.out.println("stopping camera");
-				camera2Device.bug_camera_stop();
+				cameraModlet.bug_camera_stop();
 			}
 			
 			if (get.containsKey("cameraClose")) {
 				System.out.println("closing camera");
-				camera2Device.bug_camera_close();
+				cameraModlet.bug_camera_close();
 			}
 			
 			return new WSResponse(getCameraInfoXml(), "text/xml");
@@ -389,8 +389,8 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 	private String getCameraInfoXml() {
 		XmlNode root = new XmlNode("CameraInfo");
 		try {
-			if (camera2Device.is_camera_open()) {
-				if (camera2Device.is_camera_started()) {
+			if (cameraModlet.is_camera_open()) {
+				if (cameraModlet.is_camera_started()) {
 					root.addChildElement(new XmlNode("CameraInfo", "Camera is open and started"));
 				} else {
 					root.addChildElement(new XmlNode("CameraInfo", "Camera is open but not yet started"));
@@ -404,6 +404,8 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 			root.addChildElement(new XmlNode("VerticalFlip", positiveValueOkayString(getVerticalFlip())));
 			root.addChildElement(new XmlNode("HorizontalMirror", positiveValueOkayString(getHorizontalMirror())));
 			root.addChildElement(new XmlNode("ExposureLevel", positiveValueOkayString(getExposureLevel())));
+			root.addChildElement(new XmlNode("FullFramesTaken", Integer.toString(cameraModlet.getFullsGrabbed())));
+			root.addChildElement(new XmlNode("PreviewsTaken", Integer.toString(cameraModlet.getPreviewsGrabbed())));
 		} catch (SelfReferenceException e) {
 			System.err.println("Xml error " + e);
 		}
