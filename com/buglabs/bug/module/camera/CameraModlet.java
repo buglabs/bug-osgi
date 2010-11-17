@@ -355,6 +355,10 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		isCameraStarted = (ret == 0);
 		
 		if (isCameraStarted) {
+			/* I don't like doing this - it makes startup slower,
+			 * and I'd rather have dark images in preview more
+			 * quickly
+
 			// grab a few frames and ditch them,
 			// to give the camera a chance to
 			// set its exposure etc
@@ -363,6 +367,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 			bug_camera_grab_full();
 			bug_camera_grab_full();
 			bug_camera_grab_full();
+			 */
 		}
 		return ret;
 	}
