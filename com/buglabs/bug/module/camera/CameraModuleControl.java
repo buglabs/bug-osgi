@@ -28,26 +28,16 @@
 package com.buglabs.bug.module.camera;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.jni.camera.Camera;
 import com.buglabs.bug.jni.camera.CameraControl;
-import com.buglabs.bug.module.camera.pub.ICamera2Device;
 import com.buglabs.bug.module.camera.pub.ICamera2ModuleControl;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
-import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.PublicWSProviderWithParams;
 import com.buglabs.services.ws.WSResponse;
@@ -241,7 +231,6 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 	
 	// For WS:
 	private String serviceName = "CameraControl";
-	private ServiceRegistration wsReg;
 	public void setPublicName(String name) {
 		serviceName = name;
 	}
@@ -279,7 +268,6 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 				try {
 					setLEDFlash((i == 1) ? true : false);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -290,7 +278,6 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 				try {
 					this.setFlashBeamIntensity(Integer.parseInt(v));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -351,7 +338,18 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 	}
 
 	public String getDescription() {
-		return "This service can retrieve and set camera properties.";
+		return "Returns information about the Camera. " +
+			"Allows Camera settings to be changed via GET parameters: " +
+			"flash=0/1 - turn flash off/on; " +
+			"flashIntensity=0/1 - set flash beam to low/high; " +
+			"cameraOpen/Close/Start/Stop - open/close/start/stop the camera; " +
+			// turning off test pattern seems to go a bit awry, so let's not
+			// mention that we support this
+			// "testPattern=0/1 - set test pattern off/on; " +
+			"colorEffects=0/1/2/34 - set effect to none/black-and-white/sepia/negative/solarize; " +
+			"verticalFlip=0/1 - set vertical flip off/on; " +
+			"horizontalMirror=0/1 - set mirroring off/on; " +
+			"exposureLevel=0..255 - set exposure level.";
 	}
 
 	private static String testPatternString(int testPattern) {
