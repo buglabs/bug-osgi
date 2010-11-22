@@ -29,8 +29,6 @@ package com.buglabs.bug.module.video.pub;
 
 //import java.io.IOException;
 
-import java.awt.Point;
-
 import com.buglabs.module.IModuleControl;
 
 /**
