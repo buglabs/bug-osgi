@@ -68,7 +68,15 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * 
 	 */
 	public interface ManagedRunnable {
+		/**
+		 * This is called for execution of application logic when OSGi services are available.
+		 * @param services key contains String of service name, value is service instance.
+		 */
 		public abstract void run(Map services);
+		/**
+		 * Called directly before the thread is interrupted.  Client may optionally add necessary code to shutdown thread.
+		 */
+		public abstract void shutdown();
 	}
 
 	/**
@@ -142,12 +150,17 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	public void removedService(ServiceReference arg0, Object arg1) {
 		sc--;
 		if (!(thread == null) && !thread.isInterrupted() && !(runnable instanceof UnmanagedRunnable)) {
+			runnable.shutdown();
 			thread.interrupt();
 			return;
 		}
 
 		if (runnable instanceof UnmanagedRunnable) {
 			((UnmanagedRunnable) runnable).removedService(arg0, arg1);
+		}
+		
+		if (runnable instanceof ManagedInlineRunnable) {
+			((ManagedInlineRunnable) runnable).shutdown();
 		}
 	}
 
@@ -162,9 +175,9 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @throws InvalidSyntaxException
 	 */
 	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, ManagedRunnable runnable) throws InvalidSyntaxException {
-		ServiceTracker st = new ServiceTracker(context, ServiceFilterGenerator.generateServiceFilter(context, services), new ServiceTrackerHelper(context, runnable, services));
+		ServiceTracker st = new ClosingServiceTracker(context, ServiceFilterGenerator.generateServiceFilter(context, services), new ServiceTrackerHelper(context, runnable, services));
 		st.open();
-
+		
 		return st;
 	}
 
@@ -180,7 +193,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @throws InvalidSyntaxException
 	 */
 	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, Filter filter, ManagedRunnable runnable) throws InvalidSyntaxException {
-		ServiceTracker st = new ServiceTracker(context, filter, new ServiceTrackerHelper(context, runnable, services));
+		ServiceTracker st = new ClosingServiceTracker(context, filter, new ServiceTrackerHelper(context, runnable, services));
 		st.open();
 
 		return st;
