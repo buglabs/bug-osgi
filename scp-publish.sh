@@ -19,7 +19,7 @@ WHOAMI=`/usr/bin/whoami`
 # SOURCEDIR1=/opt/sdk_build/com.buglabs.build/artifacts/$PUBENV/com.buglabs.dragonfly/current
 SOURCEDIR1=artifacts/$PUBENV/com.buglabs.dragonfly/current
 FILENAME1=$SOURCEDIR1/com.buglabs.dragonfly.updatesite*.zip
-VERSION=`ls $SOURCEDIR1/updatesite/features | grep "_[IPT]" | sed 's/com\.buglabs\.dragonfly\.feature_//' | sed 's/\.jar$//'`
+VERSION=`ls $SOURCEDIR1/updatesite/features | grep "_[IPT]" | sed 's/com\.buglabs\.dragonfly\.feature_//' | sed 's/\.jar$//' | grep -v buglabs`
 REMOTESYS=newkeds
 REMOTEUSER=web
 REMOTEBASEDIR=/var/tmp
@@ -30,12 +30,14 @@ REMOTEDIR2=$REMOTEBASEDIR/$PUBENV/$VERSION/full/
 if [ "$PUBENV" = "production" ]; then
   SOURCEDIR2=/opt/sdk_build/com.buglabs.build/artifacts/$PUBENV/com.buglabs.sdk/current
   FILENAME2=$SOURCEDIR2/dragonfly*.zip
-  VERSION=`ls $SOURCEDIR2 | grep lin | sed 's/^.*\-//' | sed 's/\.zip$//'`
+  VERSION=`ls $SOURCEDIR2 | grep lin | sed 's/^.*\-//' | sed 's/\.zip$//' | grep -v buglabs`
 fi
 
-# echo "PUBENV is:   $PUBENV"
-# echo "VERSION is:  $VERSION"
-# exit 1
+ echo "PUBENV is:   $PUBENV"
+ echo "VERSION is:  $VERSION"
+ echo "FILENAME1 IS: $FILENAME1"
+ echo "SOURCEDIR1 is: $SOURCEDIR1"
+ #exit 1
 
 #if [ $WHOAMI != "build" ]; then
 #  echo
