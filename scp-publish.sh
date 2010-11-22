@@ -39,15 +39,6 @@ fi
  echo "SOURCEDIR1 is: $SOURCEDIR1"
  #exit 1
 
-#if [ $WHOAMI != "build" ]; then
-#  echo
-#  echo "****************************************************************"
-#  echo "* You must be logged in as the build user to run this command! *"
-#  echo "****************************************************************"
-#  echo
-#  exit 1
-#fi
-
 echo "Creating directories..."
 ssh $REMOTEUSER@$REMOTESYS "mkdir -p $REMOTEDIR1"
 echo "Uploading update site..."
