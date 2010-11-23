@@ -52,10 +52,10 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 
 	private final ManagedRunnable runnable;
 	private final String[] services;
-	private int sc;
+	private volatile int sc;
 	private final BundleContext bc;
 	private Thread thread;
-	private Map serviceMap;
+	private final Map serviceMap;
 
 	/**
 	 * A runnable that provides access to OSGi services passed to
@@ -135,6 +135,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		}
 
 		if (runnable instanceof UnmanagedRunnable) {
+			//Simply call the unmanaged runnable in-line.
 			return ((UnmanagedRunnable) runnable).addingService(arg0);
 		}
 
@@ -142,12 +143,18 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	}
 
 	public void modifiedService(ServiceReference arg0, Object arg1) {
+		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
+		serviceMap.put(key, arg1);
+		
 		if (runnable instanceof UnmanagedRunnable) {
 			((UnmanagedRunnable) runnable).modifiedService(arg0, arg1);
 		}
 	}
 
 	public void removedService(ServiceReference arg0, Object arg1) {
+		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
+		serviceMap.remove(key);
+		
 		sc--;
 		if (!(thread == null) && !thread.isInterrupted() && !(runnable instanceof UnmanagedRunnable)) {
 			runnable.shutdown();
