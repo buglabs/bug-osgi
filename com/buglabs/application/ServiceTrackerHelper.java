@@ -122,7 +122,6 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		Object svc = bc.getService(arg0);
 		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
 		serviceMap.put(key, svc);
-		log.log(LogService.LOG_DEBUG, "STH ~ Loaded service " + key + " impl: " + svc.getClass().getName());
 
 		if (thread == null && sc == services.length && !(runnable instanceof UnmanagedRunnable)) {
 			if (runnable instanceof ManagedInlineRunnable) {
