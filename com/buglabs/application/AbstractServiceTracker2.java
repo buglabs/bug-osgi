@@ -26,6 +26,7 @@ import com.buglabs.util.ServiceFilterGenerator;
  * AbstractServiceTracker
  * 
  * @author bballantine
+ * @deprecated Use ServiceTrackerHelper for ServiceTracker functionality instead.
  * 
  */
 public abstract class AbstractServiceTracker2 implements ServiceTrackerCustomizer, IServiceProvider {
