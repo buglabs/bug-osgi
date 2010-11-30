@@ -6,12 +6,6 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>com.buglabs.osgi.concierge.core.ManifestConsistencyChecker
-			</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
@@ -28,7 +22,6 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>com.buglabs.dragonfly.BugApplicationNature</nature>
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
