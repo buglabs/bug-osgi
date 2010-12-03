@@ -30,7 +30,10 @@ package com.buglabs.bug.module.gps.pub;
 import org.osgi.util.position.Position;
 
 /**
- * This interface describes location services.
+ * This interface describes location services.  When a GPS module is attached to BUG, this service will be available to clients
+ * via the OSGi service registry.  It's best used when the client wishes to poll for location at given times.
+ * 
+ * See {@link IPositionSubscriber} for a notification-based API.
  * 
  * @author kgilmer
  * 

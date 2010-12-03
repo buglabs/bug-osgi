@@ -32,6 +32,10 @@ import java.io.IOException;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleLEDController;
 
+/**
+ * This is the module control interface for the GPS module.
+ *
+ */
 public interface IGPSModuleControl extends IModuleControl, IModuleLEDController {
 
 	public static final int STATUS_PASSIVE_ANTENNA = 0x40;

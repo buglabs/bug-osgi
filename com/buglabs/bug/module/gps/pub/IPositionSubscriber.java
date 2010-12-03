@@ -31,6 +31,11 @@ import org.osgi.util.position.Position;
 
 /**
  * Register this service to receive position change events.
+ * 
+ * This is a whiteboard-pattern API.  Clients register an implementation of IPositionSubscriber.
+ * If position information is available, a server will pick up this service from the OSGi service
+ * registry and pass location update events.
+ * 
  * @author kgilmer
  *
  */

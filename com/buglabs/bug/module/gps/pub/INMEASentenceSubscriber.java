@@ -30,7 +30,12 @@ package com.buglabs.bug.module.gps.pub;
 import com.buglabs.nmea2.AbstractNMEASentence;
 
 /**
- * Register this service to recieve NMEA sentence events.
+ * Register this service to receive NMEA sentence events.
+ * 
+ * This is a whiteboard-pattern API.  Clients register an implementation of IMEASentenceSubscriber.
+ * If an NMEA sentence generator is available, a server will pick up this service from the OSGi service
+ * registry and pass NMEA sentences.
+ * 
  * @author kgilmer
  *
  */

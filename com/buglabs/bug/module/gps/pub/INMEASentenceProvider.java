@@ -30,7 +30,11 @@ package com.buglabs.bug.module.gps.pub;
 import com.buglabs.nmea.sentences.RMC;
 
 /**
- * Provides access methods to NMEA data from gps devices.
+ * Provides access methods to NMEA data from GPS devices.
+ * 
+ * If a GPS device is attached, a INMEASentenceProvider service will be accessible to clients via
+ * the OSGi service registry.  This service is appropriate for clients wishing to poll for NEMA
+ * sentences at specific times.
  * 
  * @author Angel Roman
  */

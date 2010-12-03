@@ -33,6 +33,9 @@ import java.io.InputStream;
 /**
  * NMEA raw data feed from GPS device.
  * 
+ * This service will be available to clients when a NMEA sentence generating device is attached to BUG.  Clients
+ * wishing to parse raw NMEA data as it is read directly from the device should use this service.
+ * 
  * @author armoan
  * 
  */
