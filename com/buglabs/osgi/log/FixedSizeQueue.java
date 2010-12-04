@@ -86,7 +86,7 @@ class FixedSizeQueue implements Queue<Object> {
 	/**
 	 * Reduce the size of the list until it matches the defined size.
 	 */
-	private void checkAndRemove() {
+	private synchronized void checkAndRemove() {
 		while (list.size() > size) {
 			list.removeFirst();
 		}
