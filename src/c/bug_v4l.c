@@ -133,13 +133,13 @@ static struct link_desc uyvy_output_links[] = {
   { NULL },
 };
 
-static struct link_desc jpeg_output_links[] = {
-  { SUBDEV_ENTITY_NAME,         0, { 0, 0, V4L2_MBUS_FMT_JPEG8       },
-    "OMAP3 ISP CCDC",           0, { 0, 0, V4L2_MBUS_FMT_JPEG8       }, 1 },
-  { "OMAP3 ISP CCDC",           1, { 0, 0, V4L2_MBUS_FMT_JPEG8       }, 
-    "OMAP3 ISP CCDC output",    0, { 0, 0, V4L2_PIX_FMT_JPEG         }, 1 },
-  { NULL },
-};
+//static struct link_desc jpeg_output_links[] = {
+//  { SUBDEV_ENTITY_NAME,         0, { 0, 0, V4L2_MBUS_FMT_JPEG8       },
+//    "OMAP3 ISP CCDC",           0, { 0, 0, V4L2_MBUS_FMT_JPEG8       }, 1 },
+//  { "OMAP3 ISP CCDC",           1, { 0, 0, V4L2_MBUS_FMT_JPEG8       }, 
+//    "OMAP3 ISP CCDC output",    0, { 0, 0, V4L2_PIX_FMT_JPEG         }, 1 },
+//  { NULL },
+//};
 /*****************************************************************************/
 
 
@@ -185,7 +185,7 @@ static int set_subdev_format(struct media_entity_pad *pad, struct v4l2_mbus_fram
 	ret = v4l2_subdev_set_format(pad->entity, format, pad->index,
 				     V4L2_SUBDEV_FORMAT_ACTIVE);
 	if (ret < 0) {
-		printf("Unable to set format: %s (%d)\n", strerror(-ret), ret);
+	  fprintf(stderr, "Unable to set format: %s (%d)\n", strerror(-ret), ret);
 		return ret;
 	}
 
@@ -211,17 +211,15 @@ static int set_format(struct media_entity_pad *pad, struct v4l2_mbus_framefmt *f
     return set_subdev_format(pad, format);
   } else if(pad->entity->info.type == MEDIA_ENTITY_TYPE_NODE) {
     struct v4l2_format fmt;
-    int ret;
     fmt.type                = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     fmt.fmt.pix.width       = format->width  + delta_fmt->delta_width;
     fmt.fmt.pix.height      = format->height + delta_fmt->delta_height;
     fmt.fmt.pix.pixelformat = delta_fmt->code;
 
-    ret = ioctl(bug_v4l.dev_fd, VIDIOC_S_FMT, &fmt);
-    if(ret < 0)
-      return ret;
-
-    fprintf(stderr, "Format set: (%dx%d) size=%d\n", fmt.fmt.pix.width, fmt.fmt.pix.height, fmt.fmt.pix.sizeimage);
+    //ret = ioctl(bug_v4l.dev_fd, VIDIOC_S_FMT, &fmt);
+    //if(ret < 0)
+    //  return ret;
+    //fprintf(stderr, "Format set: (%dx%d) size=%d\n", fmt.fmt.pix.width, fmt.fmt.pix.height, fmt.fmt.pix.sizeimage);
     
     format->width  = fmt.fmt.pix.width;
     format->height = fmt.fmt.pix.height;
@@ -257,11 +255,11 @@ static int setup_link(struct media_device *media, struct link_desc *link, struct
   // get sink
   sink   = media_get_entity_by_name(media, link->sink, strlen(link->sink));
   if(sink == NULL) {
-    printf("Can't find link sink %s\n", link->sink);
+    fprintf(stderr, "Can't find link sink %s\n", link->sink);
     return -EINVAL;
   }
   if(link->sink_pad > sink->info.pads) {
-    printf("Can't find pad %d for link sink %s\n", link->sink_pad, link->sink);
+    fprintf(stderr, "Can't find pad %d for link sink %s\n", link->sink_pad, link->sink);
     return -EINVAL;
   }
   sink_pad = &sink->pads[link->sink_pad];
@@ -324,9 +322,9 @@ static struct link_desc* get_links(char *dev_name, int format) {
     case V4L2_PIX_FMT_GREY:
       link = mono_output_links;
       break;
-    case 1:
-      link = jpeg_output_links;
-      break;
+//    case 1:
+//      link = jpeg_output_links;
+//      break;
     case V4L2_PIX_FMT_SBGGR8:
       link = raw_BGGR_output_links;
       break;
@@ -446,8 +444,39 @@ static int set_input_slot(int slot) {
   return ioctl(bug_v4l.subdev_fd, VIDIOC_S_INPUT, &slot);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+static struct media_entity *__find_last_entity(struct media_entity *entity) {
+  unsigned int i;
+  for(i=0; i<entity->info.links; ++i) {
+    if((entity->links[i].flags & MEDIA_LINK_FLAG_ACTIVE) && 
+       (entity->links[i].source->entity == entity)) {
+      return __find_last_entity(entity->links[i].sink->entity);
+    }
+  }
+  return entity;
+}
 
+int find_output_node(char *media_node, char *dev_node) {
+  struct media_device *media;
+  struct media_entity *entity;
+
+  media = media_open(media_node, 0);
+  if(!media) {
+    fprintf(stderr, "%s: Cannot open %s media device node", __func__, media_node);
+    return -1;
+  }
+  entity = media_get_entity_by_name(media, SUBDEV_ENTITY_NAME, strlen(SUBDEV_ENTITY_NAME));
+  if(!entity) {
+    fprintf(stderr, "Can't find entity named %s. Make sure bmi_camera module is loaded and a camera is plugged in.\n", SUBDEV_ENTITY_NAME);
+    return -1;
+  }
+  entity = __find_last_entity(entity);
+  strcpy(dev_node, entity->devname);
+  media_close(media);
+  return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 int bug_camera_ioctl(int request, void *argp) {
   return ioctl(bug_v4l.subdev_fd, request, argp);
 }
@@ -457,15 +486,24 @@ int v4l_dev_ioctl(int request, void *argp) {
 }
 
 int bmi_ioctl(int request, void *argp) {
-  return ioctl(bug_v4l.bmi_fd, request, argp);
+  int err;
+  int bmi_fd = open_device(bug_v4l.bmi_node);
+  if(!bmi_fd) {
+    fprintf(stderr, "Cannot open bug camera BMI device node %s.\n", bug_v4l.bmi_node);
+    return -ENODEV;
+  }  
+  err = ioctl(bmi_fd, request, argp);
+  close(bmi_fd);
+  return err;
+
 }
 
 int set_red_led(int on) {
-  return ioctl(bug_v4l.bmi_fd, on ? BMI_CAM_RLEDON : BMI_CAM_RLEDOFF, 0);
+  return bmi_ioctl(on ? BMI_CAM_RLEDON : BMI_CAM_RLEDOFF, 0);
 }
 
 int set_green_led(int on) {
-  return ioctl(bug_v4l.bmi_fd, on ? BMI_CAM_GLEDON : BMI_CAM_GLEDOFF, 0);
+  return bmi_ioctl(on ? BMI_CAM_GLEDON : BMI_CAM_GLEDOFF, 0);
 }
 
 int set_ctrl(int id, int value) {
@@ -508,10 +546,6 @@ int bug_camera_close() {
     close(bug_v4l.subdev_fd);
     bug_v4l.subdev_fd = 0;
   }
-  if(bug_v4l.bmi_fd) {
-    close(bug_v4l.bmi_fd);
-    bug_v4l.bmi_fd = 0;
-  }
   if (bug_v4l.media) {
     media_close(bug_v4l.media);
     bug_v4l.media = 0;
@@ -526,7 +560,6 @@ int bug_camera_open(const char *media_node,
 		    struct v4l2_pix_format *resizer_fmt) {
   int err;
   struct v4l2_mbus_framefmt mbus_fmt;
-  char bmi_node[100];
 
   bug_v4l.running = 0;
   if(dev_code < 1) 
@@ -567,24 +600,11 @@ int bug_camera_open(const char *media_node,
     goto err;
   }
 
-  sprintf(bmi_node, "/dev/bmi_cam%d", slotnum);
-  bug_v4l.bmi_fd = open_device(bmi_node);
-  if(!bug_v4l.bmi_fd) {
-    fprintf(stderr, "Cannot open bug camera BMI device node %s.\n", bmi_node);
-    err = -5;
-    goto err;
-  }
+  sprintf(bug_v4l.bmi_node, "/dev/bmi_cam%d", slotnum);
 
   char *dev_node = get_dev_node(dev_code);
   if(!dev_node) {
     err = -8;
-    goto err;
-  }
-
-  bug_v4l.dev_fd = open_device(dev_node);
-  if(!bug_v4l.dev_fd) {
-    fprintf(stderr, "Cannot open V4L device node %s.\n", dev_node);
-    err = -6;
     goto err;
   }
 
@@ -595,11 +615,42 @@ int bug_camera_open(const char *media_node,
     err = -7;
     goto err;
   }
+
+  bug_v4l.dev_fd = open_device(dev_node);
+  if(!bug_v4l.dev_fd) {
+    fprintf(stderr, "Cannot open V4L device node %s.\n", dev_node);
+    err = -6;
+    goto err;
+  }
+
+
+  { // print up the frame rate for reference
+    int n,d;
+    if(get_framerate(&n, &d) == 0)
+      fprintf(stderr, "Framerate: %d/%d fps\n", n, d);
+  }
+
   return 0;
 
 err:
   bug_camera_close();
   return err;
+}
+
+int get_framerate(int *numerator, int *denominator) {
+  int err;
+  if(bug_v4l.dev_fd) {
+    struct v4l2_streamparm sp;
+    sp.type=V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    err=v4l_dev_ioctl(VIDIOC_G_PARM, &sp);
+    if(err >= 0) {
+      *numerator   = sp.parm.capture.timeperframe.denominator;
+      *denominator = sp.parm.capture.timeperframe.numerator;
+    }
+    return err;
+  } else {
+    return -EINVAL;
+  }
 }
 
 int bug_camera_start() {
@@ -643,13 +694,6 @@ int bug_camera_switch_to_dev(int dev_code) {
     goto err;
   }
 
-  bug_v4l.dev_fd = open_device(dev_node);
-  if(!bug_v4l.dev_fd) {
-    fprintf(stderr, "Cannot open V4L device node %s.\n", dev_node);
-    err = -6;
-    goto err;
-  }
-
   mbus_fmt.width  = bug_v4l.raw_width;
   mbus_fmt.height = bug_v4l.raw_height;
   media_reset_links(bug_v4l.media);
@@ -660,6 +704,14 @@ int bug_camera_switch_to_dev(int dev_code) {
     err = -7;
     goto err;
   }
+
+  bug_v4l.dev_fd = open_device(dev_node);
+  if(!bug_v4l.dev_fd) {
+    fprintf(stderr, "Cannot open V4L device node %s.\n", dev_node);
+    err = -6;
+    goto err;
+  }
+
   bug_v4l.dev_code = dev_code;
   if(running)
     bug_camera_start();
@@ -671,6 +723,10 @@ err:
 
 int bug_camera_change_resizer_to(unsigned int width, unsigned int height) {
   struct v4l2_mbus_framefmt mbus_fmt;
+
+  if(bug_v4l.resizer_width == width && bug_v4l.resizer_height == height) {
+    return 0;
+  }
 
   int err;
   if(!bug_v4l.dev_fd) {
@@ -695,8 +751,21 @@ int bug_camera_change_resizer_to(unsigned int width, unsigned int height) {
     err = -7;
     goto err;
   }
-  if(running)
-    bug_camera_start();
+
+  struct v4l2_format fmt;
+  fmt.type                = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  fmt.fmt.pix.width       = width;
+  fmt.fmt.pix.height      = height;
+  fmt.fmt.pix.pixelformat = bug_v4l.raw_pixelformat;
+  err = v4l_dev_ioctl(VIDIOC_S_FMT, &fmt);
+  if(err < 0) return err;
+  fprintf(stderr, "Format set: (%dx%d) size=%d\n", fmt.fmt.pix.width, fmt.fmt.pix.height, fmt.fmt.pix.sizeimage);
+
+  if(running) {
+    err = bug_camera_start();
+    if(err < 0)
+      return err;
+  }
   return 0;
 err:
   bug_camera_close();
@@ -717,7 +786,7 @@ int bug_camera_grab(struct bug_img *img) {
   FD_ZERO (&bug_v4l.fds);
   FD_SET (bug_v4l.dev_fd, &bug_v4l.fds);
 
-  tv.tv_sec = 10;   /* Timeout. */
+  tv.tv_sec  = 2;   /* Timeout. */
   tv.tv_usec = 0;
 
   // get the next available buffer

@@ -253,9 +253,9 @@ static void media_print_topology_dot(struct media_device *media)
 
 		switch (entity->info.type) {
 		case MEDIA_ENTITY_TYPE_NODE:
-			printf("\tn%08x [label=\"%s\", shape=box, style=filled, "
+			printf("\tn%08x [label=\"%s\\n%s\", shape=box, style=filled, "
 			       "fillcolor=yellow]\n",
-			       entity->info.id, entity->info.name);
+			       entity->info.id, entity->info.name, entity->devname);
 			break;
 
 		case MEDIA_ENTITY_TYPE_SUBDEV:
@@ -269,7 +269,10 @@ static void media_print_topology_dot(struct media_device *media)
 				npads++;
 			}
 
-			printf("} | %s | {", entity->info.name);
+			printf("} | %s", entity->info.name);
+			if (entity->devname)
+				printf("\\n%s", entity->devname);
+			printf(" | {");
 
 			for (j = 0, npads = 0; j < entity->info.pads; ++j) {
 				if (entity->pads[j].type != MEDIA_PAD_TYPE_OUTPUT)
@@ -315,7 +318,6 @@ static void media_print_topology_text(struct media_device *media)
 {
 	unsigned int i, j, k;
 	unsigned int padding;
-	int ret;
 
 	printf("Device topology\n");
 
@@ -329,22 +331,16 @@ static void media_print_topology_text(struct media_device *media)
 		printf("%*ctype %s subtype %s\n", padding, ' ',
 			media_entity_type_to_string(entity->info.type),
 			media_entity_subtype_to_string(entity->info.type, entity->info.subtype));
-		if (entity->devname)
+		if (entity->devname[0])
 			printf("%*cdevice node name %s\n", padding, ' ', entity->devname);
 
 		for (j = 0; j < entity->info.pads; j++) {
 			struct media_entity_pad *pad = &entity->pads[j];
-			struct v4l2_mbus_framefmt format;
 
-			printf("\tpad%u: %s", j, media_pad_type_to_string(pad->type));
+			printf("\tpad%u: %s ", j, media_pad_type_to_string(pad->type));
 
-			if (entity->info.type == MEDIA_ENTITY_TYPE_SUBDEV) {
-				ret = v4l2_subdev_get_format(entity, &format, j,
-						     V4L2_SUBDEV_FORMAT_ACTIVE);
-				if (ret == 0)
-					printf(" [%s %ux%u]", pixelcode_to_string(format.code),
-					       format.width, format.height);
-			}
+			if (entity->info.type == MEDIA_ENTITY_TYPE_SUBDEV)
+				v4l2_subdev_print_format(entity, j, V4L2_SUBDEV_FORMAT_ACTIVE);
 
 			printf("\n");
 
@@ -437,9 +433,11 @@ static int media_enum_entities(struct media_device *media)
 {
 	struct media_entity *entity;
 	struct stat devstat;
-	char devname[32];
 	unsigned int size;
-	unsigned int i;
+	char devname[32];
+	char sysname[32];
+	char target[1024];
+	char *p;
 	__u32 id;
 	int ret;
 
@@ -472,24 +470,29 @@ static int media_enum_entities(struct media_device *media)
 		    (entity->info.type != MEDIA_ENTITY_TYPE_SUBDEV))
 			continue;
 
-		for (i = 0; i < 256; ++i) {
-			if (entity->info.type == MEDIA_ENTITY_TYPE_NODE)
-				sprintf(devname, "/dev/video%u", i);
-			else
-				sprintf(devname, "/dev/subdev%u", i);
+		sprintf(sysname, "/sys/dev/char/%u:%u", entity->info.v4l.major,
+			entity->info.v4l.minor);
+		ret = readlink(sysname, target, sizeof(target));
+		if (ret < 0)
+			continue;
 
-			ret = stat(devname, &devstat);
-			if (ret < 0)
-				continue;
+		target[ret] = '\0';
+		p = strrchr(target, '/');
+		if (p == NULL)
+			continue;
 
-			if (major(devstat.st_rdev) == entity->info.v4l.major &&
-			    minor(devstat.st_rdev) == entity->info.v4l.minor) {
-				strcpy(entity->devname, devname);
-				break;
-			}
-		}
+		sprintf(devname, "/dev/%s", p + 1);
+		ret = stat(devname, &devstat);
+		if (ret < 0)
+			continue;
 
-		id = entity->info.id;
+		/* Sanity check: udev might have reordered the device nodes.
+		 * Make sure the major/minor match. We should really use
+		 * libudev.
+		 */
+		if (major(devstat.st_rdev) == entity->info.v4l.major &&
+		    minor(devstat.st_rdev) == entity->info.v4l.minor)
+			strcpy(entity->devname, devname);
 	}
 
 	return 0;

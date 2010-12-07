@@ -20,7 +20,6 @@
 #ifndef __MEDIA_H__
 #define __MEDIA_H__
 
-#include <linux/types.h>
 #include <linux/media.h>
 
 struct media_entity_link {

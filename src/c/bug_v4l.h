@@ -29,7 +29,7 @@ struct bug_v4l {
   struct media_device *media;
   int dev_fd;
   int subdev_fd;
-  int bmi_fd;
+  char bmi_node[100];
   struct bug_img *buffers;
   unsigned int n_buffers;
   struct v4l2_buffer buf;
@@ -54,6 +54,30 @@ enum {
   V4L2_DEVNODE_RESIZER,
   V4L2_DEVNODE_PREVIEW,
 };
+
+
+/*
+ * find_output_node() - finds the device node of the currently
+ *   configured output node.
+ *
+ * @ param media_node : set to "/dev/media0" 
+ *
+ * @ param dev_node : like strcpy, this is the char* into which the
+ *   output device node is copied. It will return with a value like
+ *   "/dev/video2"
+ */
+int find_output_node(char *media_node, char *dev_node);
+
+/*
+ * get_frame_rate() - finds frame rate of the pipeline. open() must be called
+ *
+ * @ param numerator : 
+ *
+ * @ param denomimator :
+ *
+ * frames-per-second is returned as a ratio of ints
+ */
+int get_framerate(int *numerator, int *denominator);
 
 int bug_camera_ioctl(int request, void *argp);
 int v4l_dev_ioctl(int request, void *argp);

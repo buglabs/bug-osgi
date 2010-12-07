@@ -38,6 +38,11 @@ int v4l2_subdev_get_crop(struct media_entity *entity, struct v4l2_rect *rect,
 	unsigned int pad, enum v4l2_subdev_format which);
 int v4l2_subdev_set_crop(struct media_entity *entity, struct v4l2_rect *rect,
 	unsigned int pad, enum v4l2_subdev_format which);
+int v4l2_subdev_set_frame_interval(struct media_entity *entity,
+	struct v4l2_fract *interval);
+
+void v4l2_subdev_print_format(struct media_entity *entity,
+	unsigned int pad, enum v4l2_subdev_format which);
 
 #endif
 

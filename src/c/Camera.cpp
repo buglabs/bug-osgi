@@ -313,7 +313,11 @@ JNIEXPORT jboolean JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1g
 	// to allow the case where the caller just wants us to dump
 	// a frame
 	struct bug_img yuv_img;
-	grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
+	const int ret = grab_frame(env, V4L2_DEVNODE_RESIZER, yuv_img);
+	if (ret != 0) {
+		CAMLOG(printf("Error grabbing a frame: %d", ret));
+		return false;
+	}
 
 	if (jbuf == NULL) {
 		CAMLOG(printf("jni grab preview: caller didn't give us a buffer"));
@@ -340,7 +344,10 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_
 {
 	CAMLOG(printf("jni grab raw"));
 	struct bug_img yuv_img;
-	grab_frame(env, V4L2_DEVNODE_RAW, yuv_img);
+	const int ret = grab_frame(env, V4L2_DEVNODE_RAW, yuv_img);
+	if (ret != 0) {
+		CAMLOG(printf("Failed to grab a frame: %d", ret));
+	}
 	const size_t jpeg_size = compressYUYV(yuv_img);
 
 	CAMLOG(printf("asking for java byte array of size %lu", jpeg_size));
