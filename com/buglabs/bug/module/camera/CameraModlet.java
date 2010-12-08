@@ -392,6 +392,11 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 			bug_camera_grab_preview(null);
 		}
 		
+		final int flushed = camera.bug_camera_flush_queue();
+		if (flushed != 0) {
+			return null;
+		}
+		
 		fullsGrabbed++;
 		return camera.bug_camera_grab_raw();
 	}
