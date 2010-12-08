@@ -228,7 +228,7 @@ static int set_format(struct media_entity_pad *pad, struct v4l2_mbus_framefmt *f
     bug_v4l.code   = fmt.fmt.pix.pixelformat;
     return 0;
   } else {
-    printf("Unknown type.\n");
+    fprintf(stderr, "Unknown type.\n");
     return -EINVAL;
   }
 }
@@ -243,11 +243,11 @@ static int setup_link(struct media_device *media, struct link_desc *link, struct
   // get source 
   source = media_get_entity_by_name(media, link->source, strlen(link->source));
   if(source == NULL) {
-    printf("Can't find link source %s\n", link->source);
+    fprintf(stderr, "Can't find link source %s\n", link->source);
     return -EINVAL;
   }
   if(link->source_pad > source->info.pads) {
-    printf("Can't find pad %d for link source %s\n", link->source_pad, link->source);
+    fprintf(stderr, "Can't find pad %d for link source %s\n", link->source_pad, link->source);
     return -EINVAL;
   }
   source_pad = &source->pads[link->source_pad];
@@ -653,6 +653,43 @@ int get_framerate(int *numerator, int *denominator) {
   }
 }
 
+int bug_camera_flush_queue() {
+  int ret, count=0;
+  struct v4l2_buffer buf;
+
+  // requeue the last buffer used if 
+  if(bug_v4l.buf.type) {
+    if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_QBUF, &bug_v4l.buf)) {
+      return -1;
+    }
+    bug_v4l.buf.type = 0;
+  }
+
+  buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  buf.memory = V4L2_MEMORY_MMAP;
+  for(buf.index=0; buf.index<bug_v4l.n_buffers; buf.index++) {
+    ret = v4l_dev_ioctl(VIDIOC_QUERYBUF, &buf);
+    if(ret < 0) goto end;
+    if(buf.flags & V4L2_BUF_FLAG_DONE) {
+      count++;
+    }
+  }
+
+  for(; count > 0; count--) {
+    CLEAR (buf);
+    buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    buf.memory = V4L2_MEMORY_MMAP;
+    ret = v4l_dev_ioctl(VIDIOC_DQBUF, &buf);
+    if(ret < 0) goto end;
+    ret = v4l_dev_ioctl(VIDIOC_QBUF, &buf);
+    if(ret < 0) goto end;
+  }
+  ret = 0;
+
+ end:
+  return ret;
+}
+
 int bug_camera_start() {
   struct bug_img img;
   int err = init_mmap();
@@ -779,6 +816,7 @@ int bug_camera_grab(struct bug_img *img) {
   // requeue the last buffer used if 
   if(bug_v4l.buf.type) {
     if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_QBUF, &bug_v4l.buf)) {
+      fprintf(stderr, "ERROR Queueing buffer\n");
       return -1;
     }
   }
@@ -791,8 +829,9 @@ int bug_camera_grab(struct bug_img *img) {
 
   // get the next available buffer
   ret = select (bug_v4l.dev_fd + 1, &bug_v4l.fds, NULL, NULL, &tv);
-  if (ret < 0) 
+  if (ret < 0) {
     return -1;
+  }
 
   if (0 == ret) {
     fprintf (stderr, "%s: select timeout\n", __func__);
@@ -803,6 +842,7 @@ int bug_camera_grab(struct bug_img *img) {
   bug_v4l.buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   bug_v4l.buf.memory = V4L2_MEMORY_MMAP;
   if (-1 == ioctl (bug_v4l.dev_fd, VIDIOC_DQBUF, &bug_v4l.buf)) {
+    fprintf(stderr, "Error Dequeueing buffer\n");
     return -1;
   }
 

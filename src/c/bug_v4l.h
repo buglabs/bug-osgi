@@ -113,6 +113,8 @@ int bug_camera_stop();
  */
 int bug_camera_grab(struct bug_img *img);
 
+int bug_camera_flush_queue();
+
 /* bug_camera_switch_to_dev() - Used to switch camera device nodes. Useful 
  * for switching between a small video stream for preview and a full resolution
  * image for still capture. Example:

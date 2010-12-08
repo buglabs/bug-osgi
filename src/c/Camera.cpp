@@ -362,3 +362,10 @@ JNIEXPORT jbyteArray JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_
 	CAMLOG(printf("return java_buffer %p", java_buffer));
     return java_buffer;
 }
+
+JNIEXPORT jint JNICALL Java_com_buglabs_bug_jni_camera_Camera_bug_1camera_1flush_1queue
+  (JNIEnv *, jobject)
+{
+	CAMLOG(printf("flush queue"));
+	return bug_camera_flush_queue();
+}

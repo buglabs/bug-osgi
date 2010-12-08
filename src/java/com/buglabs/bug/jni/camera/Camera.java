@@ -57,4 +57,7 @@ public class Camera extends CharDevice {
 	
 	// grab a raw-sized image as JPEG
 	public native byte[] bug_camera_grab_raw();
+	
+	// flush the frame queue
+	public native int bug_camera_flush_queue();
 }
