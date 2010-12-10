@@ -162,12 +162,17 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 
 	public void removedService(ServiceReference arg0, Object arg1) {
 		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
-		serviceMap.remove(key);
 		
-		sc--;
+		if (serviceMap.containsKey(key)) {
+			serviceMap.remove(key);
+			sc--;
+		}
+		
 		if (!(thread == null) && !thread.isInterrupted() && !(runnable instanceof UnmanagedRunnable)) {
 			runnable.shutdown();
 			thread.interrupt();
+			thread = null;
+			
 			return;
 		}
 
