@@ -53,12 +53,13 @@ import com.buglabs.util.ServiceFilterGenerator;
 public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 
 	private final ManagedRunnable runnable;
-	private final String[] services;
+	//private final String[] services;
 	private volatile int sc;
 	private final BundleContext bc;
 	private Thread thread;
 	private final Map serviceMap;
 	private LogService log;
+	private int serviceCount;
 
 	/**
 	 * A runnable that provides access to OSGi services passed to
@@ -107,10 +108,10 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	public interface ManagedInlineRunnable extends ManagedRunnable {
 	}
 
-	public ServiceTrackerHelper(BundleContext bc, ManagedRunnable t, String[] services) {
+	public ServiceTrackerHelper(BundleContext bc, ManagedRunnable t, int serviceCount) {
 		this.bc = bc;
 		this.runnable = t;
-		this.services = services;
+		this.serviceCount = serviceCount;
 		this.serviceMap = new HashMap();
 		this.log = LogServiceUtil.getLogService(bc);
 
@@ -118,12 +119,15 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	}
 
 	public Object addingService(ServiceReference arg0) {
-		sc++;
 		Object svc = bc.getService(arg0);
 		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
-		serviceMap.put(key, svc);
+		
+		if (!serviceMap.containsKey(key)) {
+			sc++;
+			serviceMap.put(key, svc);
+		}
 
-		if (thread == null && sc == services.length && !(runnable instanceof UnmanagedRunnable)) {
+		if (thread == null && sc == serviceCount && !(runnable instanceof UnmanagedRunnable)) {
 			if (runnable instanceof ManagedInlineRunnable) {
 				//Client wants to run in same thread, just call method.
 				runnable.run(serviceMap);
@@ -187,7 +191,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @throws InvalidSyntaxException
 	 */
 	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, ManagedRunnable runnable) throws InvalidSyntaxException {
-		ServiceTracker st = new ClosingServiceTracker(context, ServiceFilterGenerator.generateServiceFilter(context, services), new ServiceTrackerHelper(context, runnable, services), services);
+		ServiceTracker st = new ClosingServiceTracker(context, ServiceFilterGenerator.generateServiceFilter(context, services), new ServiceTrackerHelper(context, runnable, services.length), services);
 		st.open();
 		
 		return st;
@@ -205,7 +209,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @throws InvalidSyntaxException
 	 */
 	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, Filter filter, ManagedRunnable runnable) throws InvalidSyntaxException {
-		ServiceTracker st = new ClosingServiceTracker(context, filter, new ServiceTrackerHelper(context, runnable, services), services);
+		ServiceTracker st = new ClosingServiceTracker(context, filter, new ServiceTrackerHelper(context, runnable, services.length), services);
 		st.open();
 
 		return st;
