@@ -87,8 +87,8 @@ public class LogServiceUtil {
 		dict.put("Implementation", LogServiceImpl.class.getName());
 		dict.put("Log Level", "" + logServiceImpl.logLevel);
 		dict.put("Quiet", "" + logServiceImpl.quiet);
-		dict.put("Output Stream", logServiceImpl.out.getClass().getName());
-		dict.put("Error Stream", logServiceImpl.err.getClass().getName());
+		dict.put("Output Stream", LogServiceImpl.out.getClass().getName());
+		dict.put("Error Stream", LogServiceImpl.err.getClass().getName());
 		dict.put("Buffer Size", "" + logServiceImpl.bufferSize);
 		dict.put(Constants.SERVICE_RANKING, -4096);
 		return dict;
