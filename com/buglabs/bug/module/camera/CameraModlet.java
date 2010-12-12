@@ -339,9 +339,10 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		if (isCameraOpen) {
 			return 0;
 		}
-		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_open");
+		final long before = System.currentTimeMillis();
 		final int ret = camera.bug_camera_open(media_node, slot_num, full_height, full_width, preview_height, preview_width);
-		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_open");
+		final long after = System.currentTimeMillis();
+		System.out.println("TIMING: bug_camera_open took " + (after-before) + "ms");
 		isCameraOpen = (ret == 0);
 		return ret;
 	}
@@ -363,9 +364,10 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 			return 0;
 		}
 		
-		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_start");
+		final long before = System.currentTimeMillis();
 		final int ret = camera.bug_camera_start();
-		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_start");
+		final long after = System.currentTimeMillis();
+		System.out.println("TIMING: bug_camera_start took " + (after-before) + "ms");
 		isCameraStarted = (ret == 0);
 		return ret;
 	}
@@ -388,17 +390,19 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	public synchronized byte[] bug_camera_grab_full()
 	{
-		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_flush_queue");
+		final long before = System.currentTimeMillis();
 		final int flushed = camera.bug_camera_flush_queue();
-		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_flush_queue");
+		final long after = System.currentTimeMillis();
+		System.out.println("TIMING: bug_camera_flush_queue took " + (after-before) + "ms");
 		if (flushed != 0) {
 			return null;
 		}
 		
 		fullsGrabbed++;
-		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_grab_full");
+		final long before2 = System.currentTimeMillis();
 		final byte [] jpeg = camera.bug_camera_grab_raw();
-		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_grab_full");
+		final long after2 = System.currentTimeMillis();
+		System.out.println("TIMING: bug_camera_grab_full took " + (after2-before2) + "ms");
 		return jpeg;
 	}
 }
