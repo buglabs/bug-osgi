@@ -339,8 +339,9 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		if (isCameraOpen) {
 			return 0;
 		}
-		
+		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_open");
 		final int ret = camera.bug_camera_open(media_node, slot_num, full_height, full_width, preview_height, preview_width);
+		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_open");
 		isCameraOpen = (ret == 0);
 		return ret;
 	}
@@ -362,7 +363,9 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 			return 0;
 		}
 		
+		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_start");
 		final int ret = camera.bug_camera_start();
+		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_start");
 		isCameraStarted = (ret == 0);
 		return ret;
 	}
@@ -385,7 +388,17 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	public synchronized byte[] bug_camera_grab_full()
 	{
+		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_flush_queue");
+		final int flushed = camera.bug_camera_flush_queue();
+		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_flush_queue");
+		if (flushed != 0) {
+			return null;
+		}
+		
 		fullsGrabbed++;
-		return camera.bug_camera_grab_raw();
+		System.out.println("TIMING: " + System.currentTimeMillis() + " - Calling bug_camera_grab_full");
+		final byte [] jpeg = camera.bug_camera_grab_raw();
+		System.out.println("TIMING: " + System.currentTimeMillis() + " -    done bug_camera_grab_full");
+		return jpeg;
 	}
 }
