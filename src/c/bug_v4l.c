@@ -357,7 +357,7 @@ static int init_mmap() {
   struct v4l2_requestbuffers req;
   struct bug_img *img;
   CLEAR (req);
-  req.count               = 4;
+  req.count               = 2;
   req.type                = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   req.memory              = V4L2_MEMORY_MMAP;
 
