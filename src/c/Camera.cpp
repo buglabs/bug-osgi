@@ -171,7 +171,7 @@ size_t compressYUYV(const struct bug_img &yuv_img)
 
 	  return dataWritten;
 }
-
+#include <time.h>
 static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
 {
 	CAMLOG(printf("grab_frame(dev_node: %d)", dev_node));
@@ -195,7 +195,10 @@ static int grab_frame(JNIEnv *env, int dev_node, struct bug_img &yuv_img)
 		if (dev_node == V4L2_DEVNODE_RAW) {
 			pFormat = &raw_fmt;
 		}
+		const clock_t before = clock();
 		ret = bug_camera_change_resizer_to(pFormat->width, pFormat->height);
+		const clock_t after = clock();
+		printf("TIMING: bug_camera_change_resizer_to took %gms\n", (after-before) * 1.0 / CLOCKS_PER_SEC * 1000.0);fflush(stdout);
 		if (ret != 0) {
 			printf("Failed to change resizer to %dx%d: ret=%d",
 				pFormat->width,
