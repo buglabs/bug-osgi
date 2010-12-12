@@ -100,8 +100,6 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	private boolean isCameraOpen = false;
 	private boolean isCameraStarted = false;
 	
-	private static final int MIN_PREVIEWS_BEFORE_FULL = 5;
-	
 	private int previewsGrabbed = 0;
 	private int fullsGrabbed = 0;
 	
@@ -387,16 +385,6 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	public synchronized byte[] bug_camera_grab_full()
 	{
-		while (previewsGrabbed < MIN_PREVIEWS_BEFORE_FULL) {
-			// it's okay to use null - the JNI can cope with this
-			bug_camera_grab_preview(null);
-		}
-		
-		final int flushed = camera.bug_camera_flush_queue();
-		if (flushed != 0) {
-			return null;
-		}
-		
 		fullsGrabbed++;
 		return camera.bug_camera_grab_raw();
 	}
