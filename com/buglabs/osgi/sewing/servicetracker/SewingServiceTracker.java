@@ -73,6 +73,6 @@ public class SewingServiceTracker extends AbstractServiceTracker {
 	 * getServices().add(MyService.class.getName());
 	 */
 	public void initServices() {
-		getServices().add("org.osgi.service.http.HttpService");
+		getServices().add(org.osgi.service.http.HttpService.class.getName());
 	}
 }
