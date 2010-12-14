@@ -182,8 +182,8 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	}
 
 	public void stop() throws Exception {
-		bug_camera_stop();
-		bug_camera_close();
+		cameraStop();
+		cameraClose();
 
 		cameraModuleControlReg.unregister();
 		camera2ModuleControlReg.unregister();
@@ -216,11 +216,11 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		if (operation == PublicWSProvider2.GET) {
 			
 			// open it if we need to
-			bug_camera_open_default();
-			bug_camera_start();
+			cameraOpenDefault();
+			cameraStart();
 			
 			// we'll leave the camera running
-			return new WSResponse(new ByteArrayInputStream(bug_camera_grab_full()), JPEG_MIME_TYPE);
+			return new WSResponse(new ByteArrayInputStream(grabFull()), JPEG_MIME_TYPE);
 		}
 		return null;
 	}
@@ -323,12 +323,12 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return isCameraStarted;
 	}
 	
-	public synchronized int bug_camera_open_default()
+	public synchronized int cameraOpenDefault()
 	{
-		return bug_camera_open(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
+		return cameraOpen(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
 	}
 	
-	public synchronized int bug_camera_open(
+	public synchronized int cameraOpen(
 			final String media_node,
 			int slot_num,
 			int full_height,
@@ -347,7 +347,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 
-	public synchronized int bug_camera_close()
+	public synchronized int cameraClose()
 	{
 		if (!isCameraOpen) {
 			return 0;
@@ -358,7 +358,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 
-	public synchronized int bug_camera_start()
+	public synchronized int cameraStart()
 	{
 		if (isCameraStarted) {
 			return 0;
@@ -372,7 +372,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 	
-	public synchronized int bug_camera_stop()
+	public synchronized int cameraStop()
 	{
 		if (!isCameraStarted) {
 			return 0;
@@ -382,13 +382,13 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return ret;
 	}
 
-	public synchronized boolean bug_camera_grab_preview(int [] pixelBuffer)
+	public synchronized boolean grabPreview(int [] pixelBuffer)
 	{
 		previewsGrabbed++;
 		return camera.bug_camera_grab_preview(pixelBuffer);
 	}
 
-	public synchronized byte[] bug_camera_grab_full()
+	public synchronized byte[] grabFull()
 	{
 		final long before = System.currentTimeMillis();
 		final int flushed = camera.bug_camera_flush_queue();

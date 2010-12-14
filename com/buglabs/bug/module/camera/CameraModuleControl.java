@@ -284,7 +284,7 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 			
 			if (get.containsKey("cameraOpen")) {
 				System.out.println("opening camera");
-				cameraModlet.bug_camera_open_default();
+				cameraModlet.cameraOpenDefault();
 			}
 
 			v = (String) get.get("testPattern");
@@ -315,17 +315,17 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 			
 			if (get.containsKey("cameraStart")) {
 				System.out.println("starting camera");
-				cameraModlet.bug_camera_start();
+				cameraModlet.cameraStart();
 			}
 			
 			if (get.containsKey("cameraStop")) {
 				System.out.println("stopping camera");
-				cameraModlet.bug_camera_stop();
+				cameraModlet.cameraStop();
 			}
 			
 			if (get.containsKey("cameraClose")) {
 				System.out.println("closing camera");
-				cameraModlet.bug_camera_close();
+				cameraModlet.cameraClose();
 			}
 			
 			return new WSResponse(getCameraInfoXml(), "text/xml");
