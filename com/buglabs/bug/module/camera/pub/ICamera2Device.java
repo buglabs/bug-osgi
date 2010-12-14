@@ -39,8 +39,8 @@ public interface ICamera2Device {
 	 */
 	public final static String DEFAULT_MEDIA_NODE = "/dev/media0";
 	
-	public boolean is_camera_open();
-	public boolean is_camera_started();
+	public boolean isCameraOpen();
+	public boolean isCameraStarted();
 	
 	/**
 	 * Opens a connection with a camera module and configure it.
@@ -69,7 +69,7 @@ public interface ICamera2Device {
 	public int cameraOpenDefault();
 	
 	/**
-	 * Closes the camera - allowing other processes to access it.
+	 * Closes the camera - allowing other processes to abug_camera_openccess it.
 	 * @return 0 if open was successful
 	 */
 	public int cameraClose();

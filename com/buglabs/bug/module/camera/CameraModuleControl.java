@@ -387,8 +387,8 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 	private String getCameraInfoXml() {
 		XmlNode root = new XmlNode("CameraInfo");
 		try {
-			if (cameraModlet.is_camera_open()) {
-				if (cameraModlet.is_camera_started()) {
+			if (cameraModlet.isCameraOpen()) {
+				if (cameraModlet.isCameraStarted()) {
 					root.addChildElement(new XmlNode("CameraInfo", "Camera is open and started"));
 				} else {
 					root.addChildElement(new XmlNode("CameraInfo", "Camera is open but not yet started"));

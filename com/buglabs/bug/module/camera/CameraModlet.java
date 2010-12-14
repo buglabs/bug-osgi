@@ -315,11 +315,11 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		pictureServiceName = name;
 	}
 	
-	public boolean is_camera_open() {
+	public boolean isCameraOpen() {
 		return isCameraOpen;
 	}
 	
-	public boolean is_camera_started() {
+	public boolean isCameraStarted() {
 		return isCameraStarted;
 	}
 	
