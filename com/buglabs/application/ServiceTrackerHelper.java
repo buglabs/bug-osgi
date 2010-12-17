@@ -37,11 +37,9 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.ServiceFilterGenerator;
 
 /**
@@ -58,7 +56,6 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	private final BundleContext bc;
 	private Thread thread;
 	private final Map serviceMap;
-	private LogService log;
 	private int serviceCount;
 
 	/**
@@ -113,7 +110,6 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		this.runnable = t;
 		this.serviceCount = serviceCount;
 		this.serviceMap = new HashMap();
-		this.log = LogServiceUtil.getLogService(bc);
 
 		sc = 0;
 	}
