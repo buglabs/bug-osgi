@@ -165,7 +165,12 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		}
 		
 		if (!(thread == null) && !thread.isInterrupted() && !(runnable instanceof UnmanagedRunnable)) {
-			runnable.shutdown();
+			try {
+				runnable.shutdown();
+			} catch (Exception e) {
+				//Ignore errors thrown in shutdown.
+				//TODO: consider logging these errors.
+			}
 			thread.interrupt();
 			thread = null;
 			
