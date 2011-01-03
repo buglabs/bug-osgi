@@ -28,7 +28,9 @@
 package com.buglabs.application;
 
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -121,6 +123,8 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		if (!serviceMap.containsKey(key)) {
 			sc++;
 			serviceMap.put(key, svc);
+			//Store a dictionary of all the services properties.
+			serviceMap.put(svc, getProperties(arg0));
 		}
 
 		if (thread == null && sc == serviceCount && !(runnable instanceof UnmanagedRunnable)) {
@@ -145,6 +149,22 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		}
 
 		return svc;
+	}
+
+	/**
+	 * @param arg0
+	 * @return A dictionary containing all of a service reference's properties.
+	 */
+	private Dictionary getProperties(ServiceReference arg0) {
+		Dictionary dict = new Hashtable();
+		
+		if (arg0.getPropertyKeys() != null) {
+			for (String key: Arrays.asList(arg0.getPropertyKeys())) {
+				dict.put(key, arg0.getProperty(key));
+			}
+		}
+		
+		return dict;
 	}
 
 	public void modifiedService(ServiceReference arg0, Object arg1) {
