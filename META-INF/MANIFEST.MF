@@ -15,4 +15,4 @@ Export-Package: com.buglabs.application,
  com.buglabs.support,
  com.buglabs.util,
  com.buglabs.util.simplerestclient,
- org.osgi.service.log
+ org.osgi.service.log;version="1.3"
