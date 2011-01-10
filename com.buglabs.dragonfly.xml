@@ -77,6 +77,9 @@
 		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
 			<arg line="${felix.download.url}org.apache.felix.log-1.0.0.jar" />
 		</exec>
+		<exec dir="${checkout.dir}/com.buglabs.dragonfly.felix/bundle" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.configadmin-1.2.8.jar" />
+		</exec>
 
 		<!-- Add the BUG API Version to the Dragonfly Plugin Manifest -->
 		<manifest file="${checkout.dir}/com.buglabs.dragonfly/META-INF/MANIFEST.MF" mode="update">
