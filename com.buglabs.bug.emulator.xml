@@ -6,6 +6,7 @@
 	<property name="distDirectory" location="${meta.distDirectory}" />
 	<property name="eclipse.default.file" value="${eclipse.dir}/eclipse-lin.tar.gz" />
 	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
+	<property name="apache.mirror.url" value="http://www.ibiblio.org/pub/mirrors/apache" />
 
 	<!-- ===================================================================== -->
 	<!-- Build properties setup -->
@@ -77,6 +78,10 @@
 			<fileset file="${checkout.dir}/com.eclipse.sdk/eclipse/plugins/org.eclipse.osgi_*" />
 			<fileset file="${checkout.dir}/com.eclipse.sdk/eclipse/plugins/org.eclipse.osgi.services_*" />
 		</copy>
+		
+		<exec dir="${checkout.dir}/libs" executable="wget">
+			<arg line="${apache.mirror.url}/felix/org.apache.felix.configadmin-1.2.8.jar" />
+		</exec>
 
 		<property name="externalDirectory" location="${checkout.dir}/libs" />
 
@@ -84,7 +89,6 @@
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.http" destPath="${checkout.dir}/com.buglabs.osgi.http" />
 			<checkout url="${svn.url.bug}/com.buglabs.common" destPath="${checkout.dir}/com.buglabs.common" />
 			<checkout url="${svn.url.bug}/com.buglabs.osgi.shell" destPath="${checkout.dir}/com.buglabs.osgi.shell" />
-			<checkout url="${svn.url.bug}/com.buglabs.osgi.cm" destPath="${checkout.dir}/com.buglabs.osgi.cm" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.module" destPath="${checkout.dir}/com.buglabs.bug.module" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.event" destPath="${checkout.dir}/com.buglabs.bug.event" />
 			<checkout url="${svn.url.bug}/com.buglabs.bug.program" destPath="${checkout.dir}/com.buglabs.bug.program" />
