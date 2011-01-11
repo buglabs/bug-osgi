@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * Copyright (c) 2008 - 2011 Bug Labs, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@ package com.buglabs.application;
 
 import java.util.Arrays;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	private volatile int sc;
 	private final BundleContext bc;
 	private Thread thread;
-	private final Map serviceMap;
+	private final Map<Object, Object> serviceMap;
 	private int serviceCount;
 
 	/**
@@ -75,27 +74,11 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		 * This is called for execution of application logic when OSGi services are available.
 		 * @param services key contains String of service name, value is service instance.
 		 */
-		public abstract void run(Map services);
+		public abstract void run(Map<Object, Object> services);
 		/**
 		 * Called directly before the thread is interrupted.  Client may optionally add necessary code to shutdown thread.
 		 */
 		public abstract void shutdown();
-	}
-
-	/**
-	 * A Runnable and ServiceTrackerCustomizer that allows for fine-grained
-	 * application behavior based on OSGi service activity. An implementation of
-	 * this can be passed anywhere a ServiceTrackerRunnable is expected and
-	 * behavior will change accordingly.
-	 * 
-	 * Runnable is not started automatically. It is up to the implementor to
-	 * decide when and how to create and start the thread.
-	 * 
-	 * @author kgilmer
-	 * @deprecated Use ServiceTrackerCustomizer instead.
-	 * 
-	 */
-	public interface UnmanagedRunnable extends ManagedRunnable, ServiceTrackerCustomizer {
 	}
 
 	/**
@@ -107,15 +90,23 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	public interface ManagedInlineRunnable extends ManagedRunnable {
 	}
 
+	/**
+	 * @param bc
+	 * @param t
+	 * @param serviceCount
+	 */
 	public ServiceTrackerHelper(BundleContext bc, ManagedRunnable t, int serviceCount) {
 		this.bc = bc;
 		this.runnable = t;
 		this.serviceCount = serviceCount;
-		this.serviceMap = new HashMap();
+		this.serviceMap = new Hashtable<Object, Object>();
 
 		sc = 0;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
+	 */
 	public Object addingService(ServiceReference arg0) {
 		Object svc = bc.getService(arg0);
 		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
@@ -127,7 +118,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 			serviceMap.put(svc, getProperties(arg0));
 		}
 
-		if (thread == null && sc == serviceCount && !(runnable instanceof UnmanagedRunnable)) {
+		if (thread == null && sc == serviceCount) {
 			if (runnable instanceof ManagedInlineRunnable) {
 				//Client wants to run in same thread, just call method.
 				runnable.run(serviceMap);
@@ -143,11 +134,6 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 			}
 		}
 
-		if (runnable instanceof UnmanagedRunnable) {
-			//Simply call the unmanaged runnable in-line.
-			return ((UnmanagedRunnable) runnable).addingService(arg0);
-		}
-
 		return svc;
 	}
 
@@ -155,8 +141,8 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @param arg0
 	 * @return A dictionary containing all of a service reference's properties.
 	 */
-	private Dictionary getProperties(ServiceReference arg0) {
-		Dictionary dict = new Hashtable();
+	private Dictionary<String, Object> getProperties(ServiceReference arg0) {
+		Dictionary<String, Object> dict = new Hashtable<String, Object>();
 		
 		if (arg0.getPropertyKeys() != null) {
 			for (String key: Arrays.asList(arg0.getPropertyKeys())) {
@@ -167,15 +153,17 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 		return dict;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(org.osgi.framework.ServiceReference, java.lang.Object)
+	 */
 	public void modifiedService(ServiceReference arg0, Object arg1) {
 		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
 		serviceMap.put(key, arg1);
-		
-		if (runnable instanceof UnmanagedRunnable) {
-			((UnmanagedRunnable) runnable).modifiedService(arg0, arg1);
-		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference, java.lang.Object)
+	 */
 	public void removedService(ServiceReference arg0, Object arg1) {
 		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
 		
@@ -184,7 +172,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 			sc--;
 		}
 		
-		if (!(thread == null) && !thread.isInterrupted() && !(runnable instanceof UnmanagedRunnable)) {
+		if (!(thread == null) && !thread.isInterrupted()) {
 			try {
 				runnable.shutdown();
 			} catch (Exception e) {
@@ -195,10 +183,6 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 			thread = null;
 			
 			return;
-		}
-
-		if (runnable instanceof UnmanagedRunnable) {
-			((UnmanagedRunnable) runnable).removedService(arg0, arg1);
 		}
 		
 		if (runnable instanceof ManagedInlineRunnable) {
@@ -268,6 +252,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 *            Object handling service changes
 	 * @return
 	 * @throws InvalidSyntaxException
+	 * @Deprecated use openServiceTracker()
 	 */
 	public static ServiceTracker createAndOpen(BundleContext context, List services, RunnableWithServices runnable) throws InvalidSyntaxException {
 		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(services));
@@ -286,6 +271,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 *            Object handling service changes
 	 * @return
 	 * @throws InvalidSyntaxException
+	 * @Deprecated use openServiceTracker()
 	 * 
 	 */
 	public static ServiceTracker createAndOpen(BundleContext context, String[] services, RunnableWithServices runnable) throws InvalidSyntaxException {
@@ -306,6 +292,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 *            Object handling service changes
 	 * @return
 	 * @throws InvalidSyntaxException
+	 * @Deprecated use openServiceTracker()
 	 */
 	public static ServiceTracker createAndOpen(BundleContext context, String service, RunnableWithServices runnable) throws InvalidSyntaxException {
 		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(Arrays.asList(new String[] { service })));
@@ -324,6 +311,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 *            Object handling service changes
 	 * @return
 	 * @throws InvalidSyntaxException
+	 * @Deprecated use openServiceTracker()
 	 */
 	public static ServiceTracker createAndOpen(BundleContext context, List services, ServiceChangeListener runnable) throws InvalidSyntaxException {
 		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(services));
@@ -342,6 +330,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 *            Object handling service changes
 	 * @return
 	 * @throws InvalidSyntaxException
+	 * @Deprecated use openServiceTracker()
 	 */
 	public static ServiceTracker createAndOpen(BundleContext context, String[] services, ServiceChangeListener runnable) throws InvalidSyntaxException {
 
@@ -361,6 +350,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 *            Object handling service changes
 	 * @return
 	 * @throws InvalidSyntaxException
+	 * @Deprecated use openServiceTracker()
 	 */
 	public static ServiceTracker createAndOpen(BundleContext context, String service, ServiceChangeListener runnable) throws InvalidSyntaxException {
 		Filter filter = context.createFilter(ServiceFilterGenerator.generateServiceFilter(Arrays.asList(new String[] { service })));
