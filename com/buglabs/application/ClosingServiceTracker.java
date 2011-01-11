@@ -11,10 +11,12 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * A ServiceTracker that calls ServiceTrackerCustomizer.removedService() for all bound services.  
  * This allows the application to shutdown when the ServiceTracker is closed.  This is _not_ standard OSGi behavior.
+ * 
+ * This class is not intended to be used by clients
  * @author kgilmer
  *
  */
-class ClosingServiceTracker extends ServiceTracker {
+final class ClosingServiceTracker extends ServiceTracker {
 
 	private final ServiceTrackerCustomizer customizer2;
 	private final String[] services;

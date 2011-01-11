@@ -41,11 +41,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
 import com.buglabs.util.LogServiceUtil;
 
 /**
  * Service tracker for the BugApplication Bundle;
  * 
+ * @deprecated Use {@link ManagedRunnable} and {@link ServiceTrackerHelper} instead.
  */
 public abstract class AbstractServiceTracker implements ServiceTrackerCustomizer, IServiceProvider {
 

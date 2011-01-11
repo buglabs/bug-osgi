@@ -27,11 +27,13 @@
  *******************************************************************************/
 package com.buglabs.application;
 
+import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
+
 /**
  * Defines an interface for objects that contain references to services.
  * 
  * @author kgilmer
- * 
+ * @deprecated Use {@link ManagedRunnable} and {@link ServiceTrackerHelper} instead.
  */
 public interface IServiceProvider {
 	/**

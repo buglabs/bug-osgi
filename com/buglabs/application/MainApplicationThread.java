@@ -30,9 +30,11 @@ package com.buglabs.application;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
+
 /**
  * @author aroman
- * 
+ * @deprecated Use {@link ManagedRunnable} and {@link ServiceTrackerHelper} instead.
  */
 public class MainApplicationThread extends Thread {
 	protected boolean tearDownRequested = false;

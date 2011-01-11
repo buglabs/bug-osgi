@@ -29,9 +29,11 @@ package com.buglabs.application;
 
 import org.osgi.framework.ServiceReference;
 
+import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
+
 /**
  * @author kgilmer
- * 
+ * @deprecated Use {@link ManagedRunnable} and {@link ServiceTrackerHelper} instead.
  */
 public interface RunnableWithServices {
 	/**

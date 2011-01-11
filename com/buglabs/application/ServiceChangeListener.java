@@ -27,10 +27,13 @@
  *******************************************************************************/
 package com.buglabs.application;
 
+import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
+
 /**
  * Extends RunnableWithServices and provides more granular service events.
  * 
  * @author kgilmer
+ * @deprecated Use {@link ManagedRunnable} and {@link ServiceTrackerHelper} instead.
  * 
  */
 public interface ServiceChangeListener extends RunnableWithServices {
