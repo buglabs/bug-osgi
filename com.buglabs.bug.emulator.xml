@@ -78,10 +78,6 @@
 			<fileset file="${checkout.dir}/com.eclipse.sdk/eclipse/plugins/org.eclipse.osgi_*" />
 			<fileset file="${checkout.dir}/com.eclipse.sdk/eclipse/plugins/org.eclipse.osgi.services_*" />
 		</copy>
-		
-		<exec dir="${checkout.dir}/libs" executable="wget">
-			<arg line="${apache.mirror.url}/felix/org.apache.felix.configadmin-1.2.8.jar" />
-		</exec>
 
 		<property name="externalDirectory" location="${checkout.dir}/libs" />
 
@@ -125,6 +121,10 @@
 		<copy todir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}">
 			<fileset dir="${checkout.dir}/${meta.project}/dist" />
 		</copy>
+		
+		<exec dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/${project.version}" executable="wget">
+			<arg line="${felix.download.url}org.apache.felix.configadmin-1.2.8.jar" />
+		</exec>
 
 		<exec dir="${base.build.dir}/artifacts/${build.level}/${meta.project}/" executable="rm">
 			<arg line="current" />
