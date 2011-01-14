@@ -3,7 +3,8 @@ Bundle-Name: BUG Common Bundle
 Bundle-SymbolicName: com.buglabs.common
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
-Import-Package:  org.osgi.framework,
+Import-Package: org.osgi.framework,
+ org.osgi.service.cm;optional=true,
  org.osgi.util.tracker
 Export-Package: com.buglabs.application,
  com.buglabs.device,
