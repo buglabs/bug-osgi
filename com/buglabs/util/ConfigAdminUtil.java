@@ -56,12 +56,17 @@ public class ConfigAdminUtil {
 		return getPropertiesSafely(ca.getConfiguration(pid));		
 	}
 	
+	/**
+	 * Given a Configuration return it's dictionary.  If a dictionary does not exist it will be created.
+	 * @param config
+	 * @return
+	 * @throws IOException
+	 */
 	public static Dictionary getPropertiesSafely(Configuration config) throws IOException {
 		if (config == null) {
 			throw new RuntimeException("Client called getPropertiesSafely() with null parameter.");
 		}		
 		
-		//According to CM spec, this should never return null.
 		Dictionary properties = config.getProperties();
 		
 		if (properties == null) {
