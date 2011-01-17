@@ -40,6 +40,9 @@ public class RecordStore {
 		try {
 			Configuration c= ca.getConfiguration(createPid(recordStoreName));
 			
+			//Will create an empty Dictionary if does not yet exist.
+			c.update();
+			
 			if (c.getProperties().get(KEYSTORE_KEY) == null && !createIfNecessary) {
 				throw new RecordStoreException("Record store " + recordStoreName + " does not exist."); 
 			}
