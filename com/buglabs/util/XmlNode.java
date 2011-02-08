@@ -34,33 +34,61 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class represents an XML Node. Any DOM document is a tree of type
- * XMLNode.
+ * This class represents an XML Node. Any DOM document is a tree of <code>XMLNode</code>s.
  * 
  * @author kgilmer
  * 
  */
 public class XmlNode {
-	private String tagName;
-
-	private String text;
+	/**
+	 * Name of node.
+	 */
+	private String tagName = null;
+	/**
+	 * Content of node.
+	 */
+	private String text = null;
 
 	private Map<String, String> attributes;
 
 	private List<XmlNode> childElements;
 
-	private XmlNode parentNode;
+	private XmlNode parentNode = null;
 
+	/**
+	 * Create an empty node.
+	 * @param tagName
+	 */
 	public XmlNode(String tagName) {
 		this.tagName = tagName;
 		attributes = new HashMap<String, String>();
 	}
 
+	/**
+	 * Create a node with a String value.
+	 * @param tagName
+	 * @param value
+	 */
 	public XmlNode(String tagName, String value) {
 		this(tagName);
 		this.text = value;
 	}
+	
+	/**
+	 * Create a node with children.
+	 * @param tagName
+	 * @param children
+	 */
+	public XmlNode(String tagName, List<XmlNode> children) {
+		this(tagName);
+		this.childElements = children;
+	}
 
+	/**
+	 * Create a node with a parent.
+	 * @param parent
+	 * @param tagName
+	 */
 	public XmlNode(XmlNode parent, String tagName) {
 		this(tagName);
 
@@ -73,10 +101,43 @@ public class XmlNode {
 
 		this.parentNode = parent;
 	}
+	
+	/**
+	 * Create a node with a parent and children.
+	 * @param parent
+	 * @param tagName
+	 * @param children
+	 */
+	public XmlNode(XmlNode parent, String tagName, List<XmlNode> children) {
+		this(tagName);
 
+		try {
+			parent.addChildElement(this);
+		} catch (SelfReferenceException e) {
+			// this should never happen...new object creation.
+			e.printStackTrace();
+		}
+
+		this.parentNode = parent;
+		this.childElements = children;
+	}
+
+	/**
+	 * Create a node with a parent and a String value.
+	 * @param parent
+	 * @param tagName
+	 * @param value
+	 */
 	public XmlNode(XmlNode parent, String tagName, String value) {
 		this(parent, tagName);
 		this.text = value;
+	}
+	
+	/**
+	 * @return true if the node has childern, false otherwise.
+	 */
+	public boolean hasChildren() {
+		return childElements != null && childElements.size() > 0;
 	}
 
 	/**
@@ -97,29 +158,83 @@ public class XmlNode {
 		return this;
 	}
 
+	/**
+	 * Set the name of the tag.
+	 * @param tagName
+	 */
 	public void setName(String tagName) {
 		this.tagName = tagName;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getValue() {
 		return text;
 	}
 
 	public void setValue(String text) {
+		if (text != null && hasChildren()) {
+			throw new RuntimeException("Cannot set content on a node that has children.");
+		}
 		this.text = text;
 	}
 
+	/**
+	 * Get contents of attribute, or null if attribute does not exist.
+	 * @param name
+	 * @return
+	 */
 	public String getAttribute(String name) {
 		return (String) attributes.get(name);
 	}
 
+	/**
+	 * Set or overwrite existing attibute of node.
+	 * @param name
+	 * @param value
+	 */
 	public void setAttribute(String name, String value) {
 		attributes.put(name, value);
 	}
+	
+	/**
+	 * Clear the value of the XML node.
+	 */
+	public void clearValue() {
+		setValue(null);
+	}
 
+	/**
+	 * @param element
+	 * @return
+	 * @throws SelfReferenceException
+	 */
 	public XmlNode addChildElement(XmlNode element) throws SelfReferenceException {
 		if (element == this) {
 			throw new SelfReferenceException(element);
+		}
+		
+		if (this.text != null) {
+			throw new RuntimeException("Cannot add child elements to a node that has content.");
+		}
+
+		getChildren().add(element);
+		return element;
+	}
+	
+	/**
+	 * Equivalent to addChildElement except that unchecked exception is thrown on self referencing call.
+	 * @param element
+	 * @return
+	 */
+	public XmlNode addChild(XmlNode element) {
+		if (element == this) {
+			throw new RuntimeException("Cannot add node to itself.");
+		}
+		
+		if (this.text != null) {
+			throw new RuntimeException("Cannot add child elements to a node that has content.");
 		}
 
 		getChildren().add(element);
@@ -137,10 +252,16 @@ public class XmlNode {
 		return childElements;
 	}
 
+	/**
+	 * @return Map of attribute names and values as Strings.
+	 */
 	public Map<String, String> getAttributes() {
 		return attributes;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return printXml("");
 	}
@@ -183,8 +304,14 @@ public class XmlNode {
 		return s;
 	}
 
+	/**
+	 * @param name
+	 * @return true if a node with the given name exists, false otherwise.
+	 */
 	public boolean childExists(String name) {
-		// TODO optimize
+		if (!hasChildren()) {
+			return false;
+		}
 
 		if (getChild(name) != null) {
 			return true;
@@ -193,8 +320,14 @@ public class XmlNode {
 		return false;
 	}
 
+	/**
+	 * @param nodeName
+	 * @return node with given name if exists or null otherwise.
+	 */
 	public XmlNode getChild(String nodeName) {
-		// TODO Optimize
+		if (childElements == null) {
+			return null;
+		}
 
 		for (Iterator<XmlNode> i = getChildren().iterator(); i.hasNext();) {
 			XmlNode child = i.next() ;
@@ -208,6 +341,8 @@ public class XmlNode {
 
 	/**
 	 * Retrieve a node from this element using xpath-like notation.
+	 * 
+	 * Ex. for <root><leaf1><leaf1><leaf2></root> call with "root/leaf1" to return first occurrence leaf1 node.
 	 * 
 	 * @param path
 	 * @return
@@ -262,15 +397,15 @@ public class XmlNode {
 		String temp = "";
 		for (int index = 0; index < string.length(); index++) {
 			if (string.charAt(index) == '&') {
-				if (index + 4 < string.length() && string.substring(index + 1, index + 4) == "amp;") {
+				if (index + 4 < string.length() && string.substring(index + 1, index + 4).equals("amp;")) {
 					continue;
-				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5) == "apos;") {
+				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5).equals("apos;")) {
 					continue;
-				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5) == "quot;") {
+				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5).equals("quot;")) {
 					continue;
-				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3) == "lt;") {
+				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3).equals("lt;")) {
 					continue;
-				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3) == "gt;") {
+				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3).equals("gt;")) {
 					continue;
 				}
 				temp += "&amp;";
