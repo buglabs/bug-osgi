@@ -384,8 +384,14 @@ public class XmlParser {
 				sb.append((char) reader.read());
 			}
 		}
+		
+		String text = sb.toString();
+		
+		if (text.trim().length() == 0) {
+			return null;
+		}
 
-		return sb.toString();
+		return text;
 	}
 
 	private boolean compareIntArrays(int[] a1, int[] a2) {

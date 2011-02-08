@@ -179,10 +179,16 @@ public class XmlNode {
 	}
 
 	public void setValue(String text) {
-		if (text != null && hasChildren()) {
+		if (text != null && text.length() > 0 && hasChildren()) {
 			throw new RuntimeException("Cannot set content on a node that has children.");
 		}
-		this.text = text;
+		
+		//If an empty string is passed, set text to null.  This allows children to be added to node.
+		if (text != null && text.length() == 0) {
+			this.text = null;
+		} else {
+			this.text = text;
+		}
 	}
 
 	/**
