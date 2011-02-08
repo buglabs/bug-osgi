@@ -71,7 +71,10 @@ public class XmlNode {
 	 */
 	public XmlNode(String tagName, String value) {
 		this(tagName);
-		this.text = value;
+		
+		if (value.length() > 0) {
+			this.text = value;
+		}
 	}
 	
 	/**
@@ -130,7 +133,9 @@ public class XmlNode {
 	 */
 	public XmlNode(XmlNode parent, String tagName, String value) {
 		this(parent, tagName);
-		this.text = value;
+		if (value.length() > 0) {
+			this.text = value;
+		}
 	}
 	
 	/**

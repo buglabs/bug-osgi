@@ -176,7 +176,7 @@ public class XmlParser {
 				}
 
 				// create new element
-				XmlNode element = new XmlNode(tagName, "");
+				XmlNode element = new XmlNode(tagName);
 
 				// parse the attributes
 				boolean isTagClosed = false;
