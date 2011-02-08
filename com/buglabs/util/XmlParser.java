@@ -44,7 +44,7 @@ public class XmlParser {
 
 	private Reader reader;
 
-	private Stack elements;
+	private Stack<XmlNode> elements;
 
 	private XmlNode currentElement;
 
@@ -55,7 +55,7 @@ public class XmlParser {
 	private boolean ignoreNamespaces;
 
 	public XmlParser() {
-		elements = new Stack();
+		elements = new Stack<XmlNode>();
 		currentElement = null;
 		ignoreNamespaces = false;
 	}

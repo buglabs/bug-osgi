@@ -45,15 +45,15 @@ public class XmlNode {
 
 	private String text;
 
-	private Map attributes;
+	private Map<String, String> attributes;
 
-	private List childElements;
+	private List<XmlNode> childElements;
 
 	private XmlNode parentNode;
 
 	public XmlNode(String tagName) {
 		this.tagName = tagName;
-		attributes = new HashMap();
+		attributes = new HashMap<String, String>();
 	}
 
 	public XmlNode(String tagName, String value) {
@@ -126,15 +126,18 @@ public class XmlNode {
 		return element;
 	}
 
-	public List getChildren() {
+	/**
+	 * @return children of node, or empty list if no children exist.
+	 */
+	public List<XmlNode> getChildren() {
 		if (childElements == null) {
-			childElements = new ArrayList();
+			childElements = new ArrayList<XmlNode>();
 		}
 
 		return childElements;
 	}
 
-	public Map getAttributes() {
+	public Map<String, String> getAttributes() {
 		return attributes;
 	}
 
@@ -146,8 +149,8 @@ public class XmlNode {
 		String s = indent + "<" + this.tagName;
 
 		if (attributes != null) {
-			for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
-				String attrib = (String) i.next();
+			for (Iterator<String> i = attributes.keySet().iterator(); i.hasNext();) {
+				String attrib = i.next();
 
 				// Only display attributes with non-null values.
 				if (attributes.get(attrib) != null) {
@@ -167,9 +170,8 @@ public class XmlNode {
 
 		if (childElements != null && childElements.size() > 0) {
 			s += ">\n";
-			for (Iterator i = getChildren().iterator(); i.hasNext();) {
-				XmlNode n = (XmlNode) i.next();
-				s += n.printXml(indent + "  ");
+			for (Iterator<XmlNode> i = getChildren().iterator(); i.hasNext();) {
+				s += i.next().printXml(indent + "  ");
 			}
 			s += indent;
 		} else if (text != null) {
@@ -194,8 +196,8 @@ public class XmlNode {
 	public XmlNode getChild(String nodeName) {
 		// TODO Optimize
 
-		for (Iterator i = getChildren().iterator(); i.hasNext();) {
-			XmlNode child = (XmlNode) i.next();
+		for (Iterator<XmlNode> i = getChildren().iterator(); i.hasNext();) {
+			XmlNode child = i.next() ;
 			if (child.tagName.equals(nodeName)) {
 				return child;
 			}

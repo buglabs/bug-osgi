@@ -46,18 +46,18 @@ public class XpathQuery {
 	public static final int NODE = 2;
 
 	/**
-	 * Convienence method. Calls evaluate with NODE_LIST.
+	 * Convenience method. Calls evaluate with NODE_LIST.
 	 * 
 	 * @param expression
 	 * @param node
 	 * @return
 	 */
-	public static List getNodes(String expression, XmlNode node) {
-		return (List) evaluate(expression, node, NODE_LIST);
+	public static List<XmlNode> getNodes(String expression, XmlNode node) {
+		return (List<XmlNode>) evaluate(expression, node, NODE_LIST);
 	}
 
 	/**
-	 * Convienence method. Calls evaluate with NODE.
+	 * Convenience method. Calls evaluate with NODE.
 	 * 
 	 * @param expression
 	 * @param node
@@ -77,11 +77,11 @@ public class XpathQuery {
 	 * @return
 	 */
 	public static Object evaluate(String expression, XmlNode element, int returnType) {
-		List elems;
+		List<XmlNode> elems;
 
 		switch (returnType) {
 		case NODE:
-			elems = new ArrayList();
+			elems = new ArrayList<XmlNode>();
 			findElements(element, StringUtil.split(expression, "/"), 1, elems, true);
 
 			if (elems.size() > 1) {
@@ -94,7 +94,7 @@ public class XpathQuery {
 
 			return null;
 		case NODE_LIST:
-			elems = new ArrayList();
+			elems = new ArrayList<XmlNode>();
 
 			if (expression.startsWith("//")) {
 				findAllElements(element, StringUtil.split(expression, "/"), 2, elems);
@@ -120,12 +120,12 @@ public class XpathQuery {
 	 * @param firstOnly
 	 *            If true, return first match only, else search entire tree.
 	 */
-	private static void findElements(XmlNode node, String[] xpath, int xpathIndex, List matches, boolean firstOnly) {
+	private static void findElements(XmlNode node, String[] xpath, int xpathIndex, List<XmlNode> matches, boolean firstOnly) {
 		if (nodeMatch(node, xpath[xpathIndex])) {
 			if (xpathIndex + 1 == xpath.length) {
 				matches.add(node);
 			} else {
-				for (Iterator i = node.getChildren().iterator(); i.hasNext() && (!searchComplete(firstOnly, matches));) {
+				for (Iterator<XmlNode> i = node.getChildren().iterator(); i.hasNext() && (!searchComplete(firstOnly, matches));) {
 					XmlNode child = (XmlNode) i.next();
 					findElements(child, xpath, xpathIndex + 1, matches, firstOnly);
 				}
@@ -141,14 +141,14 @@ public class XpathQuery {
 	 * @param xpathIndex
 	 * @param matches
 	 */
-	private static void findAllElements(XmlNode node, String[] xpath, int xpathIndex, List matches) {
+	private static void findAllElements(XmlNode node, String[] xpath, int xpathIndex, List<XmlNode> matches) {
 		// First see if this node matches, if so add it to the list.
 		if (deepNodeMatch(node, xpath[xpathIndex])) {
 			matches.add(node);
 		}
 
 		// Second iterate through the children.
-		for (Iterator i = node.getChildren().iterator(); i.hasNext();) {
+		for (Iterator<XmlNode> i = node.getChildren().iterator(); i.hasNext();) {
 			XmlNode child = (XmlNode) i.next();
 			findAllElements(child, xpath, xpathIndex, matches);
 		}
@@ -162,7 +162,7 @@ public class XpathQuery {
 	 * @param matches
 	 * @return
 	 */
-	private static boolean searchComplete(boolean firstOnly, List matches) {
+	private static boolean searchComplete(boolean firstOnly, List<XmlNode> matches) {
 		if (!firstOnly) {
 			return false;
 		}
@@ -237,7 +237,7 @@ public class XpathQuery {
 	 */
 	private static boolean deepNodeMatch(XmlNode node, String exprStr) {
 
-		List l = new ArrayList();
+		List<XmlNode> l = new ArrayList<XmlNode>();
 
 		findElements(node, StringUtil.split(exprStr, "/"), 0, l, true);
 
