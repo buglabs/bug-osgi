@@ -27,6 +27,10 @@
  *******************************************************************************/
 package com.buglabs.util;
 
+/**
+ * @deprecated StreamMultiplexer is no longer used.
+ *
+ */
 public interface IStreamMultiplexerListener {
 	/**
 	 * Called when the size of opened inputstreams has changed.
