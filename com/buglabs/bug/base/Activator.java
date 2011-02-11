@@ -115,8 +115,8 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	 */
 	private void registerServices(BundleContext context) {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
-		userBepReg = context.registerService(IButtonEventProvider.class.getName(), userbep, null);
-		powerBepReg = context.registerService(IButtonEventProvider.class.getName(), powerbep, null);
+		userBepReg = context.registerService(IButtonEventProvider.class.getName(), userbep, getUserButtonProperties());
+		powerBepReg = context.registerService(IButtonEventProvider.class.getName(), powerbep, getPowerButtonProperties());
 		
 		if (bbc != null) {
 			baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
@@ -137,11 +137,25 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		*/
 	}
 
+	private Dictionary<String, String> getPowerButtonProperties() {
+		Dictionary<String, String> d = new Hashtable<String, String>();
+		d.put("Provider", this.getClass().getName());
+		d.put("Button", "Power");
+		return d;
+	}
+
+	private Dictionary<String, String> getUserButtonProperties() {
+		Dictionary<String, String> d = new Hashtable<String, String>();
+		d.put("Provider", this.getClass().getName());
+		d.put("Button", "User");
+		return d;
+	}
+
 	/**
 	 * @return A dictionary with properties for base control
 	 */
-	private Dictionary getBaseControlServiceProperties() {
-		Dictionary d = new Hashtable();
+	private Dictionary<String, String> getBaseControlServiceProperties() {
+		Dictionary<String, String> d = new Hashtable<String, String>();
 
 		d.put(BUG_BASE_VERSION_KEY, getBaseVersion());
 
