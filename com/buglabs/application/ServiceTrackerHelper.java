@@ -242,6 +242,24 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 
 		return st;
 	}
+	
+	/**
+	 * Convenience method for creating and opening a
+	 * ServiceTracker.
+	 * 
+	 * @param context
+	 * @param services
+	 * @param customizer
+	 * @return
+	 * @throws InvalidSyntaxException
+	 */
+	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, ServiceTrackerCustomizer customizer) throws InvalidSyntaxException {
+		ServiceTracker st = new ClosingServiceTracker(context, ServiceFilterGenerator.generateServiceFilter(context, services), customizer, services);
+		st.open();
+
+		return st;
+	}
+
 
 	/**
 	 * @param context
