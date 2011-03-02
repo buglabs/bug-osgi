@@ -415,4 +415,22 @@ public class XmlParser {
 	public void setIgnoreNamespaces(boolean ignoreNamespaces) {
 		this.ignoreNamespaces = ignoreNamespaces;
 	}
+	
+	public static void main(String[] args) throws IOException {
+		XmlNode xn = parse("<error>org.osgi.framework.InvalidSyntaxException: Null or empty filter." + 
+			"at org.apache.felix.framework.FilterImpl.<init>(FilterImpl.java:48)" + 
+			"at org.apache.felix.framework.BundleContextImpl.createFilter(BundleContextImpl.java:101)" + 
+			"at org.apache.felix.cm.impl.ConfigurationManager.listConfigurations(ConfigurationManager.java:503)" + 
+			"at org.apache.felix.cm.impl.ConfigurationAdminImpl.listConfigurations(ConfigurationAdminImpl.java:124)" + 
+			"at com.buglabs.bug.program.ConfigAdminServlet.getConfigurationXml(ConfigAdminServlet.java:161)" + 
+			"at com.buglabs.bug.program.ConfigAdminServlet.doGet(ConfigAdminServlet.java:70)" + 
+			"at javax.servlet.http.HttpServlet.service(HttpServlet.java:686)" + 
+			"at javax.servlet.http.HttpServlet.service(HttpServlet.java:788)" + 
+			"at com.buglabs.osgi.http.HttpServer.processRequest(HttpServer.java:433)" + 
+			"at com.buglabs.osgi.http.HttpServer.process(HttpServer.java:254)" + 
+			"at com.buglabs.osgi.http.HttpServer.run(HttpServer.java:94)" + 
+			"</error>");
+	System.out.println(xn.toString());
+		
+	}
 }
