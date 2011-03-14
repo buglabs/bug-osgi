@@ -5,7 +5,7 @@
 	<property name="meta.distDirectory" location="${checkout.dir}/${meta.project}/dist" />
 	<property name="distDirectory" location="${meta.distDirectory}" />
 	<property name="eclipse.default.file" value="${eclipse.dir}/eclipse-lin.tar.gz" />
-	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
+	<property name="eclipse.dir" value="/opt/jenkins/build-deps/com.eclipse.sdk" />
 	<property name="apache.mirror.url" value="http://www.ibiblio.org/pub/mirrors/apache" />
 
 	<!-- ===================================================================== -->

@@ -4,7 +4,7 @@
 
 	<property name="project.feature" value="com.buglabs.dragonfly.feature" />
 	<property name="meta.project" value="com.buglabs.dragonfly" />
-	<property name="eclipse.dir" value="${user.home}/com.eclipse.sdk" />
+	<property name="eclipse.dir" value="/opt/jenkins/build-deps/com.eclipse.sdk" />
 	<property name="eclipse.default.file" value="${eclipse.dir}/eclipse-lin.tar.gz" />
 	<property name="felix.download.url" value="http://www.eng.lsu.edu/mirrors/apache/felix/" />
 
