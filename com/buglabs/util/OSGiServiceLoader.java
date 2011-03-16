@@ -23,10 +23,10 @@ public class OSGiServiceLoader {
 	
 	/**
 	 * Load services from the OSGi service registry.  Refer to BundleContext.getServiceReferences() for more information.
-	 * @param context
-	 * @param clazz
-	 * @param filter
-	 * @param loader
+	 * @param context BundleContext
+	 * @param clazz Name of class that IServiceLoader should be applied to
+	 * @param filter Further filter on services returned, NULL legal for no filter.
+	 * @param loader Function to be applied to each service reference.
 	 * @throws Exception 
 	 */
 	public static void loadServices(BundleContext context, String clazz, String filter, IServiceLoader loader) throws Exception {
