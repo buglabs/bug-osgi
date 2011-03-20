@@ -18,8 +18,8 @@
 	<property name="javacVerbose" value="true" />
 	<property name="logExtension" value=".log" />
 	<property name="compilerArg" value="" />
-	<property name="javacSource" value="1.3" />
-	<property name="javacTarget" value="1.2" />
+	<property name="javacSource" value="1.6" />
+	<property name="javacTarget" value="1.6" />
 	<path id="path_bootclasspath">
 		<fileset dir="${java.home}/lib">
 			<include name="*.jar" />
@@ -50,10 +50,14 @@
           target: build.jars              
          ================================= -->
 	<target name="build.jars" depends="build, document" description="make the jar">
-		<jar destfile="${distDirectory}/${project}.jar" 
-			 basedir="${buildDirectory}" 
-		     manifest="META-INF/MANIFEST.MF"
-			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project"/>
+		<jar destfile="${distDirectory}/${project}.jar"  manifest="META-INF/MANIFEST.MF">
+			<fileset 
+			 	dir="${buildDirectory}" 
+			 	excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project"/>
+			<fileset 
+				dir="." 
+			 	includes="**/*.java"/>						
+		</jar>
 	</target>
 
 	<target name="doc.build.jars" description="javadoc and make the jar">
