@@ -20,7 +20,7 @@
 			<tstamp />
 			<property name="timestamp" value="${DSTAMP}${TSTAMP}" />
 			<property name="build.id" value="3.0.${timestamp}" />
-			<property name="bundle.version" value="2.0.${DSTAMP}" />
+			<property name="bundle.version" value="${emulator.bundle.version}.${DSTAMP}" />
 			<property name="project.version" value="${bug.version}${build.id}" />
 			<echo message="[Build type]: Running individual component build version ${bundle.version}..." />
 		</then>
