@@ -50,14 +50,10 @@
           target: build.jars              
          ================================= -->
 	<target name="build.jars" depends="build, document" description="make the jar">
-		<jar destfile="${distDirectory}/${project}.jar"  manifest="META-INF/MANIFEST.MF">
-			<fileset 
-			 	dir="${buildDirectory}" 
-			 	excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project"/>
-			<fileset 
-				dir="." 
-			 	includes="**/*.java"/>						
-		</jar>
+		<jar destfile="${distDirectory}/${project}.jar" 
+			 basedir="${buildDirectory}" 
+		     manifest="META-INF/MANIFEST.MF"
+			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project"/>
 	</target>
 
 	<target name="doc.build.jars" description="javadoc and make the jar">
