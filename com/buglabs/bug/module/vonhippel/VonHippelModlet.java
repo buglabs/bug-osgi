@@ -71,7 +71,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	public static final String MODULE_ID = "0007";
 
 	private static final int SERIAL_WAIT_TO_OPEN_TIME = 4000;  //ms to wait before trying to open the serial port.
-
 	private final String moduleName;
 
 	private VonHippel vhDevice;
@@ -277,7 +276,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	}
 
 	public void setup() throws Exception {
-		int slot = slotId + 1;
+		int slot = slotId;
 		String devnode_vh = "/dev/bmi_vh_control_m" + slot;
 		vhDevice = new VonHippel();
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
