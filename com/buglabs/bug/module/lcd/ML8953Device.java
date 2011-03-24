@@ -17,7 +17,7 @@ public class ML8953Device extends SysfsNode {
 	 * Device entries: driver uevent input subsystem name modalias power
 	 * position disable
 	 */
-	private static final String ML8953_ROOT = "/sys/devices/platform/i2c_omap.3/i2c-adapter/i2c-3/3-0070/i2c-adapter/i2c-5/5-0017/";
+	private static final String ML8953_ROOT = "/sys/devices/platform/i2c_omap.3/i2c-3/3-0070/i2c-5/5-0017/";
 	private static ML8953Device instance;
 	private final int slot;
 
