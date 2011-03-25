@@ -27,11 +27,6 @@
  *******************************************************************************/
 package com.buglabs.bug.module.vonhippel;
 
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.RXTXPort;
-import gnu.io.SerialPort;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +84,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private final BMIModuleProperties properties;
 
-	private RXTXPort serialPort;
 
 	private String devNode;
 
@@ -118,7 +112,6 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
-		vhSerialRef = context.registerService(RXTXPort.class.getName(),serialPort , createBasicServiceProperties());
 		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
 		VonHippelWS vhWS = new VonHippelWS(vhc);
 		wsRef = context.registerService(PublicWSProvider.class.getName(), vhWS, null);
@@ -141,13 +134,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 			vhModuleRef.unregister();
 		}
 		
-		if (vhSerialRef != null) {
-			vhSerialRef.unregister();
-		}
-		// close/unlock /dev/ttyBMI#
-		if (serialPort != null){
-			serialPort.close();
-		}
+	
 		//close /dev/bmi_vh_ctl_m#
 		if (vhDevice != null ){
 			vhDevice.close();
@@ -185,8 +172,8 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		}
 	}
 
-	public List getModuleProperties() {
-		List mprops = new ArrayList();
+	public List<ModuleProperty> getModuleProperties() {
+		List<ModuleProperty> mprops = new ArrayList<ModuleProperty>();
 
 		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
 		mprops.add(new ModuleProperty("Slot", "" + slotId));
@@ -284,23 +271,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		
         
         
-		try{
-		//this may have to eventually change if we want to use other names (which i think is a good idea)
-		this.devNode = "/dev/ttyBMI" + slotId;
-		
-		// initialize the serial port
-		CommPortIdentifier portIdentifier = CommPortIdentifier
-				.getPortIdentifier(devNode);
-		CommPort commPort = portIdentifier
-				.open(this.getClass().getName(), SERIAL_WAIT_TO_OPEN_TIME);
-		serialPort = (RXTXPort) commPort;
-		serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8,
-				SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-
+	
 	}
 
 }
