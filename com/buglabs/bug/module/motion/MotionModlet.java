@@ -323,7 +323,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 
 
 	public void setup() throws Exception {
-		int slot = slotId + 1;
+		int slot = slotId;
 		String devnode_motion = "/dev/bmi_mdacc_mot_m" + slot;
 		String devnode_acc = "/dev/bmi_mdacc_acc_m" + slot;
 		String devnode_mdacc_control = "/dev/bmi_mdacc_ctl_m" + slot;
