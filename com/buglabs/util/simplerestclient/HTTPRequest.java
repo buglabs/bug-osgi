@@ -165,6 +165,20 @@ public class HTTPRequest {
 		headers.put("Content-Type", "application/x-www-form-urlencoded");
 		return post(url, data, headers);
 	}
+	
+	/**
+	 * Posts a Map of key, value pair properties, like a web form
+	 * 
+	 * @param url
+	 * @param properties
+	 * @return
+	 * @throws IOException
+	 */
+	public HTTPResponse post(String url, Map properties, Map headers) throws IOException {
+		String data = propertyString(properties);		
+		headers.put("Content-Type", "application/x-www-form-urlencoded");
+		return post(url, data, headers);
+	}
 
 	/**
 	 * Post byte data to a url
