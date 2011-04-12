@@ -30,8 +30,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -54,6 +56,18 @@ import com.buglabs.util.Base64;
  * 
  */
 public class HTTPRequest {
+	
+	/**
+	 * Implementors can configure the http connection before every call is made.
+	 * Useful for setting headers that always need to be present in every WS call to a given server.
+	 * 
+	 * @author kgilmer
+	 *
+	 */
+	public interface HTTPConnectionInitializer {
+		public void initialize(HttpURLConnection connection);
+	}
+	
 	////////////////////////////////////////////////  HTTP REQUEST METHODS	
 	
 	private static final String HEADER_TYPE  = "Content-Type";
@@ -63,6 +77,8 @@ public class HTTPRequest {
     private static final String BOUNDARY     = "boundary=";
     private static final String PARA_NAME    = "name";
     private static final String FILE_NAME    = "filename";
+    
+    private List<HTTPConnectionInitializer> configurators;
 	
 	private IConnectionProvider _connectionProvider;
 	
@@ -88,10 +104,27 @@ public class HTTPRequest {
      * @return      HttpURLConnection ready with response data
      */
 	public HTTPResponse get(String url) throws IOException {
-		HttpURLConnection conn = _connectionProvider.getConnection(url);
+		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setDoInput(true);
 		conn.setDoOutput(false);
 		return connect(conn);
+	}
+	
+	/**
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
+	private HttpURLConnection getAndConfigureConnection(String url) throws IOException {
+		HttpURLConnection connection = _connectionProvider.getConnection(url);
+		
+		if (configurators == null)
+			return connection;
+		
+		for (HTTPConnectionInitializer c: configurators)
+			c.initialize(connection);
+		
+		return connection;
 	}
 	
 	/**
@@ -101,7 +134,7 @@ public class HTTPRequest {
      * @return      HttpURLConnection ready with response data
      */
 	public HTTPResponse get(String url, Map<String, String> headers) throws IOException {
-		HttpURLConnection conn = _connectionProvider.getConnection(url);
+		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setDoInput(true);
 		conn.setDoOutput(false);
 		for (Entry<String, String> e: headers.entrySet()) {
@@ -132,7 +165,7 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse post(String url, String data, Map<String, String> headers) throws IOException {
-		HttpURLConnection conn = _connectionProvider.getConnection(url);
+		HttpURLConnection conn = getAndConfigureConnection(url);
 		
 		if (headers != null) 
 			for (Entry<String, String> e: headers.entrySet())
@@ -199,7 +232,7 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse post(String url, byte[] data) throws IOException {
-		HttpURLConnection conn = _connectionProvider.getConnection(url);
+		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setRequestProperty("Content-Length", String.valueOf(data.length));
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
@@ -219,7 +252,7 @@ public class HTTPRequest {
 	 * @return
 	 */
 	public HTTPResponse postMultipart(String url, Map<String, String> parameters) throws IOException {
-		HttpURLConnection conn = _connectionProvider.getConnection(url);
+		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setRequestMethod("POST");
 		String boundary = createMultipartBoundary();
 		conn.setRequestProperty(HEADER_TYPE, CONTENT_TYPE +"; "+ BOUNDARY + boundary);
@@ -286,7 +319,7 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse put(String url, String data, Map<String, String> headers) throws IOException{
-		HttpURLConnection connection = _connectionProvider.getConnection(url);
+		HttpURLConnection connection = getAndConfigureConnection(url);
 		
 		if (headers != null) 
 			for (Entry<String, String> e: headers.entrySet())
@@ -322,7 +355,7 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse delete(String url) throws IOException {
-		HttpURLConnection connection = _connectionProvider.getConnection(url);
+		HttpURLConnection connection = getAndConfigureConnection(url);
 		connection.setDoInput(true);
 		connection.setRequestMethod("DELETE");
 		return connect(connection);
@@ -364,7 +397,7 @@ public class HTTPRequest {
      * @return          HttpURLConnection ready with response data
      */ 
 	public HTTPResponse head(String url) throws IOException {
-		HttpURLConnection connection = _connectionProvider.getConnection(url);
+		HttpURLConnection connection = getAndConfigureConnection(url);
 		connection.setDoOutput(true);
 		connection.setRequestMethod("HEAD");
 		return connect(connection);
@@ -440,6 +473,32 @@ public class HTTPRequest {
         	}
         }
         return buf.toString();
+	}
+	
+	/**
+	 * Add a initializer that will be called for each http operation before the call is made.
+	 * @param c
+	 */
+	public void addConfigurator(HTTPConnectionInitializer c) {
+		if (configurators == null)
+			configurators = new ArrayList<HTTPRequest.HTTPConnectionInitializer>();
+		
+		if (!configurators.contains(c))
+			configurators.add(c);
+	}
+	
+	/**
+	 * Remove a initializer.
+	 * @param c
+	 */
+	public void removeConfigurator(HTTPConnectionInitializer c) {
+		if (configurators == null)
+			return;
+		
+		configurators.remove(c);
+		
+		if (configurators.size() == 0)
+			configurators = null;
 	}
 	
 }
