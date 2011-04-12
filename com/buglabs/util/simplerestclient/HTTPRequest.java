@@ -341,7 +341,21 @@ public class HTTPRequest {
 		HashMap<String, String> headers = new HashMap<String, String>(); 
 		headers.put("Content-Type", "application/x-www-form-urlencoded");
 		return put(url, data, headers);
-	}	
+	}
+	
+	/**
+	 * Puts a Map of key, value pair properties, like a web form
+	 * 
+	 * @param url
+	 * @param properties
+	 * @return
+	 * @throws IOException
+	 */
+	public HTTPResponse put(String url, Map<String, String> properties, Map<String, String> headers) throws IOException {
+		String data = propertyString(properties);	 
+		headers.put("Content-Type", "application/x-www-form-urlencoded");
+		return put(url, data, headers);
+	}
 
     /**
      * Do an HTTP HEAD to url
