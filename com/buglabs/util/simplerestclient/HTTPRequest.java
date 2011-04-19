@@ -360,6 +360,26 @@ public class HTTPRequest {
 		connection.setRequestMethod("DELETE");
 		return connect(connection);
 	}	
+	
+	/**
+	 * Do an HTTP DELETE to url
+	 * 
+	 * @param url
+	 * @param headers
+	 * @return
+	 * @throws IOException
+	 */
+	public HTTPResponse delete(String url, Map<String, String> headers) throws IOException {
+		HttpURLConnection connection = getAndConfigureConnection(url);
+		
+		if (headers != null) 
+			for (Entry<String, String> e: headers.entrySet())
+				connection.setRequestProperty(e.getKey(), e.getValue());
+		
+		connection.setDoInput(true);
+		connection.setRequestMethod("DELETE");
+		return connect(connection);
+	}
 
 	/**
 	 * Puts a Map of key, value pair properties, like a web form
@@ -499,6 +519,5 @@ public class HTTPRequest {
 		
 		if (configurators.size() == 0)
 			configurators = null;
-	}
-	
+	}	
 }

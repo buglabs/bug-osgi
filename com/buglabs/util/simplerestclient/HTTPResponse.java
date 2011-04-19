@@ -147,11 +147,13 @@ public class HTTPResponse {
 	 * @return
 	 */
 	public int getResponseCode() {
-		String statusStr = _connection.getHeaderField("Status");
-		int status = 0;
-		if (statusStr != null)
-			status = Integer.parseInt(statusStr.substring(0, 3));
-		return status;
+		try {
+			return _connection.getResponseCode();
+		} catch (IOException e) {
+			//Not sure what to do here with this exception.
+			e.printStackTrace();
+		}
+		return -1;		
 	}
 
 	/**
