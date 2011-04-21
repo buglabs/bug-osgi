@@ -72,6 +72,7 @@
 	<target name="test" depends="build">
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
+			<formatter type="plain"/>
 			<batchtest todir="${report.dir}">
 				<fileset dir="${report.src}">
 					<include name="**/*Test*.java" />
