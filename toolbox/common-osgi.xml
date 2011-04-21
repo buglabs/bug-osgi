@@ -70,6 +70,7 @@
 	</target>
 
 	<target name="test" depends="build">
+		<mkdir dir="${report.dir}" />
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
 			<formatter type="plain"/>
