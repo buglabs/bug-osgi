@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="/home/jconnolly/Desktop/com.buglabs.bug.base.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/com.buglabs.bug.base.molly/makebundle.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/com.buglabs.bug.base.molly/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <file path="/com.buglabs.bug.base.molly/makebundle.jardesc"/>
+        <javaElement handleIdentifier="=com.buglabs.bug.base.molly/&lt;com.buglabs.bug.base"/>
+        <file path="/com.buglabs.bug.base.molly/build.xml"/>
+        <file path="/com.buglabs.bug.base.molly/.classpath"/>
+        <javaElement handleIdentifier="=com.buglabs.bug.base.molly/&lt;com.buglabs.bug.sysfs"/>
+        <folder path="/com.buglabs.bug.base.molly/META-INF"/>
+        <javaElement handleIdentifier="=com.buglabs.bug.base.molly/&lt;com.buglabs.bug.base.pub"/>
+        <file path="/com.buglabs.bug.base.molly/.project"/>
+    </selectedElements>
+</jardesc>
