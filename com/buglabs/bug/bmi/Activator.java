@@ -51,6 +51,7 @@ import com.buglabs.bug.bmi.pub.Manager;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.util.LogServiceUtil;
 
 public class Activator implements BundleActivator, ServiceListener {
 	private static final String DEFAULT_PIPE_FILENAME = "/tmp/eventpipe";
@@ -80,13 +81,9 @@ public class Activator implements BundleActivator, ServiceListener {
 
 		modletFactories = new Hashtable();
 		activeModlets = new Hashtable();
-		ServiceReference sr = context.getServiceReference(LogService.class.getName());
-		if (sr != null) {
-			logService = (LogService) context.getService(sr);
-		}
-
+		logService = LogServiceUtil.getLogService(context);
+		
 		context.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
-
 		registerExistingServices(context);
 
 		pipeFilename = context.getProperty("com.buglabs.pipename");
