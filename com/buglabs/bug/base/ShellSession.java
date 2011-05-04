@@ -15,6 +15,7 @@ import com.buglabs.util.StringUtil;
 /**
  * Default implementation of ShellSession.
  * 
+ * @deprecated This has moved to com.buglabs.util.shell.
  * @author kgilmer
  */
 public class ShellSession implements IShellSession {

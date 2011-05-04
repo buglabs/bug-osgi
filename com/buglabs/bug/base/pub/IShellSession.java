@@ -7,6 +7,7 @@ import java.io.IOException;
  * This is a shell session that's accessible from Java.  An instance of this service
  * represents a separate shell process running concurrently with the Java program.
  * 
+ * @deprecated This has moved to com.buglabs.util.shell.
  * @author kgilmer
  *
  */

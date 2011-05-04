@@ -11,6 +11,7 @@ import com.buglabs.bug.base.pub.IShellSession;
 /**
  * Default implementation of IShellService.
  * 
+ * @deprecated This has moved to com.buglabs.util.shell.
  * @author kgilmer
  */
 public class ShellService implements IShellService {

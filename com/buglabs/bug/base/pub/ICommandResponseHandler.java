@@ -5,6 +5,7 @@ package com.buglabs.bug.base.pub;
  * A callback interface for handling output resulting from command execution
  * in a shell session.
  * 
+ * @deprecated This has moved to com.buglabs.util.shell.
  * @author kgilmer
  */
 public interface ICommandResponseHandler {

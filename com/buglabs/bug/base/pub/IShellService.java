@@ -7,6 +7,7 @@ import java.io.Writer;
 /**
  * This service is accessed by clients to create a IShellSession service.
  * 
+ * @deprecated This has moved to com.buglabs.util.shell.
  * @author kgilmer
  */
 public interface IShellService {
