@@ -7,4 +7,5 @@ Bundle-Activator: com.buglabs.util.shell.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.osgi.framework;version="1.3.0"
-Export-Package: com.buglabs.util.shell.pub
+Export-Package: 
+ com.buglabs.util.shell.pub
