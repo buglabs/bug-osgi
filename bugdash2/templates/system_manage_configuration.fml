@@ -1,0 +1,54 @@
+<include "header">
+<h1>Manage configuration</h1>
+<script type="text/javascript">
+	var config_manager; 
+	$(function() {
+		config_manager = new BL.BUGdash.ConfigurationManager(); 
+		config_manager.init();
+		<if created != "" >
+			config_manager.announcer.tell({category: 'info', message: 'Saved configuration ${created}', animate: true}, true);
+		</if>		
+	}); 
+</script>
+<style>
+	td.pid {width: 300px; font-weight:bold}
+	td.prop {padding-left: 20px; width: 280px; }
+	.input_prop_value {width: 250px;}
+	table.config_detail {background:#dbdbdb;}
+	table.config_detail tr td:first-child { padding-left: 20px; }
+	table.config_detail tr:first-child td { padding-top: 20px; }
+	table.config_detail tr:last-child td { padding-bottom: 20px; }
+	table.config_detail tr.header td {font-weight:bold; color:#666; }
+	table.config_detail tr td span.label {color:#666;}
+</style>
+<div class="main">
+	<form action="" method="post">
+		<input type="hidden" name="task" value="create" />
+		New configuration: <input type="text" name="txt_config_pid" /> <input type="submit" name="btn_submit" value="Submit" class="submit-small" />
+		<br /><br />
+	</form>
+	<form action="" method="post" id="frm_delete" name="frm_delete">
+		<input type="hidden" name="task" value="delete" />
+		<input type="hidden" name="txt_remove_pid" id="txt_remove_pid" value="" />
+	</form>
+	<table>
+		<tbody>
+		<foreach config in config_list>
+				<tr id="config_${config.pid_cleaned}">
+					<td class="pid">${config.pid}</td>
+					<td style="width:190px;">
+						<a class="show" href="javascript:void(0);" onclick="config_manager.display_properties('${config.pid}')">Show detail</a>
+						<a class="hide" href="javascript:void(0);" onclick="config_manager.hide_properties('${config.pid}');" style="display:none;">Hide detail</a>
+					</td>
+					<td><a href="javascript:void(0);" onclick="config_manager.delete_config('${config.pid}');">Delete</a></td>
+				</tr>
+				<tr id="config_${config.pid_cleaned}_properties">
+					<td colspan="3">
+						<!-- properties go here -->
+					</td>
+				</tr>
+			</foreach>
+		</tbody>
+	</table>
+</div>
+<include "footer">

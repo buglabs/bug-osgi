@@ -1,0 +1,65 @@
+<include "header">
+<h1>File Browser</h1>
+
+<script type="text/javascript">
+	//function setFile()
+	//{
+		//var filepath = document.getElementById("current").innerHTML;
+		//filepath = filepath.replace("<h2>", "");
+		//filepath = filepath.replace("</h2>", "");
+		//document.getElementById("buttons").value = filepath;
+	//}
+	
+	function upOneLevel()
+	{
+			var answer = confirm("Do you really want to remove this directory?");
+			if(answer)
+			{
+				buttons.submit();
+				this.nav.window.location = "/admin_system/navigator?-1";
+			}
+			else
+			{
+				
+			}
+	}
+</script>
+<style>
+	table td {padding:0px;}
+	div#current {width: 900px; background-color:#fff; }
+	div#current h2 { margin: 3px 8px;}
+</style>
+<!-- comment out since we have just one user right now 
+	Change User: ${userlist}
+-->
+<div id="current">
+	<h2 id="innerDir">/home/root/</h2>
+</div>
+<table>
+	<tr>
+	<td style="border-right:1px solid #E9E9E9;">
+		<iframe name="nav" src ="/admin_system/navigator" style="width:200px; height: 450px;" ></iframe>
+	</td>
+	<td>
+		<iframe name="view" src ="/admin_system/viewer" style="width:700px; height: 450px;" scrolling="no" ></iframe>
+	</td>
+	</tr>
+	<tr>
+	<form id="buttons" name="nav_buttons" action="" method="post" enctype="multipart/form-data">
+	<td colspan="2" style="padding-top:7px;">
+		<div style="float:right">
+			<input type="file" name="up_file" style="margin: 5px 0px;" /> &nbsp;
+    	<input name="add" type="submit" value="Upload" style="margin-top:7px;" size="30" />
+    </div>
+    <div style="float:left">	
+			<input type="text" name="dir_name"/>
+			<input name="dir" type="submit" value="Create Directory" class="submit-small" /><br />
+			<a href="javascript:void(0);" onclick="upOneLevel();" style="font-size:11px">Remove current directory</a>
+		</div>
+	</td>
+	<input type="text" name="hiddenDir" value="/home/root/" style="display:none" />
+	</form>
+	</tr>
+</table>
+
+<include "footer">

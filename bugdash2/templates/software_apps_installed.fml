@@ -1,0 +1,54 @@
+<include "header">
+<style>
+	body {background-color:#f9f9f9} /* displayed inside a module */
+
+</style>
+<script type="text/javascript">
+$(function() {
+	if (typeof(parent.update_count) == 'function') {
+		parent.update_count('installed',${installed_size}); 
+	}
+
+});
+</script>
+<table class="general">
+	<tbody>
+	<foreach app in installed_list>
+		<if app.icon != "" >
+			<tr <if app.index%2==0 >class="alternate"</if> >
+				<td><a href="javascript:void(0);" onclick="parent.preview_app('${app.name}')" title="${app.name}"><img src="${app.icon}" class="polaroid icon" /></a></td>
+				<td class="title">
+					<div>
+					<a href="javascript:void(0);" onclick="parent.preview_app('${app.name}')">${app.name}</a>
+					<p class="quiet">${app.dependencies}</p>
+					</div>
+				</td>
+				<td class="status"><div class="${app.state}">${app.state}</div></td>
+				<if disable != "true">
+					<td class="menu nowrap"><a href="javascript:void(0);" onclick="parent.manager.uninstall('${app.name}','${app.bundleId}');">Uninstall [x]</a></td>
+					<if app.state == 'Active' >
+						<td class="menu"><a href="javascript:void(0);" onclick="parent.manager.stop('${app.name}','${app.bundleId}');">Stop</a></td>
+					<else>
+						<td class="menu"><a href="javascript:void(0);" onclick="parent.manager.start('${app.name}','${app.bundleId}');">Start</a></td>
+					</if>
+				</if>
+			</tr>
+		<else>
+			<tr <if app.index%2==0 >class="alternate"</if> >
+				<td><img src="/admin.images/not-found-icn.jpg" class="polaroid icon" /></td>
+				<td class="title"><div>${app.name}<div></td>
+				<td class="status"><div class="${app.state}">${app.state}</div></td>
+				<if disable != "true">
+					<td class="menu nowrap"><a href="javascript:void(0);" onclick="parent.manager.uninstall('${app.name}','${app.bundleId}');">Uninstall [x]</a></td>
+					<if app.state == 'Active' >
+						<td class="menu"><a href="javascript:void(0);" onclick="parent.manager.stop('${app.name}','${app.bundleId}');">Stop</a></td>
+					<else>
+						<td class="menu"><a href="javascript:void(0);" onclick="parent.manager.start('${app.name}','${app.bundleId}');">Start</a></td>
+					</if>					
+				</if>
+			</tr>	
+		</if>
+	</foreach>
+	</tbody>
+</table>
+<include "footer">

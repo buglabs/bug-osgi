@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bug-Bundle-Type: Application
+Bundle-Vendor: Bug Labs, Inc.
+Bundle-Version: 2.1.0
+BUG-API-Version: 1.4.4
+Bundle-Name: bugdash
+Bundle-Activator: webadmin.Activator
+Bundle-SymbolicName: bugdash
+Import-Package: com.buglabs.application,com.buglabs.bug.base.pub,com.b
+ uglabs.bug.program.pub,com.buglabs.module,com.buglabs.nmea,com.buglab
+ s.osgi.sewing.pub,com.buglabs.osgi.sewing.pub.util,com.buglabs.osgi.s
+ hell.pub,com.buglabs.util,com.buglabs.util.simplerestclient,freemarke
+ r.template,javax.servlet,javax.servlet.http,org.osgi.framework,org.os
+ gi.service.cm,org.osgi.service.log,org.osgi.util.tracker
+

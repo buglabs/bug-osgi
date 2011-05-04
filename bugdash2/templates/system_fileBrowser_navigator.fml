@@ -1,0 +1,30 @@
+<include "header">
+<script type="text/javascript">
+	function changeHeader(directory)
+	{ 
+		this.parent.document.getElementById("current").innerHTML = "<h2>" + directory + "</h2>"; 
+	}
+	if("${upDirectory}" != "" || "${upDirectory}" != null)
+	{
+		this.parent.document.getElementById("buttons").hiddenDir.value = "${upDirectory}";
+		this.parent.document.getElementById("current").innerHTML = "<h2>${upDirectory}</h2>";
+	}
+</script>
+<style>
+body {background-color:#fefefe;}
+ul { list-style-type:none; margin; 5px; }
+ul li { font-size:12px; white-space:nowrap;}
+ul li a:link, ul li a:visited {color:#333; text-decoration:none;}
+ul li img { vertical-align:middle;}
+</style>
+<ul>
+	<li><a href="navigator?-1" style="color:#999;">[Go up]</a></li>
+	<foreach file in dir_list>
+		<li><img src="/admin.images/folder.png" /> <a href="/admin_system/navigator?${file.path}" target='nav' onClick="changeHeader('${file.path}')">${file.name}</a></li>
+	</foreach>
+	<foreach file in file_list>
+		<li><img src="/admin.images/file.png" /> <a href="/admin_system/viewer?${file.path}" target='view' >${file.name}</a></li>
+	</foreach>	
+</ul>
+
+<include "footer">

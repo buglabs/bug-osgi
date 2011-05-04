@@ -1,0 +1,4 @@
+[<foreach item in properties_list>
+{key: "${item.key}", value: "${item.value}"}
+<if (item.index lt (properties_size-1))>,</if>
+</foreach>]

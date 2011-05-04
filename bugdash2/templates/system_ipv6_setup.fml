@@ -1,0 +1,143 @@
+<include "header">
+<h1>IPv6 Setup</h1>
+
+<script>
+	var submit_status;
+	<if js_submit_status != "" >  
+	submit_status = ${js_submit_status}; 
+	</if>
+	
+	$(function() {
+		if (submit_status != undefined) 
+			parent.announcer.tell(submit_status, true); 
+	});
+</script>
+
+Enabling IPv6 allows your BUG to be accessible on the internet. 
+
+<div class="main">
+<table>
+	<if display_address == "true" >
+		<tr>
+			<td></td>
+			<td>
+				<div style="padding: 10px; background:#fff; border:2px dotted #ccc;">
+					Your BUG is available via <a href="${freenet_url}" target="_blank">${freenet_url}</a> <br /><br />
+					<a href="javascript:void(0);" onclick="$('#div_need_help').toggle();" class="quiet">Need help?</a>
+					<div id="div_need_help" style="display:none; padding: 5px;" class="subtle">
+						If you're not able to access the URL above,
+						<ul>
+							<li>check your account info. gogoNET requires you to verify your account via email.</li>
+							<li>enable gw6c logging to troubleshoot</li>
+						</ul>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</if>
+	<tr>
+		<td>
+			<if account_user != "" && account_pwd != "" > 
+				<img src="/admin.images/checked.png" alt="Ready" /> 
+			<else>
+				<img src="/admin.images/not_checked.png" alt="Not ready" /> 
+			</if>
+		</td>
+		<td>
+			<form name="frm" action="" method="post" >
+				<input type="hidden" name="step" value="save-login" />
+				<span class="title">Set up an account with <a href="http://gogonet.gogo6.com/" target="_blank">gogoNET Freenet6</a>.</span><br /> 
+				Provide us with your username and password you registered with. <br /><br />
+				Username: <input type="text" name="inp_username" value="${account_user}" style="width:120px" /> &nbsp;&nbsp; 
+				Password: <input type="password" name="inp_password" value="${account_pwd}" style="width:120px" autocomplete="off" />
+				<input type="submit" name="btn_save_account" value="Save" class="submit-small" />
+			</form> 
+		</td>
+	<tr>
+	<tr>
+		<td>
+			<img id="img_internet_conn" src="/admin.images/not_checked.png" />  
+		</td>
+		<td>
+			<span class="title">Check internet connection.</span><br />
+			<span id="span_internet_conn"></span>
+		</td>
+	</tr>	
+	<tr>
+		<td>
+			<if client_location != ""> 
+				<img src="/admin.images/checked.png" alt="Ready" />  
+			<else>
+				<img src="/admin.images/not_checked.png" alt="Not ready" /> 
+			</if>
+		</td>
+		<td>
+			<form name="frm" action="" method="post">
+				<input type="hidden" name="step" value="install" />
+				<span class="title">Install Gateway6 client (gw6c).</span><br />
+				<if client_location == ""> 
+					<input type="submit" name="btn_install" value="Install" class="submit-small" />
+				</if>
+				<!-- 
+				<if match_config == "true" >
+					<br /><span class="quiet">Configured</span>
+				<else>
+					<br /><span class="quiet">May need configuration</span>
+				</if>
+				-->
+			</form>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<if client_running == "true">
+				<img src="/admin.images/checked.png" alt="Ready" />  
+			<else>
+				<img src="/admin.images/not_checked.png" alt="Not ready" /> 
+			</if>
+		</td>
+		<td>
+			<form name="frm" action="" method="post">
+				<input type="hidden" name="step" value="run" />
+				<span class="title">Run the client.</span><br />
+				<if client_running == "false">
+					Not running &nbsp;&nbsp; <input type="submit" name="btn_run" value="Run" class="submit-small" />
+				<else>
+					Running &nbsp;&nbsp; <input type="submit" name="btn_run" value="Stop" class="submit-small" />
+				</if>
+			</form>
+		</td>
+
+	</tr>
+</table>
+
+	<div class="quiet" style="width:650px; padding-top:20px;">
+		This check list uses <a href="http://gogonet.gogo6.com/" target="_blank" class="quiet">gogoNET</a> as a tunnel provider. 
+		Feel free to use other providers if you feel comfortable configuring it yourself.  
+	</div>
+</div>
+<style>
+	table tr td {padding: 5px 15px 20px 5px;}
+	span.title {font-weight:bold; line-height:25px;}
+</style>
+<script>
+	function checkInternetConnForNav() {
+		var MSG_CONNECTED = 'Good. You\'re connected.';
+		var MSG_NOT_CONNECTED = 'There\'s no network connectivity.';	
+		BL.BUGdash.Utilities.checkConnectivity(
+			function(text) {
+					var status = eval('('+text+')'); 
+					$('#img_internet_conn').attr('src','/admin.images/checked.png');	
+					$('#span_internet_conn').html( (status && status.connected) ? MSG_CONNECTED : MSG_NOT_CONNECTED );				
+			},
+			function() {
+				$('#img_internet_conn').attr('src','/admin.images/not_checked.png');
+				$('#span_internet_conn').html(MSG_NOT_CONNECTED);
+			}
+		);
+	}
+	$(document).ready(function() {
+		checkInternetConnForNav();
+	});
+</script>
+<include "footer">

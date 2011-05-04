@@ -1,0 +1,84 @@
+<include "header">
+<h1>Update date and time</h1>
+
+<if error != "">${error}</if>
+
+<script type="text/javascript">
+	function use_computer_time() {
+		var now = new Date(); 
+		var new_date = 	two_digits(String(now.getMonth()+1)) + '-' + two_digits(String(now.getDate())) + '-' + now.getFullYear() + ' ' + two_digits(String(now.getHours())) + ':' + two_digits(String(now.getMinutes()));  
+		$('#inp_datetime').attr('value',new_date);
+	}
+	function two_digits(input) {
+		return (input.length == 1) ? '0'+input : input; 
+	}
+	var submit_status;
+	<if js_submit_status != "" >  
+		submit_status = ${js_submit_status}; 
+	</if>	
+	
+	$(function() {
+		if (submit_status != undefined) 
+			parent.announcer.tell(submit_status, true); 
+	});
+	var rebooter = new BL.BUGdash.Rebooter();
+</script>
+<style>
+div.message { background-color:#fff; padding: 15px 10px 20px 20px; width: 400px; }
+</style>
+
+<div class="main">
+	<form name="frm_date" method="post" action="">
+	
+	<if ipkg_installed == "false"> 
+		<div id="div_install" class="message">
+			<p>An ipkg <code class="hilite">tzdata</code> is required to set your timezone. <br /><br /></p>
+			<p>
+				<label ><input type="checkbox" value="yes" name="chb_install_tzdata" id="chb_install_tzdata" /> Yes, install the ipkg <span class="quiet">(requires internet connection)</span></label>&nbsp;&nbsp; 
+			</p>
+			<p style="padding:10px 0px 0px 25px;">
+				<input type="submit" name="btn_install" value="Install" class="submit-small" />
+			</p>
+		</div>
+		<br /><br />
+	</if> 	
+	<if time_set == "true">
+		<div class="message">
+			<p>You may have to <a href="javascript:void(0);" onclick="rebooter.reboot();">reboot</a> to have the change in effect.</p>
+			<div id="div_status_message"><h3></h3></div>				
+		</div>
+		<br /><br />
+	</if>
+
+	<table class="form">
+		<if ipkg_installed == "true">
+			<tr>
+				<td>Timezone</td>
+				<td>
+					<select name="ddl_timezone">
+						<foreach tz in zone_list>
+							<option value="${tz.value}" <if tz.selected == "selected" >selected="selected"</if> >${tz.name}</option>
+						</foreach>
+					</select>
+				</td>
+			</tr>
+		</if>
+		<tr>
+			<td>Date</td>
+			<td>
+				<input type="text" name="inp_datetime" id="inp_datetime" value="${current_datetime}" class="text" />&nbsp;
+				<span class="quiet">MM-dd-yyyy hh:mm</span>			
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><a href="javascript:void(0);" onclick="use_computer_time();" class="secondary">Use my computer's time</a><br /><br /></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><input type="submit" name="btn_submit" value="Save" class="submit" /></td>
+		</tr>
+		</table>
+	</form>
+</div>
+<include "footer">

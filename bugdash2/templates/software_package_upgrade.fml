@@ -1,0 +1,43 @@
+<include "header">
+<h1>Upgrade packages &nbsp; <a href="check_new_updates" style="font-size:14px; font-weight:normal;" class="secondary">Check what's new</a></h1>
+<script type="text/javascript">
+	var upgrader;
+	$(function() {
+		upgrader = new BL.BUGdash.PackageUpgrader();
+	});
+</script>
+<style>
+	table#announcement {margin:10px 0px 30px 0px;}
+	table#announcement tr td {background-color:#FCFFE0; padding: 10px 20px; vertical-align:middle;}
+	table#announcement tr td:last-child {padding-left:0px; padding-top:0px;}
+</style>
+
+<div class="main">
+	<!-- <div>${error}</div> -->
+	
+	<table id="announcement">
+		<tr class="content">
+			<td><img src="/admin.images/clock.jpg" style="width:58px;height:58px" /></td>
+			<td class="text">This process may take a few minutes.</td>
+		</tr>
+		<tr class="content">
+			<td><img src="/admin.images/plug.jpg" style="width:54px;height:54px" /></td>
+			<td class="text">Make sure your BUG is plugged into power.</td>
+		</tr>
+	</table>
+
+	<a href="javascript:void(0);" onclick="upgrader.start();" class="submit">Start upgrade</a>&nbsp;&nbsp;
+	<a href="javascript:void(0);" onclick="upgrader.toggle_detail();" class="secondary">Show me what's going on</a>
+	<br /><br />
+	<div id="div_status_message"><h3></h3></div>
+	<br />
+	
+	<div id="div_upgrade_progress_holder" class="reader" style="display:none">
+		<a href="javascript:void(0);" class="btn-menu" onclick="upgrader.toggle_detail();">Close [x]</a><br />
+		<div id="div_upgrade_progress" class="message" style="height: 200px;">
+	</div>
+	&nbsp;
+	</div>
+</div>
+<include "footer">
+

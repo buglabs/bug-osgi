@@ -1,0 +1,23 @@
+<include "header">
+<h1>System Info</h1>
+<style>
+.reader .message {width:700px}
+</style>
+<function show_info(label, key, height)>
+  <div id="kernel_reader" class="reader">
+      <div class="menu" style="padding:7px 0 5px">${label}</div>
+      <div class="message"  style="height:${height}px;">
+          <pre>${key}</pre>
+      </div>
+  </div>
+  <br/>
+</function>
+<div class="main">
+<call show_info("Kernel Information",       kernel,     50)>
+<call show_info("Build Information",        build,      100)>
+<call show_info("Drive Information",        drives,     200)> 
+<call show_info("Memory Information",       meminfo,    450)>
+<call show_info("CPU Information",          cpuinfo,    450)>
+<call show_info("Partition Information",    partitions, 100)>
+</div>
+<include "footer">

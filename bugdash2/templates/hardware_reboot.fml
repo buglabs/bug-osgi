@@ -1,0 +1,19 @@
+<include "header">
+<h1>Reboot your BUG</h1>
+<script type="text/javascript">
+
+var rebooter = new BL.BUGdash.Rebooter();
+</script>
+<div class="main">
+	<table>
+		<tr>
+			<td><a href="javascript:void(0);" onclick="rebooter.reboot();" class="submit">Reboot</a></td>
+			<td style="padding-left:20px;">
+				<div id="div_status_message">
+					<h3></h3>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>
+<include "footer">
