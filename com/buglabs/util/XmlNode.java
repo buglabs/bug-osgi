@@ -60,6 +60,7 @@ public class XmlNode {
 	 * @param tagName
 	 */
 	public XmlNode(String tagName) {
+		guardInvalidName(tagName);
 		this.tagName = tagName;
 		attributes = new HashMap<String, String>();
 	}
@@ -433,6 +434,21 @@ public class XmlNode {
 		}
 
 		return temp;
-
+	}
+	
+	/**
+	 * Throw a runtime exception if a name has invalid characters for an XML node name.
+	 * 
+	 * See http://www.xml.com/pub/a/2001/07/25/namingparts.html
+	 * 
+	 * @param name
+	 */
+	private void guardInvalidName(String name) {
+		if (name.endsWith(":") || 
+				name.contains("&") ||
+				name.contains("%") ||
+				name.contains("@"))
+			throw new RuntimeException("Invalid node name: " + name);
+		
 	}
 }
