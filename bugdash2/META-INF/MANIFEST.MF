@@ -4,7 +4,7 @@ Bundle-Vendor: Bug Labs, Inc.
 Bundle-Version: 2.2.0
 BUG-API-Version: 1.4.4
 Bundle-Name: BUGDash
-Bundle-Activator: webadmin.Activator
+Bundle-Activator: com.buglabs.app.bugdash2.Activator
 Bundle-SymbolicName: com.buglabs.app.bugdash2
 Import-Package: com.buglabs.application,com.buglabs.bug.base.pub,com.b
  uglabs.bug.program.pub,com.buglabs.module,com.buglabs.nmea,com.buglab
