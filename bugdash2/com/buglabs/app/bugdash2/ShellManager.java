@@ -3,7 +3,7 @@ package com.buglabs.app.bugdash2;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-import com.buglabs.bug.base.pub.IShellService;
+import com.buglabs.util.shell.pub.IShellService;
 
 public class ShellManager {
 

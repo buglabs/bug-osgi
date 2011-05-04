@@ -2,7 +2,7 @@ package com.buglabs.app.bugdash2;
 
 import java.util.List;
 
-import com.buglabs.bug.base.pub.ICommandResponseHandler;
+import com.buglabs.util.shell.pub.ICommandResponseHandler;
 
 /**
  * Saves results from ShellService in a list 

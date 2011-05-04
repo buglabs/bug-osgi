@@ -6,10 +6,21 @@ BUG-API-Version: 1.4.4
 Bundle-Name: BUGDash
 Bundle-Activator: com.buglabs.app.bugdash2.Activator
 Bundle-SymbolicName: com.buglabs.app.bugdash2
-Import-Package: com.buglabs.application,com.buglabs.bug.base.pub,com.b
- uglabs.bug.program.pub,com.buglabs.module,com.buglabs.nmea,com.buglab
- s.osgi.sewing.pub,com.buglabs.osgi.sewing.pub.util,com.buglabs.osgi.s
- hell.pub,com.buglabs.util,com.buglabs.util.simplerestclient,freemarke
- r.template,javax.servlet,javax.servlet.http,org.osgi.framework,org.os
- gi.service.cm,org.osgi.service.log,org.osgi.util.tracker
-
+Import-Package: 
+ com.buglabs.application,
+ com.buglabs.bug.program.pub,
+ com.buglabs.util.shell.pub,
+ com.buglabs.module,
+ com.buglabs.nmea,
+ com.buglabs.osgi.sewing.pub,
+ com.buglabs.osgi.sewing.pub.util,
+ com.buglabs.osgi.shell.pub,
+ com.buglabs.util,
+ com.buglabs.util.simplerestclient,
+ freemarker.template,
+ javax.servlet,
+ javax.servlet.http,
+ org.osgi.framework,
+ org.osgi.service.cm,
+ org.osgi.service.log,
+ org.osgi.util.tracker

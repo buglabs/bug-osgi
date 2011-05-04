@@ -3,10 +3,9 @@ package com.buglabs.app.bugdash2;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.buglabs.bug.base.pub.ICommandResponseHandler;
-import com.buglabs.bug.base.pub.IShellService;
-import com.buglabs.bug.base.pub.IShellSession;
+import com.buglabs.util.shell.pub.ICommandResponseHandler;
+import com.buglabs.util.shell.pub.IShellService;
+import com.buglabs.util.shell.pub.IShellSession;
 
 import freemarker.template.SimpleScalar;
 

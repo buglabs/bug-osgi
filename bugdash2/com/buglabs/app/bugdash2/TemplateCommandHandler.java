@@ -1,6 +1,6 @@
 package com.buglabs.app.bugdash2;
 
-import com.buglabs.bug.base.pub.ICommandResponseHandler;
+import com.buglabs.util.shell.pub.ICommandResponseHandler;
 
 import freemarker.template.SimpleScalar;
 

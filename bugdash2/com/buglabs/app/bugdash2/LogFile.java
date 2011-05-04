@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.buglabs.app.bugdash2.controller.system.LogController;
-import com.buglabs.bug.base.pub.IShellService;
+import com.buglabs.util.shell.pub.IShellService;
 
 /**
  * Represents a log file entity for log readers
