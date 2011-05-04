@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import lib.Utils;
 
-
-//import com.buglabs.osgi.sewing.pub.RedirectInfo;
 import com.buglabs.app.bugdash2.AdminConfigManager;
 import com.buglabs.app.bugdash2.ConfigPropEntry;
 import com.buglabs.app.bugdash2.LogManager;

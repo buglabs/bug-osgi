@@ -1,7 +1,8 @@
 package com.buglabs.app.bugdash2;
 
-import freemarker.template.SimpleScalar;
 import com.buglabs.bug.base.pub.ICommandResponseHandler;
+
+import freemarker.template.SimpleScalar;
 
 public class TemplateCommandHandler implements ICommandResponseHandler {
 	private static final String ERROR = "[ERROR]";

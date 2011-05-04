@@ -7,7 +7,6 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import com.buglabs.app.bugdash2.AdminConfigManager;
 import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.app.bugdash2.WebAdminSettings;

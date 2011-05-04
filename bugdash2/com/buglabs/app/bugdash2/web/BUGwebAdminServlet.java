@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import com.buglabs.app.bugdash2.AdminConfigManager;
 import com.buglabs.app.bugdash2.WebAdminSettings;
 import com.buglabs.app.bugdash2.controller.AdminControllerFactory;

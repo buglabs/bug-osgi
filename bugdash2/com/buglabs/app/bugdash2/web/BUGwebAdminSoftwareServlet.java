@@ -3,8 +3,6 @@ package com.buglabs.app.bugdash2.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-import com.buglabs.app.bugdash2.Activator;
 import com.buglabs.app.bugdash2.WebAdminSettings;
 import com.buglabs.app.bugdash2.controller.AdminControllerFactory;
 import com.buglabs.app.bugdash2.controller.bugnet.BUGnetController;

@@ -21,14 +21,13 @@ import lib.Utils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.buglabs.bug.program.pub.IUserAppManager;
+import com.buglabs.util.XmlNode;
+import com.buglabs.util.XmlParser;
 import com.buglabs.util.simplerestclient.BasicAuthenticationConnectionProvider;
 import com.buglabs.util.simplerestclient.HTTPRequest;
 import com.buglabs.util.simplerestclient.HTTPResponse;
 import com.buglabs.util.simplerestclient.IConnectionProvider;
-
-import com.buglabs.bug.program.pub.IUserAppManager;
-import com.buglabs.util.XmlNode;
-import com.buglabs.util.XmlParser;
 
 /**
  * Represents BUG apps from BUGnet 

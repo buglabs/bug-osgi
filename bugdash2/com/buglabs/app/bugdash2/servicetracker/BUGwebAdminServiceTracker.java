@@ -15,7 +15,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-
 import com.buglabs.app.bugdash2.AdminConfigManager;
 import com.buglabs.app.bugdash2.App;
 import com.buglabs.app.bugdash2.LogManager;

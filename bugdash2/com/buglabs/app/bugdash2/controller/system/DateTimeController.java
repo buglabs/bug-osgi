@@ -18,9 +18,6 @@ import com.buglabs.app.bugdash2.Package;
 import com.buglabs.app.bugdash2.ShellUtil;
 import com.buglabs.app.bugdash2.TemplateHelper;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
-import com.buglabs.bug.base.pub.ICommandResponseHandler;
-
-
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 import com.buglabs.util.StringUtil;
 

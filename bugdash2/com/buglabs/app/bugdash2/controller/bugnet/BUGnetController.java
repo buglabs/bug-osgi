@@ -17,7 +17,6 @@ import com.buglabs.app.bugdash2.TemplateHelper;
 import com.buglabs.app.bugdash2.WebAdminSettings;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-
 import com.buglabs.util.simplerestclient.BasicAuthenticationConnectionProvider;
 import com.buglabs.util.simplerestclient.HTTPException;
 import com.buglabs.util.simplerestclient.HTTPRequest;

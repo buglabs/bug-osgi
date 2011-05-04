@@ -11,7 +11,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.app.bugdash2.Package;
 import com.buglabs.app.bugdash2.controller.ApplicationController;

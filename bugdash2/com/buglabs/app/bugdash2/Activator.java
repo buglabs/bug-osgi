@@ -1,13 +1,12 @@
 package com.buglabs.app.bugdash2;
 import java.net.URL;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.app.bugdash2.BatteryInfoProvider;
-import com.buglabs.app.bugdash2.IBatteryInfoProvider;
 import com.buglabs.app.bugdash2.servicetracker.BUGwebAdminServiceTracker;
 import com.buglabs.application.IDesktopApp;
 import com.buglabs.module.IModuleControl;

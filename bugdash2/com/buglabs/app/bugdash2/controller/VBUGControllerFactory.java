@@ -2,8 +2,6 @@ package com.buglabs.app.bugdash2.controller;
 
 
 import com.buglabs.app.bugdash2.controller.bugnet.BUGnetController;
-import com.buglabs.app.bugdash2.controller.software.PackageInstallControllerVBUG;
-import com.buglabs.app.bugdash2.controller.software.PackageNewUpdateControllerPBUG;
 import com.buglabs.app.bugdash2.controller.software.PackageNewUpdateControllerVBUG;
 import com.buglabs.app.bugdash2.controller.software.PackageUpgradeControllerVBUG;
 import com.buglabs.app.bugdash2.controller.software.PackageViewerControllerVBUG;

@@ -5,7 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import com.buglabs.app.bugdash2.ShellManager;
 import com.buglabs.app.bugdash2.ShellThread;
 import com.buglabs.app.bugdash2.controller.ApplicationController;

@@ -1,9 +1,9 @@
 package com.buglabs.app.bugdash2.controller.hardware;
 
 import java.util.Iterator;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 
 import com.buglabs.app.bugdash2.Activator;
 import com.buglabs.app.bugdash2.controller.ApplicationController;

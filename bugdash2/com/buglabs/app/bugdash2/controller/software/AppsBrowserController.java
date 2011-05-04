@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 
-
 import com.buglabs.app.bugdash2.Activator;
 import com.buglabs.app.bugdash2.App;
 import com.buglabs.app.bugdash2.AppResultManager;

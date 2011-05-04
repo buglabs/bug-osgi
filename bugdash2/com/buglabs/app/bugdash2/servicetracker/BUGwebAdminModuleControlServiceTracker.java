@@ -1,14 +1,10 @@
 package com.buglabs.app.bugdash2.servicetracker;
 
-import java.io.IOException;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-
 import com.buglabs.app.bugdash2.Activator;
-import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.module.IModuleControl;
 
 public class BUGwebAdminModuleControlServiceTracker implements

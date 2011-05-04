@@ -1,14 +1,35 @@
 package com.buglabs.app.bugdash2.controller;
 
 import com.buglabs.app.bugdash2.Activator;
-import com.buglabs.app.bugdash2.controller.bugnet.*;
-import com.buglabs.app.bugdash2.controller.hardware.*;
+import com.buglabs.app.bugdash2.controller.bugnet.BUGnetController;
+import com.buglabs.app.bugdash2.controller.hardware.BUGmoduleController;
+import com.buglabs.app.bugdash2.controller.hardware.BUGmodulePropertiesController;
 import com.buglabs.app.bugdash2.controller.login.BugResetPasswordController;
 import com.buglabs.app.bugdash2.controller.login.LoginHomepageController;
 import com.buglabs.app.bugdash2.controller.login.LogoutController;
-import com.buglabs.app.bugdash2.controller.software.*;
-import com.buglabs.app.bugdash2.controller.system.*;
-import com.buglabs.app.bugdash2.controller.utils.*;
+import com.buglabs.app.bugdash2.controller.software.AppViewerController;
+import com.buglabs.app.bugdash2.controller.software.AppsBrowserController;
+import com.buglabs.app.bugdash2.controller.software.AppsManagerController;
+import com.buglabs.app.bugdash2.controller.software.AppsRecommendedController;
+import com.buglabs.app.bugdash2.controller.software.PackageNewUpdateController;
+import com.buglabs.app.bugdash2.controller.software.PackageUpgradeController;
+import com.buglabs.app.bugdash2.controller.software.ReadPackageNewUpdateBufferController;
+import com.buglabs.app.bugdash2.controller.software.ReadPackageUpgradeBufferController;
+import com.buglabs.app.bugdash2.controller.system.BugLoginController;
+import com.buglabs.app.bugdash2.controller.system.ConfigurationController;
+import com.buglabs.app.bugdash2.controller.system.ConfigurationPropertyController;
+import com.buglabs.app.bugdash2.controller.system.DateTimeController;
+import com.buglabs.app.bugdash2.controller.system.DeviceRenameController;
+import com.buglabs.app.bugdash2.controller.system.Ipv6SetupController;
+import com.buglabs.app.bugdash2.controller.system.LogController;
+import com.buglabs.app.bugdash2.controller.system.ReadBufferController;
+import com.buglabs.app.bugdash2.controller.system.StartReadingLogController;
+import com.buglabs.app.bugdash2.controller.system.StopReadingLogController;
+import com.buglabs.app.bugdash2.controller.system.fileBrowserController;
+import com.buglabs.app.bugdash2.controller.system.fileDownloadController;
+import com.buglabs.app.bugdash2.controller.system.fileNavigatorController;
+import com.buglabs.app.bugdash2.controller.system.fileViewerController;
+import com.buglabs.app.bugdash2.controller.utils.CheckInternetController;
 import com.buglabs.osgi.sewing.pub.SewingController;
 
 
