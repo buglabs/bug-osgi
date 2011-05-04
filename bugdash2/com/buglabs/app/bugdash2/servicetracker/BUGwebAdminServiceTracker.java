@@ -123,7 +123,7 @@ public class BUGwebAdminServiceTracker extends AbstractServiceTracker {
 	public void initServices() {
 		getServices().add(com.buglabs.osgi.sewing.pub.ISewingService.class.getName());
 		getServices().add(org.osgi.service.cm.ConfigurationAdmin.class.getName());
-		getServices().add(IShellService.class.getName());
+		getServices().add(com.buglabs.util.shell.pub.IShellService.class.getName());
 		getServices().add(com.buglabs.app.bugdash2.IBatteryInfoProvider.class.getName());
 		getServices().add(LogService.class.getName());
 	}
