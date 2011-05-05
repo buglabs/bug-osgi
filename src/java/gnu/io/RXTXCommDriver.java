@@ -523,8 +523,8 @@ public class RXTXCommDriver implements CommDriver
 						"ttySA", // for the IPAQs
 						"ttyUSB", // for USB frobs
 						"ttymxc",
-						"ttyBMI"
-						
+						"ttyBMI",
+						"ttyACM"
 						};
 						CandidatePortPrefixes=Temp;
 					}
