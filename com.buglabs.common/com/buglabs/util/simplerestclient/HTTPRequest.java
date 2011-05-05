@@ -82,12 +82,32 @@ public class HTTPRequest {
 	
 	private IConnectionProvider _connectionProvider;
 	
+	private boolean debugMode = false;
+	
 	/**
 	 * constructor where client provides connectionProvider
 	 * 	
 	 */
 	public HTTPRequest(IConnectionProvider connectionProvider) {
 		_connectionProvider = connectionProvider;
+	}
+		
+	/**
+	 * @param connectionProvider
+	 * @param debugMode
+	 */
+	public HTTPRequest(IConnectionProvider connectionProvider, boolean debugMode) {
+		this(connectionProvider);
+		this.debugMode = debugMode;
+	}
+	
+	/**
+	 * @param connectionProvider
+	 * @param debugMode
+	 */
+	public HTTPRequest(boolean debugMode) {
+		this();
+		this.debugMode = debugMode;
 	}
 	
 	/**
@@ -104,18 +124,24 @@ public class HTTPRequest {
      * @return      HttpURLConnection ready with response data
      */
 	public HTTPResponse get(String url) throws IOException {
+		
 		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setDoInput(true);
 		conn.setDoOutput(false);
+		
+		if (debugMode)
+			debugMessage("GET", url, conn);
+		
 		return connect(conn);
 	}
-	
+
 	/**
 	 * @param url
 	 * @return
 	 * @throws IOException
 	 */
 	private HttpURLConnection getAndConfigureConnection(String url) throws IOException {
+		url = guardUrl(url);
 		HttpURLConnection connection = _connectionProvider.getConnection(url);
 		
 		if (configurators == null)
@@ -134,12 +160,17 @@ public class HTTPRequest {
      * @return      HttpURLConnection ready with response data
      */
 	public HTTPResponse get(String url, Map<String, String> headers) throws IOException {
+		
 		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setDoInput(true);
 		conn.setDoOutput(false);
-		for (Entry<String, String> e: headers.entrySet()) {
+		
+		for (Entry<String, String> e: headers.entrySet()) 
 			conn.addRequestProperty(e.getKey(), e.getValue());
-		}
+		
+		if (debugMode)
+			debugMessage("GET", url, conn);
+		
 		return connect(conn);
 	}
 	
@@ -165,12 +196,16 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse post(String url, String data, Map<String, String> headers) throws IOException {
+		
 		HttpURLConnection conn = getAndConfigureConnection(url);
 		
 		if (headers != null) 
 			for (Entry<String, String> e: headers.entrySet())
 				conn.setRequestProperty(e.getKey(), e.getValue());
 			
+		if (debugMode)
+			debugMessage("POST", url + " data: " + data, conn);
+		
 		conn.setDoOutput(true);
 		OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream());
 		osr.write(data);
@@ -232,10 +267,15 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse post(String url, byte[] data) throws IOException {
+		
 		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setRequestProperty("Content-Length", String.valueOf(data.length));
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
+		
+		if (debugMode)
+			debugMessage("POST", url, conn);
+		
 		OutputStream os = conn.getOutputStream();
 		os.write(data);
 		return connect(conn);
@@ -252,11 +292,15 @@ public class HTTPRequest {
 	 * @return
 	 */
 	public HTTPResponse postMultipart(String url, Map<String, String> parameters) throws IOException {
+		
 		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setRequestMethod("POST");
 		String boundary = createMultipartBoundary();
 		conn.setRequestProperty(HEADER_TYPE, CONTENT_TYPE +"; "+ BOUNDARY + boundary);
         conn.setDoOutput(true);		
+        
+        if (debugMode)
+			debugMessage("POST", url, conn);
 		
 		// write things out to connection
         OutputStream os = conn.getOutputStream();
@@ -319,11 +363,15 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse put(String url, String data, Map<String, String> headers) throws IOException{
+		
 		HttpURLConnection connection = getAndConfigureConnection(url);
 		
 		if (headers != null) 
 			for (Entry<String, String> e: headers.entrySet())
 				connection.setRequestProperty(e.getKey(), e.getValue());
+		
+		if (debugMode)
+			debugMessage("PUT", url, connection);
 		
 		connection.setDoOutput(true);
 		connection.setRequestMethod("PUT");
@@ -355,9 +403,14 @@ public class HTTPRequest {
 	 * @throws IOException
 	 */
 	public HTTPResponse delete(String url) throws IOException {
+		
 		HttpURLConnection connection = getAndConfigureConnection(url);
 		connection.setDoInput(true);
 		connection.setRequestMethod("DELETE");
+		
+		if (debugMode)
+			debugMessage("DELETE", url, connection);
+		
 		return connect(connection);
 	}	
 	
@@ -375,6 +428,9 @@ public class HTTPRequest {
 		if (headers != null) 
 			for (Entry<String, String> e: headers.entrySet())
 				connection.setRequestProperty(e.getKey(), e.getValue());
+		
+		if (debugMode)
+			debugMessage("DELETE", url, connection);
 		
 		connection.setDoInput(true);
 		connection.setRequestMethod("DELETE");
@@ -420,6 +476,10 @@ public class HTTPRequest {
 		HttpURLConnection connection = getAndConfigureConnection(url);
 		connection.setDoOutput(true);
 		connection.setRequestMethod("HEAD");
+		
+		if (debugMode)
+			debugMessage("HEAD", url, connection);
+		
 		return connect(connection);
 	}
 	
@@ -520,4 +580,30 @@ public class HTTPRequest {
 		if (configurators.size() == 0)
 			configurators = null;
 	}	
+	
+	/**
+	 * Print debug messages
+	 * @param httpMethod
+	 * @param url
+	 * @param conn 
+	 */
+	private void debugMessage(String httpMethod, String url, HttpURLConnection conn) {
+		System.out.println("HTTPRequest DEBUG " + System.currentTimeMillis() + ": [" + httpMethod + "] " + url + " ~ " + conn.getRequestProperties());
+	}
+	
+	/**
+	 * Check for null and handle protocol-less type.
+	 * @param url
+	 */
+	private String guardUrl(String url) {
+		if (url == null)
+			throw new RuntimeException("URL passed in was null.");
+
+		//If no protocol defined in url, assume HTTP.
+		if (!url.toLowerCase().trim().startsWith("http"))
+			return "http://" + url;
+		
+		return url;
+	}
+
 }
