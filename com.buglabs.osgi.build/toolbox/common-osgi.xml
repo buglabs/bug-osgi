@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<project name="common-osgi" default="build.jars" basedir=".">
+	<property name="buildDirectory" location="${checkout.dir}/${project}" />
+
+	<!-- PROJECT CLASSPATH -->
+	<path id="bin.classpath">
+		<fileset dir="${externalDirectory}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${distDirectory}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- COMPILER SETTINGS -->
+	<property name="javacFailOnError" value="true" />
+	<property name="javacDebugInfo" value="on" />
+	<property name="javacVerbose" value="true" />
+	<property name="logExtension" value=".log" />
+	<property name="compilerArg" value="" />
+	<property name="javacSource" value="1.6" />
+	<property name="javacTarget" value="1.6" />
+	<path id="path_bootclasspath">
+		<fileset dir="${java.home}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<property name="bootclasspath" refid="path_bootclasspath" />
+	<property name="bundleJavacSource" value="${javacSource}" />
+	<property name="bundleJavacTarget" value="${javacTarget}" />
+	<property name="bundleBootClasspath" value="${bootclasspath}" />
+
+	<!-- ================================= 
+          target: build              
+         ================================= -->
+	<target name="build" description="BUILDING: ${project}">
+		<echo message="BUILDING: ${project}" />
+		<javac destdir="${buildDirectory}" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" includeAntRuntime="no" bootclasspath="${bundleBootClasspath}" srcdir=".">
+			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
+			<classpath refid="bin.classpath" />
+		</javac>
+		<manifest file="META-INF/MANIFEST.MF" mode="update">
+			<attribute name="Bundle-Version" value="${bundle.version}" />
+			<attribute name="Build-Level" value="${build.level}" />
+			<attribute name="Built-On" value="${env.COMPUTERNAME} ${TODAY} ${TSTAMP}" />
+		</manifest>
+	</target>
+
+	<!-- ================================= 
+          target: build.jars              
+         ================================= -->
+	<target name="build.jars" depends="build, document" description="make the jar">
+		<jar destfile="${distDirectory}/${project}.jar" 
+			 basedir="${buildDirectory}" 
+		     manifest="META-INF/MANIFEST.MF"
+			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project"/>
+	</target>
+
+	<target name="doc.build.jars" description="javadoc and make the jar">
+		<property name="generate.docs" value="true" />
+		<antcall target="build.jars" />
+	</target>
+
+	<target name="document" if="generate.docs">
+		<javadoc destdir="${buildDirectory}/docs">
+			<fileset dir=".">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<target name="test" depends="build">
+		<mkdir dir="${report.dir}" />
+		<junit printsummary="yes">
+			<classpath refid="bin.classpath" />
+			<formatter type="xml"/>
+			<batchtest todir="${report.dir}">
+				<fileset dir="${report.src}">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="create_dirs" depends="clean">
+		<mkdir dir="${buildDirectory}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${buildDirectory}" />
+	</target>
+</project>
