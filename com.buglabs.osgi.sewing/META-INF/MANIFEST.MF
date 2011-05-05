@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-Name: com.buglabs.osgi.sewing
+Bundle-Activator: com.buglabs.osgi.sewing.Activator
+Bundle-SymbolicName: com.buglabs.osgi.sewing
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Import-Package: com.buglabs.application,
+ com.buglabs.util,
+ javax.servlet,
+ javax.servlet.http,
+ org.osgi.framework,
+ org.osgi.service.http,
+ org.osgi.service.log,
+ org.osgi.util.tracker
+Export-Package: com.buglabs.osgi.sewing.pub,
+ com.buglabs.osgi.sewing.pub.util,
+ freemarker.template
+BUG-API-Version: 1.4.4
