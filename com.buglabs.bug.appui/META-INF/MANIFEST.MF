@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-Vendor: Bug  Labs, Inc.
+Bundle-Version: 1.0.0
+Bundle-Name: AppUI
+Bundle-Activator: com.buglabs.bug.appui.Activator
+Bundle-SymbolicName: com.buglabs.bug.appui
+Import-Package: 
+ com.buglabs.application,
+ com.buglabs.bug.module.lcd.pub,
+ com.buglabs.osgi.shell.pub,
+ com.buglabs.util,
+ org.osgi.util.tracker,
+ org.osgi.framework,
+ org.osgi.service.log
