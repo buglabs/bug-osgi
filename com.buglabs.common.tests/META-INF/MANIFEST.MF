@@ -11,4 +11,4 @@ Import-Package:
  junit.textui,
  org.osgi.framework,
  org.osgi.util.tracker
-Export-Package: com.buglabs.common.tests.pub
+Export-Package: com.buglabs.common.tests.osgi.pub

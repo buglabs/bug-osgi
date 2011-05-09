@@ -1,4 +1,4 @@
-package com.buglabs.common.tests;
+package com.buglabs.common.tests.junit;
 
 import java.io.IOException;
 import java.util.List;

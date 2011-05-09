@@ -1,4 +1,4 @@
-package com.buglabs.common.tests;
+package com.buglabs.common.tests.junit;
 
 
 import com.buglabs.util.StringUtil;
