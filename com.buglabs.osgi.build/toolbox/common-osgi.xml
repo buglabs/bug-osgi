@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
-<project name="common-osgi" default="build.jars" basedir=".">
+<project name="common-osgi" default="build.jars" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
 	<property name="buildDirectory" location="${checkout.dir}/${project}" />
+	
+	<!-- Import Checkstyle -->
+	<taskdef resource="checkstyletask.properties"
+			         classpath="${base.build.dir}/toolbox/checkstyle/checkstyle-5.3-all.jar"/>
 
 	<!-- PROJECT CLASSPATH -->
 	<path id="bin.classpath">
@@ -80,6 +84,15 @@
 				</fileset>
 			</batchtest>
 		</junit>
+	</target>
+	
+	<target name="checkstyle">
+		<mkdir dir="${checkstyle.dir}" />
+		<echo message="Running checkstyle template: ${checkstyle.config} for sources in ${checkstyle.src} and outputing to ${checkstyle.dir}/checkstyle_errors.xml"></echo>
+		<checkstyle config="${checkstyle.config}">
+			<fileset dir="${checkstyle.src}" includes="**/*.java"/>
+			<formatter type="xml" toFile="${checkstyle.dir}/checkstyle_errors.xml"/>
+		</checkstyle>
 	</target>
 
 	<target name="create_dirs" depends="clean">
