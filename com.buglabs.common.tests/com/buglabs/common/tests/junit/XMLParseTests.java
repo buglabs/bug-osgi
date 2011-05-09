@@ -9,6 +9,11 @@ import com.buglabs.util.XpathQuery;
 
 import junit.framework.TestCase;
 
+/**
+ * Test the xml parser.
+ * @author kgilmer
+ *
+ */
 public class XMLParseTests extends TestCase {
 	private String xml;
 
@@ -180,7 +185,7 @@ public class XMLParseTests extends TestCase {
 	
 	public void testNamespaceXml() {
 		String namespaceXml="<obr:repository name='Untitled' obr:time='20051210072623.031' xmlns:obr=\"http://www.osgi.org/xmlns/scr/v1.0.0\"></obr:repository>";
-		String nonNamespaceXml="<repository name='Untitled' time='20051210072623.031'></repository>";
+		String nonNamespaceXml="<repository name='Untitled' time='20051210072623.031' xmlns:obr='http://www.osgi.org/xmlns/scr/v1.0.0'></repository>";
 		
 		XmlNode e1 = null;
 		

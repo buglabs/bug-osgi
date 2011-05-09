@@ -8,6 +8,6 @@
 	<import file="${common.ant.file}" />
 	
 	<!-- JUnit tests -->
-	<property name="report.src" location="."/>
+	<property name="report.src" location="./com/buglabs/common/tests/junit"/>
 
 </project>
