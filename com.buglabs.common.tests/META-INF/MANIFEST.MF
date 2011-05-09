@@ -3,15 +3,12 @@ Bundle-Name: com.buglabs.common.tests
 Bundle-Activator: com.buglabs.common.tests.Activator
 Bundle-SymbolicName: com.buglabs.common.tests
 Bundle-Version: 1.0.0
-Import-Package: junit.framework,
- junit.textui,
- com.buglabs.services.ws,
- com.buglabs.util.trackers,
- com.buglabs.util,
+Import-Package: 
  com.buglabs.application,
- edu.emory.mathcs.backport.java.util, 
- edu.emory.mathcs.backport.java.util.concurrent, 
- edu.emory.mathcs.backport.java.util.concurrent.atomic,
- edu.emory.mathcs.backport.java.util.concurrent.helpers,
- edu.emory.mathcs.backport.java.util.concurrent.locks
+ com.buglabs.services.ws,
+ com.buglabs.util,
+ junit.framework,
+ junit.textui,
+ org.osgi.framework,
+ org.osgi.util.tracker
 Export-Package: com.buglabs.common.tests.pub

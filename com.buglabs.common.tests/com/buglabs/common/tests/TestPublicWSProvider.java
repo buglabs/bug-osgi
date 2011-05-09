@@ -17,7 +17,6 @@ import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.trackers.PublicWSAdminTracker;
 
 import junit.framework.TestCase;
 
@@ -34,7 +33,7 @@ public class TestPublicWSProvider extends TestCase {
 	public void testPublicWSProviderGET() throws InvalidSyntaxException, IOException {
 		assertNotNull(port);
 
-		ServiceTracker wsST = PublicWSAdminTracker.createTracker(context, new NameWS());
+		ServiceTracker wsST = null; //PublicWSAdminTracker.createTracker(context, new NameWS());
 
 		URL url = new URL("http://localhost:" + port + "/service/Name");
 
@@ -50,7 +49,7 @@ public class TestPublicWSProvider extends TestCase {
 		
 		assertNotNull(port);
 
-		ServiceTracker wsST = PublicWSAdminTracker.createTracker(context, new NameWS());
+		ServiceTracker wsST = null; //PublicWSAdminTracker.createTracker(context, new NameWS());
 
 		URL url = new URL("http://localhost:" + port + "/service/Name");
 		post(url, name);
