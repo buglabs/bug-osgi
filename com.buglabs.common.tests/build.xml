@@ -9,6 +9,6 @@
 	
 	<!-- JUnit tests -->
 	<property name="report.dir" location="junit-reports"/>
-	<property name="report.src" location="test/"/>
+	<property name="report.src" location="."/>
 
 </project>
