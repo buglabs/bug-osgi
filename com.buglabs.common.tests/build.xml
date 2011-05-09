@@ -6,5 +6,9 @@
 	<!-- PROJECT IMPORTS -->
 	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
 	<import file="${common.ant.file}" />
+	
+	<!-- JUnit tests -->
+	<property name="report.dir" location="junit-reports"/>
+	<property name="report.src" location="test/"/>
 
 </project>
