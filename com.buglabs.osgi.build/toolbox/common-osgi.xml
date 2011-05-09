@@ -81,6 +81,7 @@
 			<batchtest todir="${report.dir}">
 				<fileset dir="${report.src}">
 					<include name="**/*Test*.java" />
+					<exclude name="*osgi*/*Test*.java" />
 				</fileset>
 			</batchtest>
 		</junit>
