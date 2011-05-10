@@ -21,7 +21,7 @@ import com.buglabs.services.ws.WSResponse;
 
 import junit.framework.TestCase;
 
-public class TestPublicWSProvider extends TestCase {
+public class OSGITestPublicWSProvider extends TestCase {
 
 	private String port;
 	private BundleContext context;
