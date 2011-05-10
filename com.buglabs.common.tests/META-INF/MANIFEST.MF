@@ -5,10 +5,14 @@ Bundle-SymbolicName: com.buglabs.common.tests
 Bundle-Version: 1.0.0
 Import-Package: 
  com.buglabs.application,
+ com.buglabs.device,
  com.buglabs.services.ws,
  com.buglabs.util,
  junit.framework,
  junit.textui,
  org.osgi.framework,
- org.osgi.util.tracker
+ org.osgi.util.tracker,
+ com.buglabs.module,
+ com.buglabs.osgi.shell,
+ com.buglabs.util.simplerestclient
 Export-Package: com.buglabs.common.tests.osgi.pub
