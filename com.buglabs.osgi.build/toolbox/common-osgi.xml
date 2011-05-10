@@ -73,7 +73,7 @@
 		</javadoc>
 	</target>
 
-	<target name="test" depends="build">
+	<target name="test" depends="build.jars">
 		<mkdir dir="${report.dir}" />
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
