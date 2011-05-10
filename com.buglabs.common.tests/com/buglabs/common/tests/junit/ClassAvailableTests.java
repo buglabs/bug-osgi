@@ -49,7 +49,6 @@ import com.buglabs.util.simplerestclient.HTTPRequest;
 import com.buglabs.util.simplerestclient.HTTPResponse;
 import com.buglabs.util.simplerestclient.IConnectionProvider;
 import com.buglabs.util.simplerestclient.IFormFile;
-import com.sun.net.httpserver.BasicAuthenticator;
 
 /**
  * This test case simply loads BUG contributed classes to verify they are on the
