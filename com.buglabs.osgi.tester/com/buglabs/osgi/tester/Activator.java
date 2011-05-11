@@ -1,15 +1,7 @@
 package com.buglabs.osgi.tester;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-
-import com.buglabs.osgi.shell.ICommand;
-import com.buglabs.osgi.shell.IShellCommandProvider;
 
 /**
  * A test runner for OSGi-contexted JUnit tests.
@@ -28,44 +20,15 @@ import com.buglabs.osgi.shell.IShellCommandProvider;
  * @author kgilmer
  *
  */
-public class Activator implements BundleActivator, IShellCommandProvider {
+public class Activator implements BundleActivator {
 
-	private ServiceRegistration sr;
-	private ICommand runCmd;
 
 	public void start(final BundleContext context) throws Exception {
-		runCmd = new RunTestCaseCommand();
-		sr = context.registerService(IShellCommandProvider.class.getName(), this, null);
-		
-		//Auto run if it's been specified.
-		if (context.getProperty("com.buglabs.osgi.tester.autorun") != null && context.getProperty("com.buglabs.osgi.tester.autorun").toUpperCase().equals("TRUE")) {
-			new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(1000);
-						runCmd.initialize(new ArrayList(), System.out, System.err, context);
-						runCmd.execute();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}).start();
-			
-		}
+		BundleTestRunnerThread thread = new BundleTestRunnerThread(context);
+		thread.start();
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		sr.unregister();
-	}
-
-	@Override
-	public List getCommands() {
-		return Arrays.asList(new ICommand[] {runCmd, new ListTestsCommand()});
+		
 	}
 }
