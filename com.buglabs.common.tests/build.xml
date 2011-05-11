@@ -12,8 +12,9 @@
 	
 	<!-- OSGi tests -->
 	<property name="testBundles" value="
-		file:${distDirectory}/com.buglabs.osgi.jar 
+		file:${distDirectory}/felix-configadmin.jar
+		file:${distDirectory}/com.buglabs.osgi.tester.jar
 		file:${distDirectory}/com.buglabs.common.jar
+		file:${distDirectory}/com.buglabs.common.tests.jar
 		"></property>
-
 </project>
