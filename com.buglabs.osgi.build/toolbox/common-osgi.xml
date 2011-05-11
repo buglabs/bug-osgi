@@ -87,6 +87,17 @@
 		</junit>
 	</target>
 	
+	<target name="test-osgi" depends="test">
+		<property name="osgi.framework.jar" location="${distDirectory}/felix.jar" />
+		<java jar="${osgi.framework.jar}" newenvironment="true" fork="true">
+			<jvmarg value="-Dorg.osgi.framework.storage=/tmp/felix-cache"/>
+			<jvmarg value="-Dorg.osgi.framework.storage.clean=onFirstInit"/>
+			<jvmarg value="-Dorg.osgi.framework.storage.clean=onFirstInit"/>
+			<jvmarg value="-Dfelix.auto.deploy.dir=${distDirectory}"/>
+			<jvmarg value="-Dfelix.auto.start.1=${testBundles}"/>
+		</java>
+	</target>
+	
 	<target name="checkstyle">
 		<mkdir dir="${checkstyle.dir}" />
 		<echo message="Running checkstyle template: ${checkstyle.config} for sources in ${checkstyle.src} and outputing to ${checkstyle.dir}/checkstyle_errors.xml"></echo>

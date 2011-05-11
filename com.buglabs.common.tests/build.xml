@@ -9,5 +9,8 @@
 	
 	<!-- JUnit tests -->
 	<property name="report.src" location="."/>
+	
+	<!-- OSGi tests -->
+	<property name="testBundles" value="file:${distDirectory}/com.buglabs.common.jar"></property>
 
 </project>
