@@ -1,7 +1,10 @@
 package com.buglabs.osgi.tester;
 
+import java.io.File;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 
 /**
  * A test runner for OSGi-contexted JUnit tests.
@@ -15,16 +18,30 @@ import org.osgi.framework.BundleContext;
  * <code>tlist</code> is used to list available test cases that the tester can see.
  * <code>trun</code> is used to execute all or a specific test case.
  * 
- * If the OSGi bundle property <code>com.buglabs.osgi.tester.autorun</code> is set, all tests will be executed on <code>Activator.start()</code>.
- * 
  * @author kgilmer
  *
  */
 public class Activator implements BundleActivator {
 
 
+	private static final String JUNIT_REPORT_DIR = "com.buglabs.osgi.tester.report.dir";
+
 	public void start(final BundleContext context) throws Exception {
-		BundleTestRunnerThread thread = new BundleTestRunnerThread(context);
+		File outputDir = context.getDataFile("temp").getParentFile();
+		
+		if (context.getProperty(JUNIT_REPORT_DIR) != null) {
+			outputDir = new File(context.getProperty(JUNIT_REPORT_DIR));
+			
+			if (outputDir.isFile())
+				throw new BundleException("Unable to start tester, " + JUNIT_REPORT_DIR + " is set to an existing file, needs to be a directory.");
+			
+			if (!outputDir.exists())
+				if (!outputDir.mkdirs())
+					throw new BundleException("Unable to start tester, unable to create directory " + JUNIT_REPORT_DIR);
+		}
+			
+		System.out.println("Test report directory: " + outputDir);
+		BundleTestRunnerThread thread = new BundleTestRunnerThread(context, outputDir);
 		thread.start();
 	}
 
