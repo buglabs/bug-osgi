@@ -11,6 +11,9 @@
 	<property name="report.src" location="."/>
 	
 	<!-- OSGi tests -->
-	<property name="testBundles" value="file:${distDirectory}/com.buglabs.common.jar"></property>
+	<property name="testBundles" value="
+		file:${distDirectory}/com.buglabs.osgi.jar 
+		file:${distDirectory}/com.buglabs.common.jar
+		"></property>
 
 </project>

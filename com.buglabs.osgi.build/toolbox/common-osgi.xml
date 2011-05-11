@@ -95,6 +95,7 @@
 			<jvmarg value="-Dorg.osgi.framework.storage.clean=onFirstInit"/>
 			<jvmarg value="-Dfelix.auto.deploy.dir=${distDirectory}"/>
 			<jvmarg value="-Dfelix.auto.start.1=${testBundles}"/>
+			<jvmarg value="-Dcom.buglabs.osgi.tester.autorun=true"/>
 		</java>
 	</target>
 	
