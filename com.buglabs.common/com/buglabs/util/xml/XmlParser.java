@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.util.xml;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,8 +36,6 @@ import java.util.Stack;
 /**
  * <code>XMLParser</code> is a highly-simplified XML DOM parser. It does not
  * support namespaces.
- * 
- *  @deprecated use the com.buglabs.util.xml package.
  */
 public class XmlParser {
 	private static final int[] cdata_start = { '<', '!', '[', 'C', 'D', 'A', 'T', 'A', '[' };
@@ -251,11 +249,7 @@ public class XmlParser {
 				// add new element as a child element of
 				// the current element
 				if (currentElement != null) {
-					try {
-						element.setParent(currentElement);
-					} catch (SelfReferenceException e) {
-						throw new IOException(e.getMessage());
-					}
+					element.setParent(currentElement);					
 				}
 
 				if (!isTagClosed) {

@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.util.xml;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +34,6 @@ import java.util.List;
 /**
  * Reduced XPath query engine against simplified Xml DOM.
  * 
- * @deprecated use the com.buglabs.util.xml package.
  * @author ken
  * 
  */
@@ -83,7 +82,7 @@ public class XpathQuery {
 		switch (returnType) {
 		case NODE:
 			elems = new ArrayList<XmlNode>();
-			findElements(element, StringUtil.split(expression, "/"), 1, elems, true);
+			findElements(element, expression.split("/"), 1, elems, true);
 
 			if (elems.size() > 1) {
 				throw new RuntimeException("Search for first returned multiple matches!");
@@ -98,9 +97,9 @@ public class XpathQuery {
 			elems = new ArrayList<XmlNode>();
 
 			if (expression.startsWith("//")) {
-				findAllElements(element, StringUtil.split(expression, "/"), 2, elems);
+				findAllElements(element, expression.split("/"), 2, elems);
 			} else {
-				findElements(element, StringUtil.split(expression, "/"), 1, elems, false);
+				findElements(element, expression.split("/"), 1, elems, false);
 			}
 
 			return elems;
@@ -240,7 +239,7 @@ public class XpathQuery {
 
 		List<XmlNode> l = new ArrayList<XmlNode>();
 
-		findElements(node, StringUtil.split(exprStr, "/"), 0, l, true);
+		findElements(node, exprStr.split("/"), 0, l, true);
 
 		if (l.size() > 0) {
 			return true;

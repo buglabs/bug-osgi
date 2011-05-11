@@ -31,7 +31,7 @@ package com.buglabs.util;
  * An XPath attribute.
  * 
  * @author kgilmer
- * 
+ * @deprecated use the com.buglabs.util.xml package.
  */
 class AttribExpression {
 	public static final int EQUAL_OPERATOR = 1;

@@ -25,21 +25,92 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
-
-import java.io.IOException;
+package com.buglabs.util.xml;
 
 /**
- * This exception is thrown when an attempt is made to add itself as a child (to
- * itself).
+ * An XPath attribute.
  * 
- * @author ken
- * @deprecated use the com.buglabs.util.xml package.
+ * @author kgilmer
+ * 
  */
-public class SelfReferenceException extends IOException {
-	private static final long serialVersionUID = -7313712854018859157L;
+class AttribExpression {
+	public static final int EQUAL_OPERATOR = 1;
 
-	public SelfReferenceException(XmlNode node) {
-		super(node.getName() + " tried to add itself as a child.");
+	public static final int NOT_EQUAL_OPERATOR = 2;
+
+	private String name;
+
+	private String value;
+
+	private String tagName;
+
+	private int operator;
+
+	boolean exists = false;
+
+	public AttribExpression(String exprToken) {
+		String[] b;
+		String[] s = exprToken.split("[@");
+
+		if (s.length == 2) {
+			tagName = s[0];
+			b = s[1].split("=");
+
+			if (b.length == 2) {
+				name = b[0];
+				value = resolveValue(b[1].substring(0, b[1].length() - 1));
+				operator = EQUAL_OPERATOR;
+				exists = true;
+			} else {
+				b = s[1].split("!=");
+
+				if (b.length == 2) {
+					name = b[0];
+					value = b[1];
+					operator = NOT_EQUAL_OPERATOR;
+					exists = true;
+				}
+			}
+		}
+	}
+
+	private String resolveValue(String string) {
+		// this may resolve a variable to a literal.
+
+		return string.substring(1, string.length() - 1);
+	}
+
+	public String toString() {
+		if (!exists) {
+			return super.toString();
+		}
+		String op = "?";
+		if (operator == EQUAL_OPERATOR) {
+			op = "=";
+		} else if (operator == NOT_EQUAL_OPERATOR) {
+			op = "!=";
+		}
+
+		return tagName + "[@" + name + op + value + "]";
+	}
+
+	public String getTagName() {
+		return tagName;
+	}
+
+	public boolean isExists() {
+		return exists;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getOperator() {
+		return operator;
+	}
+
+	public String getValue() {
+		return value;
 	}
 }

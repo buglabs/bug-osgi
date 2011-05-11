@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * Copyright (c) 2008, 2009, 2011 Bug Labs, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.util.xml;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +37,6 @@ import java.util.Map;
  * This class represents an XML Node. Any DOM document is a tree of <code>XMLNode</code>s.
  * 
  * @author kgilmer
- * @deprecated use the com.buglabs.util.xml package.
  * 
  */
 public class XmlNode {
@@ -97,12 +96,8 @@ public class XmlNode {
 	public XmlNode(XmlNode parent, String tagName) {
 		this(tagName);
 
-		try {
-			parent.addChildElement(this);
-		} catch (SelfReferenceException e) {
-			// this should never happen...new object creation.
-			e.printStackTrace();
-		}
+		parent.addChild(this);
+		
 
 		this.parentNode = parent;
 	}
@@ -116,12 +111,7 @@ public class XmlNode {
 	public XmlNode(XmlNode parent, String tagName, List<XmlNode> children) {
 		this(tagName);
 
-		try {
-			parent.addChildElement(this);
-		} catch (SelfReferenceException e) {
-			// this should never happen...new object creation.
-			e.printStackTrace();
-		}
+		parent.addChild(this);
 
 		this.parentNode = parent;
 		this.childElements = children;
@@ -217,24 +207,6 @@ public class XmlNode {
 	public void clearValue() {
 		setValue(null);
 	}
-
-	/**
-	 * @param element
-	 * @return
-	 * @throws SelfReferenceException
-	 */
-	public XmlNode addChildElement(XmlNode element) throws SelfReferenceException {
-		if (element == this) {
-			throw new SelfReferenceException(element);
-		}
-		
-		if (this.text != null) {
-			throw new RuntimeException("Cannot add child elements to a node that has content.");
-		}
-
-		getChildren().add(element);
-		return element;
-	}
 	
 	/**
 	 * Equivalent to addChildElement except that unchecked exception is thrown on self referencing call.
@@ -243,7 +215,7 @@ public class XmlNode {
 	 */
 	public XmlNode addChild(XmlNode element) {
 		if (element == this) {
-			throw new RuntimeException("Cannot add node to itself.");
+			throw new RuntimeException("Cannot add node to itself as parent.");
 		}
 		
 		if (this.text != null) {
@@ -361,7 +333,7 @@ public class XmlNode {
 	 * @return
 	 */
 	public XmlNode getFirstElement(String path) {
-		String[] elems = StringUtil.split(path, "/");
+		String[] elems = path.split("/");
 		XmlNode root = this;
 		for (int i = 0; i < elems.length; ++i) {
 			root = (XmlNode) root.getChild(elems[i]);
@@ -385,13 +357,13 @@ public class XmlNode {
 	 * @param parent
 	 * @throws SelfReferenceException
 	 */
-	public void setParent(XmlNode parent) throws SelfReferenceException {
+	public void setParent(XmlNode parent) {
 		if (parentNode != null) {
 			parentNode.getChildren().remove(this);
 		}
 
 		if (parent != null) {
-			parent.addChildElement(this);
+			parent.addChild(this);
 		}
 
 		parentNode = parent;
