@@ -10,12 +10,8 @@ Import-Package:
  com.buglabs.osgi.shell,
  com.buglabs.util,
  com.buglabs.osgi.shell.pub,
- com.buglabs.tableviewer
-Export-Package: 
- junit.awtui,
+ com.buglabs.tableviewer,
  junit.extensions,
  junit.framework,
  junit.runner,
- junit.swingui,
  junit.textui
-Bundle-ClassPath: libs/junit.jar, /, .
