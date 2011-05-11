@@ -13,6 +13,7 @@
 	<!-- OSGi tests -->
 	<property name="testBundles" value="
 		file:${distDirectory}/felix-configadmin.jar
+		file:${distDirectory}/junit-osgi-4.9b2.jar
 		file:${distDirectory}/com.buglabs.osgi.tester.jar
 		file:${distDirectory}/com.buglabs.common.jar
 		file:${distDirectory}/com.buglabs.common.tests.jar
