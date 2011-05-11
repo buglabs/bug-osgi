@@ -1,20 +1,26 @@
 package com.buglabs.common.tests;
 
+import junit.framework.TestSuite;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+
+import com.buglabs.common.tests.osgi.OSGiTestCommon;
 
 public class Activator implements BundleActivator {
 
 	private static Activator instance;
 	private BundleContext context;
+	private ServiceRegistration sr;
 	
-	public Activator()
-	{
+	public Activator()	{
 		instance = this;
 	}
 	
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
+		sr = context.registerService(TestSuite.class.getName(), new TestSuite(OSGiTestCommon.class), null);
 	}
 
 	public static synchronized Activator getDefault() {
@@ -26,7 +32,6 @@ public class Activator implements BundleActivator {
 	}
 	
 	public void stop(BundleContext context) throws Exception {
-		// TODO Auto-generated method stub
-		
+		sr.unregister();
 	}
 }

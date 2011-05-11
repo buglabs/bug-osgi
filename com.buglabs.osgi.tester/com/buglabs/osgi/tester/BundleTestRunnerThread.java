@@ -25,19 +25,23 @@ public class BundleTestRunnerThread extends Thread {
 	public void run()  {	
 		TestRunner tr = new TestRunner(new PrintStream(System.out));
 		
-		try {
-			System.out.println("Waiting " + SETTLE_MILLIS + " for OSGi instance to settle...");
-			Thread.sleep(SETTLE_MILLIS);
+		try {						
+			ServiceReference[] srefs = context.getServiceReferences(TestSuite.class.getName(), null);
+			
+			if (srefs != null && srefs.length > 0) {
+				System.out.println("Waiting " + SETTLE_MILLIS + " for OSGi instance to settle...");
+				Thread.sleep(SETTLE_MILLIS);
 				
-			for (ServiceReference sr : Arrays.asList(context.getAllServiceReferences(TestSuite.class.getName(), null))) {
-				TestSuite ts = (TestSuite) context.getService(sr);
-				
-				if (ts != null)
-					try {
-						runTest(tr, ts);
-					} catch (IOException e) {						
-						e.printStackTrace();
-					}
+				for (ServiceReference sr : Arrays.asList(srefs)) {
+					TestSuite ts = (TestSuite) context.getService(sr);
+					
+					if (ts != null)
+						try {
+							runTest(tr, ts);
+						} catch (IOException e) {						
+							e.printStackTrace();
+						}
+				}
 			}
 		} catch (InvalidSyntaxException e) {
 			// TODO Auto-generated catch block
