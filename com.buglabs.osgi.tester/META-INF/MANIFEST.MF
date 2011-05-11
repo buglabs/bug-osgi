@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-Name: com.buglabs.osgi.tester
+Bundle-Activator: com.buglabs.osgi.tester.Activator
+Bundle-SymbolicName: com.buglabs.osgi.tester
+Bundle-Version: 1.0.0
+Bug-Bundle-Type: Application
+BUG-API-Version: 1.4.4
+Import-Package: 
+ org.osgi.framework,
+ com.buglabs.osgi.shell,
+ com.buglabs.util,
+ com.buglabs.osgi.shell.pub,
+ com.buglabs.tableviewer
+Export-Package: 
+ junit.awtui,
+ junit.extensions,
+ junit.framework,
+ junit.runner,
+ junit.swingui,
+ junit.textui
+Bundle-ClassPath: libs/junit.jar, /, .
