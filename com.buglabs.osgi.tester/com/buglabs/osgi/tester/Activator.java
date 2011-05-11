@@ -40,7 +40,7 @@ public class Activator implements BundleActivator {
 					throw new BundleException("Unable to start tester, unable to create directory " + JUNIT_REPORT_DIR);
 		}
 			
-		System.out.println("Test report directory: " + outputDir);
+		System.out.println("Test report output directory: " + outputDir);
 		BundleTestRunnerThread thread = new BundleTestRunnerThread(context, outputDir);
 		thread.start();
 	}

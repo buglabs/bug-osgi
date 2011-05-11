@@ -1,5 +1,8 @@
 package com.buglabs.common.tests;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestSuite;
 
 import org.osgi.framework.BundleActivator;
@@ -12,7 +15,8 @@ public class Activator implements BundleActivator {
 
 	private static Activator instance;
 	private BundleContext context;
-	private ServiceRegistration sr;
+
+	private List<ServiceRegistration> regs;
 	
 	public Activator()	{
 		instance = this;
@@ -20,7 +24,10 @@ public class Activator implements BundleActivator {
 	
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		sr = context.registerService(TestSuite.class.getName(), new TestSuite(OSGiTestCommon.class), null);
+		regs = new ArrayList<ServiceRegistration>();
+		regs.add(context.registerService(TestSuite.class.getName(), new TestSuite(OSGiTestCommon.class), null));
+		
+		System.out.println(this.getClass().getName() + " added " + regs.size() + " suites for OSGi testing.");
 	}
 
 	public static synchronized Activator getDefault() {
@@ -32,6 +39,7 @@ public class Activator implements BundleActivator {
 	}
 	
 	public void stop(BundleContext context) throws Exception {
-		sr.unregister();
+		for (ServiceRegistration sr: regs)
+			sr.unregister();
 	}
 }

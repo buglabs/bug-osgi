@@ -38,11 +38,12 @@ public class BundleTestRunnerThread extends Thread {
 	@Override
 	public void run() {
 		try {
+			System.out.println("Waiting " + SETTLE_MILLIS + " millis for OSGi instance to settle...");
+			Thread.sleep(SETTLE_MILLIS);
+			
 			ServiceReference[] srefs = context.getServiceReferences(TestSuite.class.getName(), null);
 
-			if (srefs != null && srefs.length > 0) {
-				System.out.println("Waiting " + SETTLE_MILLIS + " millis for OSGi instance to settle...");
-				Thread.sleep(SETTLE_MILLIS);
+			if (srefs != null && srefs.length > 0) {				
 
 				for (ServiceReference sr : Arrays.asList(srefs)) {
 					TestSuite ts = (TestSuite) context.getService(sr);
@@ -54,6 +55,8 @@ public class BundleTestRunnerThread extends Thread {
 							e.printStackTrace();
 						}
 				}
+			} else {
+				System.out.println("No " + TestSuite.class.getName() + " tests were found in the service registry.");
 			}
 		} catch (InvalidSyntaxException e) {
 			// TODO Auto-generated catch block
