@@ -3,11 +3,11 @@ package com.buglabs.common.tests.junit;
 import java.io.IOException;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import com.buglabs.util.XmlNode;
 import com.buglabs.util.XmlParser;
 import com.buglabs.util.XpathQuery;
-
-import junit.framework.TestCase;
 
 /**
  * Test the xml parser.
@@ -216,6 +216,13 @@ public class XMLParseTests extends TestCase {
 		}
 
 		System.out.println(e.toString());
+	}
+	
+	/**
+	 * Temporary test to verify failure works as expected.
+	 */
+	public void testFailure() {
+		assertTrue(false);
 	}
 
 }
