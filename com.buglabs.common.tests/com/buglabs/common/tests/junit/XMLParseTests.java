@@ -224,5 +224,4 @@ public class XMLParseTests extends TestCase {
 	public void testFailure() {
 		assertTrue(false);
 	}
-
 }
