@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Enumeration;
 
 import junit.framework.Test;
+import junit.framework.TestFailure;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -77,13 +78,26 @@ public class BundleTestRunnerThread extends Thread {
 		ByteArrayOutputStream outbuf = new ByteArrayOutputStream();
 		TestRunner tr = new TestRunner(new PrintStream(outbuf));
 		System.out.println("Running Test Suite: " + tc.getName());
+		
+		long time = System.currentTimeMillis();
 		TestResult result = tr.doRun(tc);
+		time = (System.currentTimeMillis() - time) / 1000;
 
 		Enumeration<Test> te = tc.tests();
 		while (te.hasMoreElements()) {
 			Test test = te.nextElement();
-			out.addChild(new XmlNode("testcase").addAttribute("classname", tc.getName()).addAttribute("name", test.toString()).addAttribute("time", "0.030"));
-
+			
+			XmlNode testNode = new XmlNode(out, "testcase").addAttribute("classname", tc.getName()).addAttribute("name", test.toString()).addAttribute("time", "" + time);
+			
+			for (Enumeration<TestFailure> fenum = result.failures(); fenum.hasMoreElements();)	{		
+				TestFailure f = fenum.nextElement();
+				testNode.addChild(new XmlNode("failure", f.trace()).addAttribute("type", f.exceptionMessage()));
+			}
+			
+			for (Enumeration<TestFailure> fenum = result.errors(); fenum.hasMoreElements();)	{		
+				TestFailure f = fenum.nextElement();
+				testNode.addChild(new XmlNode("error", f.trace()).addAttribute("type", f.exceptionMessage()));
+			}
 		}
 
 		out.addAttribute("errors", "" + result.errorCount());
@@ -92,7 +106,7 @@ public class BundleTestRunnerThread extends Thread {
 		out.addAttribute("hostname", getHostName());
 		out.addAttribute("name", tc.getName());
 		out.addAttribute("tests", "" + tc.testCount());
-		out.addAttribute("time", "0.100");
+		out.addAttribute("time", "" + time);
 		out.addAttribute("timestamp", getDateStamp());
 
 		out.addChild(new XmlNode("system-out", outbuf.toString()));
