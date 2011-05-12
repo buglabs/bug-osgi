@@ -35,13 +35,6 @@ public class OSGiTestCommon extends TestCase {
 	}
 	
 	/**
-	 * Temporary test to verify failure works as expected.
-	 */
-	public void testFailure() {
-		assertTrue(false);
-	}
-	
-	/**
 	 * Test the OSGiServiceLoader class
 	 * @throws Exception
 	 */

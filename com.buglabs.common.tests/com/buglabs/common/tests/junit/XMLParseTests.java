@@ -217,11 +217,4 @@ public class XMLParseTests extends TestCase {
 
 		System.out.println(e.toString());
 	}
-	
-	/**
-	 * Temporary test to verify failure works as expected.
-	 */
-	public void testFailure() {
-		assertTrue(false);
-	}
 }
