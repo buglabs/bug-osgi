@@ -73,7 +73,7 @@
 		</javadoc>
 	</target>
 
-	<target name="test" depends="build.jars">
+	<target name="test" depends="create_dirs, build.jars">
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
 			<formatter type="xml"/>
@@ -98,7 +98,7 @@
 		</java>
 	</target>
 	
-	<target name="checkstyle">		
+	<target name="checkstyle" depends="create_dirs">		
 		<echo message="Running checkstyle template: ${checkstyle.config} for sources in ${checkstyle.src} and outputing to ${checkstyle.dir}/checkstyle_errors.xml"></echo>
 		<checkstyle config="${checkstyle.config}">
 			<fileset dir="${checkstyle.src}" includes="**/*.java"/>
@@ -106,7 +106,7 @@
 		</checkstyle>
 	</target>
 
-	<target name="create_dirs" depends="clean">
+	<target name="create_dirs">
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${checkstyle.dir}" />
 		<mkdir dir="${report.dir}" />
