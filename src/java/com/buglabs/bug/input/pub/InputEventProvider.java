@@ -75,15 +75,18 @@ public class InputEventProvider extends Thread implements IButtonEventProvider {
 
 		while (!isInterrupted()) {
 			try {
+				//block on reading events from JNI
 				InputEvent[] inputEvents = dev.readEvents();
 
 				synchronized (listeners) {
-					Iterator iter = listeners.iterator();
-
+					//process each event
 					for (int i = 0; i < inputEvents.length; ++i) {
+						//get reference to the listners
+						Iterator iter = listeners.iterator();
+						//create a new ButtonEvent object
 						ButtonEvent b = new ButtonEvent(inputEvents[i].code, 0, inputEvents[i].code, convertButtonAction(inputEvents[i].value), this.getClass().toString());
 						log.log(LogService.LOG_DEBUG, this.getClass().getName() + ": Input event: " + inputEvents[i].code);
-						
+						//for each event, iterate through 
 						while (iter.hasNext()) {
 							IButtonEventListener l = (IButtonEventListener) iter.next();
 							try {

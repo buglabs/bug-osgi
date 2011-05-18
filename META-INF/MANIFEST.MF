@@ -5,7 +5,8 @@ Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: com.buglabs.bug.jni.common,
  org.osgi.service.log,
- com.buglabs.device
+ com.buglabs.device,
+ org.osgi.framework
 Export-Package: com.buglabs.bug.jni.input,
  com.buglabs.bug.input.pub
 Bundle-NativeCode: /lib/libInputDevice.so;

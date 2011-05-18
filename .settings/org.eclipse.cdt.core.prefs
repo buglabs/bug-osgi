@@ -1,5 +1,25 @@
-#Tue Aug 12 11:21:51 GMT-05:00 2008
+#Wed May 18 12:23:19 EDT 2011
 eclipse.preferences.version=1
-environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="CXX" operation\="append" value\="arm-none-linux-gnueabi-g++"/>\n<variable delimiter\=";" name\="CXXFLAGS" operation\="replace" value\="-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp"/>\n<variable delimiter\=";" name\="COMMON_CLASSPATH" operation\="append" value\="${CHECKOUT_DIR}/com.buglabs.bug.jni.common/bin"/>\n<variable delimiter\=";" name\="JAVAH_CLASSPATH" operation\="append" value\="../../bin"/>\n</environment>\n
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888=
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/COMMON_CLASSPATH/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/COMMON_CLASSPATH/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/COMMON_CLASSPATH/value=${CHECKOUT_DIR}/com.buglabs.bug.jni.common/bin
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXX/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXX/operation=replace
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXX/value=arm-angstrom-linux-gnueabi-g++
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXXFLAGS/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXXFLAGS/operation=replace
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXXFLAGS/value=-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/JAVAH_CLASSPATH/delimiter=;
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/JAVAH_CLASSPATH/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/JAVAH_CLASSPATH/value=../../bin
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/ROOTFS_BUG/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/ROOTFS_BUG/operation=replace
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/ROOTFS_BUG/value=/opt/build/r2.1/tmp/sysroots/armv7a-angstrom-linux-gnueabi/
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/STAGING_LIBDIR/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/STAGING_LIBDIR/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/STAGING_LIBDIR/value=/opt/build/r2.1/tmp/sysroots/armv7a-angstrom-linux-gnueabi/usr/lib/
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/append=true
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/appendContributed=true
 indexer/indexerId=org.eclipse.cdt.core.fastIndexer
 indexerId=org.eclipse.cdt.core.fastIndexer
