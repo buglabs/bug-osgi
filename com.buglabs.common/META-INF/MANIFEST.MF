@@ -6,7 +6,8 @@ Bundle-Vendor: Bug Labs, Inc.
 Bundle-ManifestVersion: 2
 Import-Package: org.osgi.framework,
  org.osgi.service.cm;resolution:=optional,
- org.osgi.util.tracker
+ org.osgi.util.tracker,
+ org.osgi.service.log
 Export-Package: com.buglabs.application,
  com.buglabs.device,
  com.buglabs.menu,
@@ -16,5 +17,4 @@ Export-Package: com.buglabs.application,
  com.buglabs.status,
  com.buglabs.support,
  com.buglabs.util,
- com.buglabs.util.simplerestclient,
- org.osgi.service.log;version="1.3"
+ com.buglabs.util.simplerestclient

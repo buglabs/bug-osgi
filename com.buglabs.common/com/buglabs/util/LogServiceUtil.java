@@ -29,17 +29,11 @@ package com.buglabs.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogReaderService;
 import org.osgi.service.log.LogService;
-
-import com.buglabs.osgi.log.LogServiceImpl;
 
 /**
  * Utility functions relating to OSGi log service.
@@ -58,6 +52,7 @@ public class LogServiceUtil {
 	 */
 	public static LogService getLogService(BundleContext context) {
 		final LogService logService;
+		boolean created = false;
 		// See if LogService is available.
 		// also protect against context being null
 		ServiceReference sr = null;
@@ -67,31 +62,62 @@ public class LogServiceUtil {
 		if (sr != null) {
 			logService = (LogService) context.getService(sr);
 		} else {
-			LogServiceImpl logServiceImpl = new LogServiceImpl(context);
-			logService = (LogService) logServiceImpl;
+			// Return a log service that outputs to stout and sterr.
+			logService = new LogService() {
 
-			//We will register a log service and just let it dangle out there for the lifetime of the OSGi framework instance.
-			context.registerService(LogService.class.getName(), logServiceImpl, getLogServiceProperties(logServiceImpl));
-			context.registerService(LogReaderService.class.getName(), logServiceImpl, getLogServiceProperties(logServiceImpl));
+				public void log(int level, String message) {
+					System.out.println(levelString(level) + message);
+				}
+
+				public void log(int level, String message, Throwable exception) {
+					System.out.println(levelString(level) + message + "\n" + exception.toString());
+					if (level == LogService.LOG_ERROR) {
+						System.err.println(levelString(level) + message + "\n" + exception.toString());
+					}
+					exception.printStackTrace(new PrintWriter(System.out, true));
+				}
+
+				public void log(ServiceReference sr, int level, String message) {
+					System.out.println(levelString(level) + "Service Reference: " + sr.toString() + " " + message);
+					if (level == LogService.LOG_ERROR) {
+						System.err.println(levelString(level) + "Service Reference: " + sr.toString() + " " + message);
+					}
+				}
+
+				public void log(ServiceReference sr, int level, String message, Throwable exception) {
+					System.out.println(levelString(level) + message + "\n" + exception.toString());
+					exception.printStackTrace(new PrintWriter(System.out, true));
+					if (level == LogService.LOG_ERROR) {
+						System.err.println(levelString(level) + message + "\n" + exception.toString());
+						exception.printStackTrace(new PrintWriter(System.err, true));
+					}
+				}
+
+				private String levelString(int level) {
+					switch (level) {
+					case LogService.LOG_DEBUG:
+						return "[DEBUG]   ";
+					case LogService.LOG_ERROR:
+						return "[ERROR]   ";
+					case LogService.LOG_INFO:
+						return "[INFO]    ";
+					case LogService.LOG_WARNING:
+						return "[WARNING] ";
+					default:
+						return "[UNKNOWN] ";
+					}
+				}
+			};
+			created = true;
+		}
+		
+		if (created) {
+			// Register the service with the framework so that future calls to
+			// this static method need not create new objects.
+			context.registerService(LogService.class.getName(), logService, null);
 		}
 
 		return logService;
-	}
-
-	
-	/**
-	 * @return Properties associated with this service implementation.
-	 */
-	private static Dictionary getLogServiceProperties(LogServiceImpl logServiceImpl) {
-		Hashtable dict = new Hashtable();
-		dict.put("Implementation", LogServiceImpl.class.getName());
-		dict.put("Log Level", "" + logServiceImpl.logLevel);
-		dict.put("Quiet", "" + logServiceImpl.quiet);
-		dict.put("Output Stream", LogServiceImpl.out.getClass().getName());
-		dict.put("Error Stream", LogServiceImpl.err.getClass().getName());
-		dict.put("Buffer Size", "" + logServiceImpl.bufferSize);
-		dict.put(Constants.SERVICE_RANKING, -4096);
-		return dict;
 	}
 
 	/**
