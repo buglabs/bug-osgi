@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project name="common-osgi" default="build.jars" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
-	<fail unless="checkout.dir"      message="checkout.dir must be defined."/>
-	<fail unless="base.build.dir"    message="base.build.dir must be defined."/>
-	<fail unless="externalDirectory" message="externalDirectory must be defined."/>
-	<fail unless="distDirectory"     message="distDirectory must be defined."/>
+	<fail unless="checkout.dir"      message="Ant variable checkout.dir must be defined."/>
+	<fail unless="base.build.dir"    message="Ant variable base.build.dir must be defined."/>
+	<fail unless="externalDirectory" message="Ant variable externalDirectory must be defined."/>
+	<fail unless="distDirectory"     message="Ant variable distDirectory must be defined."/>
 	
 	<property name="buildDirectory" location="${checkout.dir}/${ant.project.name}" />
 	<property environment="env"/>
