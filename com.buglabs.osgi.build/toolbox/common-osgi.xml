@@ -50,9 +50,7 @@
 		</manifest>
 	</target>
 
-	<!-- ================================= 
-          target: build.jars              
-         ================================= -->
+	<!-- target: build.jars   Build jars intended for production distribution -->
 	<target name="build.jars" depends="build, document" description="make the jar">
 		<jar destfile="${distDirectory}/${project}.jar" 
 			 basedir="${buildDirectory}" 
@@ -60,13 +58,15 @@
 			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**"/>
 	</target>
 	
+	<!-- target: build.src.jars   Build jars with source code -->
 	<target name="build.src.jars" depends="build, document" description="make the jar">
-			<jar destfile="${distDirectory}/${project}.jar" 
-				 basedir="${buildDirectory}" 
-			     manifest="META-INF/MANIFEST.MF"
-				 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore"/>
+		<jar destfile="${distDirectory}/${project}.jar" 
+			 basedir="${buildDirectory}" 
+		     manifest="META-INF/MANIFEST.MF"
+			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore"/>
 	</target>
 
+	<!-- target: doc.build.jars   Generate javadocs after building and jaring -->
 	<target name="doc.build.jars" description="javadoc and make the jar">
 		<property name="generate.docs" value="true" />
 		<antcall target="build.jars" />
@@ -80,6 +80,7 @@
 		</javadoc>
 	</target>
 
+	<!-- target: test   Run JUnit tests -->
 	<target name="test" depends="create_dirs, build.jars">
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
@@ -93,6 +94,7 @@
 		</junit>
 	</target>
 	
+	<!-- target: test-osgi   Run tests within an OSGi framework -->
 	<target name="test-osgi" depends="test">
 		<echo message="Creating OSGi instance with following bundles: ${testBundles}"></echo>
 		<property name="osgi.framework.jar" location="${distDirectory}/felix.jar" />
@@ -105,6 +107,7 @@
 		</java>
 	</target>
 	
+	<!-- target: checkstyle   Run the checkstyle validator against sources -->
 	<target name="checkstyle" depends="create_dirs">		
 		<echo message="Running checkstyle template: ${checkstyle.config} for sources in ${checkstyle.src} and outputing to ${checkstyle.dir}/checkstyle_errors.xml"></echo>
 		<checkstyle config="${checkstyle.config}">
