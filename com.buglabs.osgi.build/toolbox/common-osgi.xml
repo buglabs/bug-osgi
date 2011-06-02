@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <project name="common-osgi" default="build.jars" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
-	<property name="buildDirectory" location="${checkout.dir}/${project}" />
+	<fail unless="checkout.dir"      message="checkout.dir must be defined."/>
+	<fail unless="base.build.dir"    message="base.build.dir must be defined."/>
+	<fail unless="externalDirectory" message="externalDirectory must be defined."/>
+	<fail unless="distDirectory"     message="distDirectory must be defined."/>
+	
+	<property name="buildDirectory" location="${checkout.dir}/${ant.project.name}" />
+	<property environment="env"/>
+	<tstamp/>
 	
 	<!-- Import Checkstyle -->
 	<taskdef resource="checkstyletask.properties"
@@ -33,26 +40,34 @@
 	<property name="bundleJavacSource" value="${javacSource}" />
 	<property name="bundleJavacTarget" value="${javacTarget}" />
 	<property name="bundleBootClasspath" value="${bootclasspath}" />
-
-	<!-- ================================= 
-          target: build              
-         ================================= -->
-	<target name="build" description="BUILDING: ${project}">
-		<echo message="BUILDING: ${project}" />
+	
+	<!-- target: build	  Compile the source code -->
+	<target name="build" description="BUILDING: ${ant.project.name}">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build" />
+		
+		<fail unless="package.version" message="package.version must be defined."/>
+		<fail unless="env.BUILD_NUMBER" message="env.BUILD_NUMBER must be defined."/>
+			
+		<property name="full.version" value="${package.version}.${env.BUILD_NUMBER}"></property>
+		
 		<javac destdir="${buildDirectory}" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" includeAntRuntime="no" bootclasspath="${bundleBootClasspath}" srcdir=".">
 			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
 			<classpath refid="bin.classpath" />
 		</javac>
 		<manifest file="META-INF/MANIFEST.MF" mode="update">
-			<attribute name="Bundle-Version" value="${bundle.version}" />
-			<attribute name="Build-Level" value="${build.level}" />
-			<attribute name="Built-On" value="${env.COMPUTERNAME} ${TODAY} ${TSTAMP}" />
+			<attribute name="Bundle-Version" value="${full.version}" />
+			<attribute name="Build-Label" value="${env.JOB_NAME}" />
+			<attribute name="Build-Source" value="${env.COMPUTERNAME} ${TODAY} ${TSTAMP}" />
 		</manifest>
 	</target>
 
 	<!-- target: build.jars   Build jars intended for production distribution -->
 	<target name="build.jars" depends="build, document" description="make the jar">
-		<jar destfile="${distDirectory}/${project}.jar" 
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.jars" />
+		<fail unless="distDirectory" message="distDirectory must be defined."/>
+		<fail unless="buildDirectory" message="buildDirectory must be defined."/>
+		
+		<jar destfile="${distDirectory}/${ant.project.name}.jar" 
 			 basedir="${buildDirectory}" 
 		     manifest="META-INF/MANIFEST.MF"
 			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**"/>
@@ -60,7 +75,9 @@
 	
 	<!-- target: build.src.jars   Build jars with source code -->
 	<target name="build.src.jars" depends="build, document" description="make the jar">
-		<jar destfile="${distDirectory}/${project}.jar" 
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.src.jars" />
+		
+		<jar destfile="${distDirectory}/${ant.project.name}.jar" 
 			 basedir="${buildDirectory}" 
 		     manifest="META-INF/MANIFEST.MF"
 			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore"/>
@@ -68,11 +85,14 @@
 
 	<!-- target: doc.build.jars   Generate javadocs after building and jaring -->
 	<target name="doc.build.jars" description="javadoc and make the jar">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: doc.build.jars" />
+		
 		<property name="generate.docs" value="true" />
 		<antcall target="build.jars" />
 	</target>
 
 	<target name="document" if="generate.docs">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: document" />
 		<javadoc destdir="${buildDirectory}/docs">
 			<fileset dir=".">
 				<include name="**/*.java" />
@@ -82,6 +102,7 @@
 
 	<!-- target: test   Run JUnit tests -->
 	<target name="test" depends="create_dirs, build.jars">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test" />
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
 			<formatter type="xml"/>
@@ -96,6 +117,8 @@
 	
 	<!-- target: test-osgi   Run tests within an OSGi framework -->
 	<target name="test-osgi" depends="test">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test.osgi" />
+		
 		<echo message="Creating OSGi instance with following bundles: ${testBundles}"></echo>
 		<property name="osgi.framework.jar" location="${distDirectory}/felix.jar" />
 		<java jar="${osgi.framework.jar}" newenvironment="true" fork="true">
@@ -109,6 +132,7 @@
 	
 	<!-- target: checkstyle   Run the checkstyle validator against sources -->
 	<target name="checkstyle" depends="create_dirs">		
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: checkstyle" />
 		<echo message="Running checkstyle template: ${checkstyle.config} for sources in ${checkstyle.src} and outputing to ${checkstyle.dir}/checkstyle_errors.xml"></echo>
 		<checkstyle config="${checkstyle.config}">
 			<fileset dir="${checkstyle.src}" includes="**/*.java"/>
@@ -117,12 +141,14 @@
 	</target>
 
 	<target name="create_dirs">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: create_dirs" />
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${checkstyle.dir}" />
 		<mkdir dir="${report.dir}" />
 	</target>
 
 	<target name="clean">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: clean" />
 		<delete dir="${report.dir}" />
 		<delete dir="${buildDirectory}" />
 		<delete dir="${checkstyle.dir}" />
