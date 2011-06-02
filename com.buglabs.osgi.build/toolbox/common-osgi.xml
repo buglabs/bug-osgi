@@ -57,7 +57,8 @@
 		<manifest file="META-INF/MANIFEST.MF" mode="update">
 			<attribute name="Bundle-Version" value="${full.version}" />
 			<attribute name="Build-Label" value="${env.JOB_NAME}" />
-			<attribute name="Build-Source" value="${env.COMPUTERNAME} ${TODAY} ${TSTAMP}" />
+			<attribute name="Build-Source" value="${env.BUILD_URL}" />
+			<attribute name="Build-Date" value="${TODAY}" />
 		</manifest>
 	</target>
 
