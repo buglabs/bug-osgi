@@ -57,7 +57,7 @@
 		<jar destfile="${distDirectory}/${project}.jar" 
 			 basedir="${buildDirectory}" 
 		     manifest="META-INF/MANIFEST.MF"
-			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore"/>
+			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**"/>
 	</target>
 	
 	<target name="build.src.jars" depends="build, document" description="make the jar">
