@@ -51,10 +51,12 @@
 		<!-- These will only be set if previously undefined -->
 		<property name="package.version" value="default.package.version"/>
 		<property name="env.BUILD_NUMBER" value="0"/>
+		<property name="env.JOB_NAME" value="undefined"/>
+		<property name="env.BUILD_URL" value="undefined"/>
 			
 		<property name="full.version" value="${package.version}.${env.BUILD_NUMBER}"></property>
 		
-		<javac destdir="${buildDirectory}" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" includeAntRuntime="no" bootclasspath="${bundleBootClasspath}" srcdir=".">
+		<javac destdir="${buildDirectory}" srcdir="." source="1.6" target="1.6" encoding="utf-8" fork="true" >
 			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
 			<classpath refid="bin.classpath" />
 		</javac>
@@ -75,7 +77,7 @@
 		<jar destfile="${distDirectory}/${ant.project.name}.jar" 
 			 basedir="${buildDirectory}" 
 		     manifest="META-INF/MANIFEST.MF"
-			 excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**"/>
+			 excludes="**/*.java,build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**"/>
 	</target>
 	
 	<!-- target: build.src.jars   Build jars with source code -->
@@ -108,6 +110,8 @@
 	<!-- target: test   Run JUnit tests -->
 	<target name="test" depends="create_dirs, build.jars">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test" />
+		<fail unless="report.dir"      message="Ant variable repord.dir must be defined."/>
+		<mkdir dir="${report.dir}" />
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
 			<formatter type="xml"/>
@@ -138,6 +142,8 @@
 	<!-- target: checkstyle   Run the checkstyle validator against sources -->
 	<target name="checkstyle" depends="create_dirs">		
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: checkstyle" />
+		<fail unless="checkstyle.dir"      message="Ant variable checkstyle.dir must be defined."/>
+		<mkdir dir="${checkstyle.dir}" />
 		<echo message="Running checkstyle template: ${checkstyle.config} for sources in ${checkstyle.src} and outputing to ${checkstyle.dir}/checkstyle_errors.xml"></echo>
 		<checkstyle config="${checkstyle.config}">
 			<fileset dir="${checkstyle.src}" includes="**/*.java"/>
@@ -147,9 +153,7 @@
 
 	<target name="create_dirs">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: create_dirs" />
-		<mkdir dir="${buildDirectory}" />
-		<mkdir dir="${checkstyle.dir}" />
-		<mkdir dir="${report.dir}" />
+		<mkdir dir="${buildDirectory}" />		
 		<mkdir dir="${externalDirectory}" />
 		<mkdir dir="${distDirectory}" />
 	</target>
@@ -159,5 +163,7 @@
 		<delete dir="${report.dir}" />
 		<delete dir="${buildDirectory}" />
 		<delete dir="${checkstyle.dir}" />
+		<delete dir="${distDirectory}" />
+		<delete dir="${externalDirectory}" />
 	</target>
 </project>
