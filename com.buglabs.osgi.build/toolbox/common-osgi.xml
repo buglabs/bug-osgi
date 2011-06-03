@@ -5,6 +5,9 @@
 	<fail unless="externalDirectory" message="Ant variable externalDirectory must be defined."/>
 	<fail unless="distDirectory"     message="Ant variable distDirectory must be defined."/>
 	
+	<!-- The package version if previously undefined -->
+	<property name="default.package.version" value="2.5" />
+	
 	<property name="buildDirectory" location="${checkout.dir}/${ant.project.name}" />
 	<property environment="env"/>
 	<tstamp/>
@@ -45,8 +48,9 @@
 	<target name="build" description="BUILDING: ${ant.project.name}">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build" />
 		
-		<fail unless="package.version" message="package.version must be defined."/>
-		<fail unless="env.BUILD_NUMBER" message="env.BUILD_NUMBER must be defined."/>
+		<!-- These will only be set if previously undefined -->
+		<property name="package.version" value="default.package.version"/>
+		<property name="env.BUILD_NUMBER" value="0"/>
 			
 		<property name="full.version" value="${package.version}.${env.BUILD_NUMBER}"></property>
 		
@@ -146,6 +150,8 @@
 		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${checkstyle.dir}" />
 		<mkdir dir="${report.dir}" />
+		<mkdir dir="${externalDirectory}" />
+		<mkdir dir="${distDirectory}" />
 	</target>
 
 	<target name="clean">
