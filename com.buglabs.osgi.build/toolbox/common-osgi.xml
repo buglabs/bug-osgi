@@ -9,6 +9,14 @@
 	<property name="default.package.version" value="2.5" />
 	
 	<property name="buildDirectory" location="${checkout.dir}/${ant.project.name}" />
+	<fail message="The project build directory ${buildDirectory} does not exist.">
+	    <condition>
+	        <not>
+	        	<available file="${buildDirectory}" type="dir"/>
+	        </not>
+	    </condition>
+	</fail>
+	
 	<property environment="env"/>
 	<tstamp/>
 	
