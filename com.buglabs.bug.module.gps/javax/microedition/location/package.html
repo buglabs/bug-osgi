@@ -1,0 +1,359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<body>
+The javax.microedition.location package contains the basic classes needed to request and get a location result.
+
+<p>The <CODE>javax.microedition.location</CODE> package contains the 
+basic classes needed to request and get a location result. 
+</p>
+<p>The <code>LocationProvider</code> class represents a module that 
+is able to determine the location of the terminal. This may be 
+implemented using any possible location methods, for example,
+satellite based methods like GPS, cellular network based
+methods, short-range positioning methods like Bluetooth Local
+Positioning, etc. The implementation may also combine the 
+methods in various ways to get the optimal result.
+</p>
+<p>
+The application can specify criteria for selecting the location provider
+and obtain a <code>LocationProvider</code> instance that is able to 
+fulfil these criteria as closely as possible. By using the 
+<code>LocationProvider</code>, the application can get 
+<code>Location</code> objects representing the 
+location of the terminal at the time of the measurement.
+The application can either request a single <code>Location</code>
+object or be periodically updated with new <code>Location</code> objects 
+via a <code>LocationListener</code> implemented by the application.
+</p>
+<p>The location is represented by the <code>Location</code> object that
+contains a <code>QualifiedCoordinates</code> object representing 
+the geographical coordinates (latitude, longitude and altitude) and
+ information about their accuracy, a timestamp and possibly
+information about speed and course of the terminal.
+For some location methods,
+the <CODE>Location</CODE> object may also contain an <code>AddressInfo</code> object
+that includes textual address information, e.g. a street address.
+</p>
+<p>The <code>Location</code> gives the accuracy of the 
+coordinates as the radius of a circular area indicating 
+the 1-sigma confidence level. The 1-sigma confidence refers
+to the standard deviation of the distribution. Assuming a normal
+distribution (which is not necessarily the case), this implies
+that the actual location is within the circle defined by
+the returned point and radius at a probability of 
+approximately 68%. The actual location may thus be also outside
+of the circle, which has to be taken into account when
+using the location information in applications.
+</p>
+
+<p>This package also includes a database of landmarks. A landmark
+is a known physical location that is associated with a name
+representing that location for the end user. The user can store
+commonly used locations in the database. Examples of landmarks
+could be e.g. the user's home, office, etc. The landmark database
+must be shared between all Java applications and may be shared 
+with other applications in the terminal, including
+native applications, so that the end user has a consistent user
+experience across all location based applications on the 
+terminal.
+</p>
+
+<h2>Mandatory and optional features</h2>
+
+<p>This API contains some options whose availability depends on 
+the used location methods. These features are not optional
+in order to allow for differences in the implementations and
+to cause unnecessary fragmentation, but they are unavoidable 
+due to the differences in the underlying location methods.
+Implementations should support all features that are possible
+with the locations methods that are used.
+</p>
+<p>Mandatory features for all location methods are:
+<ul>
+  <li>Provide latitude and longitude coordinates and their accuracy
+  </li>
+  <li>Provide timestamp of the location measurement
+  </li>
+</ul>
+</p>
+<p>Mandatory other API features for the terminal are:
+<ul>
+  <li>Support one (default) <code>LandmarkStore</code> for storing landmarks
+  </li>
+</ul>
+</p>
+<p>Features whose availability depend on the used location
+method:
+<ul>
+  <li>Provide altitude information
+  </li>
+  <li>Provide accuracy of altitude
+  </li>
+  <li>Provide course and speed information
+  </li>
+  <li>Provide textual address information related to the location
+  </li>
+  <li>Provide landmark proximity events
+  </li>
+</ul>
+</p>
+<p>Optional features whose availability depend on the landmark store 
+implementation of the terminal and its possible relation to landmark 
+stores shared with native applications:
+<ul>
+   <li>Creating and deleting landmark stores
+   </li>
+   <li>Adding and removing landmark categories
+   </li>
+</ul>
+<p>Additionally, depending on the hardware capabilities of the
+terminal, the following features are optionally supported: 
+<ul>
+  <li>Provide the compass azimuth of the terminal orientation
+  </li>
+  <li>Provide the pitch and roll 3D terminal orientation information
+  </li>
+</ul>
+</p>
+<p>In general, every implementation MUST contain all the classes, interfaces and
+methods as defined in this specification. Those features that are optional to 
+implement have a defined behaviour in the case the feature is not supported by
+the implementation.
+</p>
+
+<h2>Security of this API</h2>
+
+<p>Some methods in this API are defined to throw a <code>SecurityException</code>
+if the caller does not have the permissions needed to perform the action.
+This MUST be enforced by an appropriate security framework in the platform.
+</p>
+<h3>Using the MIDP 2.0 Security Framework</h3>
+<p>
+If this API is implemented on the MIDP 2.0 platform, the security framework
+of MIDP 2.0 MUST be used as defined below.
+<p>
+<p>The table below defines the names of the permissions used
+and the methods that are protected by each permission. 
+The definition of the policy for these permissions is out of 
+scope for this specification.
+</p>
+
+<table border=1>
+       <tr>
+         <th>
+           <p>Permission name</p>
+         </th>
+         <th>
+           <p>Methods protected by this permission</p>
+         </th>
+       </tr>
+       <tr>
+         <td>
+           <p><code>javax.microedition.location.Location</code></p>
+         </td>
+         <td>
+           <p><code>LocationProvider.getLocation()</code>,
+              <code>LocationProvider.setLocationListener()</code>
+	   </p>
+         </td>
+       </tr>
+
+       <tr>
+         <td>
+           <p><code>javax.microedition.location.Orientation</code></p>
+         </td>
+         <td>
+           <p><code>Orientation.getOrientation()</code>
+	   </p>
+         </td>
+       </tr>
+
+       <tr>
+         <td>
+           <p><code>javax.microedition.location.ProximityListener</code></p>
+         </td>
+         <td>
+           <p><code>LocationProvider.addProximityListener()</code>
+	   </p>
+         </td>
+       </tr>
+
+       <tr>
+         <td>
+           <p><code>javax.microedition.location.LandmarkStore.read</code></p>
+         </td>
+         <td>
+           <p><code>LandmarkStore.getInstance()</code>,
+              <code>LandmarkStore.listLandmarkStores()</code>
+	   </p>
+         </td>
+       </tr>
+
+       <tr>
+         <td>
+           <p><code>javax.microedition.location.LandmarkStore.write</code></p>
+         </td>
+         <td>
+           <p><code>LandmarkStore.addLandmark()</code>,
+              <code>LandmarkStore.deleteLandmark()</code>,
+              <code>LandmarkStore.removeLandmarkFromCategory()</code>,
+              <code>LandmarkStore.updateLandmark()</code>
+	   </p>
+         </td>
+       </tr>
+
+       <tr>
+         <td>
+           <p><code>javax.microedition.location.LandmarkStore.category</code></p>
+         </td>
+         <td>
+           <p><code>LandmarkStore.addCategory()</code>,
+              <code>LandmarkStore.deleteCategory()</code>
+	   </p>
+         </td>
+       </tr>
+
+       <tr>
+         <td>
+           <p><code>javax.microedition.location.LandmarkStore.management</code></p>
+         </td>
+         <td>
+           <p><code>LandmarkStore.createLandmarkStore()</code>,
+              <code>LandmarkStore.deleteLandmarkStore()</code>
+	   </p>
+         </td>
+       </tr>
+
+</table>
+
+<h2>Identification of the Location API</h2>
+
+<p>To enable applications to test for the presence of the Location API
+and its version during runtime, a system property is defined.
+Platforms where this API is implemented according to this specification
+shall include a system property with a key <code>"microedition.location.version"</code>.
+When <code>System.getProperty</code> is called with this key, 
+implementations conforming to this specification shall return the 
+version string <code>"1.0"</code>.
+</p>
+
+<h2>Example of Usage</h2>
+<p>The following piece of code illustrates how to obtain
+the current location of the terminal. This piece of code illustrates
+obtaining the location syncronously. An application would normally
+perform this within a separate thread, because the <code>getLocation</code>
+method may block for a long time.</p>
+<p>
+<code>
+<pre>
+try {
+
+    // Create a Criteria object for defining desired selection criteria
+    Criteria cr = new Criteria();
+    // Specify horizontal accuracy of 500 meters, leave other parameters 
+    // at default values.
+    cr.setHorizontalAccuracy(500);
+   
+    LocationProvider lp = LocationProvider.getInstance(cr);
+
+    // get the location, one minute timeout
+    Location l = lp.getLocation(60);
+
+    Coordinates c = l.getQualifiedCoordinates();
+    
+    if (c != null) {
+       // use coordinate information
+       ...
+    }
+} catch (LocationException e) {
+   // not able to retrive location information
+   ...
+} 
+</pre>
+</code>
+</p>
+
+
+<p>The following example illustrates how to use the 
+<code>LocationListener</code> for subscribing to periodic location
+updates. This example creates a handler thread to handle the updates
+so that the methods on the listener would not block the platform
+implementation threads for a long time. 
+<p>
+
+<p>
+<code>
+<pre>
+class MovementTracker implements LocationListener {
+    float movementDistance;
+    LocationProvider provider;
+    Location lastValidLocation;
+    UpdateHandler handler;
+    boolean done;
+
+    public MovementTracker(float movementDistance) throws LocationException {
+	this.movementDistance = movementDistance;
+	done = false;
+	handler = new UpdateHandler();
+	new Thread(handler).start();
+	provider = LocationProvider.getInstance(null);
+	provider.setLocationListener(this, -1, -1, -1);
+    }
+
+    public void locationUpdated(LocationProvider provider, Location location) {
+	handler.handleUpdate(location);
+    }
+
+    public void providerStateChanged(LocationProvider provider, int newState) {
+    }
+
+    class UpdateHandler implements Runnable {
+	private Location updatedLocation = null;
+
+	// The run method performs the actual processing of the location 
+	// updates
+	public void run() {
+	    Location locationToBeHandled = null;
+	    while (!done) {
+		synchronized(this) {
+		    if (updatedLocation == null) {
+			try {
+			    wait();
+			} catch (Exception e) {
+			    // Handle interruption
+			}
+		    }   
+		    locationToBeHandled = updatedLocation;
+		    updatedLocation = null;
+		}
+
+		// The benefit of the MessageListener is here.
+		// This thread could via similar triggers be
+		// handling other kind of events as well in
+		// addition to just receiving the location updates.
+		if (locationToBeHandled != null) 
+		    processUpdate(locationToBeHandled);
+	    }
+	}
+
+	public synchronized void handleUpdate(Location update) {
+	    updatedLocation = update;
+	    notify();
+	}
+
+	private void processUpdate(Location update) {
+	    if ( update.getQualifiedCoordinates().distance(
+			lastValidLocation.getQualifiedCoordinates() ) 
+		 > movementDistance ) {
+		// Alert user to movement...
+		    
+		// Cache new position as we have moved a sufficient distance 
+		// from last one
+		lastValidLocation = location;
+	    }
+	}
+    }
+}
+</pre>
+</code>
+</p>
+</body>
