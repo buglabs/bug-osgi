@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG LCD
+Bundle-SymbolicName: com.buglabs.bug.module.lcd
+Bundle-Version: 1.0.0
+Bundle-Activator: com.buglabs.bug.module.lcd.Activator
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.bug.module.lcd.pub
+Import-Package: org.osgi.framework,
+ com.buglabs.device,
+ org.osgi.util.tracker,
+ com.buglabs.menu,
+ com.buglabs.bug.module.pub,
+ com.buglabs.module,
+ com.buglabs.services.ws,
+ com.buglabs.status,
+ com.buglabs.util,
+ com.buglabs.bug.jni.common,
+ org.osgi.service.log,
+ com.buglabs.bug.sysfs,
+ com.buglabs.bug.accelerometer.pub
+Bug-Bundle-Type: Module
+Bug-Module-Id: 0003
+Bug-Module-Driver-Id: bmi_lcd
