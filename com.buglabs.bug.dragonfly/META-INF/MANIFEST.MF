@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG SDK Event System
+Bundle-SymbolicName: com.buglabs.bug.event
+Bundle-Version: 1.0.0
+Bundle-Activator: com.buglabs.bug.event.Activator
+Bundle-Vendor: Bug Labs, Inc.
+Import-Package: javax.servlet,
+ javax.servlet.http,
+ org.osgi.framework,
+ org.osgi.service.log,
+ org.osgi.util.tracker,
+ com.buglabs.device,
+ com.buglabs.menu,
+ com.buglabs.module,
+ com.buglabs.services.ws,
+ com.buglabs.status,
+ com.buglabs.util,
+ org.osgi.service.http
+Export-Package: com.buglabs.bug.event
