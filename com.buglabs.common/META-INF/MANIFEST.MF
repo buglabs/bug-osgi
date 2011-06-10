@@ -17,4 +17,5 @@ Export-Package: com.buglabs.application,
  com.buglabs.status,
  com.buglabs.support,
  com.buglabs.util,
+ com.buglabs.util.xml,
  com.buglabs.util.simplerestclient
