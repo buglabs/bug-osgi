@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BUG vonhippel
+Bundle-SymbolicName: com.buglabs.bug.module.vonhippel
+Bundle-Version: 1.0.0
+Bundle-Activator: com.buglabs.bug.module.vonhippel.Activator
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.bug.module.vonhippel.pub
+Import-Package: org.osgi.util.position,
+ org.osgi.util.measurement,
+ org.osgi.framework;version="1.3.0",
+ com.buglabs.module,
+ org.osgi.service.log,
+ org.osgi.util.tracker,
+ com.buglabs.services.ws,
+ com.buglabs.status,
+ com.buglabs.bug.module.pub,
+ com.buglabs.util,
+ com.buglabs.bug.jni.common,
+ com.buglabs.bug.jni.vonhippel,
+ gnu.io
+Bug-Bundle-Type: Module
+Bug-Module-Id: 0007
+Bug-Module-Driver-Id: bmi_vh
