@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="com.buglabs.bug.bmi" basedir=".">
 	<!-- PROJECT CONSTANTS -->
-	<property name="project" value="com.buglabs.bug.bmi" />
+	<property name="package.version" value="2.5" />
 	<!-- PROJECT IMPORTS -->
 	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml"/>
 	<import file="${common.ant.file}"/>
