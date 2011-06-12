@@ -24,6 +24,7 @@ package com.buglabs.osgi.sewing.pub;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -176,6 +177,21 @@ public abstract class SewingController {
 	protected final void redirectTo(String url) {
 		pending_redirect_info = new RedirectInfo(url);
 		pending_redirect = true;
+	}
+	
+	/**
+	 * Verify that all expected keys are present.
+	 * 
+	 * @param params parameters to check
+	 * @param requiredKeys array of key names
+	 * @return true if all keys are present, false otherwise
+	 */
+	protected final String getMissingParameter(RequestParameters params, String ... requiredKeys) {
+		for (String key: Arrays.asList(requiredKeys))
+			if (params.get(key) == null)
+				return key;
+		
+		return null;
 	}
 
 	/**
