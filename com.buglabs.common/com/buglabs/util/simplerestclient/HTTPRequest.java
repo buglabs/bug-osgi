@@ -491,8 +491,16 @@ public class HTTPRequest {
 	 * Connect to server, check the status, and return the new HTTPResponse
 	 */
 	private HTTPResponse connect(HttpURLConnection connection) throws HTTPException, IOException {
+		long timestamp = 0;
+		if (debugMode)
+			timestamp = System.currentTimeMillis();
+		
 		HTTPResponse response = new HTTPResponse(connection);
 		response.checkStatus();
+		
+		if (debugMode)
+			debugMessage(timestamp, connection.getURL().toString());
+			
 		return response;
 	}
 	
@@ -589,6 +597,15 @@ public class HTTPRequest {
 	 */
 	private void debugMessage(String httpMethod, String url, HttpURLConnection conn) {
 		System.out.println("HTTPRequest DEBUG " + System.currentTimeMillis() + ": [" + httpMethod + "] " + url + " ~ " + conn.getRequestProperties());
+	}
+	
+	/**
+	 * Print debug messages with ws time info
+	 * @param time
+	 * @param url
+	 */
+	private void debugMessage(long time, String url) {
+		System.out.println("HTTPRequest DEBUG time (" + (System.currentTimeMillis() - time) + " ms): " + url);
 	}
 	
 	/**
