@@ -2,9 +2,10 @@ Manifest-Version: 1.0
 Bundle-Name: BUG SDK Event System
 Bundle-SymbolicName: com.buglabs.bug.dragonfly
 Bundle-Version: 1.0.0
-Bundle-Activator: com.buglabs.bug.event.Activator
+Bundle-Activator: com.buglabs.bug.dragonfly.Activator
 Bundle-Vendor: Bug Labs, Inc.
-Import-Package: javax.servlet,
+Import-Package: 
+ javax.servlet,
  javax.servlet.http,
  org.osgi.framework,
  org.osgi.service.log,
@@ -17,4 +18,5 @@ Import-Package: javax.servlet,
  com.buglabs.util.osgi,
  com.buglabs.util.xml,
  org.osgi.service.http
-Export-Package: com.buglabs.bug.event
+Export-Package: 
+ com.buglabs.bug.dragonfly

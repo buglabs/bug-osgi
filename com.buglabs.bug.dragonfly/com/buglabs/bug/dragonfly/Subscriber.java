@@ -25,58 +25,47 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.event;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+package com.buglabs.bug.dragonfly;
 
 import com.buglabs.util.xml.XmlNode;
-import com.buglabs.util.xml.XmlParser;
 
-public class EventServlet extends HttpServlet {
-	private static final long serialVersionUID = -6041541048676568932L;
+public class Subscriber {
 
-	private final Map eventMap;
+	private String url;
 
-	public EventServlet(Map eventMap) {
-		this.eventMap = eventMap;
+	private String topic;
+
+	public Subscriber(XmlNode node) {
+		url = node.getAttribute("url");
+		topic = node.getAttribute("topic");
 	}
 
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		BufferedReader br = new BufferedReader(req.getReader());
-		StringBuffer reqStr = new StringBuffer();
-		String line;
-		while ((line = br.readLine()) != null) {
-			reqStr.append(line);
+	public boolean isValid() {
+		if (url == null || topic == null) {
+			return false;
 		}
 
-		XmlNode reqXml = XmlParser.parse(reqStr.toString());
+		return true;
+	}
 
-		for (Iterator i = reqXml.getChildren().iterator(); i.hasNext();) {
-			XmlNode eventXml = (XmlNode) i.next();
-			Subscriber subscriber = new Subscriber(eventXml);
+	public String getTopic() {
+		return topic;
+	}
 
-			if (subscriber.isValid()) {
-				List subList = (List) eventMap.get(subscriber.getTopic());
+	public String getUrl() {
+		return url;
+	}
 
-				if (subList == null) {
-					subList = new ArrayList();
-					eventMap.put(subscriber.getTopic(), subList);
-				}
-
-				if (!subList.contains(subscriber)) {
-					subList.add(subscriber);
-				}
+	public boolean equals(Object arg0) {
+		if (arg0 instanceof Subscriber) {
+			Subscriber othersub = (Subscriber) arg0;
+			if (url.equals(othersub.getUrl()) && topic.equals(othersub.getTopic())) {
+				return true;
 			}
+
+			return false;
 		}
+		return super.equals(arg0);
 	}
+
 }
