@@ -27,7 +27,7 @@
  *******************************************************************************/
 package com.buglabs.bug.event;
 
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.xml.XmlNode;
 
 public class Subscriber {
 

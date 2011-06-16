@@ -39,8 +39,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.buglabs.util.XmlNode;
-import com.buglabs.util.XmlParser;
+import com.buglabs.util.xml.XmlNode;
+import com.buglabs.util.xml.XmlParser;
 
 public class EventServlet extends HttpServlet {
 	private static final long serialVersionUID = -6041541048676568932L;

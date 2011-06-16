@@ -50,8 +50,9 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.module.IModuleControl;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.osgi.FilterUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.xml.XmlNode;
 
 /**
  * This bundle is responsible for accepting clients for callback notifications
@@ -88,7 +89,7 @@ public class Activator implements BundleActivator, ServiceListener {
 		httpTracker = new ServiceTracker(context, f, new HttpServiceTracker(context, config, servlets, logService));
 		httpTracker.open();
 
-		context.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + IModuleControl.class.getName() + ")");
+		context.addServiceListener(this, FilterUtil.generateServiceFilter(IModuleControl.class.getName()));
 	}
 
 	public void stop(BundleContext context) throws Exception {

@@ -39,7 +39,7 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.buglabs.util.LogServiceUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
  * A utility class that will handle management of servlets when containers come
