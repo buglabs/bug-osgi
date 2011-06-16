@@ -15,7 +15,7 @@ Import-Package:
  org.osgi.service.log,
  com.buglabs.util.xml,
  com.buglabs.module,
- com.buglabs.util,
+ com.buglabs.util.osgi,
  com.buglabs.application,
  org.osgi.service.cm,
  com.buglabs.services.ws

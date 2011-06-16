@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.util.osgi;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,9 +40,9 @@ import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * A helper class for OSGi filters.
- * @deprecated Use com.buglabs.util.osgi instead.
+ * 
  */
-public final class ServiceFilterGenerator {
+public final class FilterUtil {
 
 	/**
 	 * Generate a service filter string for a single service.
@@ -123,5 +123,4 @@ public final class ServiceFilterGenerator {
 		}
 		return "";
 	}
-
 }

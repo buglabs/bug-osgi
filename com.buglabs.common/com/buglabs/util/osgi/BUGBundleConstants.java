@@ -25,16 +25,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.util.osgi;
 
 /**
  * Constants relating to bundles.
  * 
- * @deprecated This class has moved to com.buglabs.util.osgi.BUGBundleConstants.
  * @author kgilmer
  * 
  */
-public interface BugBundleConstants {
+public interface BUGBundleConstants {
 	/**
 	 * A designation for core runtime bundles that provide core services.
 	 */

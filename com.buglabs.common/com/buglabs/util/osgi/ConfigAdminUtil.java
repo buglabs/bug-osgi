@@ -25,53 +25,69 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.util.osgi;
+
+import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
- * Constants relating to bundles.
+ * Static helper methods to work with the ConfigurationAdmin
  * 
- * @deprecated This class has moved to com.buglabs.util.osgi.BUGBundleConstants.
  * @author kgilmer
- * 
+ *
  */
-public interface BugBundleConstants {
-	/**
-	 * A designation for core runtime bundles that provide core services.
-	 */
-	public static final String BUG_BUNDLE_CORE = "Core";
+public class ConfigAdminUtil {
 
 	/**
-	 * A module desginated as a Module bundle, providing module services.
+	 * Get a config dictionary safely based on a ConfigurationAdmin service and a PID.  If configuration or properties do not exist it will be created.
+	 * @param ca
+	 * @return A dictionary
+	 * @throws IOException 
 	 */
-	public static final String BUG_BUNDLE_MODULE = "Module";
-
+	public static Dictionary getPropertiesSafely(ConfigurationAdmin ca, String pid) throws IOException {
+		if (ca == null || pid == null) {
+			throw new RuntimeException("Client called getPropertiesSafely() with null parameter.");
+		}
+		
+		return getPropertiesSafely(ca.getConfiguration(pid));		
+	}
+	
 	/**
-	 * A module designated as an application.
+	 * Given a Configuration return it's dictionary.  If a dictionary does not exist it will be created.
+	 * @param config
+	 * @return
+	 * @throws IOException
 	 */
-	public static final String BUG_BUNDLE_APPLICATION = "Application";
-
+	public static Dictionary getPropertiesSafely(Configuration config) throws IOException {
+		if (config == null) {
+			throw new RuntimeException("Client called getPropertiesSafely() with null parameter.");
+		}		
+		
+		Dictionary properties = config.getProperties();
+		
+		if (properties == null) {
+			properties = new Hashtable();
+			
+			config.update(properties);
+		}
+	
+		return properties;
+	}
+	
 	/**
-	 * A module designated as a library.
+	 * @param dict
+	 * @param key
+	 * @return true if dictionary contains key, false otherwise.
 	 */
-	public static final String BUG_BUNDLE_LIBRARY = "Library";
-
-	/**
-	 * Header to define and describe the type of bundle in the bug context.
-	 */
-	public static final String BUG_BUNDLE_TYPE_HEADER = "Bug-Bundle-Type";
-
-	/**
-	 * The slot ID the module is connected to.
-	 */
-	public static final String BUG_BUNDLE_SLOT_ID_HEADER = "Bug-Slot-Index";
-
-	/**
-	 * This header represents the version of the hardware module.
-	 */
-	public static final String BUG_BUNDLE_MODULE_VERSION = "Bug-Module-Version";
-
-	/**
-	 * The Module ID header as presented by the BMI bus.
-	 */
-	public static final String BUG_BUNDLE_MODULE_ID = "Bug-Module-Id";
+	public static boolean containsKey(Dictionary dict, String key) {
+		if (dict == null || key == null) {
+			return false;
+		}
+		
+		return dict.get(key) != null;
+	}
 }

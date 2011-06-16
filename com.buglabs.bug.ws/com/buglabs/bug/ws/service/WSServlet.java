@@ -20,8 +20,7 @@ import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.PublicWSProviderWithParams;
-import com.buglabs.util.StringUtil;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.xml.XmlNode;
 
 /**
  * This class used to do it all, but now it extends AbstractWSServlet so other
@@ -34,7 +33,7 @@ public class WSServlet extends AbstractWSServlet {
 
 	private static final long serialVersionUID = 2559949124867457077L;
 
-	public WSServlet(BundleContext context, Hashtable serviceMap, ConfigurationAdmin configAdmin) {
+	public WSServlet(BundleContext context, Map<String, PublicWSProvider> serviceMap, ConfigurationAdmin configAdmin) {
 		super(context, serviceMap, configAdmin);
 	}
 
@@ -80,9 +79,9 @@ public class WSServlet extends AbstractWSServlet {
 				get = new HashMap();
 				String query = req.getQueryString();
 				if (query != null) {
-					String[] params = StringUtil.split(query, "&");
+					String[] params = query.split("&");
 					for (int i = 0; i < params.length; i++) {
-						String[] pair = StringUtil.split(params[i], "=");
+						String[] pair = params[i].split("=");
 						if (pair.length > 1) {
 							get.put(pair[0], pair[1]);
 						} else if (pair.length > 0) {
@@ -121,18 +120,18 @@ public class WSServlet extends AbstractWSServlet {
 		}
 	}
 
-	private void returnServices(HttpServletResponse resp, Map serviceMap2) throws IOException {
+	private void returnServices(HttpServletResponse resp, Map<String, PublicWSProvider> serviceMap2) throws IOException {
 		resp.setContentType("text/xml");
 		resp.getWriter().print(mapToXml("service", serviceMap2).toString());
 	}
 
-	private XmlNode mapToXml(String entityName, Map serviceMap2) throws IOException {
+	private XmlNode mapToXml(String entityName, Map<String, PublicWSProvider> serviceMap2) throws IOException {
 		// Collection container is plural.
 		// TODO: make sure 's' is the right pluralizer.
 		XmlNode root = new XmlNode(entityName + "s");
 
-		for (Iterator i = serviceMap2.keySet().iterator(); i.hasNext();) {
-			String key = (String) i.next();
+		for (Iterator<String> i = serviceMap2.keySet().iterator(); i.hasNext();) {
+			String key = i.next();
 			Object v = serviceMap2.get(key);
 
 			XmlNode element = null;

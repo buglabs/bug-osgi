@@ -28,7 +28,6 @@
 package com.buglabs.bug.ws.service;
 
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -46,8 +45,8 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.OSGiServiceLoader;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.OSGiServiceLoader;
 
 /**
  * Abstract class to hold common functionality for different Service views
@@ -59,7 +58,7 @@ import com.buglabs.util.OSGiServiceLoader;
 public abstract class AbstractWSServlet extends HttpServlet implements ServiceListener {
 	private static final long serialVersionUID = 3348932042438010201L;
 
-	private final Map serviceMap;
+	private final Map<String, PublicWSProvider> serviceMap;
 	private static int serviceCounter = 2;
 	private static volatile boolean listenerRegistered = false;
 
@@ -69,7 +68,7 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 
 	private LogService log;
 
-	public AbstractWSServlet(BundleContext context, Map serviceMap) {
+	public AbstractWSServlet(BundleContext context, Map<String, PublicWSProvider> serviceMap) {
 		this.context = context;
 		this.log = LogServiceUtil.getLogService(context);
 		this.serviceMap = serviceMap;
@@ -96,7 +95,7 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 	 * @param serviceMap2
 	 * @throws Exception
 	 */
-	private void addExistingServices(BundleContext context2, Map serviceMap2) throws Exception {
+	private void addExistingServices(BundleContext context2, Map<String, PublicWSProvider> serviceMap2) throws Exception {
 
 		OSGiServiceLoader.loadServices(context, PublicWSProvider.class.getName(), null, new OSGiServiceLoader.IServiceLoader() {
 			public void load(Object service) {
@@ -111,7 +110,7 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 		});
 	}
 
-	public AbstractWSServlet(BundleContext context, Hashtable serviceMap, ConfigurationAdmin configAdmin) {
+	public AbstractWSServlet(BundleContext context, Map<String, PublicWSProvider> serviceMap, ConfigurationAdmin configAdmin) {
 		this(context, serviceMap);
 		this.configAdmin = configAdmin;
 	}
@@ -174,7 +173,7 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 	 * 
 	 * @return
 	 */
-	protected Map getServiceMap() {
+	protected Map<String, PublicWSProvider> getServiceMap() {
 		return serviceMap;
 	}
 

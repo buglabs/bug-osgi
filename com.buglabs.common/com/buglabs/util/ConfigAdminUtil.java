@@ -37,6 +37,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 /**
  * Static helper methods to work with the ConfigurationAdmin
  * 
+ * @deprecated This class has moved to com.buglabs.util.osgi.ConfigAdminUtil.
  * @author kgilmer
  *
  */

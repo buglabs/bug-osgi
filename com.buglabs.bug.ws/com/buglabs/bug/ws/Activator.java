@@ -28,8 +28,8 @@ import com.buglabs.bug.ws.program.ProgramServlet;
 import com.buglabs.bug.ws.service.WSHtmlServlet;
 import com.buglabs.bug.ws.service.WSServlet;
 import com.buglabs.module.IModuleControl;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.ServiceFilterGenerator;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.FilterUtil;
 
 /**
  * Bundle activator for BUG web services functionality.
@@ -48,6 +48,8 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	private static final String ROOT_ALIAS = "/";
 	private static final String SERVICE_WS_PATH = "/service";
 	private static final String SERVICE_HTML_PATH = SERVICE_WS_PATH + ".html";
+
+	private static final String PACKAGE_WS_PATH = "/package";
 
 	private static BundleContext context;
 
@@ -116,14 +118,13 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 		
 		try {
 			moduleServlet = new ModuleServlet();
-			context.addServiceListener(moduleServlet, 
-					ServiceFilterGenerator.generateServiceFilter(context, new String[] {IModuleControl.class.getName()}).toString());
+			context.addServiceListener(moduleServlet, FilterUtil.generateServiceFilter(IModuleControl.class.getName()));
 			servlets.put(MODULE_WS_PATH, moduleServlet);
 		} catch (InvalidSyntaxException e) {
 			log.log(LogService.LOG_ERROR, "Failed to construct a valid service filter.", e);
 			return;
 		}
-		servlets.put("/package", new PackageServlet(context));
+		servlets.put(PACKAGE_WS_PATH, new PackageServlet(context));
 		servlets.put(PROGRAM_WS_PATH, new ProgramServlet(context));
 		servlets.put(CONFIG_WS_PATH, new ConfigAdminServlet(context, configAdmin));
 				

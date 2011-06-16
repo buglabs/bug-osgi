@@ -44,7 +44,7 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.ws.Activator;
 import com.buglabs.services.ws.PublicWSProvider;
-import com.buglabs.util.ConfigAdminUtil;
+import com.buglabs.util.osgi.ConfigAdminUtil;
 import com.buglabs.util.xml.XmlNode;
 import com.buglabs.util.xml.XmlParser;
 

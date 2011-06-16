@@ -1,4 +1,4 @@
-package com.buglabs.util;
+package com.buglabs.util.osgi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,6 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * A utility for loading a set of pre-existing registered services into client-defined state.
- * 
- * @deprecated This class has moved to com.buglabs.util.osgi.OSGiServiceLoader.
  * @author kgilmer
  *
  */

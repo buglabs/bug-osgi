@@ -44,17 +44,12 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.Configuration;
 import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.program.pub.IProgramXml;
-import com.buglabs.bug.program.pub.IUserAppManager;
 import com.buglabs.bug.ws.Activator;
-import com.buglabs.util.BugBundleConstants;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.StringUtil;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.osgi.BUGBundleConstants;
+import com.buglabs.util.xml.XmlNode;
 
 public class ProgramServlet extends HttpServlet {
 
@@ -109,7 +104,7 @@ public class ProgramServlet extends HttpServlet {
 			return;
 		}
 
-		String[] toks = StringUtil.split(path, "/");
+		String[] toks = path.split("/");
 
 		String jarName = toks[toks.length - 1];
 
@@ -259,7 +254,7 @@ public class ProgramServlet extends HttpServlet {
 			return;
 		}
 
-		String[] toks = StringUtil.split(path, "/");
+		String[] toks = path.split("/");
 
 		try {
 			Bundle b = findBundleByName(toks[toks.length - 1]);
@@ -295,7 +290,7 @@ public class ProgramServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	private File createJar(File jarDir, File bundleFile) throws IOException {
-		List files = new ArrayList();
+		List<File> files = new ArrayList<File>();
 		getAllChildFiles(jarDir, files);
 		createJarArchive(bundleFile, (File[]) files.toArray(new File[files.size()]), jarDir);
 
@@ -308,7 +303,7 @@ public class ProgramServlet extends HttpServlet {
 	 * @param root
 	 * @param files
 	 */
-	private void getAllChildFiles(File root, List files) {
+	private void getAllChildFiles(File root, List<File> files) {
 
 		File[] children = root.listFiles(new FilenameFilter() {
 
@@ -446,7 +441,7 @@ public class ProgramServlet extends HttpServlet {
 	private String getBugBundleType(Bundle b) {
 		String type = "";
 
-		String temp = (String) b.getHeaders().get(BugBundleConstants.BUG_BUNDLE_TYPE_HEADER);
+		String temp = (String) b.getHeaders().get(BUGBundleConstants.BUG_BUNDLE_TYPE_HEADER);
 		if (temp != null) {
 			type = temp;
 		}
@@ -484,19 +479,20 @@ public class ProgramServlet extends HttpServlet {
 		return null;
 	}
 
-	private String getAllBundles() throws SelfReferenceException {
+	private String getAllBundles() {
 		Bundle[] bundles = context.getBundles();
 
 		XmlNode root = new XmlNode(IProgramXml.NODE_PROGRAMS);
 
 		for (int i = 0; i < bundles.length; ++i) {
 			Bundle b = bundles[i];
-			root.addChildElement(getBundleXmlNode(b));
+			root.addChild(getBundleXmlNode(b));
 		}
 
 		return root.toString();
 	}
 
+	/*
 	public static String getRelativePath(File file, File relativeTo) throws IOException {
 		file = new File(file + File.separator + "89243jmsjigs45u9w43545lkhj7").getParentFile();
 		relativeTo = new File(relativeTo + File.separator + "984mvcxbsfgqoykj30487df556").getParentFile();
@@ -543,4 +539,5 @@ public class ProgramServlet extends HttpServlet {
 		}
 		return relString.toString();
 	}
+	*/
 }

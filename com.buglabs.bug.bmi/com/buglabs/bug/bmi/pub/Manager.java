@@ -42,7 +42,7 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
-import com.buglabs.util.BugBundleConstants;
+import com.buglabs.util.osgi.BUGBundleConstants;
 
 /**
  * Manages logic of receiving messages from BMI and making changes to runtime.
@@ -102,7 +102,7 @@ public class Manager {
 		for (int i = 0; i < bundles.length; ++i) {
 			Dictionary d = bundles[i].getHeaders();
 
-			if ((id = (String) d.get(BugBundleConstants.BUG_BUNDLE_MODULE_ID)) != null) {
+			if ((id = (String) d.get(BUGBundleConstants.BUG_BUNDLE_MODULE_ID)) != null) {
 				if (id.equals(moduleId)) {
 					matches.add(bundles[i]);
 				}

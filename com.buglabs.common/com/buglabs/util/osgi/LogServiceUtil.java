@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.util.osgi;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -38,7 +38,6 @@ import org.osgi.service.log.LogService;
 /**
  * Utility functions relating to OSGi log service.
  * 
- * @deprecated Class has moved to com.buglabs.util.osgi.LogServiceUtil
  * @author kgilmer
  * 
  */

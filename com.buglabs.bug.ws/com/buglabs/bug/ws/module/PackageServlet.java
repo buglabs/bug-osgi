@@ -40,20 +40,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogService;
 
-import com.buglabs.util.LogServiceUtil;
 import com.buglabs.util.xml.XmlNode;
 
 public class PackageServlet extends HttpServlet {
 	private static final long serialVersionUID = -2460404903765995674L;
 	private final BundleContext context;
-	private List serviceList;
-	private LogService log;
+	private List<String> serviceList;
 
 	public PackageServlet(BundleContext context) {
 		this.context = context;
-		this.log = LogServiceUtil.getLogService(context);
 	}
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -121,10 +117,10 @@ public class PackageServlet extends HttpServlet {
 		return !serviceList.contains(packageName);
 	}
 
-	private List populateServiceList() {
+	private List<String> populateServiceList() {
 		Bundle[] bundles = context.getBundles();
 
-		List services = new ArrayList();
+		List<String> services = new ArrayList<String>();
 
 		for (int i = 0; i < bundles.length; ++i) {
 			Bundle b = bundles[i];
@@ -137,8 +133,8 @@ public class PackageServlet extends HttpServlet {
 		return services;
 	}
 
-	private List getServiceRoots(ServiceReference[] registeredServices) {
-		List s = new ArrayList();
+	private List<String> getServiceRoots(ServiceReference[] registeredServices) {
+		List<String> s = new ArrayList<String>();
 
 		for (int i = 0; i < registeredServices.length; ++i) {
 			Object props = registeredServices[i].getProperty("objectClass");

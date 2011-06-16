@@ -40,7 +40,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -53,6 +52,7 @@ import com.buglabs.application.IDesktopApp;
 import com.buglabs.bug.module.lcd.pub.IModuleDisplay;
 import com.buglabs.osgi.shell.pub.BundleUtils;
 import com.buglabs.util.LogServiceUtil;
+import com.buglabs.util.osgi.FilterUtil;
 
 /**
  * Activator for AppUI.  Listens to bundle and IDesktopApp service events.
@@ -90,7 +90,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 		st = new ServiceTracker(context, IModuleDisplay.class.getName(), this);
 		st.open();
 		context.addBundleListener(this);
-		context.addServiceListener(this, "(" + Constants.OBJECTCLASS + "=" + IDesktopApp.class.getName() + ")");
+		context.addServiceListener(this, FilterUtil.generateServiceFilter(IDesktopApp.class.getName()));
 	}
 	
 	/**
