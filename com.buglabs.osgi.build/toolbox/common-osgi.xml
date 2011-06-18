@@ -138,7 +138,7 @@
 		
 		<echo message="Creating OSGi instance with following bundles: ${testBundles}"></echo>
 		<property name="osgi.framework.jar" location="${distDirectory}/felix.jar" />
-		<java jar="${osgi.framework.jar}" newenvironment="true" fork="true">
+		<java jar="${osgi.framework.jar}" newenvironment="false" fork="true">
 			<jvmarg value="-Dorg.osgi.framework.storage=/tmp/felix-cache"/>
 			<jvmarg value="-Dorg.osgi.framework.storage.clean=onFirstInit"/>
 			<jvmarg value="-Dfelix.auto.deploy.dir=${distDirectory}"/>
