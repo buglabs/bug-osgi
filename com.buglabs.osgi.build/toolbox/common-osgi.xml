@@ -118,7 +118,7 @@
 	<!-- target: test   Run JUnit tests -->
 	<target name="test" depends="create_dirs, build.jars">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test" />
-		<fail unless="report.dir"      message="Ant variable repord.dir must be defined."/>
+		<fail unless="report.dir"      message="Ant variable report.dir must be defined."/>
 		<mkdir dir="${report.dir}" />
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
