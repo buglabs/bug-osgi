@@ -122,6 +122,7 @@
 		<mkdir dir="${report.dir}" />
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
+			<sysproperty key="report.misc" value="${report.misc}"/>
 			<formatter type="xml"/>
 			<batchtest todir="${report.dir}">
 				<fileset dir="${report.src}">
@@ -138,7 +139,7 @@
 		
 		<echo message="Creating OSGi instance with following bundles: ${testBundles}"></echo>
 		<property name="osgi.framework.jar" location="${distDirectory}/felix.jar" />
-		<java jar="${osgi.framework.jar}" newenvironment="false" fork="true">
+		<java jar="${osgi.framework.jar}" fork="true">
 			<jvmarg value="-Dorg.osgi.framework.storage=/tmp/felix-cache"/>
 			<jvmarg value="-Dorg.osgi.framework.storage.clean=onFirstInit"/>
 			<jvmarg value="-Dfelix.auto.deploy.dir=${distDirectory}"/>
