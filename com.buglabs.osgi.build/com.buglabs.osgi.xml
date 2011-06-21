@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <project name="com.buglabs.osgi" default="jar">
 	<property name="project.description" value="BUG OSGi Bundles" />
-	<property name="external.dir" location="${basedir}/external" />
+	<property name="externalDirectory" location="${basedir}/external" />
+	<property name="distDirectory" location="${basedir}/dist" />
+
 	<property name="base.build.dir" location="${basedir}/bug-osgi/com.buglabs.osgi.build" />
+	<property name="checkout.dir" location="${basedir}/bug-osgi" />
 
 	<property name="wget.bin" location="/usr/bin/wget" />
 	<property name="svn.bin" location="/usr/bin/svn" />
@@ -11,11 +14,13 @@
 	<property name="framework.version" value="3.2.2" />
 	<property name="log.version" value="1.0.1" />
 	<property name="configadmin.version" value="1.2.8" />
+	<property name="http.version" value="2.2.0" />
 	<property name="compendium.version" value="1.4.0" />
 
 	<property name="framework.fqpn" value="org.apache.felix.framework" />
 	<property name="log.fqpn" value="org.apache.felix.log" />
 	<property name="configadmin.fqpn" value="org.apache.felix.configadmin" />
+	<property name="http.fqpn" value="org.apache.felix.http.bundle" />
 	<property name="compendium.fqpn" value="org.osgi.compendium" />
 
 	<property name="apache.mirror" value="http://ftp.riken.jp/net/apache/felix/" />
@@ -26,49 +31,48 @@
 
 
 	<target name="clean" description="remove intermediate files">
-		<delete dir="classes" />
-		<delete dir="external" />
+		<delete dir="${externalDirectory}" />
+		<delete dir="${distDirectory}" />
 	</target>
 
-	<target name="fetch.dependencies">
-		<mkdir dir="${external.dir}" />
+	<target name="make.dirs" description="create directories">
+		<echo message="Creating '${externalDirectory}'" />
+		<mkdir dir="${externalDirectory}" />
+		<mkdir dir="${distDirectory}" />
+	</target>
+
+	<target name="fetch.dependencies" depends="make.dirs">
 
 		<exec executable="${wget.bin}">
-			<arg value="-P ${external.dir}" />
-			<arg value="${apache.mirror}${framework.fqpn}-${framework.version}.jar" />
+			<arg line="-P ${externalDirectory}" />
+			<arg line="${apache.mirror}${framework.fqpn}-${framework.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="-P ${external.dir}" />
-			<arg value="${apache.mirror}${log.fqpn}-${log.version}.jar" />
+			<arg line="-P ${externalDirectory}" />
+			<arg line="${apache.mirror}${log.fqpn}-${log.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="-P ${external.dir}" />
-			<arg value="${apache.mirror}${configadmin.fqpn}-${configadmin.version}.jar" />
+			<arg line="-P ${externalDirectory}" />			
+			<arg line="${apache.mirror}${configadmin.fqpn}-${configadmin.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="-P ${external.dir}" />
-			<arg value="${apache.mirror}${compendium.fqpn}-${compendium.version}.jar" />
+			<arg line="-P ${externalDirectory}" />
+			<arg line="${apache.mirror}${compendium.fqpn}-${compendium.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="-P ${external.dir}" />
-			<arg value="${apache.mirror}javax.servlet-1.0.0.jar" />
+			<arg line="-P ${externalDirectory}" />
+			<arg line="${apache.mirror}${http.fqpn}-${http.version}.jar" />
 		</exec>
 	</target>
 
-	<target name="compile" depends="fetch.dependencies" description="compile the Java source code to class files">
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="compile" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="compile" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="compile" />
-	</target>
-
-	<target name="jar" depends="compile" description="create a Jar file for the application">
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="jar" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="jar" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="jar" />
+	<target name="jar" depends="fetch.dependencies" description="compile the Java source code to class files">
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 	</target>
 
 	<target name="javadoc" depends="jar">
