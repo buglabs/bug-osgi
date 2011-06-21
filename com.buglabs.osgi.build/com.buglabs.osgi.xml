@@ -33,27 +33,27 @@
 		<mkdir dir="${external.dir}" />
 
 		<exec executable="${wget.bin}">
-			<arg value="--directory-prefix ${external.dir}" />
+			<arg value="-P ${external.dir}" />
 			<arg value="${apache.mirror}${framework.fqpn}-${framework.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="--directory-prefix ${external.dir}" />
+			<arg value="-P ${external.dir}" />
 			<arg value="${apache.mirror}${log.fqpn}-${log.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="--directory-prefix ${external.dir}" />
+			<arg value="-P ${external.dir}" />
 			<arg value="${apache.mirror}${configadmin.fqpn}-${configadmin.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="--directory-prefix ${external.dir}" />
+			<arg value="-P ${external.dir}" />
 			<arg value="${apache.mirror}${compendium.fqpn}-${compendium.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg value="--directory-prefix ${external.dir}" />
+			<arg value="-P ${external.dir}" />
 			<arg value="${apache.mirror}javax.servlet-1.0.0.jar" />
 		</exec>
 	</target>
