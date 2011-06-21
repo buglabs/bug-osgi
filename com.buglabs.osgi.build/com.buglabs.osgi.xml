@@ -59,20 +59,20 @@
 	</target>
 
 	<target name="compile" depends="fetch.dependencies" description="compile the Java source code to class files">
-		<ant dir="${basedir}/com.buglabs.common" target="compile" />
-		<ant dir="${basedir}/com.buglabs.bug.ws" target="compile" />
-		<ant dir="${basedir}/com.buglabs.bug.bmi" target="compile" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="compile" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="compile" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="compile" />
 	</target>
 
 	<target name="jar" depends="compile" description="create a Jar file for the application">
-		<ant dir="${basedir}/com.buglabs.common" target="jar" />
-		<ant dir="${basedir}/com.buglabs.bug.ws" target="jar" />
-		<ant dir="${basedir}/com.buglabs.bug.bmi" target="jar" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="jar" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="jar" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="jar" />
 	</target>
 
 	<target name="javadoc" depends="jar">
-		<ant dir="${basedir}/com.buglabs.common" target="javajar" />
-		<ant dir="${basedir}/com.buglabs.bug.ws" target="javajar" />
-		<ant dir="${basedir}/com.buglabs.bug.bmi" target="javajar" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="javajar" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="javajar" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="javajar" />
 	</target>
 </project>
