@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project name="common-osgi" default="build.jars" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
 	<property name="buildDirectory" value="${basedir}/build" />
+	<property name="srcDirectory" location="${basedir}" />
 	
 	<fail unless="checkout.dir" message="Ant variable checkout.dir must be defined." />
 	<fail unless="base.build.dir" message="Ant variable base.build.dir must be defined." />
@@ -9,7 +10,13 @@
 
 	<!-- The package version if previously undefined -->
 	<property name="default.package.version" value="2.5" />
-	<property name="docDirectory" value="${buildDirectory}/javadoc" />
+	
+	<!--
+	<property name="docDirectory" value="${basedir}/javadoc" />
+	-->
+	<property name="report.dir" value="${basedir}/report" />
+	<property name="report.src" location="${srcDirectory}" />
+	<property name="checkstyle.dir" value="${basedir}/checkstyle" />
 
 	<property environment="env" />
 	<tstamp />
@@ -30,9 +37,7 @@
 	<!-- COMPILER SETTINGS -->
 	<property name="javacFailOnError" value="true" />
 	<property name="javacDebugInfo" value="on" />
-	<property name="javacVerbose" value="true" />
 	<property name="logExtension" value=".log" />
-	<property name="compilerArg" value="" />
 	<property name="javacSource" value="1.6" />
 	<property name="javacTarget" value="1.6" />
 	<path id="path_bootclasspath">
@@ -63,7 +68,7 @@
 		<property name="full.version" value="${package.version}.${env.BUILD_NUMBER}">
 		</property>
 
-		<javac destdir="${buildDirectory}" srcdir="." source="1.6" target="1.6" encoding="utf-8" fork="true" includeantruntime="false">
+		<javac destdir="${buildDirectory}" srcdir="${srcDirectory}" source="${javacSource}" target="${javacTarget}" encoding="utf-8" fork="true" includeantruntime="false" debug="${javacDebugInfo}">
 			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
 			<classpath refid="bin.classpath" />
 		</javac>
@@ -101,8 +106,9 @@
 
 	<target name="document" if="generate.docs">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: document" />
-		<javadoc destdir="${docDirectory}" classpathref="bin.classpath">
-			<fileset dir=".">
+		<echo message="Generating documentation in directory: ${docDirectory}/${ant.project.name}" />
+		<javadoc destdir="${docDirectory}/${ant.project.name}" classpathref="bin.classpath">
+			<fileset dir="${srcDirectory}">
 				<include name="**/*.java" />
 			</fileset>
 		</javadoc>
@@ -162,7 +168,6 @@
 	<target name="create_dirs">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: create_dirs" />
 		<mkdir dir="${report.dir}" />
-		<mkdir dir="${buildDirectory}" />
 		<mkdir dir="${checkstyle.dir}" />
 		<mkdir dir="${distDirectory}" />
 		<mkdir dir="${externalDirectory}" />

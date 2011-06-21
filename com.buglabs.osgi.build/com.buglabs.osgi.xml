@@ -4,6 +4,12 @@
 	<property name="externalDirectory" location="${basedir}/external" />
 	<property name="distDirectory" location="${basedir}/dist" />
 
+	<property name="rootDir" location="${basedir}">
+	</property>
+	<property name="docDirectory" value="${rootDir}/javadoc" />
+	<property name="report.dir" location="${rootDir}/junit" />
+	<property name="checkstyle.dir" value="${rootDir}/checkstyle" />
+
 	<property name="base.build.dir" location="${basedir}/bug-osgi/com.buglabs.osgi.build" />
 	<property name="checkout.dir" location="${basedir}/bug-osgi" />
 
@@ -23,22 +29,20 @@
 	<property name="http.fqpn" value="org.apache.felix.http.bundle" />
 	<property name="compendium.fqpn" value="org.osgi.compendium" />
 
+	<property name="junit.jar.url" value="https://github.com/downloads/KentBeck/junit/junit-4.8.2.jar" />
 	<property name="apache.mirror" value="http://ftp.riken.jp/net/apache/felix/" />
 
 	<tstamp>
 		<format property="TS_NOW" pattern="yyyy-MM-dd HH:mm:ss" />
 	</tstamp>
 
-
-	<target name="clean" description="remove intermediate files">
-		<delete dir="${externalDirectory}" />
-		<delete dir="${distDirectory}" />
-	</target>
-
 	<target name="make.dirs" description="create directories">
 		<echo message="Creating '${externalDirectory}'" />
 		<mkdir dir="${externalDirectory}" />
 		<mkdir dir="${distDirectory}" />
+		<mkdir dir="${docDirectory}" />
+		<mkdir dir="${report.dir}" />
+		<mkdir dir="${checkstyle.dir}" />
 	</target>
 
 	<target name="fetch.dependencies" depends="make.dirs">
@@ -54,7 +58,7 @@
 		</exec>
 
 		<exec executable="${wget.bin}">
-			<arg line="-P ${externalDirectory}" />			
+			<arg line="-P ${externalDirectory}" />
 			<arg line="${apache.mirror}${configadmin.fqpn}-${configadmin.version}.jar" />
 		</exec>
 
@@ -67,17 +71,41 @@
 			<arg line="-P ${externalDirectory}" />
 			<arg line="${apache.mirror}${http.fqpn}-${http.version}.jar" />
 		</exec>
+
+		<exec executable="${wget.bin}">
+			<arg line="-P ${externalDirectory}" />
+			<arg line="--no-check-certificate" />
+			<arg line="${junit.jar.url}" />
+		</exec>
 	</target>
 
-	<target name="jar" depends="fetch.dependencies" description="compile the Java source code to class files">
+	<target name="jar" depends="clean, fetch.dependencies" description="compile the Java source code to class files">
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 	</target>
 
-	<target name="javadoc" depends="jar">
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="javajar" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="javajar" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="javajar" />
+	<target name="test" depends="clean, fetch.dependencies" description="Test the code">
+		<echo message="docDirectory: ${docDirectory}">
+		</echo>
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
+
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test" />
 	</target>
+
+	<target name="clean" description="remove intermediate files">
+		<delete dir="${externalDirectory}" />
+		<delete dir="${distDirectory}" />
+		<delete dir="${docDirectory}" />
+		<delete dir="${report.dir}" />
+		<delete dir="${checkstyle.dir}" />
+
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="clean" />
+	</target>
+
 </project>
