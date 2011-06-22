@@ -90,6 +90,12 @@
 			<arg line="--no-check-certificate" />
 			<arg line="${osgi-tester.jar.url}" />
 		</exec>
+
+		<exec executable="${wget.bin}">
+			<arg line="-P ${externalDirectory}" />
+			<arg line="--no-check-certificate" />
+			<arg line="http://hamcrest.googlecode.com/files/hamcrest-all-1.3.0RC2.jar" />
+		</exec>
 	</target>
 
 	<target name="jar" description="compile the Java source code to class files">
