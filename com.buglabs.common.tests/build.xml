@@ -3,20 +3,20 @@
 	<!-- PROJECT CONSTANTS -->
 	<property name="package.version" value="2.5" />
 
-	<!-- PROJECT IMPORTS -->
-	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
-	<import file="${common.ant.file}" />
-
 	<!-- JUnit tests -->
 	<property name="report.src" location="." />
 
 	<!-- OSGi tests -->
 	<property name="testBundles" value="
-		file:${distDirectory}/felix-configadmin.jar
-		file:${distDirectory}/junit-osgi-4.9b2.jar
-		file:${distDirectory}/com.buglabs.osgi.tester.jar
-		file:${distDirectory}/com.buglabs.common.jar
-		file:${distDirectory}/com.buglabs.common.tests.jar
-		">
+			file:${externalDirectory}/${configadmin.jar.name}
+			file:${externalDirectory}/${junit.jar.name}
+			file:${distDirectory}/com.buglabs.osgi.tester.jar
+			file:${distDirectory}/com.buglabs.common.jar
+			file:${distDirectory}/com.buglabs.common.tests.jar
+			">
 	</property>
+
+	<!-- PROJECT IMPORTS -->
+	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
+	<import file="${common.ant.file}" />
 </project>

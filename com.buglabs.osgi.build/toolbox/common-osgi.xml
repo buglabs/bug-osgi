@@ -2,7 +2,7 @@
 <project name="common-osgi" default="build.jars" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
 	<property name="buildDirectory" value="${basedir}/build" />
 	<property name="srcDirectory" location="${basedir}" />
-	
+
 	<fail unless="checkout.dir" message="Ant variable checkout.dir must be defined." />
 	<fail unless="base.build.dir" message="Ant variable base.build.dir must be defined." />
 	<fail unless="externalDirectory" message="Ant variable externalDirectory must be defined." />
@@ -10,13 +10,16 @@
 
 	<!-- The package version if previously undefined -->
 	<property name="default.package.version" value="2.5" />
-	
-	<!--
+
 	<property name="docDirectory" value="${basedir}/javadoc" />
-	-->
 	<property name="report.dir" value="${basedir}/report" />
 	<property name="report.src" location="${srcDirectory}" />
 	<property name="checkstyle.dir" value="${basedir}/checkstyle" />
+	<property name="checkstyle.config" value="${base.build.dir}/toolbox/checkstyle/buglabs_checks.xml" />
+	<property name="checkstyle.src" value="${srcDirectory}" />
+	<property name="junit.jar.name" value="junit-osgi-4.9b2.jar" />
+	<property name="configadmin.jar.name" value="org.apache.felix.configadmin-1.2.8.jar" />
+	<property name="testBundles" value="file:${distDirectory}/com.buglabs.osgi.tester.jar file:${externalDirectory}/${junit.jar.name}" />
 
 	<property environment="env" />
 	<tstamp />
@@ -133,7 +136,7 @@
 
 	<!-- target: test-osgi   Run tests within an OSGi framework -->
 	<target name="test-osgi" depends="test">
-		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test.osgi" />
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test-osgi" />
 
 		<echo message="Creating OSGi instance with following bundles: ${testBundles}">
 		</echo>

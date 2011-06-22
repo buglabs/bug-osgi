@@ -4,8 +4,7 @@
 	<property name="externalDirectory" location="${basedir}/external" />
 	<property name="distDirectory" location="${basedir}/dist" />
 
-	<property name="rootDir" location="${basedir}">
-	</property>
+	<property name="rootDir" location="${basedir}" />	
 	<property name="docDirectory" value="${rootDir}/javadoc" />
 	<property name="report.dir" location="${rootDir}/junit" />
 	<property name="checkstyle.dir" value="${rootDir}/checkstyle" />
@@ -23,14 +22,17 @@
 	<property name="http.version" value="2.2.0" />
 	<property name="compendium.version" value="1.4.0" />
 
-	<property name="framework.fqpn" value="org.apache.felix.framework" />
+	<property name="framework.fqpn" value="org.apache.felix.main" />
 	<property name="log.fqpn" value="org.apache.felix.log" />
 	<property name="configadmin.fqpn" value="org.apache.felix.configadmin" />
 	<property name="http.fqpn" value="org.apache.felix.http.bundle" />
 	<property name="compendium.fqpn" value="org.osgi.compendium" />
-
-	<property name="junit.jar.url" value="https://github.com/downloads/KentBeck/junit/junit-4.8.2.jar" />
+	
+	<property name="junit.jar.name" value="junit-osgi-4.9b2.jar" />
+	<property name="junit.jar.url" value="https://github.com/downloads/buglabs/bug-osgi/${junit.jar.name}" />
 	<property name="apache.mirror" value="http://ftp.riken.jp/net/apache/felix/" />
+	
+	<property name="osgi.framework.jar" location="${externalDirectory}/${framework.fqpn}-${framework.version}.jar" />
 
 	<tstamp>
 		<format property="TS_NOW" pattern="yyyy-MM-dd HH:mm:ss" />
@@ -83,16 +85,30 @@
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="build.jars" />
 	</target>
 
 	<target name="test" depends="clean, fetch.dependencies" description="Test the code">
-		<echo message="docDirectory: ${docDirectory}">
-		</echo>
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
-
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test" />
+	</target>
+
+	<target name="test-osgi" depends="clean, fetch.dependencies" description="Test the code via OSGi context">
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="build.jars" />
+		
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test-osgi" />
+	</target>
+
+	<target name="checkstyle" depends="clean, fetch.dependencies" description="Checkstyle the code">
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="checkstyle" />
 	</target>
 
 	<target name="clean" description="remove intermediate files">
@@ -101,11 +117,12 @@
 		<delete dir="${docDirectory}" />
 		<delete dir="${report.dir}" />
 		<delete dir="${checkstyle.dir}" />
+		
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="clean" />
 
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="clean" />
 	</target>
-
 </project>
