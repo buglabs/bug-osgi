@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<project name="test" default="compile" basedir=".">
+
+     <property name="src" value="."/>
+     <property name="build" value="../../bin"/>
+
+     <target name="init">
+          <mkdir dir="${build}"/>
+     </target>
+
+     <target name="compile" depends="init">
+		<delete>
+	       <fileset dir="${build}" includes="**/*.class"/>
+		</delete>
+          <!-- Compile the java code -->
+     	<javac srcdir="${src}" destdir="${build}" target="1.4" source="1.4">
+     		<classpath>
+     			<pathelement location="../../../com.buglabs.bug.jni.common/bin/"/>
+     		</classpath>
+     	</javac>
+     </target>
+</project>
