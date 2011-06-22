@@ -84,17 +84,41 @@
 		</exec>
 	</target>
 
-	<target name="jar" description="compile the Java source code to class files">
+	<target name="jar" description="compile the Java source code to class files">			
+		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="build.jars" />
+		
+		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="build.jars" />
+		
+		<!-- BUG hardware module driver integration -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="build.jars" />
 
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="build.jars" />		
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="build.jars" />		
-
+		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
+
+		<!-- BUG hardware module APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="build.jars" />
+		
+		<!-- BUG Applications -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="build.jars" />
 	</target>
 
 	<target name="test" description="Test the code">

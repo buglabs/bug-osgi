@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="com.buglabs.bug.jni.gps" basedir=".">
+<project name="com.buglabs.bug.jni.libmatthew" basedir=".">
 	<!-- PROJECT CONSTANTS -->
 	<property name="package.version" value="2.5" />
 	<property name="srcDirectory" value="./src/java" />
