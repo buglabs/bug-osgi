@@ -17,7 +17,7 @@ import com.buglabs.app.bugdash2.TemplateHelper;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
 import com.buglabs.bug.program.pub.IUserAppManager;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.osgi.shell.pub.BundleUtils;
+import com.buglabs.util.osgi.BundleUtils;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleList;

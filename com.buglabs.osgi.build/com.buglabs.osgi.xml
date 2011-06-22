@@ -101,6 +101,7 @@
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="build.jars" />
@@ -109,6 +110,7 @@
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="build.jars" />
 
 		<!-- BUG hardware module APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="build.jars" />
@@ -191,6 +193,7 @@
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="clean" />
 
 		<!-- BUG hardware module APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="clean" />
