@@ -157,7 +157,7 @@
 		</echo>
 		<checkstyle config="${checkstyle.config}">
 			<fileset dir="${checkstyle.src}" includes="**/*.java" />
-			<formatter type="xml" toFile="${checkstyle.dir}/checkstyle_errors.xml" />
+			<formatter type="xml" toFile="${checkstyle.dir}/checkstyle-${ant.project.name}.xml" />
 		</checkstyle>
 	</target>
 
