@@ -17,7 +17,8 @@
 	<property name="checkstyle.dir" value="${basedir}/checkstyle" />
 	<property name="checkstyle.config" value="${base.build.dir}/toolbox/checkstyle/buglabs_checks.xml" />
 	<property name="checkstyle.src" value="${srcDirectory}" />
-	<property name="testBundles" value="file:${distDirectory}/com.buglabs.osgi.tester.jar file:${externalDirectory}/${junit.jar.name}" />
+	<property name="testBundles" value="file:${externalDirectory}/com.buglabs.osgi.tester.jar file:${externalDirectory}/${junit.jar.name}" />
+	<property name="felix.jar.name" value="felix.jar" />
 
 	<property environment="env" />
 	<tstamp />
@@ -138,7 +139,7 @@
 
 		<echo message="Creating OSGi instance with following bundles: ${testBundles}">
 		</echo>
-		<property name="osgi.framework.jar" location="${distDirectory}/felix.jar" />
+		<property name="osgi.framework.jar" location="${externalDirectory}/${felix.jar.name}" />
 		<java jar="${osgi.framework.jar}" fork="true">
 			<jvmarg value="-Dorg.osgi.framework.storage=/tmp/felix-cache" />
 			<jvmarg value="-Dorg.osgi.framework.storage.clean=onFirstInit" />

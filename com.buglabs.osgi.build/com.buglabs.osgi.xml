@@ -28,11 +28,13 @@
 	<property name="http.fqpn" value="org.apache.felix.http.bundle" />
 	<property name="compendium.fqpn" value="org.osgi.compendium" />
 
+	<property name="felix.jar.name" value="${framework.fqpn}-${framework.version}.jar" />
 	<property name="junit.jar.name" value="junit-osgi-4.9b2.jar" />
 	<property name="configadmin.jar.name" value="${configadmin.fqpn}-${configadmin.version}.jar" />
 	<property name="log.jar.name" value="${log.fqpn}-${log.version}.jar" />
 
 	<property name="junit.jar.url" value="https://github.com/downloads/buglabs/bug-osgi/${junit.jar.name}" />
+	<property name="osgi-tester.jar.url" value="https://github.com/downloads/buglabs/bug-osgi/com.buglabs.osgi.tester.jar" />
 	<property name="apache.mirror" value="http://ftp.riken.jp/net/apache/felix/" />
 
 	<property name="osgi.framework.jar" location="${externalDirectory}/${framework.fqpn}-${framework.version}.jar" />
@@ -81,6 +83,12 @@
 			<arg line="-P ${externalDirectory}" />
 			<arg line="--no-check-certificate" />
 			<arg line="${junit.jar.url}" />
+		</exec>
+
+		<exec executable="${wget.bin}">
+			<arg line="-P ${externalDirectory}" />
+			<arg line="--no-check-certificate" />
+			<arg line="${osgi-tester.jar.url}" />
 		</exec>
 	</target>
 
