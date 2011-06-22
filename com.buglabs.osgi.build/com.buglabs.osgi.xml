@@ -95,7 +95,6 @@
 	<target name="jar" description="compile the Java source code to class files">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="build.jars" />
@@ -136,7 +135,6 @@
 	<target name="test" description="Test the code">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test" />
@@ -343,7 +341,6 @@
 
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="clean" />
