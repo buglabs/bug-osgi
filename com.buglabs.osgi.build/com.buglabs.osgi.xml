@@ -89,6 +89,12 @@
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="build.jars" />
+
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="build.jars" />		
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="build.jars" />		
+
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
 	</target>
 
 	<target name="test" description="Test the code">
@@ -120,13 +126,13 @@
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="cpd" />
 	</target>
-	
+
 	<target name="pmd" description="Check the code with pmd">
-			<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="pmd" />
-			<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="pmd" />
-			<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="pmd" />
-			<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="pmd" />
-		</target>
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="pmd" />
+	</target>
 
 	<target name="clean" description="remove intermediate files">
 		<delete dir="${externalDirectory}" />
