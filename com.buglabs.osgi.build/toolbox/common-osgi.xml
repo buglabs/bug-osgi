@@ -17,8 +17,6 @@
 	<property name="checkstyle.dir" value="${basedir}/checkstyle" />
 	<property name="checkstyle.config" value="${base.build.dir}/toolbox/checkstyle/buglabs_checks.xml" />
 	<property name="checkstyle.src" value="${srcDirectory}" />
-	<property name="junit.jar.name" value="junit-osgi-4.9b2.jar" />
-	<property name="configadmin.jar.name" value="org.apache.felix.configadmin-1.2.8.jar" />
 	<property name="testBundles" value="file:${distDirectory}/com.buglabs.osgi.tester.jar file:${externalDirectory}/${junit.jar.name}" />
 
 	<property environment="env" />

@@ -29,6 +29,9 @@
 	<property name="compendium.fqpn" value="org.osgi.compendium" />
 	
 	<property name="junit.jar.name" value="junit-osgi-4.9b2.jar" />
+	<property name="configadmin.jar.name" value="${configadmin.fqpn}-${configadmin.version}.jar" />
+	<property name="log.jar.name" value="${log.fqpn}-${log.version}.jar" />
+
 	<property name="junit.jar.url" value="https://github.com/downloads/buglabs/bug-osgi/${junit.jar.name}" />
 	<property name="apache.mirror" value="http://ftp.riken.jp/net/apache/felix/" />
 	
@@ -56,12 +59,12 @@
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
-			<arg line="${apache.mirror}${log.fqpn}-${log.version}.jar" />
+			<arg line="${apache.mirror}${log.jar.name}" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
-			<arg line="${apache.mirror}${configadmin.fqpn}-${configadmin.version}.jar" />
+			<arg line="${apache.mirror}${configadmin.jar.name}" />
 		</exec>
 
 		<exec executable="${wget.bin}">

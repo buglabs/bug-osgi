@@ -10,6 +10,7 @@
 	<property name="testBundles" value="
 			file:${externalDirectory}/${configadmin.jar.name}
 			file:${externalDirectory}/${junit.jar.name}
+			file:${externalDirectory}/${log.jar.name}
 			file:${distDirectory}/com.buglabs.osgi.tester.jar
 			file:${distDirectory}/com.buglabs.common.jar
 			file:${distDirectory}/com.buglabs.common.tests.jar
