@@ -84,16 +84,17 @@
 		</exec>
 	</target>
 
-	<target name="jar" description="compile the Java source code to class files">			
+	<target name="jar" description="compile the Java source code to class files">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="build.jars" />
-		
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="build.jars" />
+
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="build.jars" />
-		
+
 		<!-- BUG hardware module driver integration -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="build.jars" />
@@ -116,7 +117,7 @@
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="build.jars" />
-		
+
 		<!-- BUG Applications -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="build.jars" />
 	</target>
@@ -165,11 +166,42 @@
 		<delete dir="${report.dir}" />
 		<delete dir="${checkstyle.dir}" />
 
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="clean" />
-
+		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="clean" />
+
+		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="clean" />
+
+		<!-- BUG hardware module driver integration -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="clean" />
+
+		<!-- BUG hardware base APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="clean" />
+
+		<!-- BUG hardware module APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="clean" />
+
+		<!-- BUG Applications -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="clean" />
+
 	</target>
 </project>
