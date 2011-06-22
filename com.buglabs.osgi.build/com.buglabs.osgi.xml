@@ -8,6 +8,7 @@
 	<property name="docDirectory" value="${rootDir}/javadoc" />
 	<property name="report.dir" location="${rootDir}/junit" />
 	<property name="checkstyle.dir" value="${rootDir}/checkstyle" />
+	<property name="generate.docs" value="false" />
 
 	<property name="base.build.dir" location="${basedir}/bug-osgi/com.buglabs.osgi.build" />
 	<property name="checkout.dir" location="${basedir}/bug-osgi" />
@@ -216,6 +217,44 @@
 
 		<!-- BUG Applications -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="test-osgi" />
+	</target>
+	
+	<target name="document" description="Generate javadoc for entire codebase.">
+		<path id="javadoc.classpath">
+			<fileset dir="${externalDirectory}">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${distDirectory}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+		<javadoc destdir="${docDirectory}" classpathref="javadoc.classpath">
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.common"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.ws"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.bmi"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.util.shell"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.util.nmea"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel/src/java"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.video"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel"><include name="**/*.java" /></fileset>
+			<fileset dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2"><include name="**/*.java" /></fileset>		
+		</javadoc>
 	</target>
 
 	<target name="checkstyle" description="Checkstyle the code">
