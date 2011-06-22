@@ -164,7 +164,7 @@
 	<target name="cpd">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: cpd" />
 		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpath="${base.build.dir}/toolbox/pmd/pmd-4.2.5.jar:${base.build.dir}/toolbox/pmd/jaxen-1.1.1.jar" />
-		<cpd minimumTokenCount="100" format="xml" outputFile="${checkstyle.dir}/cpd.xml">
+		<cpd minimumTokenCount="100" format="xml" outputFile="${checkstyle.dir}/cpd-${ant.project.name}.xml">
 			<fileset dir="${checkstyle.src}">
 				<include name="**/*.java" />
 			</fileset>
@@ -183,7 +183,7 @@
 			<ruleset>coupling</ruleset>
 			<ruleset>design</ruleset>
 			<ruleset>imports</ruleset>
-			<formatter type="xml" toFile="${checkstyle.dir}/pmd.xml" />
+			<formatter type="xml" toFile="${checkstyle.dir}/pmd-${ant.project.name}.xml" />
 			<fileset dir="${srcDirectory}">
 				<include name="**/*.java" />
 			</fileset>
