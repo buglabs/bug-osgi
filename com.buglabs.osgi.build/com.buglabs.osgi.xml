@@ -84,21 +84,21 @@
 		</exec>
 	</target>
 
-	<target name="jar" depends="clean, fetch.dependencies" description="compile the Java source code to class files">
+	<target name="jar" description="compile the Java source code to class files">
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="build.jars" />
 	</target>
 
-	<target name="test" depends="clean, fetch.dependencies" description="Test the code">
+	<target name="test" description="Test the code">
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test" />
 	</target>
 
-	<target name="test-osgi" depends="clean, fetch.dependencies" description="Test the code via OSGi context">
+	<target name="test-osgi" description="Test the code via OSGi context">
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="build.jars" />
 		
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test-osgi" />
@@ -107,7 +107,7 @@
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test-osgi" />
 	</target>
 
-	<target name="checkstyle" depends="clean, fetch.dependencies" description="Checkstyle the code">
+	<target name="checkstyle" description="Checkstyle the code">
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="checkstyle" />
