@@ -160,6 +160,37 @@
 		</checkstyle>
 	</target>
 
+	<!-- target: cpd   Run the cpd dup checker against sources -->
+	<target name="cpd">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: cpd" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpath="${base.build.dir}/toolbox/pmd/pmd-4.2.5.jar:${base.build.dir}/toolbox/pmd/jaxen-1.1.1.jar" />
+		<cpd minimumTokenCount="100" format="xml" outputFile="${checkstyle.dir}/cpd.xml">
+			<fileset dir="${checkstyle.src}">
+				<include name="**/*.java" />
+			</fileset>
+		</cpd>
+	</target>
+
+	<!-- target: pmd   Run the pmd validator against sources -->
+	<target name="pmd">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: pmd" />
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpath="${base.build.dir}/toolbox/pmd/pmd-4.2.5.jar:${base.build.dir}/toolbox/pmd/jaxen-1.1.1.jar:${base.build.dir}/toolbox/pmd/asm-3.1.jar" />
+		<pmd>
+			<ruleset>rulesets/favorites.xml</ruleset>
+			<ruleset>basic</ruleset>
+			<ruleset>strings</ruleset>
+			<ruleset>braces</ruleset>
+			<ruleset>coupling</ruleset>
+			<ruleset>design</ruleset>
+			<ruleset>imports</ruleset>
+			<formatter type="xml" toFile="${checkstyle.dir}/pmd.xml" />
+			<fileset dir="${srcDirectory}">
+				<include name="**/*.java" />
+			</fileset>
+		</pmd>
+	</target>
+
+
 	<target name="buildDirectory.check">
 		<condition property="buildDirectory.exists">
 			<available file="${buildDirectory}" type="dir" />
