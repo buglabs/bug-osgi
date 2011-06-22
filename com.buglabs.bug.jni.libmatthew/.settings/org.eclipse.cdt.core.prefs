@@ -1,0 +1,26 @@
+#Tue Jul 27 14:51:43 EDT 2010
+eclipse.preferences.version=1
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="JAVAH_CLASSPATH" operation\="append" value\="../../bin"/>\n<variable delimiter\=";" name\="CC" operation\="replace" value\="arm-poky-linux-gnueabi-gcc"/>\n<variable delimiter\=";" name\="CXX" operation\="append" value\="arm-poky-linux-gnueabi-g++"/>\n<variable delimiter\=";" name\="CXXFLAGS" operation\="replace" value\="-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -B /com.buglabs.build.oe/build/tmp/staging/arm-poky-linux-gnueabi/usr/lib -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp"/>\n<variable delimiter\=";" name\="GCC" operation\="replace" value\="arm-none-linux-gnueabi-gcc"/>\n<variable delimiter\=";" name\="CLASSPATH_INCDIR" operation\="append" value\="/opt/build/trunk/com.buglabs.build.oe/tmp/staging/i686-linux/usr/include/classpath/jni.h"/>\n</environment>\n
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CC/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CC/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CC/value=arm-angstrom-linux-gnueabi-gcc
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CLASSPATH_INCDIR/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CLASSPATH_INCDIR/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CLASSPATH_INCDIR/value=/opt/build/trunk/com.buglabs.build.oe/build/tmp/staging/x86_64-linux/usr/include/classpath/
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXX/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXX/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXX/value=arm-angstrom-linux-gnueabi-g++
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXXFLAGS/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXXFLAGS/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/CXXFLAGS/value=-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -B /com.buglabs.build.oe/build/tmp/staging/arm-poky-linux-gnueabi/usr/lib -iwithprefix include -O2 -march\=armv7-a -mtune\=cortex-a8 -mfpu\=neon -mfloat-abi\=softfp -fpic -Wall -Os -pedantic -std\=c99 -Werror
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/JAVAH_CLASSPATH/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/JAVAH_CLASSPATH/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/JAVAH_CLASSPATH/value=../../bin
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/append=true
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.438115888/appendContributed=true
+indexer/filesToParseUpFront=
+indexer/indexAllFiles=false
+indexer/indexerId=org.eclipse.cdt.core.fastIndexer
+indexer/skipReferences=false
+indexer/skipTypeReferences=false
+indexerId=org.eclipse.cdt.core.fastIndexer
