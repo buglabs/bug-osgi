@@ -125,40 +125,203 @@
 	</target>
 
 	<target name="test" description="Test the code">
+		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test" />
+
+		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test" />
+
+		<!-- BUG hardware module driver integration -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="test" />
+
+		<!-- BUG hardware base APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="test" />
+
+		<!-- BUG hardware module APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="test" />
+
+		<!-- BUG Applications -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="test" />
 	</target>
 
 	<target name="test-osgi" description="Test the code via OSGi context">
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.tester" target="build.jars" />
-
+		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test-osgi" />
+
+		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test-osgi" />
+
+		<!-- BUG hardware module driver integration -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="test-osgi" />
+
+		<!-- BUG hardware base APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="test-osgi" />
+
+		<!-- BUG hardware module APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="test-osgi" />
+
+		<!-- BUG Applications -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="test-osgi" />
 	</target>
 
 	<target name="checkstyle" description="Checkstyle the code">
+		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="checkstyle" />
+
+		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="checkstyle" />
+
+		<!-- BUG hardware module driver integration -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="checkstyle" />
+
+		<!-- BUG hardware base APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="checkstyle" />
+
+		<!-- BUG hardware module APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="checkstyle" />
+
+		<!-- BUG Applications -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="checkstyle" />
 	</target>
 
 	<target name="cpd" description="Check the code for duplications">
+		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="cpd" />
+
+		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="cpd" />
+
+		<!-- BUG hardware module driver integration -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="cpd" />
+
+		<!-- BUG hardware base APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="cpd" />
+
+		<!-- BUG hardware module APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="cpd" />
+
+		<!-- BUG Applications -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="cpd" />
 	</target>
 
 	<target name="pmd" description="Check the code with pmd">
+		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="pmd" />
+
+		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="pmd" />
+
+		<!-- BUG hardware module driver integration -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="pmd" />
+
+		<!-- BUG hardware base APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="pmd" />
+
+		<!-- BUG hardware module APIs -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="pmd" />
+
+		<!-- BUG Applications -->
+		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="pmd" />
 	</target>
 
 	<target name="clean" description="remove intermediate files">
