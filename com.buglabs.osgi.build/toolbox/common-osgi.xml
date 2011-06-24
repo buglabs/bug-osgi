@@ -120,6 +120,7 @@
 	<target name="test" depends="create_dirs, build.jars">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test" />
 		<fail unless="report.dir" message="Ant variable report.dir must be defined." />
+		<echo message="Generating test result output in ${report.dir}..." />
 		<junit printsummary="yes">
 			<classpath refid="bin.classpath" />
 			<sysproperty key="report.misc" value="${report.misc}" />
@@ -137,6 +138,7 @@
 	<target name="test-osgi" depends="test">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test-osgi" />
 
+		<echo message="Generating osgi-test result output in ${report.dir}..." />
 		<echo message="Creating OSGi instance with following bundles: ${testBundles}">
 		</echo>
 		<property name="osgi.framework.jar" location="${externalDirectory}/${felix.jar.name}" />
