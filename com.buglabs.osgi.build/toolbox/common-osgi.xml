@@ -204,17 +204,20 @@
 		<mkdir dir="${checkstyle.dir}" />
 		<mkdir dir="${distDirectory}" />
 		<mkdir dir="${externalDirectory}" />
-		<mkdir dir="${distDirectory}" />
 	</target>
 
 	<target name="clean">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: clean" />
+		<delete dir="${buildDirectory}" />
+	</target>
+	
+	<target name="clean_all">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: clean_all" />
 		<delete dir="${report.dir}" />
 		<delete dir="${buildDirectory}" />
 		<delete dir="${checkstyle.dir}" />
 		<delete dir="${distDirectory}" />
 		<delete dir="${externalDirectory}" />
 		<delete dir="${docDirectory}" />
-		<delete dir="${buildDirectory}" />
 	</target>
 </project>
