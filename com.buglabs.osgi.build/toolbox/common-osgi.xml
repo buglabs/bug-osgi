@@ -62,6 +62,7 @@
 		<mkdir dir="${buildDirectory}" />
 
 		<!-- These will only be set if previously undefined -->
+		<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
 		<property name="package.version" value="${default.package.version}" />
 		<property name="env.BUILD_NUMBER" value="0" />
 		<property name="env.JOB_NAME" value="undefined" />
