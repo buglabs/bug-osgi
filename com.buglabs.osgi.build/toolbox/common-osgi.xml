@@ -10,9 +10,6 @@
 
 	<!-- The package version if previously undefined -->
 	<property name="default.package.version" value="2.5" />
-
-	<property name="jar.name" value="${ant.project.name}" />
-	<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
 	<property name="docDirectory" value="${basedir}/javadoc" />
 	<property name="report.dir" value="${basedir}/report" />
 	<property name="report.src" location="${srcDirectory}" />
@@ -86,24 +83,32 @@
 	</target>
 
 	<!-- target: build.jars   Build jars intended for production distribution -->
-	<target name="build.jars" depends="build, document" description="make the jar">
+	<target name="build.jars" depends="build, document" description="Package the java class files into a jar.">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.jars" />
+			
+		<property name="dist.jar.name" value="${ant.project.name}" />
+		<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
+			
 		<fail unless="distDirectory" message="distDirectory must be defined." />
 		<fail unless="buildDirectory" message="buildDirectory must be defined." />
 
-		<jar destfile="${distDirectory}/${jar.name}.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="**/*.java,build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**" />
+		<jar destfile="${distDirectory}/${dist.jar.name}.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="**/*.java,build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**" />
 	</target>
 
 	<!-- target: build.src.jars   Build jars with source code -->
-	<target name="build.src.jars" depends="build, document" description="make the jar">
+	<target name="build.src.jars" depends="build, document" description="Package the java class files into a jar with source files.">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.src.jars" />
+			
+		<property name="dist.jar.name" value="${ant.project.name}" />
+		<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
 
-		<jar destfile="${distDirectory}/${jar.name}-src.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore" />
+		<jar destfile="${distDirectory}/${dist.jar.name}-src.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore" />
 	</target>
 
 	<!-- target: doc.build.jars   Generate javadocs after building and jaring -->
-	<target name="doc.build.jars" description="javadoc and make the jar">
+	<target name="doc.build.jars" description="Generate javadoc and make the jar.">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: doc.build.jars" />
+		
 
 		<property name="generate.docs" value="true" />
 		<antcall target="build.jars" />
