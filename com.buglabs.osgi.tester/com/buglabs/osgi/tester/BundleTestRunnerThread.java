@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.Map;
 
 import junit.framework.Test;
 import junit.framework.TestFailure;
@@ -45,6 +46,10 @@ public class BundleTestRunnerThread extends Thread {
 		try {
 			System.out.println("Waiting " + SETTLE_MILLIS + " millis for OSGi instance to settle...");
 			Thread.sleep(SETTLE_MILLIS);
+			
+			System.out.println("System properties:");
+			for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) 
+				System.out.println("Property: " + entry.getKey().toString() + "  Value: " + entry.getValue());
 			
 			ServiceReference[] srefs = context.getServiceReferences(TestSuite.class.getName(), null);
 
