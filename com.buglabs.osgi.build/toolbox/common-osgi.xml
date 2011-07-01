@@ -11,6 +11,8 @@
 	<!-- The package version if previously undefined -->
 	<property name="default.package.version" value="2.5" />
 
+	<property name="jar.name" value="${ant.project.name}" />
+	<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
 	<property name="docDirectory" value="${basedir}/javadoc" />
 	<property name="report.dir" value="${basedir}/report" />
 	<property name="report.src" location="${srcDirectory}" />
@@ -75,7 +77,7 @@
 			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
 			<classpath refid="bin.classpath" />
 		</javac>
-		<manifest file="META-INF/MANIFEST.MF" mode="update">
+		<manifest file="${manifest.location}" mode="update">
 			<attribute name="Bundle-Version" value="${full.version}" />
 			<attribute name="Build-Label" value="${env.JOB_NAME}" />
 			<attribute name="Build-Source" value="${env.BUILD_URL}" />
@@ -89,14 +91,14 @@
 		<fail unless="distDirectory" message="distDirectory must be defined." />
 		<fail unless="buildDirectory" message="buildDirectory must be defined." />
 
-		<jar destfile="${distDirectory}/${ant.project.name}.jar" basedir="${buildDirectory}" manifest="META-INF/MANIFEST.MF" excludes="**/*.java,build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**" />
+		<jar destfile="${distDirectory}/${jar.name}.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="**/*.java,build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**" />
 	</target>
 
 	<!-- target: build.src.jars   Build jars with source code -->
 	<target name="build.src.jars" depends="build, document" description="make the jar">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.src.jars" />
 
-		<jar destfile="${distDirectory}/${ant.project.name}.jar" basedir="${buildDirectory}" manifest="META-INF/MANIFEST.MF" excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore" />
+		<jar destfile="${distDirectory}/${jar.name}-src.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore" />
 	</target>
 
 	<!-- target: doc.build.jars   Generate javadocs after building and jaring -->
