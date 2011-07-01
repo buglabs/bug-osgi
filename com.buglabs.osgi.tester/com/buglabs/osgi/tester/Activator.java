@@ -22,9 +22,8 @@ import org.osgi.framework.BundleException;
  *
  */
 public class Activator implements BundleActivator {
-
-
 	private static final String JUNIT_REPORT_DIR = "com.buglabs.osgi.tester.report.dir";
+	private static final String SHUTDOWN_DELAY_MILLIS = "com.buglabs.osgi.tester.shutdown.delay";
 
 	public void start(final BundleContext context) throws Exception {
 		File outputDir = context.getDataFile("temp").getParentFile();
@@ -39,13 +38,19 @@ public class Activator implements BundleActivator {
 				if (!outputDir.mkdirs())
 					throw new BundleException("Unable to start tester, unable to create directory " + JUNIT_REPORT_DIR);
 		}
+		
+		int shutdownTimeout = 10000;
+		if (context.getProperty(SHUTDOWN_DELAY_MILLIS) != null) {
+			shutdownTimeout = Integer.parseInt(context.getProperty(SHUTDOWN_DELAY_MILLIS));
+		}
 			
 		System.out.println("Test report output directory: " + outputDir);
-		BundleTestRunnerThread thread = new BundleTestRunnerThread(context, outputDir);
+		BundleTestRunnerThread thread = new BundleTestRunnerThread(context, outputDir, shutdownTimeout);
 		thread.start();
 	}
 
 	public void stop(BundleContext context) throws Exception {
 		
 	}
+	
 }

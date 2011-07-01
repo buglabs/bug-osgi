@@ -17,6 +17,7 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -31,9 +32,12 @@ public class BundleTestRunnerThread extends Thread {
 	private final File outputDir;
 	private boolean errorOccurred = false;
 
-	public BundleTestRunnerThread(BundleContext context, final File outputDir) {
+	private final int shutdownTimeout;
+
+	public BundleTestRunnerThread(BundleContext context, final File outputDir, int shutdownTimeout) {
 		this.context = context;
 		this.outputDir = outputDir;
+		this.shutdownTimeout = shutdownTimeout;
 	}
 
 	@Override
@@ -64,8 +68,29 @@ public class BundleTestRunnerThread extends Thread {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 		}
+		
+		try {
+			Thread.sleep(shutdownTimeout);
+		} catch (InterruptedException e) {			
+		}
+		
+		//Shutdown all the bundles
+		for (Bundle bundle : Arrays.asList(context.getBundles())) {
+			if (bundle.getBundleId() != 0) {
+				try {
+					bundle.stop();
+				} catch (Exception e) {
+					//Ignore errors
+				}
+			}
+		}
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {			
+		}
 
-		// Test execution complete, now forcably shutdown the JVM.
+		// Test execution complete, now forcibly shutdown the JVM.
 		if (errorOccurred)
 			System.exit(1);
 		else 
