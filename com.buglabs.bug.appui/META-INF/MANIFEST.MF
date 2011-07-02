@@ -7,7 +7,6 @@ Bundle-SymbolicName: com.buglabs.bug.appui
 Import-Package: 
  com.buglabs.application,
  com.buglabs.bug.module.lcd.pub,
- com.buglabs.osgi.shell.pub,
  com.buglabs.util.osgi,
  org.osgi.util.tracker,
  org.osgi.framework,
