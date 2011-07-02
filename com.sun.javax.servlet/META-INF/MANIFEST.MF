@@ -3,4 +3,4 @@ Bundle-SymbolicName: javax.servlet.source
 Bundle-Name: javax.servlet.source
 Bundle-Version: 2.3.0.v200806031603
 Bundle-Vendor: Eclipse Orbit
-Export-Package: javax.servlet, javax.servlet.http, javax.servlet.jsp, javax.servlet.resources
+Export-Package: javax.servlet;version="2.5", javax.servlet.http;version="2.5", javax.servlet.jsp;version="2.5", javax.servlet.resources;version="2.5"
