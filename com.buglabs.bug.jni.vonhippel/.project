@@ -4,12 +4,7 @@
 	<comment></comment>
 	<projects>
 	</projects>
-	<buildSpec>
-		<buildCommand>
-			<name>com.buglabs.osgi.concierge.core.ManifestConsistencyChecker</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
+	<buildSpec>	
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
 			<triggers>clean,full,incremental,</triggers>

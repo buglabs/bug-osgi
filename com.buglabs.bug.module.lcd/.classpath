@@ -3,12 +3,5 @@
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="/home/jconnolly/buglabs/dev/apps/eclipse-helios-dragonfly2.0/plugins/org.eclipse.osgi_3.6.1.R36x_v20100806.jar" sourcepath="/home/jconnolly/buglabs/dev/apps/eclipse-helios-dragonfly2.0/plugins/org.eclipse.osgi_3.6.1.R36x_v20100806.jar">
-		<accessrules>
-			<accessrule kind="accessible" pattern="org/osgi/util/tracker/*"/>
-			<accessrule kind="accessible" pattern="org/osgi/framework/*"/>
-			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
-		</accessrules>
-	</classpathentry>
 	<classpathentry kind="output" path=""/>
 </classpath>
