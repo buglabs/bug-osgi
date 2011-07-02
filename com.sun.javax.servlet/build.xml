@@ -19,7 +19,6 @@
 			<jar destfile="${distDirectory}/${dist.jar.name}.jar" 
 				basedir="${srcDirectory}" 
 				update="true" 
-				includes="**/*.properties" 
-				excludesfile="build.properties,plugin.properties" />
+				includes="**/*.properties" />
 		</target>
 </project>
