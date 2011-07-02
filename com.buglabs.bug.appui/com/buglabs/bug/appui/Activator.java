@@ -50,7 +50,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.buglabs.application.IDesktopApp;
 import com.buglabs.bug.module.lcd.pub.IModuleDisplay;
-import com.buglabs.util.LogServiceUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.osgi.BundleUtils;
 import com.buglabs.util.osgi.FilterUtil;
 
