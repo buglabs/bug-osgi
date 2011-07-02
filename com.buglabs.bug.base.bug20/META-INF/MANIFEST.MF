@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bundle-Name: BUG Base Services
+Bundle-Name: BUG Base 2.0 Services
 Bundle-Activator: com.buglabs.bug.base.Activator
-Bundle-SymbolicName: com.buglabs.bug.base
+Bundle-SymbolicName: com.buglabs.bug.base.bug20
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.base.pub,
