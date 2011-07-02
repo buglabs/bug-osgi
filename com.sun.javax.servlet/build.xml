@@ -1,9 +1,22 @@
 <?xml version="1.0"?>
 <project name="com.sun.javax.servlet"  basedir=".">
-	<!-- PROJECT CONSTANTS -->
-	<property name="project" value="com.sun.javax.servlet" />
+	<property name="package.version" value="2.3" />
+	
+	<property name="extra.jar.includes" value="**/*.properties **/*.class" />
 
 	<!-- PROJECT IMPORTS -->
 	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
 	<import file="${common.ant.file}" />
+	
+	<target name="append.resources" description="Append locale resources into jar.">
+			<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.jars" />
+				
+			<property name="dist.jar.name" value="${ant.project.name}" />
+			<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
+				
+			<fail unless="distDirectory" message="distDirectory must be defined." />
+			<fail unless="buildDirectory" message="buildDirectory must be defined." />
+
+			<jar destfile="${distDirectory}/${dist.jar.name}.jar" basedir="${srcDirectory}" update="true" includes="**/*.properties" />
+		</target>
 </project>
