@@ -9,14 +9,17 @@
 	<import file="${common.ant.file}" />
 	
 	<target name="append.resources" description="Append locale resources into jar.">
-			<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.jars" />
+			<echo message="## PROJECT: ${ant.project.name} ## TARGET: append.resources" />
 				
-			<property name="dist.jar.name" value="${ant.project.name}" />
-			<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
+			<property name="dist.jar.name" value="${ant.project.name}" />			
 				
 			<fail unless="distDirectory" message="distDirectory must be defined." />
 			<fail unless="buildDirectory" message="buildDirectory must be defined." />
 
-			<jar destfile="${distDirectory}/${dist.jar.name}.jar" basedir="${srcDirectory}" update="true" includes="**/*.properties" />
+			<jar destfile="${distDirectory}/${dist.jar.name}.jar" 
+				basedir="${srcDirectory}" 
+				update="true" 
+				includes="**/*.properties" 
+				excludesfile="build.properties,plugin.properties" />
 		</target>
 </project>
