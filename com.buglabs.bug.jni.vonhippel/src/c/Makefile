@@ -1,9 +1,5 @@
 JAVAH = javah
 
-ifdef LTIB_ROOTFS
-PHONEME_HOME=$(LTIB_ROOTFS)/tmp/phoneme-advanced/cdc/build/linux-arm-mx31
-endif
-
 #empty :=
 #space := $(empty) $(empty)
 #tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
@@ -15,22 +11,10 @@ endif
 LIB_DIR = ../../lib/
 
 INCLUDE = -I./include/
-ifdef USE_PHONEME
-INCLUDE += -I$(PHONEME_HOME)/../../src/share/
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(ARCH)
-INCLUDE += -I$(PHONEME_HOME)/../../src/
-INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
-endif
+
 INCLUDE += -I$(CLASSPATH_INCDIR)
 INCLUDE += -I$(BUG_LINUX_SRC)/include/
 INCLUDE += -I$(STAGING_BUG_INCDIR)
-
-ifndef BUG_LINUX_SRC
-	BUG_LINUX_SRC=$(CHECKOUT_DIR)/com.freescale.ltib2/rpm/BUILD/linux-2.6.19.2
-endif
-
 INCLUDE += -I${BUG_LINUX_SRC}/include
 
 LD_FLAGS = -L${STAGING_LIBDIR}/bug

@@ -4,9 +4,6 @@ JAVAH = javah
 # CXXFLAGS:  -B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi=aapcs-linux -mfpu=vfp -mfloat-abi=softfp
 # GCC = arm-none-linux-gnueabi-gcc
 
-ifdef LTIB_ROOTFS
-PHONEME_HOME=$(LTIB_ROOTFS)/tmp/phoneme-advanced/cdc/build/linux-arm-mx31
-endif
 #empty :=
 #space := $(empty) $(empty)
 #tmpdirs := $(subst /,$(space),$(PHONEME_HOME))
@@ -20,20 +17,9 @@ LIB_DIR = ../../lib/
 INCLUDE = -I./include/
 INCLUDE += -I./include/alsa
 INCLUDE += -I./include/jni
-ifdef USE_PHONEME
-INCLUDE += -I$(PHONEME_HOME)/../../src/share/
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(ARCH)
-INCLUDE += -I$(PHONEME_HOME)/../../src/
-INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
-endif
+
 INCLUDE += -I$(CLASSPATH_INCDIR)
 INCLUDE += -I$(BUG_LINUX_SRC)/include/
-
-
-
-
 
 ALL_CXXFLAGS += $(INCLUDE) $(CXXFLAGS) -std=c99
 

@@ -8,6 +8,7 @@ INCLUDE += -I$(BUG_LINUX_SRC)/include/
 INCLUDE += -I$(STAGING_BUG_INCDIR)
 
 LD_FLAGS = -L${STAGING_LIBDIR}/bug
+LD_FLAGS += -lCommon
 
 ALL_CXXFLAGS += $(INCLUDE) $(CXXFLAGS)
 
@@ -41,7 +42,7 @@ printvars:
 all: clean jni libs
 
 jni:
-		$(JAVAH)  -d include/jni -classpath $(JAVAH_CLASSPATH):$(COMMON_CLASSPATH):. $(JNI_CLASSES)
+	$(JAVAH)  -d include/jni -classpath $(JAVAH_CLASSPATH):$(COMMON_CLASSPATH):. $(JNI_CLASSES)
 
 libs: $(LIBRARY)
 	cp $(LIBRARY) $(LIB_DIR)

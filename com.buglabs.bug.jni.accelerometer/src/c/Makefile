@@ -1,32 +1,15 @@
 JAVAH = javah
-ifdef LTIB_ROOTFS
-PHONEME_HOME=$(LTIB_ROOTFS)/tmp/phoneme-advanced/cdc/build/linux-arm-mx31
-endif
 
 LIB_DIR = ../../lib/
 
 INCLUDE = -I./include/
-ifdef USE_PHONEME
-echo "USE_PHONEME is somehow defined" "monkies"
-INCLUDE += -I$(PHONEME_HOME)/../../src/share/
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(OS)-$(ARCH)
-INCLUDE += -I$(PHONEME_HOME)/../../src/$(ARCH)
-INCLUDE += -I$(PHONEME_HOME)/../../src/
-INCLUDE += -I$(PHONEME_HOME)/../../src/share/javavm/export
-endif
 INCLUDE += -I$(STAGING_BUG_INCDIR)
 INCLUDE += -I$(CLASSPATH_INCDIR)
 INCLUDE += -I$(BUG_LINUX_SRC)/include/
 
-ifndef BUG_LINUX_SRC
-	BUG_LINUX_SRC=$(CHECKOUT_DIR)/com.freescale.ltib2/rpm/BUILD/linux-2.6.19.2
-endif
-
-INCLUDE += -I${BUG_LINUX_SRC}/include
-
 LD_FLAGS = -L${STAGING_LIBDIR}/bug
 LD_FLAGS += -lCommon
+
 ALL_CXXFLAGS += $(INCLUDE) $(CXXFLAGS)
 
 JNI_CLASSES = com.buglabs.bug.jni.accelerometer.Accelerometer
