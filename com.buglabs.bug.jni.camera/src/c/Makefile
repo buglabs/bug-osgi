@@ -13,8 +13,7 @@ endif
 INCLUDE += -I$(CLASSPATH_INCDIR)
 INCLUDE += -I$(BUG_LINUX_SRC)/include/
 INCLUDE += -I$(ROOTFS_BUG)/usr/include/classpath
-#TODO change once Lane's stuff is in BL git repo
-INCLUDE += -I/home/dave/dev/buglabs/lane/bl-linux-omap/include/
+INCLUDE += -I$(STAGING_INCDIR)
 
 #LD_FLAGS = -L$(CHECKOUT_DIR)/com.buglabs.bug.jni.common/lib
 LD_FLAGS = -L$(ROOTFS_BUG)/usr/lib

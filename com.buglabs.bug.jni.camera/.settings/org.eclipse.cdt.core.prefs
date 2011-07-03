@@ -1,21 +1,27 @@
-#Fri Sep 17 21:23:04 EDT 2010
+#Sun Jul 03 08:29:57 EDT 2011
 eclipse.preferences.version=1
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528=
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/BUG_LINUX_SRC/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/BUG_LINUX_SRC/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/BUG_LINUX_SRC/value=/home/jconnolly/buglabs/dev/misc/bug20-2.6.35-linaro
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/delimiter=\:
-environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/operation=append
-environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/value=arm-angstrom-linux-gnueabi-gcc
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/operation=replace
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CC/value=arm-linux-gnueabi-gcc
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CLASSPATH_INCDIR/delimiter=\:
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CLASSPATH_INCDIR/operation=append
-environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CLASSPATH_INCDIR/value=/home/dave/dev/buglabs/com.buglabs.build.oe/build/tmp/staging/armv7a-angstrom-linux-gnueabi
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CLASSPATH_INCDIR/value=/home/jconnolly/buglabs/dev/misc/build/tmp/sysroots/x86_64-linux/usr/include/classpath
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXX/delimiter=;
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXX/operation=replace
-environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXX/value=arm-angstrom-linux-gnueabi-g++
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXX/value=arm-linux-gnueabi-g++
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXXFLAGS/delimiter=;
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXXFLAGS/operation=replace
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/CXXFLAGS/value=-B ${ROOTFS_BUG}/lib/ -B ${ROOTFS_BUG}/usr/lib/ -iwithprefix include -O2 -fsigned-char -mabi\=aapcs-linux -mfpu\=vfp -mfloat-abi\=softfp
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/JAVAH_CLASSPATH/delimiter=;
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/JAVAH_CLASSPATH/operation=append
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/JAVAH_CLASSPATH/value=../../bin
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/STAGING_INCDIR/delimiter=\:
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/STAGING_INCDIR/operation=append
+environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/STAGING_INCDIR/value=/home/jconnolly/buglabs/dev/misc/build/tmp/sysroots/armv7a-angstrom-linux-gnueabi/usr/include
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/append=true
 environment/project/preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.689074596.1755507528/appendContributed=true
 indexer/indexerId=org.eclipse.cdt.core.fastIndexer
