@@ -18,7 +18,8 @@ Import-Package:
  com.buglabs.util.osgi,
  com.buglabs.application,
  org.osgi.service.cm,
- com.buglabs.services.ws
+ com.buglabs.services.ws,
+ org.knapsack.init.pub
 Export-Package: 
  com.buglabs.bug.module.pub,
  com.buglabs.bug.program.pub

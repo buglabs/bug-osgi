@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.knapsack.init.pub.KnapsackInitService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -77,8 +78,11 @@ public class ProgramServlet extends HttpServlet {
 
 	private LogService log;
 
-	public ProgramServlet(BundleContext context) {
+	private final KnapsackInitService initService;
+
+	public ProgramServlet(BundleContext context, KnapsackInitService initService) {
 		this.context = context;
+		this.initService = initService;
 		log = Activator.getLog();
 		
 		this.incomingBundleDir = context.getProperty(Activator.APP_BUNDLE_PATH);
@@ -131,10 +135,7 @@ public class ProgramServlet extends HttpServlet {
 		fos.flush();
 		fos.close();
 
-		/*appManager.addApplication(jarFile.getAbsolutePath());
-		appManager.run();*/
-		//TODO: Implement telling knapsack that bundles have changed
-		log.log(LogService.LOG_ERROR, "IMPLEMENT ME.");
+		initService.updateBundles();
 
 		resp.getWriter().println(HTTP_OK_RESPONSE);
 		req.getInputStream().close();
@@ -491,53 +492,4 @@ public class ProgramServlet extends HttpServlet {
 
 		return root.toString();
 	}
-
-	/*
-	public static String getRelativePath(File file, File relativeTo) throws IOException {
-		file = new File(file + File.separator + "89243jmsjigs45u9w43545lkhj7").getParentFile();
-		relativeTo = new File(relativeTo + File.separator + "984mvcxbsfgqoykj30487df556").getParentFile();
-		File origFile = file;
-		File origRelativeTo = relativeTo;
-		ArrayList filePathStack = new ArrayList();
-		ArrayList relativeToPathStack = new ArrayList();
-		// build the path stack info to compare it afterwards
-		file = file.getCanonicalFile();
-		while (file != null) {
-			filePathStack.add(0, file);
-			file = file.getParentFile();
-		}
-		relativeTo = relativeTo.getCanonicalFile();
-		while (relativeTo != null) {
-			relativeToPathStack.add(0, relativeTo);
-			relativeTo = relativeTo.getParentFile();
-		}
-		// compare as long it goes
-		int count = 0;
-		file = (File) filePathStack.get(count);
-		relativeTo = (File) relativeToPathStack.get(count);
-		while ((count < filePathStack.size() - 1) && (count != relativeToPathStack.size() - 1) && file.equals(relativeTo)) {
-			count++;
-			file = (File) filePathStack.get(count);
-			relativeTo = (File) relativeToPathStack.get(count);
-		}
-		if (file.equals(relativeTo))
-			count++;
-		// up as far as necessary
-		StringBuffer relString = new StringBuffer();
-		for (int i = count; i != relativeToPathStack.size(); i++) {
-			relString.append(".." + File.separator);
-		}
-		// now back down to the file
-		for (int i = count; i < filePathStack.size() - 1; i++) {
-			relString.append(((File) filePathStack.get(i)).getName() + File.separator);
-		}
-		relString.append(((File) filePathStack.get(filePathStack.size() - 1)).getName());
-		// just to test
-		File relFile = new File(origRelativeTo.getAbsolutePath() + File.separator + relString.toString());
-		if (!relFile.getCanonicalFile().equals(origFile.getCanonicalFile())) {
-			throw new IOException("Failed to find relative path.");
-		}
-		return relString.toString();
-	}
-	*/
 }

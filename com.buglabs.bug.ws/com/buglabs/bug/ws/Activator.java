@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.knapsack.init.pub.KnapsackInitService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -71,7 +72,8 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	 */
 	private String[] services = {
 			HttpService.class.getName(),
-			ConfigurationAdmin.class.getName()
+			ConfigurationAdmin.class.getName(),
+			KnapsackInitService.class.getName()
 	};
 	private HttpService httpService;
 
@@ -111,6 +113,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 			
 		// Get a reference to the HTTP service
 		httpService = (HttpService) services.get(HttpService.class.getName());
+		KnapsackInitService initService = (KnapsackInitService) services.get(KnapsackInitService.class.getName());
 		configAdmin = (ConfigurationAdmin) services.get(ConfigurationAdmin.class.getName());
 		
 		// Create servlet instances to be hosted by HTTP service
@@ -125,7 +128,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 			return;
 		}
 		servlets.put(PACKAGE_WS_PATH, new PackageServlet(context));
-		servlets.put(PROGRAM_WS_PATH, new ProgramServlet(context));
+		servlets.put(PROGRAM_WS_PATH, new ProgramServlet(context, initService));
 		servlets.put(CONFIG_WS_PATH, new ConfigAdminServlet(context, configAdmin));
 				
 		servlets.put(SERVICE_WS_PATH, new WSServlet(context, serviceMap, configAdmin));
