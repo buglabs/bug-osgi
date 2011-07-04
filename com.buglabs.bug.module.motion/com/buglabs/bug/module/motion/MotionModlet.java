@@ -60,8 +60,7 @@ import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.services.ws.PublicWSProvider;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.RemoteOSGiServiceConstants;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleControl, IModuleLEDController {
 	// default is 0; make ours +1 since better than BUGview at accelerometer functionality.
@@ -200,8 +199,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		Properties p = new Properties();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
-		p.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-		
+				
 		if (properties != null) {
 			if (properties.getDescription() != null) {
 				p.put("ModuleDescription", properties.getDescription());
