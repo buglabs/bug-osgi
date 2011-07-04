@@ -10,7 +10,6 @@ import java.io.Writer;
 
 import com.buglabs.bug.base.pub.ICommandResponseHandler;
 import com.buglabs.bug.base.pub.IShellSession;
-import com.buglabs.util.StringUtil;
 
 /**
  * Default implementation of ShellSession.
@@ -37,7 +36,7 @@ public class ShellSession implements IShellSession {
 
 		StringBuffer sb = new StringBuffer();
 
-		String elems[] = StringUtil.split(file, File.separator);
+		String elems[] = file.split(File.separator);
 
 		for (int i = 0; i < elems.length - 1; ++i) {
 			sb.append(elems[i]);

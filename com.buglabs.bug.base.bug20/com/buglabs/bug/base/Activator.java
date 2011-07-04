@@ -56,7 +56,7 @@ import com.buglabs.device.IButtonEventListener;
 import com.buglabs.device.IButtonEventProvider;
 import com.buglabs.support.SupportInfoTextFormatter;
 import com.buglabs.support.SupportInfoXMLFormatter;
-import com.buglabs.util.LogServiceUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
  * This bundle offers base unit features to the runtime, such as date/time and
@@ -121,20 +121,6 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		if (bbc != null) {
 			baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
 		}
-		
-		/*if (soundplayer != null) {
-			audioReg = context.registerService(IBaseAudioPlayer.class.getName(), soundplayer, null);
-		}
-		
-		try {
-			btReg = context.registerService(LocalDevice.class.getName(), LocalDevice.getLocalDevice(), null);
-			// I'm also going to need to figure out whether hci0 is the base
-			// bluetooth or whatever
-			// need to think this through more
-		} catch (BluetoothStateException e) {
-			logService.log(LogService.LOG_INFO, "No Bluetooth Device found.  Not registering javax.bluetooth.LocalDevice as a service");
-		}
-		*/
 	}
 
 	private Dictionary<String, String> getPowerButtonProperties() {
