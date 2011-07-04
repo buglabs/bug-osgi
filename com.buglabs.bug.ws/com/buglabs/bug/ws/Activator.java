@@ -45,7 +45,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	public static final String CONFIG_WS_PATH = "/configuration";
 	
 	public static final String MODULE_WS_PATH = "/module";
-	private static final String ROOT_ALIAS = "/";
+	
 	private static final String SERVICE_WS_PATH = "/service";
 	private static final String SERVICE_HTML_PATH = SERVICE_WS_PATH + ".html";
 
@@ -131,12 +131,6 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 		servlets.put(SERVICE_WS_PATH, new WSServlet(context, serviceMap, configAdmin));
 		servlets.put(SERVICE_HTML_PATH, new WSHtmlServlet(context, serviceMap, configAdmin));
 		
-		try {
-			httpService.registerResources(ROOT_ALIAS, "static", new StaticResourceContext());
-		} catch (NamespaceException e2) {
-			log.log(LogService.LOG_ERROR, "Failed to register resource " + ROOT_ALIAS, e2);
-		}
-		
 		// Register servlets
 		for (Map.Entry<String, HttpServlet> e : servlets.entrySet())
 			try {
@@ -155,25 +149,5 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 		if (httpService != null && servlets != null && servlets.size() > 0)
 			for (String alias : servlets.keySet())
 				httpService.unregister(alias);
-	}
-	
-	/**
-	 * HttpContext for static resource included in bundle.
-	 *
-	 */
-	private class StaticResourceContext implements HttpContext {
-
-		public String getMimeType(String name) {
-			return null;
-		}
-
-		public URL getResource(String name) {
-
-			return context.getBundle().getResource(name);
-		}
-
-		public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
-			return true;
-		}
 	}
 }

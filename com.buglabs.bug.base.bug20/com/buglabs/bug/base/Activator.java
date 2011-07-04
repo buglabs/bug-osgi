@@ -28,6 +28,8 @@
 package com.buglabs.bug.base;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
@@ -35,10 +37,13 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
@@ -74,6 +79,11 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	private static final String DEVNODE_BUGNAV = "/dev/input/user_button";
 
 	private static final String DEVNODE_BUGPOWER = "/dev/input/power_button";
+	
+	/**
+	 * Location where static web content will be registered with web server.
+	 */
+	private static final String ROOT_ALIAS = "/";
 
 	private static Activator ref;
 
@@ -260,16 +270,18 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		this.httpService = (HttpService) services.get(HttpService.class.getName());
 		
 		try {
-			logService.log(LogService.LOG_INFO, "Registering info service.");
+			logService.log(LogService.LOG_INFO, "Registering base servlets.");
 			
 			// register xml version
 			httpService.registerServlet(INFO_SERVLET_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoXMLFormatter()), null, null);
 			// register html version
 			httpService.registerServlet(INFO_SERVLET_HTML_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
+			// register static root web content
+			httpService.registerResources(ROOT_ALIAS, "static", new StaticResourceContext());
 		} catch (ServletException e) {
-			logService.log(LogService.LOG_ERROR, "An error occurred launching Info servlet: " + e.getMessage());
+			logService.log(LogService.LOG_ERROR, "An error occurred registering servlet or resource: " + e.getMessage());
 		} catch (NamespaceException e) {
-			logService.log(LogService.LOG_ERROR, "An error occurred launching Info servlet: " + e.getMessage());
+			logService.log(LogService.LOG_ERROR, "An error occurred registering servlet or resource: " + e.getMessage());
 		}
 	}
 
@@ -277,7 +289,29 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	public void shutdown() {
 		if (httpService != null) {
 			httpService.unregister(INFO_SERVLET_PATH);
+			httpService.unregister(INFO_SERVLET_HTML_PATH);
+			httpService.unregister(ROOT_ALIAS);
 			httpService = null;
+		}
+	}
+	
+	/**
+	 * HttpContext for static resource included in bundle.
+	 *
+	 */
+	private class StaticResourceContext implements HttpContext {
+
+		public String getMimeType(String name) {
+			return null;
+		}
+
+		public URL getResource(String name) {
+
+			return context.getBundle().getResource(name);
+		}
+
+		public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
+			return true;
 		}
 	}
 }
