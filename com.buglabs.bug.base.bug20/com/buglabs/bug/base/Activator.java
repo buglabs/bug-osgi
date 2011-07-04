@@ -32,23 +32,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.application.IServiceProvider;
-import com.buglabs.application.RunnableWithServices;
 import com.buglabs.application.ServiceTrackerHelper;
+import com.buglabs.application.ServiceTrackerHelper.ManagedRunnable;
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
-import com.buglabs.bug.base.pub.IShellService;
 import com.buglabs.bug.base.pub.ITimeProvider;
 import com.buglabs.bug.input.pub.InputEventProvider;
 import com.buglabs.device.ButtonEvent;
@@ -65,7 +63,7 @@ import com.buglabs.util.osgi.LogServiceUtil;
  * @author kgilmer
  * 
  */
-public class Activator implements BundleActivator, ITimeProvider, IButtonEventListener {
+public class Activator implements BundleActivator, ITimeProvider, IButtonEventListener, ManagedRunnable {
 
 	private static final String BUG_BASE_VERSION_KEY = "bug.base.version";
 
@@ -92,8 +90,6 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 
 	private ServiceTracker httpTracker;
 
-	private ServiceRegistration sr;
-
 	private InputEventProvider userbep;
 
 	private ServiceRegistration userBepReg;
@@ -103,6 +99,8 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	private InputEventProvider powerbep;
 
 	private ServiceRegistration powerBepReg;
+
+	private HttpService httpService;
 
 	public Date getTime() {
 		return Calendar.getInstance().getTime();
@@ -181,34 +179,9 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		//http://redmine.buglabs.net/issues/show/1429#note-4
 		powerbep.addListener(this);
 		
-		
 		registerServices(context);
-
-		// Create a ST for the HTTP Service, create the 'info' servlet when
-		// available.
-		httpTracker = ServiceTrackerHelper.createAndOpen(context, HttpService.class.getName(), new RunnableWithServices() {
-			public void allServicesAvailable(IServiceProvider serviceProvider) {
-				try {
-					logService.log(LogService.LOG_INFO, "Registering info service.");
-					HttpService httpService = (HttpService) serviceProvider.getService(HttpService.class);
-					// register xml version
-					httpService.registerServlet(INFO_SERVLET_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoXMLFormatter()), null, null);
-					// register html version
-					httpService.registerServlet(INFO_SERVLET_HTML_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
-				} catch (ServletException e) {
-					logService.log(LogService.LOG_ERROR, "An error occurred launching Info servlet: " + e.getMessage());
-				} catch (NamespaceException e) {
-					logService.log(LogService.LOG_ERROR, "An error occurred launching Info servlet: " + e.getMessage());
-				}
-			}
-
-			public void serviceUnavailable(IServiceProvider serviceProvider, ServiceReference sr, Object service) {
-				((HttpService) serviceProvider.getService(HttpService.class)).unregister(INFO_SERVLET_PATH);
-			}
-
-		});
-
-		sr = context.registerService(IShellService.class.getName(), new ShellService(), null);
+		
+		httpTracker = ServiceTrackerHelper.openServiceTracker(context, new String[] {HttpService.class.getName()}, this);
 
 		signalStartup();
 	}
@@ -250,8 +223,7 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		t.start();
 	}
 
-	public void stop(BundleContext context) throws Exception {
-		sr.unregister();
+	public void stop(BundleContext context) throws Exception {	
 		httpTracker.close();
 		unregisterServices(context);
 	}
@@ -281,5 +253,31 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 			signalShutdown();
 		}
 		
+	}
+
+	@Override
+	public void run(Map<Object, Object> services) {
+		this.httpService = (HttpService) services.get(HttpService.class.getName());
+		
+		try {
+			logService.log(LogService.LOG_INFO, "Registering info service.");
+			
+			// register xml version
+			httpService.registerServlet(INFO_SERVLET_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoXMLFormatter()), null, null);
+			// register html version
+			httpService.registerServlet(INFO_SERVLET_HTML_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
+		} catch (ServletException e) {
+			logService.log(LogService.LOG_ERROR, "An error occurred launching Info servlet: " + e.getMessage());
+		} catch (NamespaceException e) {
+			logService.log(LogService.LOG_ERROR, "An error occurred launching Info servlet: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public void shutdown() {
+		if (httpService != null) {
+			httpService.unregister(INFO_SERVLET_PATH);
+			httpService = null;
+		}
 	}
 }
