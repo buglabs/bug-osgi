@@ -85,12 +85,22 @@ public class ProgramServlet extends HttpServlet {
 		this.initService = initService;
 		log = Activator.getLog();
 		
+		//Make sure we know where to install bundles to.
 		this.incomingBundleDir = context.getProperty(Activator.APP_BUNDLE_PATH);
 		if (incomingBundleDir == null) {
-			throw new RuntimeException("Bundle property " + Activator.APP_BUNDLE_PATH + " is not defined.  " + this.getClass().getName() + " cannot start.");
+			throw new RuntimeException("Bundle property " + Activator.APP_BUNDLE_PATH + " is not defined.  " + this.getClass().getSimpleName() + " cannot start.");
 		}
 		
-		log.log(LogService.LOG_DEBUG, "BUGapp storage location set to: " + incomingBundleDir);
+		//Make sure the configured directory is being scanned by knapsack
+		boolean found = false;
+		for (File f : initService.getBundleDirectories())
+			if (f.getAbsolutePath().equals(incomingBundleDir))
+				found = true;
+				
+		if (!found)
+			throw new RuntimeException(Activator.APP_BUNDLE_PATH + " is set to a directory that knapsack is not configured to read from.  Check knapsack property 'org.knapsack.bundleDirs'.");
+		
+		log.log(LogService.LOG_DEBUG, this.getClass().getSimpleName() + " initialization complete.  BUGapp storage location set to: " + incomingBundleDir);
 	}
 
 	/*
@@ -134,6 +144,8 @@ public class ProgramServlet extends HttpServlet {
 		pipe(req.getInputStream(), fos, req.getContentLength());
 		fos.flush();
 		fos.close();
+		//Tell knapsack to start the bundle.
+		jarFile.setExecutable(true);
 
 		initService.updateBundles();
 
