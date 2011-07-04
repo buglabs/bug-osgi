@@ -256,7 +256,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	}
 
 	private void registerExistingServices(BundleContext context2) throws InvalidSyntaxException {
-		ServiceReference sr[] = context2.getServiceReferences(null, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
+		ServiceReference sr[] = context2.getServiceReferences((String) null, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
 
 		if (sr != null) {
 			for (int i = 0; i < sr.length; ++i) {
