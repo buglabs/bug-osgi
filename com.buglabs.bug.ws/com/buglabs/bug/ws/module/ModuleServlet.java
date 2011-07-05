@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.service.log.LogService;
@@ -53,7 +54,10 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 
 	private IModuleControl[] modules;
 
+	private BundleContext context;
+
 	public ModuleServlet() {
+		context = Activator.getContext();
 		//Initialize the array that tracks modules.
 		this.modules = new IModuleControl[4];
 		for (int i = 0; i < modules.length; ++i)
@@ -185,7 +189,7 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 	@Override
 	public void serviceChanged(ServiceEvent event) {
 		//Here we get notified when IModuleControls are added and removed from OSGi service registry.  We want to keep our state up-to-date with the modules array.
-		IModuleControl imc = (IModuleControl) event.getSource();
+		IModuleControl imc = (IModuleControl) context.getService(event.getServiceReference());
 		
 		if (event.getType() == ServiceEvent.REGISTERED) {
 			if (modules[imc.getSlotId()] != null)
