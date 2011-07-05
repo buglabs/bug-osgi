@@ -65,24 +65,27 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 	private static BundleContext context;
 	private AppWindow appWindow;
 	private static LogService log;
-	private Map appBundles;
-	private Map launchListeners;
+	private Map<String, Bundle> appBundles;
+	private Map<String, IDesktopApp> launchListeners;
 	private Frame appFrame;
 	
-	protected static final Toolkit toolkit = Toolkit.getDefaultToolkit();
+	protected static final Toolkit AWT_TOOLKIT = Toolkit.getDefaultToolkit();
 
 	protected static Image BUNDLE_STOPPED;
 	protected static Image APP_ACTIVE;
 	protected static Image APP_INVERTED;
 	protected static Image BUNDLE_STARTED;
 	
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 */
 	public void start(BundleContext context) throws Exception {
 		Activator.context = context;
 
-		APP_ACTIVE = toolkit.createImage(context.getBundle().getResource("app_started.png"));
-		BUNDLE_STOPPED = toolkit.createImage(context.getBundle().getResource("bundle_stopped.png"));
-		BUNDLE_STARTED = toolkit.createImage(context.getBundle().getResource("bundle_started.png"));
-		APP_INVERTED = toolkit.createImage(context.getBundle().getResource("app_invert.png"));
+		APP_ACTIVE = AWT_TOOLKIT.createImage(context.getBundle().getResource("app_started.png"));
+		BUNDLE_STOPPED = AWT_TOOLKIT.createImage(context.getBundle().getResource("bundle_stopped.png"));
+		BUNDLE_STARTED = AWT_TOOLKIT.createImage(context.getBundle().getResource("bundle_started.png"));
+		APP_INVERTED = AWT_TOOLKIT.createImage(context.getBundle().getResource("app_invert.png"));
 
 		appBundles = loadModel(context.getBundles());
 		launchListeners = loadLaunchListeners();
@@ -104,6 +107,9 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 		return log;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
 		st.close();
 		
@@ -116,11 +122,11 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 
 	/**
 	 * @return A map containing bundle names and launch listeners.
-	 * @throws InvalidSyntaxException
+	 * @throws InvalidSyntaxException Thrown if errors in filter expression.
 	 */
-	private Map loadLaunchListeners() throws InvalidSyntaxException {
+	private Map<String, IDesktopApp> loadLaunchListeners() throws InvalidSyntaxException {
 		ServiceReference[] srs = context.getServiceReferences(IDesktopApp.class.getName(), null);
-		Map model = new Hashtable();
+		Map<String, IDesktopApp> model = new Hashtable<String, IDesktopApp>();
 
 		if (srs != null) {
 			for (int i = 0; i < srs.length; ++i) {
@@ -128,7 +134,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 				String name = BundleUtils.getBestName(b);
 
 				if (!model.containsKey(name)) {
-					model.put(name, context.getService(srs[i]));
+					model.put(name, (IDesktopApp) context.getService(srs[i]));
 				}
 			}
 		}
@@ -136,6 +142,9 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 		return model;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
+	 */
 	public Object addingService(ServiceReference reference) {
 		IModuleDisplay display = (IModuleDisplay) context.getService(reference);
 		
@@ -152,10 +161,11 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 	}
 	
 	/**
+	 * @param bundles Array of Bundles
 	 * @return a map of existing app bundles.
 	 */
-	private Map loadModel(Bundle[] bundles) {
-		Map model = new Hashtable();
+	private Map<String, Bundle> loadModel(Bundle[] bundles) {
+		Map<String, Bundle> model = new Hashtable<String, Bundle>();
 
 		for (int i = 0; i < bundles.length; ++i) {
 			Bundle b = bundles[i];
@@ -171,7 +181,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 	}
 
 	/**
-	 * @param b
+	 * @param b Bundle to check
 	 * @return true if a given bundle is a BUG app
 	 */
 	private boolean isApp(Bundle b) {
@@ -184,15 +194,24 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(org.osgi.framework.ServiceReference, java.lang.Object)
+	 */
 	public void modifiedService(ServiceReference reference, Object service) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference, java.lang.Object)
+	 */
 	public void removedService(ServiceReference reference, Object service) {
 		if (appWindow != null) {
 			appWindow.dispose();
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleListener#bundleChanged(org.osgi.framework.BundleEvent)
+	 */
 	public void bundleChanged(BundleEvent event) {
 		if (!isApp(event.getBundle())) {
 			return;
@@ -223,13 +242,16 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.ServiceListener#serviceChanged(org.osgi.framework.ServiceEvent)
+	 */
 	public void serviceChanged(ServiceEvent event) {
 		String name = BundleUtils.getBestName(event.getServiceReference().getBundle());
 
 		switch (event.getType()) {
 		case ServiceEvent.REGISTERED:
 			if (!launchListeners.containsKey(name)) {
-				launchListeners.put(name, context.getService(event.getServiceReference()));
+				launchListeners.put(name, (IDesktopApp) context.getService(event.getServiceReference()));
 			}
 			break;
 		case ServiceEvent.UNREGISTERING:
@@ -239,6 +261,11 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 		}
 	}
 	
+	/**
+	 * Add hooks to shutdown application from UI.
+	 * 
+	 * @param f2 AWT Window Frame
+	 */
 	private void addWindowListeners(final Frame f2) {
 		f2.addWindowListener(new WindowListener() {
 

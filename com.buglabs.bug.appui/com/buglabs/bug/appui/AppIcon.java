@@ -42,28 +42,44 @@ class AppIcon extends Container {
 	private final Image inverted;
 	private Image image;
 
+	/**
+	 * @param normal regular image
+	 * @param inverted inverted image
+	 */
 	public AppIcon(Image normal, Image inverted) {
 		this.normal = normal;
 		this.inverted = inverted;
 		this.image = normal;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.Container#paint(java.awt.Graphics)
+	 */
 	public void paint(Graphics g) {
 		g.drawImage(image, 0, 0, this);
 		super.paint(g);
 	}
 	
-	synchronized public void invert(Graphics g) {
+	/**
+	 * @param g graphics to invert
+	 */
+	public synchronized void invert(Graphics g) {
 		image = inverted;
 		paint(g);
 	}
 
-	synchronized public void revert(Graphics g) {
+	/**
+	 * @param g graphics to revert
+	 */
+	public synchronized void revert(Graphics g) {
 		image = normal;
 		paint(g);
 	}
 	
-	synchronized public boolean isInverted() {
+	/**
+	 * @return true if inverted
+	 */
+	public synchronized boolean isInverted() {
 		return image == inverted;
 	}
 

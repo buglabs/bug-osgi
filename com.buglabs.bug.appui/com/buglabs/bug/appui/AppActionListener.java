@@ -50,12 +50,20 @@ public class AppActionListener implements ActionListener {
 	private final Bundle bundle;
 	private final LogService log;
 
+	/**
+	 * @param interaction Application
+	 * @param bundle App Bundle
+	 * @param log Log Service
+	 */
 	public AppActionListener(IDesktopApp interaction, Bundle bundle, LogService log) {
 		this.interaction = interaction;
 		this.bundle = bundle;
 		this.log = log;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
 	public void actionPerformed(final ActionEvent e) {
 		final String cmd = e.getActionCommand();
 		try {

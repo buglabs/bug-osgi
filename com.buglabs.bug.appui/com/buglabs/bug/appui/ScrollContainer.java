@@ -39,20 +39,31 @@ import java.awt.Dimension;
  */
 class ScrollContainer extends Container {
 	private static final long serialVersionUID = 7194753406047720880L;
-	private static Dimension pref_size;
-	private static Dimension max_size;
+	private static final int MAX_HIEGHT = 3000;
+	private static final int PREFERRED_HEIGHT = 200;
+	private static Dimension preferredSize;
+	private static Dimension maxSize;
 
+	/**
+	 * @param width w of container
+	 */
 	public ScrollContainer(int width) {
-		pref_size = new Dimension(width, 200);
-		max_size = new Dimension(width, 3000);
+		preferredSize = new Dimension(width, PREFERRED_HEIGHT);
+		maxSize = new Dimension(width, MAX_HIEGHT);
 		this.setBackground(Color.WHITE);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.Container#getMaximumSize()
+	 */
 	public Dimension getMaximumSize() {
-		return max_size;
+		return maxSize;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.Container#getPreferredSize()
+	 */
 	public Dimension getPreferredSize() {
-		return pref_size;
+		return preferredSize;
 	}
 }

@@ -47,29 +47,49 @@ class AppIconMouseListener implements MouseListener {
 	private final IDesktopApp app;
 	private PopupMenu menu;
 
+	/**
+	 * @param icon icon
+	 * @param app application
+	 * @param menu menu
+	 */
 	public AppIconMouseListener(AppIcon icon, IDesktopApp app, PopupMenu menu) {
 		this.icon = icon;
 		this.app = app;
 		this.menu = menu;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
 	public void mouseClicked(MouseEvent arg0) {
 		if (app != null && System.currentTimeMillis() - delta < MENU_PRESS_TIMEOUT_MILLIS) {
 			app.click();
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 */
 	public void mouseEntered(MouseEvent arg0) {
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
 	public void mouseExited(MouseEvent arg0) {
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 */
 	public void mousePressed(MouseEvent e) {
 		delta = System.currentTimeMillis();
 		icon.invert(icon.getGraphics());
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
 	public void mouseReleased(MouseEvent e) {
 		icon.revert(icon.getGraphics());
 		if (System.currentTimeMillis() - delta > MENU_PRESS_TIMEOUT_MILLIS) {

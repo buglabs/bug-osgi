@@ -66,7 +66,7 @@ public class AppWidget extends Container {
 
 	private static final String TRUNCATE_STRING = "..";
 
-	private final static Dimension WIDGET_SIZE = new Dimension(64, 44);
+	private static final Dimension WIDGET_SIZE = new Dimension(64, 44);
 
 	private final PopupMenu menu = new PopupMenu();
 
@@ -74,7 +74,13 @@ public class AppWidget extends Container {
 
 	private final String appName;
 
-	public AppWidget(final String name, final Map launchListeners, Bundle bundle, Font font) {
+	/**
+	 * @param name name of icon
+	 * @param launchListeners listeners
+	 * @param bundle bundle
+	 * @param font font
+	 */
+	public AppWidget(final String name, final Map<String, IDesktopApp> launchListeners, Bundle bundle, Font font) {
 		appName = name;
 		desktopApp = (IDesktopApp) launchListeners.get(name);
 
@@ -99,23 +105,24 @@ public class AppWidget extends Container {
 	}
 
 	/**
-	 * Load the icon image for the app
-	 * @param desktopApp2
-	 * @param bundle 
-	 * @return
+	 * Load the icon image for the app.
+	 * 
+	 * @param app The application
+	 * @param bundle The bundle representing the application
+	 * @return Icon as image
 	 */
-	private Image getIcon(IDesktopApp desktopApp2, Bundle bundle) {
+	private Image getIcon(IDesktopApp app, Bundle bundle) {
 		//Custom icon provided by app.
-		if (desktopApp2 != null) {
-			URL imageFile = desktopApp2.getIcon(ICON_SIZE_Y, ICON_SIZE_Y, SCREEN_DEPTH);
+		if (app != null) {
+			URL imageFile = app.getIcon(ICON_SIZE_Y, ICON_SIZE_Y, SCREEN_DEPTH);
 			
 			if (imageFile != null) {
-				return Activator.toolkit.createImage(imageFile);
+				return Activator.AWT_TOOLKIT.createImage(imageFile);
 			}
 		}
 		
 		//default app icon for IDesktopApp clients
-		if (desktopApp2 != null) {
+		if (app != null) {
 			return Activator.APP_ACTIVE;
 		}
 		
@@ -128,6 +135,13 @@ public class AppWidget extends Container {
 		return Activator.BUNDLE_STOPPED;
 	}
 
+	/**
+	 * Populate the menu.
+	 * 
+	 * @param m menu
+	 * @param app application
+	 * @param state bundle state
+	 */
 	private void populateMenu(PopupMenu m, IDesktopApp app, int state) {
 		//Display app title.
 		m.add(appName);
@@ -155,10 +169,10 @@ public class AppWidget extends Container {
 	}
 
 	/**
-	 * Truncate bundle name if necessary
+	 * Truncate bundle name if necessary.
 	 * 
-	 * @param name
-	 * @return
+	 * @param name String to be formatted.
+	 * @return The input string truncated if exceeds maximum length defined in MAX_NAME_LENGTH.
 	 */
 	private String formatName(String name) {
 		if (name.length() < MAX_NAME_LENGTH) {
@@ -168,10 +182,16 @@ public class AppWidget extends Container {
 		return name.substring(0, MAX_NAME_LENGTH - (TRUNCATE_STRING.length())) + TRUNCATE_STRING;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.Container#getPreferredSize()
+	 */
 	public Dimension getPreferredSize() {
 		return WIDGET_SIZE;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.Container#getMinimumSize()
+	 */
 	public Dimension getMinimumSize() {
 		return WIDGET_SIZE;
 	}

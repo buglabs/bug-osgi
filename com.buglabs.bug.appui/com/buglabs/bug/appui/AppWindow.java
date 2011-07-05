@@ -33,10 +33,12 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.ScrollPane;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.osgi.framework.Bundle;
+
+import com.buglabs.application.IDesktopApp;
 
 /**
  * AppUI Frame.
@@ -44,13 +46,13 @@ import org.osgi.framework.Bundle;
  *
  */
 public class AppWindow {
-	private static final long serialVersionUID = 1142379544558770397L;
+
 	//Map of apps to be shown
-	private Map model;
+	private Map<String, Bundle> model;
 	//Map of apps that implement IDesktopApp
-	private Map launchListeners;
+	private Map<String, IDesktopApp> launchListeners;
 	
-	private static final Font font = new Font("Arial", Font.PLAIN, 12);
+	private static final Font APP_FONT = new Font("Arial", Font.PLAIN, 12);
 
 	private static final int HORIZ_MARGIN = 10;
 
@@ -62,6 +64,9 @@ public class AppWindow {
 	private Container paneCont;
 	private final Frame f;
 
+	/**
+	 * @param f AWT Frame
+	 */
 	public AppWindow(Frame f) {
 		this.f = f;
 		
@@ -81,32 +86,42 @@ public class AppWindow {
 	}
 
 	/**
-	 * Rebuild window
+	 * Rebuild window.
+	 * 
 	 */
 	public void refresh() {
 		//TODO this could be much more efficient.
 		paneCont.removeAll();
-		for (Iterator i = model.keySet().iterator(); i.hasNext();) {
-			final String name = (String) i.next();
-			AppWidget widget = new AppWidget(name, launchListeners, (Bundle) model.get(name), font);
-			paneCont.add(widget);
-		}
-		
+		for (Entry<String, Bundle> e : model.entrySet()) 
+			paneCont.add(new AppWidget(e.getKey(), launchListeners, e.getValue(), APP_FONT));
+					
 		f.pack();
 	}
 	
-	public void setBundles(Map appBundles) {
+	/**
+	 * @param appBundles set the map of bundles
+	 */
+	public void setBundles(Map<String, Bundle> appBundles) {
 		this.model = appBundles;
 	}
 
-	public void setLaunchClients(Map launchListeners) {
+	/**
+	 * @param launchListeners map of launch listeners
+	 */
+	public void setLaunchClients(Map<String, IDesktopApp> launchListeners) {
 		this.launchListeners = launchListeners;
 	}
 
+	/**
+	 * @param b true to make window visible, false otherwise
+	 */
 	public void setVisible(boolean b) {
 		f.setVisible(b);
 	}
 
+	/**
+	 * Dispose window.
+	 */
 	public void dispose() {
 		f.dispose();
 	}
