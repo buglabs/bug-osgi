@@ -36,7 +36,7 @@ public class ADXL34xDevice extends SysfsNode {
 	 */
 	public ADXL34xDevice(File root) {
 		super(root);
-		slot = Integer.parseInt(root.getName().substring(0, 1)) - 4;	
+		slot = Integer.parseInt(root.getName().substring(0, 1)) - BMIDevice.MAX_BMI_SLOTS;	
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class ADXL34xDevice extends SysfsNode {
 		
 		File [] children = root.listFiles(new ADXLDeviceFilenameFilter());
 		
-		if (children == null || children.length ==0) {
+		if (children == null || children.length == 0) {
 			return null;
 		}
 		
@@ -132,6 +132,9 @@ public class ADXL34xDevice extends SysfsNode {
 	 */
 	private static class ADXLDeviceFilenameFilter implements FilenameFilter {
 
+		/* (non-Javadoc)
+		 * @see java.io.FilenameFilter#accept(java.io.File, java.lang.String)
+		 */
 		public boolean accept(File dir, String name) {
 			return name.endsWith("-001d");
 		}

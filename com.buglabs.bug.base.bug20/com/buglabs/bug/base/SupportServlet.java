@@ -11,7 +11,7 @@ import com.buglabs.support.ISupportInfoFormatter;
 import com.buglabs.support.SupportInfo;
 
 /**
- * Servlet for /support web service on BUG
+ * Servlet for /support web service on BUG.
  * 
  * @author bballantine
  *
@@ -22,11 +22,18 @@ public class SupportServlet extends HttpServlet {
 	private SupportInfo info;
 	private ISupportInfoFormatter formatter;
 	
+	/**
+	 * @param info SupportInfo
+	 * @param formatter ISupportInfoFormatter
+	 */
 	public SupportServlet(SupportInfo info, ISupportInfoFormatter formatter) {
 		this.info = info;
 		this.formatter = formatter;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		resp.setContentType(formatter.getContentType());

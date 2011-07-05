@@ -75,24 +75,26 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	private static final String INFO_SERVLET_PATH = "/support";
 
 	private static final String INFO_SERVLET_HTML_PATH = "/support.html";
-	
+
 	private static final String DEVNODE_BUGNAV = "/dev/input/user_button";
 
 	private static final String DEVNODE_BUGPOWER = "/dev/input/power_button";
-	
+
 	/**
 	 * Location where static web content will be registered with web server.
 	 */
 	private static final String ROOT_ALIAS = "/";
 
+	/**
+	 * Sleep delay for blinking LED.
+	 */
+	protected static final long LED_SLEEP_DELAY = 300;
+
 	private static Activator ref;
 
 	private ServiceRegistration timeReg;
 
-	//private ServiceRegistration audioReg;
-
-
-	private LogService logService;
+	private static LogService logService;
 
 	private BUGBaseControl bbc;
 
@@ -112,6 +114,11 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 
 	private HttpService httpService;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.buglabs.bug.base.pub.ITimeProvider#getTime()
+	 */
 	public Date getTime() {
 		return Calendar.getInstance().getTime();
 	}
@@ -120,17 +127,21 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	 * Register all the OSGi services that this bundle provides.
 	 * 
 	 * @param context
+	 *            BundleContext
 	 */
 	private void registerServices(BundleContext context) {
 		timeReg = context.registerService(ITimeProvider.class.getName(), this, null);
 		userBepReg = context.registerService(IButtonEventProvider.class.getName(), userbep, getUserButtonProperties());
 		powerBepReg = context.registerService(IButtonEventProvider.class.getName(), powerbep, getPowerButtonProperties());
-		
+
 		if (bbc != null) {
 			baseControlReg = context.registerService(IBUG20BaseControl.class.getName(), bbc, getBaseControlServiceProperties());
 		}
 	}
 
+	/**
+	 * @return Dictionary of properties for power button.
+	 */
 	private Dictionary<String, String> getPowerButtonProperties() {
 		Dictionary<String, String> d = new Hashtable<String, String>();
 		d.put("Provider", this.getClass().getName());
@@ -138,6 +149,9 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		return d;
 	}
 
+	/**
+	 * @return Dictionary of properties for user button.
+	 */
 	private Dictionary<String, String> getUserButtonProperties() {
 		Dictionary<String, String> d = new Hashtable<String, String>();
 		d.put("Provider", this.getClass().getName());
@@ -163,6 +177,13 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		return "2.0";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext
+	 * )
+	 */
 	public void start(final BundleContext context) throws Exception {
 		this.context = context;
 		ref = this;
@@ -172,26 +193,27 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		System.setProperty(BUG_BASE_VERSION_KEY, getBaseVersion());
 		try {
 			bbc = new BUGBaseControl();
-			//see http://redmine.buglabs.net/issues/show/1424
+			// see http://redmine.buglabs.net/issues/show/1424
 			bbc.setLEDTrigger(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_BLUE, "none");
 			bbc.setLEDBrightness(IBUG20BaseControl.LED_POWER, 255);
 		} catch (FileNotFoundException e) {
 			logService.log(LogService.LOG_ERROR, "Unable to initialize LEDs.  " + e.getMessage());
 		}
-	
+
 		userbep = new InputEventProvider(DEVNODE_BUGNAV, logService);
 		userbep.start();
-		
+
 		powerbep = new InputEventProvider(DEVNODE_BUGPOWER, logService);
 		powerbep.start();
-		
-		//listen for the power button to be hit, then toggle the LED sequence for user feedback.  see
-		//http://redmine.buglabs.net/issues/show/1429#note-4
+
+		// listen for the power button to be hit, then toggle the LED sequence
+		// for user feedback. see
+		// http://redmine.buglabs.net/issues/show/1429#note-4
 		powerbep.addListener(this);
-		
+
 		registerServices(context);
-		
-		httpTracker = ServiceTrackerHelper.openServiceTracker(context, new String[] {HttpService.class.getName()}, this);
+
+		httpTracker = ServiceTrackerHelper.openServiceTracker(context, new String[] { HttpService.class.getName() }, this);
 
 		signalStartup();
 	}
@@ -200,31 +222,31 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	 * Signal to user that OSGi runtime is up and running.
 	 */
 	private void signalStartup() {
-		Thread t = new Thread(new Runnable() {
+		(new Thread(new Runnable() {
 
 			public void run() {
 				try {
 					bbc.setLEDColor(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_RED, true);
-					Thread.sleep(300);
+					Thread.sleep(LED_SLEEP_DELAY);
 					bbc.setLEDColor(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_GREEN, true);
-					Thread.sleep(300);
+					Thread.sleep(LED_SLEEP_DELAY);
 					bbc.setLEDColor(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_BLUE, true);
 				} catch (Exception e) {
+					// Ignore error
 				}
 			}
 
-		});
-		t.start();
+		})).start();
 	}
-	
+
 	private void signalShutdown() {
 		Thread t = new Thread(new Runnable() {
 
 			public void run() {
 				try {
 					logService.log(LogService.LOG_INFO, "Power Button engaged: base bundle signalling via LEDs shutdown sequence initiated");
-					bbc.setLEDTrigger(IBUG20BaseControl.LED_POWER , IBUG20BaseControl.COLOR_BLUE, "heartbeat");
-					
+					bbc.setLEDTrigger(IBUG20BaseControl.LED_POWER, IBUG20BaseControl.COLOR_BLUE, "heartbeat");
+
 				} catch (Exception e) {
 				}
 			}
@@ -233,49 +255,68 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		t.start();
 	}
 
-	public void stop(BundleContext context) throws Exception {	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception {
 		httpTracker.close();
 		unregisterServices(context);
 	}
 
+	/**
+	 * @param context BundleContext
+	 */
 	private void unregisterServices(BundleContext context) {
 		timeReg.unregister();
-		if (baseControlReg !=null){
+		if (baseControlReg != null) {
 			baseControlReg.unregister();
 		}
 		userBepReg.unregister();
 		powerBepReg.unregister();
 	}
 
+	/**
+	 * @return Activator instance
+	 */
 	public static Activator getDefault() {
 		return ref;
 	}
 
+	/**
+	 * @return BundleContext
+	 */
 	public BundleContext getBundleContext() {
 		return context;
 	}
 
 	@Override
 	public void buttonEvent(ButtonEvent event) {
-		
-		if (event.getButton() == 116 && event.getAction() == ButtonEvent.KEY_UP){
-			logService.log(LogService.LOG_DEBUG, "base bundle received Power Button event: "+event.getButton());
+
+		if (event.getButton() == ButtonEvent.BUTTON_BUG20_POWER && event.getAction() == ButtonEvent.KEY_UP) {
+			logService.log(LogService.LOG_DEBUG, "base bundle received Power Button event: " + event.getButton());
 			signalShutdown();
 		}
-		
+
 	}
 
 	@Override
 	public void run(Map<Object, Object> services) {
 		this.httpService = (HttpService) services.get(HttpService.class.getName());
-		
+
 		try {
 			logService.log(LogService.LOG_INFO, "Registering base servlets.");
-			
+
 			// register xml version
-			httpService.registerServlet(INFO_SERVLET_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoXMLFormatter()), null, null);
+			httpService.registerServlet(
+					INFO_SERVLET_PATH, new SupportServlet(
+							new BUGSupportInfo(context), new SupportInfoXMLFormatter()), null, null);
 			// register html version
-			httpService.registerServlet(INFO_SERVLET_HTML_PATH, new SupportServlet(new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
+			httpService.registerServlet(
+					INFO_SERVLET_HTML_PATH, new SupportServlet(
+							new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
 			// register static root web content
 			httpService.registerResources(ROOT_ALIAS, "static", new StaticResourceContext());
 		} catch (ServletException e) {
@@ -294,24 +335,40 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 			httpService = null;
 		}
 	}
-	
+
 	/**
 	 * HttpContext for static resource included in bundle.
-	 *
+	 * TODO: Determine if this class is necessary or servlet can be registered w/ null HttpContext.
 	 */
 	private class StaticResourceContext implements HttpContext {
 
+		/* (non-Javadoc)
+		 * @see org.osgi.service.http.HttpContext#getMimeType(java.lang.String)
+		 */
 		public String getMimeType(String name) {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
+		 */
 		public URL getResource(String name) {
 
 			return context.getBundle().getResource(name);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.osgi.service.http.HttpContext#handleSecurity(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+		 */
 		public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
 			return true;
 		}
+	}
+
+	/**
+	 * @return Activator's instance of log service.
+	 */
+	public static LogService getLog() {
+		return logService;
 	}
 }

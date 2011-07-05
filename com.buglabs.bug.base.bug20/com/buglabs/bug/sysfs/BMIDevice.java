@@ -3,6 +3,10 @@ package com.buglabs.bug.sysfs;
 import java.io.File;
 import java.io.IOException;
 
+import org.osgi.service.log.LogService;
+
+import com.buglabs.bug.base.Activator;
+
 /**
  * A for properties associated with a BMI module attached to
  * BUG.  This class is designed to be subclassed for specific modules.
@@ -11,26 +15,29 @@ import java.io.IOException;
  * 
  */
 public class BMIDevice extends SysfsNode {
+	/**
+	 * Total number of possible BMI devices.
+	 */
+	public static final int MAX_BMI_SLOTS = 4;
+	
 	private static final String SUSPEND_FILENAME = "suspend";
 	
 	private String description;
-	private int gpio_usage;
-	private int power_use;
-	private int revision;
-	private int vendor;
-	private int bus_usage;
-	private int memory_size;
-	private int power_charging;
-	private String product_id;
-	private String serial_num;
-	private final int slot;
 	private int gpioUsage;
 	private int powerUse;
+	private int revision;
+	private int vendor;
 	private int busUsage;
 	private int memorySize;
 	private int powerCharging;
+	private String productId;
 	private String serialNum;
+	private final int slot;
 	
+	/**
+	 * @param root of sysfs directory for bmi device
+	 * @param slot slot index for bmi device
+	 */
 	public BMIDevice(File root, int slot) {
 		super(root);
 		this.slot = slot;
@@ -42,7 +49,7 @@ public class BMIDevice extends SysfsNode {
 		this.busUsage = parseInt(getFirstLineofFile(new File(root, "bus_usage")));
 		this.memorySize = parseInt(getFirstLineofFile(new File(root, "memory_size")));
 		this.powerCharging = parseInt(getFirstLineofFile(new File(root, "power_charging")));
-		this.product_id = parseHexInt(getFirstLineofFile(new File(root, "product")));
+		this.productId = parseHexInt(getFirstLineofFile(new File(root, "product")));
 		this.serialNum = parseMultiInt(getFirstLineofFile(new File(root, "serial_num")));
 	}
 
@@ -50,10 +57,9 @@ public class BMIDevice extends SysfsNode {
 	 * Create an instance of BMIModuleProperties class using the base BMI /sys
 	 * filesystem directory, for example /sys/devices/conn-m1.
 	 * 
-	 * @param directory
-	 * @param slot 
-	 * @return
-	 * @throws IOException if the root directory is not valid and readable.
+	 * @param directory of BMI sysfs entry
+	 * @param slot slot index
+	 * @return BMIDevice
 	 */
 	protected static BMIDevice createFromSYSDirectory(File directory, int slot) {
 		if (directory == null || !directory.exists() || !directory.isDirectory()) {
@@ -73,65 +79,104 @@ public class BMIDevice extends SysfsNode {
 		return new BMIDevice(directory, slot);
 	}
 	
+	/**
+	 * @return Slot device is attached to
+	 */
 	public int getSlot() {
 		return slot;
 	}
 
+	/**
+	 * @return Description of device provided in EEPROM
+	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * @return GPIO Usage
+	 */
 	public int getGpioUsage() {
-		return gpio_usage;
+		return gpioUsage;
 	}
 
+	/**
+	 * @return Power Usage
+	 */
 	public int getPowerUse() {
-		return power_use;
+		return powerUse;
 	}
 
+	/**
+	 * @return Module hardware revision number
+	 */
 	public int getRevision() {
 		return revision;
 	}
 
+	/**
+	 * @return Vendor of hardware module
+	 */
 	public int getVendor() {
 		return vendor;
 	}
 
+	/**
+	 * @return Hardware bus usage
+	 */
 	public int getBusUsage() {
-		return bus_usage;
+		return busUsage;
 	}
 
+	/**
+	 * @return Memory usage
+	 */
 	public int getMemorySize() {
-		return memory_size;
+		return memorySize;
 	}
 
+	/**
+	 * @return power charging status
+	 */
 	public int getPowerCharging() {
-		return power_charging;
+		return powerCharging;
 	}
 
+	/**
+	 * @return Product ID of hardware module
+	 */
 	public String getProductId() {
-		return product_id;
+		return productId;
 	}
 
+	/**
+	 * @return Serial number of hardware module
+	 */
 	public String getSerialNum() {
-		return serial_num;
+		return serialNum;
 	}
 	
+	/**
+	 * @return true if device was successfully suspended, false otherwise.
+	 */
 	public boolean suspend() {
 		try {
 			println(new File(root, SUSPEND_FILENAME), "1");
 		} catch (IOException e) {
-			e.printStackTrace();
+			Activator.getLog().log(LogService.LOG_ERROR, "Unable to suspend device.", e);
 			return false;
 		}
 		return true;
 	}
 	
+	/**
+	 * @return true if device was successfully resumed, false otherwise.
+	 */
 	public boolean resume() {
 		try {
 			println(new File(root, SUSPEND_FILENAME), "0");
 		} catch (IOException e) {
-			e.printStackTrace();
+			Activator.getLog().log(LogService.LOG_ERROR, "Unable to suspend device.", e);
 			return false;
 		}
 		return true;

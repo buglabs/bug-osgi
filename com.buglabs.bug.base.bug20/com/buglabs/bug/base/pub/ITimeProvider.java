@@ -29,6 +29,13 @@ package com.buglabs.bug.base.pub;
 
 import java.util.Date;
 
+/**
+ * A service definition for something that can provide time.  Intended for use by GPS devices.
+ *
+ */
 public interface ITimeProvider {
-	public Date getTime();
+	/**
+	 * @return current time 
+	 */
+	Date getTime();
 }

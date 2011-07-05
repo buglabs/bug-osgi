@@ -30,73 +30,96 @@ package com.buglabs.bug.base.pub;
 import java.io.IOException;
 import java.util.List;
 
+import com.buglabs.bug.sysfs.LEDDevice;
+
 /**
  * Provides control of BUGbase 20 LEDs.
  * 
  */
 public interface IBUG20BaseControl {
-	public static int COLOR_BLUE = 0;
-	public static int COLOR_RED = 1;
-	public static int COLOR_GREEN = 2;
+	int COLOR_BLUE = 0;
+	int COLOR_RED = 1;
+	int COLOR_GREEN = 2;
 
-	public static int LED_BATTERY = 0;
-	public static int LED_POWER = 1;
-	public static int LED_WLAN = 2;
-	public static int LED_BLUETOOTH = 3;
-	
+	int LED_BATTERY = 0;
+	int LED_POWER = 1;
+	int LED_WLAN = 2;
+	int LED_BLUETOOTH = 3;
+
 	/**
 	 * Turn on or off a specific color on a multi color LED.
 	 * 
-	 * @param led IBUGBaseControl.LED_*
-	 * @param color  IBUGBaseControl.COLOR_*
-	 * @param on TRUE if LED is to be on, false otherwise.
-	 * @throws IOException is thrown if invalid LED or color value is passed
-	 */
-	public void setLEDColor(int led, int color, boolean on) throws IOException;
-	
-	/**
 	 * @param led
+	 *            IBUGBaseControl.LED_*
 	 * @param color
+	 *            IBUGBaseControl.COLOR_*
+	 * @param on
+	 *            TRUE if LED is to be on, false otherwise.
 	 * @throws IOException
+	 *             is thrown if invalid LED or color value is passed
 	 */
-	public int getLEDBrightness(int led, int color) throws IOException;
-	
+	void setLEDColor(int led, int color, boolean on) throws IOException;
+
 	/**
-	 * Set the trigger for a given LED and Color
 	 * @param led
+	 *            IBUG20BaseControl.LED_*
 	 * @param color
+	 *            IBUG20BaseControl.COLOR_*
+	 * @return led brightness
+	 * @throws IOException
+	 *             on File I/O
+	 */
+	int getLEDBrightness(int led, int color) throws IOException;
+
+	/**
+	 * Set the trigger for a given LED and Color.
+	 * 
+	 * @param led
+	 *            IBUG20BaseControl.LED_*
+	 * @param color
+	 *            IBUG20BaseControl.COLOR_*
 	 * @param trigger
+	 *            Name of trigger
 	 * @throws IOException
+	 *             on File I/O
 	 */
-	public void setLEDTrigger(int led, int color, String trigger) throws IOException;
-	
+	void setLEDTrigger(int led, int color, String trigger) throws IOException;
+
 	/**
 	 * @param led
+	 *            IBUG20BaseControl.LED_*
 	 * @param color
+	 *            IBUG20BaseControl.COLOR_*
 	 * @return The trigger a given light is currently set to.
 	 * @throws IOException
+	 *             on File I/O
 	 */
-	public String getLEDTrigger(int led, int color) throws IOException;
-	
+	String getLEDTrigger(int led, int color) throws IOException;
+
 	/**
 	 * @param led
+	 *            IBUG20BaseControl.LED_*
 	 * @param color
+	 *            IBUG20BaseControl.COLOR_*
 	 * @return A list of string names of triggers that can be set for LEDs.
-	 * @throws IOException
+	 * @throws IOException on File I/O
 	 */
-	public String[] getLEDTriggers(int led, int color) throws IOException;
-	
+	String[] getLEDTriggers(int led, int color) throws IOException;
+
 	/**
 	 * Set brightness level for PWM-controlled LED.
 	 * 
-	 * @param led IBUGBaseControl.LED_*
-	 * @param brightness 0 - 255
-	 * @throws IOException is thrown if invalid LED value is passed.
+	 * @param led
+	 *            IBUGBaseControl.LED_*
+	 * @param brightness
+	 *            0 - 255
+	 * @throws IOException
+	 *             is thrown if invalid LED value is passed.
 	 */
-	public void setLEDBrightness(int led, int brightness) throws IOException;
-	
+	void setLEDBrightness(int led, int brightness) throws IOException;
+
 	/**
 	 * @return A list of LEDDevices controllable on BUG 2.0 base.
 	 */
-	public List getLEDDevices();
+	List<LEDDevice> getLEDDevices();
 }

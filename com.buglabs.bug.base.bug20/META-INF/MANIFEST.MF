@@ -17,4 +17,5 @@ Import-Package: com.buglabs.status,
  javax.servlet.http,
  org.osgi.service.http,
  org.osgi.framework,
- com.buglabs.bug.input.pub
+ com.buglabs.bug.input.pub,
+ org.apache.commons.io

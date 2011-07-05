@@ -57,7 +57,7 @@ public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 	private LEDDevice btLED;
 
 	/**
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException on sysfs error
 	 */
 	public BUGBaseControl() throws FileNotFoundException {
 		super(new File(LED_ROOT));
@@ -113,9 +113,9 @@ public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 	}
 
 	/**
-	 * @param index
+	 * @param index of LED device (0-3)
 	 * @return the output stream for a given LED
-	 * @throws IOException
+	 * @throws IOException on file I/O error
 	 */
 	private LEDDevice getLEDDevice(int index) throws IOException {
 		switch (index) {
@@ -132,6 +132,9 @@ public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#getLEDBrightness(int, int)
+	 */
 	public int getLEDBrightness(int led, int color) throws IOException {
 		LEDDevice ld = getLEDDevice(led);
 
@@ -142,6 +145,9 @@ public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 		return ld.getBrightness(color);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#setLEDTrigger(int, int, java.lang.String)
+	 */
 	public void setLEDTrigger(int led, int color, String trigger) throws IOException {
 
 		LEDDevice ld = getLEDDevice(led);
@@ -149,19 +155,28 @@ public class BUGBaseControl extends SysfsNode implements IBUG20BaseControl {
 		ld.setTrigger(color, trigger);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#getLEDTrigger(int, int)
+	 */
 	public String getLEDTrigger(int led, int color) throws IOException {
 		LEDDevice ld = getLEDDevice(led);
 
 		return ld.getLEDTrigger(color);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#getLEDTriggers(int, int)
+	 */
 	public String[] getLEDTriggers(int led, int color) throws IOException {
 		LEDDevice ld = getLEDDevice(led);
 
 		return ld.getLEDTriggers(color);
 	}
 
-	public List getLEDDevices() {
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.base.pub.IBUG20BaseControl#getLEDDevices()
+	 */
+	public List<LEDDevice> getLEDDevices() {
 		return Arrays.asList(new LEDDevice[] {batteryLED, wlanLED, btLED, powerLED});
 	}
 }

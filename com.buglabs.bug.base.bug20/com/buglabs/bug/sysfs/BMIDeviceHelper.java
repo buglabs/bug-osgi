@@ -6,22 +6,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entry-point into the sysfs API for BUG20.  This API is a null-safe way of reading and writing to sysfs entries for BUG drivers that support them.
+ * Entry-point into the sysfs API for BUG20.  
+ * This API is a null-safe way of reading and writing to sysfs entries for BUG drivers that support them.
  * 
  * @author kgilmer
  *
  */
-public class BMIDeviceHelper {
+public final class BMIDeviceHelper {
 
 	/**
-	 * @return The BMIDevices attached at the time of the call.  If a given array element is null, no module is attached to that slot.
-	 * @throws IOException
+	 * Utility class, not instantiatable.
 	 */
-	public static BMIDevice[] getDevices() {
+	private BMIDeviceHelper() {		
+	}
+	
+	/**
+	 * @return The BMIDevices attached at the time of the call.  If a given array element is null, no module is attached to that slot.
+	 * @throws IOException on File I/O error
+	 */
+	public static BMIDevice[] getDevices() throws IOException {
 
-		BMIDevice[] devs = new BMIDevice[4];
+		BMIDevice[] devs = new BMIDevice[BMIDevice.MAX_BMI_SLOTS];
 
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < BMIDevice.MAX_BMI_SLOTS; ++i) {
 			File prodFile = getBMIDeviceRoot(i);
 			if (!validBMIDeviceRoot(prodFile)) {
 				devs[i] = null;
@@ -36,13 +43,14 @@ public class BMIDeviceHelper {
 	
 	/**
 	 * @return list of BMIDevices that are currently attached, or empty list if no modules are attached.
+	 * @throws IOException on File I/O error
 	 */
-	public static List<BMIDevice> getAttachedDevices() {
+	public static List<BMIDevice> getAttachedDevices() throws IOException {
 		BMIDevice[] devs = getDevices();
 		
 		List<BMIDevice>  l = new ArrayList<BMIDevice>();
 		
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < BMIDevice.MAX_BMI_SLOTS; ++i) {
 			if (devs[i] != null) {
 				l.add(devs[i]);
 			}
@@ -54,9 +62,10 @@ public class BMIDeviceHelper {
 	/**
 	 * @param slot Legal values: 0 - 3
 	 * @return The BMIDevice that exists at the passed slot or null if no device attached.
+	 * @throws IOException on File I/O error
 	 */
-	public static BMIDevice getDevice(int slot) {
-		if (slot < 0 || slot > 3) {
+	public static BMIDevice getDevice(int slot) throws IOException {
+		if (slot < 0 || slot > (BMIDevice.MAX_BMI_SLOTS - 1)) {
 			return null;
 		}
 		
@@ -65,23 +74,29 @@ public class BMIDeviceHelper {
 
 
 	/**
-	 * @param prodFile
+	 * @param directory directory of sysfs root
 	 * @return true if a module is inserted and recognized by BMI, false otherwise.
 	 */
-	private static boolean validBMIDeviceRoot(File prodFile) {
-		if (!prodFile.exists() || !prodFile.isDirectory()) {
+	private static boolean validBMIDeviceRoot(File directory) {
+		if (!directory.exists() || !directory.isDirectory()) {
 			return false;
 		}
 		
-		return prodFile.listFiles().length > 0;
+		return directory.listFiles().length > 0;
 	}
 
 	/**
-	 * @param i
-	 * @return
+	 * @param i slot index
+	 * @return valid directory of BMI device root
+	 * @throws IOException 
 	 */
-	private static File getBMIDeviceRoot(int i) {
-		return new File("/sys/class/bmi/bmi-" + i + "/bmi-dev-" + i);
+	private static File getBMIDeviceRoot(int i) throws IOException {
+		File root = new File("/sys/class/bmi/bmi-" + i + "/bmi-dev-" + i);
+		
+		if (!root.exists() || root.isFile())
+			throw new IOException("Invalid BMI device root directory: " + root);
+		
+		return root;
 	}
 
 
