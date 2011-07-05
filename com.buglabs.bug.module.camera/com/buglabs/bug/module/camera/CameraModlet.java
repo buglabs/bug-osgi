@@ -30,6 +30,8 @@ package com.buglabs.bug.module.camera;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
@@ -144,7 +146,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		cameraControl = new CameraModuleControl(cc, this);
 		cameraModuleControlReg = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
 		camera2ModuleControlReg = context.registerService(ICamera2ModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
-		Properties modProperties = createBasicServiceProperties();
+		Dictionary modProperties = createBasicServiceProperties();
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleControlReg = context.registerService(IModuleControl.class.getName(), this, modProperties);
 		camera2DeviceReg = context.registerService(ICamera2Device.class.getName(), this, createBasicServiceProperties());
@@ -153,8 +155,8 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		cameraControlWSReg = context.registerService(PublicWSProvider.class.getName(), cameraControl, null);
 	}
 
-	private Properties createBasicServiceProperties() {
-		Properties p = new Properties();
+	private Dictionary createBasicServiceProperties() {
+		Dictionary p = new Hashtable();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
 
@@ -175,7 +177,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	private void updateIModuleControlProperties(){
 		if (moduleControlReg!=null){
-			Properties modProperties = createBasicServiceProperties();
+			Dictionary modProperties = createBasicServiceProperties();
 			modProperties.put("Power State", suspended ? "Suspended": "Active");
 			moduleControlReg.setProperties(modProperties);
 		}
