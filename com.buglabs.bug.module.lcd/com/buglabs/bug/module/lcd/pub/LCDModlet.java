@@ -119,7 +119,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public void start() throws Exception {
-		Properties modProperties = createBasicServiceProperties();
+		Dictionary modProperties = createBasicServiceProperties();
 		modProperties.put("Power State", suspended ? "Suspended" : "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 
@@ -183,8 +183,8 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		return ht;
 	}
 
-	private Properties createBasicServiceProperties() {
-		Properties p = new Properties();
+	private Dictionary createBasicServiceProperties() {
+		Dictionary p = new Hashtable();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
 
@@ -208,7 +208,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 	private void updateIModuleControlProperties() {
 		if (moduleRef != null) {
-			Properties modProperties = createBasicServiceProperties();
+			Dictionary modProperties = createBasicServiceProperties();
 			modProperties.put("Power State", suspended ? "Suspended" : "Active");
 			moduleRef.setProperties(modProperties);
 		}
