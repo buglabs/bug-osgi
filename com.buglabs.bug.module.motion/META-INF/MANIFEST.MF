@@ -15,6 +15,7 @@ Import-Package:
  com.buglabs.status,
  com.buglabs.bug.module.pub,
  com.buglabs.util.osgi,
+ com.buglabs.util.xml,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.motion,
  com.buglabs.bug.jni.accelerometer,

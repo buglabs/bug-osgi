@@ -35,8 +35,7 @@ import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.xml.XmlNode;
 
 public class MotionWS implements PublicWSProvider2, IMotionObserver {
 	private Date lastMotion;
@@ -68,13 +67,11 @@ public class MotionWS implements PublicWSProvider2, IMotionObserver {
 
 	private Object getTimeXml() {
 		XmlNode root = new XmlNode("Motion");
-		try {
-			if (lastMotion != null) {
-				root.addChildElement(new XmlNode("date", lastMotion.toString()));
-			}
-		} catch (SelfReferenceException e) {
-			e.printStackTrace();
+		
+		if (lastMotion != null) {
+			root.addChild(new XmlNode("date", lastMotion.toString()));
 		}
+	
 		return root.toString();
 	}
 

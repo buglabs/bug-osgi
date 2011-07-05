@@ -28,6 +28,7 @@
 package com.buglabs.bug.bmi.pub;
 
 import com.buglabs.bug.module.pub.BMIModuleProperties;
+import com.buglabs.bug.sysfs.BMIDevice;
 
 /**
  * A message from the BMI system. Format [moduleId] [version] [slot] [event]
@@ -50,8 +51,6 @@ public class BMIMessage {
 
 	private String version;
 
-	private BMIModuleProperties props;
-
 	public BMIMessage(String raw) {
 		this.raw = raw;
 	}
@@ -67,21 +66,37 @@ public class BMIMessage {
 	 * A BMIMessage for inserted module with parsed properties.
 	 * @param props
 	 * @param slot
+	 * @deprecated
 	 */
 	public BMIMessage(BMIModuleProperties props, int slot) {
-		this.props = props;
+
 		this.moduleId = props.getProduct_id();
 		this.version = "" + props.getRevision();
 		this.slot = slot;
 		this.event = EVENT_INSERT;
 	}
 
+	public BMIMessage(BMIDevice device, int slot) {
+		this.moduleId = device.getProductId();
+		this.version = "" + device.getRevision();
+		this.slot = slot;
+		this.event = EVENT_INSERT;
+	}
+
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	public BMIModuleProperties getBMIModuleProperties() {
-		return props;
+		throw new RuntimeException("Deprecated!");
 	}
 	
+	/**
+	 * @deprecated
+	 * @param p
+	 */
 	public void setBMIModuleProperties(BMIModuleProperties p) {
-		this.props = p;
+		throw new RuntimeException("Deprecated!");
 	}
 	
 	public int getEvent() {

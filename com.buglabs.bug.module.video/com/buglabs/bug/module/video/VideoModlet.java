@@ -116,7 +116,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 
 	public void start() throws Exception {
-		Properties modProperties = createBasicServiceProperties();
+		Dictionary modProperties = createBasicServiceProperties();
 		modProperties.put("Power State", suspended ? "Suspended" : "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 

@@ -37,10 +37,10 @@ public class BMIDeviceHelper {
 	/**
 	 * @return list of BMIDevices that are currently attached, or empty list if no modules are attached.
 	 */
-	public static List getAttachedDevices() {
+	public static List<BMIDevice> getAttachedDevices() {
 		BMIDevice[] devs = getDevices();
 		
-		List l = new ArrayList();
+		List<BMIDevice>  l = new ArrayList<BMIDevice>();
 		
 		for (int i = 0; i < 4; ++i) {
 			if (devs[i] != null) {
@@ -52,7 +52,7 @@ public class BMIDeviceHelper {
 	}
 	
 	/**
-	 * @param slot
+	 * @param slot Legal values: 0 - 3
 	 * @return The BMIDevice that exists at the passed slot or null if no device attached.
 	 */
 	public static BMIDevice getDevice(int slot) {

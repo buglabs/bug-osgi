@@ -29,6 +29,8 @@ package com.buglabs.bug.module.vonhippel;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
@@ -108,7 +110,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	}
 
 	public void start() throws Exception {
-		Properties modProperties = createBasicServiceProperties();
+		Dictionary modProperties = createBasicServiceProperties();
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
@@ -142,8 +144,8 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		
 	}
 
-	private Properties createBasicServiceProperties() {
-		Properties p = new Properties();
+	private Dictionary createBasicServiceProperties() {
+		Dictionary p = new Hashtable();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
 
@@ -166,7 +168,7 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 
 	private void updateIModuleControlProperties(){
 		if (moduleRef!=null){
-			Properties modProperties = createBasicServiceProperties();
+			Dictionary modProperties = createBasicServiceProperties();
 			modProperties.put("Power State", suspended ? "Suspended": "Active");
 			moduleRef.setProperties(modProperties);
 		}

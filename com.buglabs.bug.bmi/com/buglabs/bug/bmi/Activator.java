@@ -51,11 +51,25 @@ import com.buglabs.bug.bmi.pub.Manager;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.bug.sysfs.BMIDevice;
+import com.buglabs.bug.sysfs.BMIDeviceHelper;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
 
+/**
+ * Activator for BMI Bundle.  BMI bundle handles event notification and IModlet initialization upon
+ * hardware change events.  This bundle is specific to BUG hardware that has BMI ports.
+ * 
+ * @author kgilmer
+ *
+ */
 public class Activator implements BundleActivator, ServiceListener {
 	private static final String DEFAULT_PIPE_FILENAME = "/tmp/eventpipe";
+
+	/**
+	 * If present as a property, used as the name of the pipe used to communicate udev events
+	 */
+	public static final String PIPE_FILENAME_KEY = "com.buglabs.pipename";
 
 	private static Activator ref;
 
@@ -76,6 +90,9 @@ public class Activator implements BundleActivator, ServiceListener {
 	private BundleContext context;
 	
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 */
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 		Activator.ref = this;
@@ -87,7 +104,7 @@ public class Activator implements BundleActivator, ServiceListener {
 		context.addServiceListener(this, FilterUtil.generateServiceFilter(IModletFactory.class.getName()));
 		registerExistingServices(context);
 
-		pipeFilename = context.getProperty("com.buglabs.pipename");
+		pipeFilename = context.getProperty(PIPE_FILENAME_KEY);
 
 		if (pipeFilename == null || pipeFilename.length() == 0) {
 			pipeFilename = DEFAULT_PIPE_FILENAME;
@@ -97,8 +114,7 @@ public class Activator implements BundleActivator, ServiceListener {
 		createPipe(pipeFilename);
 		pipeReader = new PipeReader(pipeFilename, Manager.getManager(context, logService, modletFactories, activeModlets), logService);
 
-		logService.log(LogService.LOG_INFO, "Initializing existing modules");
-
+		logService.log(LogService.LOG_INFO, "Initializing existing modules (coldplug)");
 		coldPlug();
 
 		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
@@ -129,6 +145,8 @@ public class Activator implements BundleActivator, ServiceListener {
 				logService.log(LogService.LOG_INFO, "Registering existing module with message: " + bmiMessage.toString());
 				m.processMessage(bmiMessage);
 			}
+		} else {
+			logService.log(LogService.LOG_DEBUG, "Not registering existing modules, none found.");
 		}
 	}
 
@@ -225,25 +243,23 @@ public class Activator implements BundleActivator, ServiceListener {
 	 * @return
 	 * @throws IOException
 	 */
-	private List getSysFSModules() throws IOException {
-		List slots = null;
+	private List<BMIMessage> getSysFSModules() throws IOException {
+		List<BMIMessage> slots = null;
 
 		for (int i = 0; i < 4; ++i) {
-			//this changed as of kernel 7e8ddd053c9a06fefb7e71a944846bdecb25c9ee, Oct 6, 2010
-			File prodFile = new File("/sys/class/bmi/bmi-"+i+"/bmi-dev-"+i+"/product");		
-			if (!prodFile.exists()) {
+			BMIDevice device = BMIDeviceHelper.getDevice(i);
+			
+			if (device == null) {
 				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
 				continue;
-			}
+			}			
 			
 			// Lazily create data structure. If no modules then not needed.
 			if (slots == null) {
-				slots = new ArrayList();
+				slots = new ArrayList<BMIMessage>();
 			}
 			
-			BMIModuleProperties props = BMIModuleProperties.createFromSYSDirectory(prodFile.getParentFile());
-
-			BMIMessage m = new BMIMessage(props, i);
+			BMIMessage m = new BMIMessage(device, i);
 			
 			slots.add(m);
 		}

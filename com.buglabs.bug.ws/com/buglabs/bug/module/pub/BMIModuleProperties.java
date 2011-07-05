@@ -9,6 +9,7 @@ import java.io.IOException;
  * A bean-style class for properties associated with a BMI module attached to
  * BUG.
  * 
+ * @deprecated Use com.buglabs.bug.sysfs.BMIDevice instead.
  * @author kgilmer
  * 
  */
