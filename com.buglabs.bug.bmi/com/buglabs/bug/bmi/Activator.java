@@ -309,10 +309,8 @@ public class Activator implements BundleActivator, ServiceListener {
 		}
 	}
 
-	public void serviceChanged(ServiceEvent event) {
-		ServiceReference sr = event.getServiceReference();
-
-		registerService(sr, event.getType());
+	public void serviceChanged(ServiceEvent event) {		
+		registerService(event.getServiceReference(), event.getType());
 	}
 
 	/**

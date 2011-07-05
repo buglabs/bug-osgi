@@ -213,7 +213,9 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 			subscribers.add(context.getService(event.getServiceReference()));
 			break;
 		case ServiceEvent.UNREGISTERING:
-			subscribers.remove(context.getService(event.getServiceReference()));
+			if (subscribers != null) 
+				subscribers.remove(context.getService(event.getServiceReference()));
+			
 			break;
 		}
 	}
