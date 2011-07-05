@@ -51,14 +51,15 @@ import com.buglabs.nmea.sentences.NMEAParserException;
 import com.buglabs.nmea2.AbstractNMEASentence;
 import com.buglabs.nmea2.NMEASentenceFactory;
 import com.buglabs.nmea2.RMC;
-import com.buglabs.util.LogServiceUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
- * This class is a thread that listens for NMEA sentences on the InputStream passed in the constructor, and will present the last
- * parsed sentence to clients.
+ * This class is a thread that listens for NMEA sentences on the InputStream
+ * passed in the constructor, and will present the last parsed sentence to
+ * clients.
  * 
  * @author aroman
- *
+ * 
  */
 public class NMEASentenceProvider extends Thread implements INMEASentenceProvider, ServiceListener {
 	/**
@@ -69,7 +70,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	 * System property to define sleep between GPS reads.
 	 */
 	public static final String SLEEP_INTERVAL_PROPERTY_KEY = "bug.gps.sleep_interval";
-	
+
 	private InputStream nmeaStream;
 
 	private RMC cachedRMC;
@@ -81,12 +82,12 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	private final BundleContext context;
 
 	private final long readSleepInterval;
-	
+
 	public NMEASentenceProvider(InputStream nmeaStream, BundleContext context) {
 		this.nmeaStream = nmeaStream;
 		this.context = context;
 		this.log = LogServiceUtil.getLogService(context);
-		
+
 		if (context.getProperty(SLEEP_INTERVAL_PROPERTY_KEY) == null) {
 			readSleepInterval = DEFAULT_SLEEP_INTERVAL;
 		} else {
@@ -94,8 +95,11 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.buglabs.bug.module.gps.pub.INMEASentenceProvider#getRMC()
+	 * 
 	 * @deprecated
 	 */
 	public com.buglabs.nmea.sentences.RMC getRMC() {
@@ -103,18 +107,17 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		if (cachedRMC == null || cachedRMC.getLatitude() == null || cachedRMC.getLongitude() == null) {
 			return null;
 		}
-		
+
 		return new com.buglabs.nmea.sentences.RMC(cachedRMC);
 	}
-	
+
 	public RMC getLastRMC() {
 		if (cachedRMC == null || cachedRMC.getLatitude() == null || cachedRMC.getLongitude() == null) {
 			return null;
 		}
-		
+
 		return cachedRMC;
 	}
-	
 
 	public void run() {
 		BufferedReader br = null;
@@ -140,7 +143,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 					if (objSentence != null && objSentence instanceof RMC) {
 						cachedRMC = (RMC) objSentence;
 						index++;
-					} 
+					}
 					if (objSentence != null) {
 						notifySubscribers(objSentence);
 					}
@@ -149,9 +152,9 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 				}
 			} while (!Thread.currentThread().isInterrupted() && (sentence != null));
 		} catch (IOException e) {
-			LogServiceUtil.logBundleException(log,  "An IO Error occurred in reading from NMEA stream.", e);
+			LogServiceUtil.logBundleException(log, "An IO Error occurred in reading from NMEA stream.", e);
 		} catch (InterruptedException e) {
-			//Ignore this exception.
+			// Ignore this exception.
 		} finally {
 			try {
 				if (br != null) {
@@ -168,29 +171,29 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	}
 
 	private void notifySubscribers(AbstractNMEASentence objSentence) {
-		if (subscribers == null || subscribers.size() == 0)  {
+		if (subscribers == null || subscribers.size() == 0) {
 			return;
 		}
-		
+
 		synchronized (subscribers) {
 			for (Iterator i = subscribers.iterator(); i.hasNext();) {
 				Object subscriber = i.next();
-				
+
 				try {
-				if (subscriber instanceof INMEASentenceSubscriber) {
-					INMEASentenceSubscriber sub = (INMEASentenceSubscriber) subscriber;
-					sub.sentenceReceived(objSentence);
-				} else if (subscriber instanceof IPositionSubscriber && objSentence instanceof RMC){
-					IPositionSubscriber sub = (IPositionSubscriber) subscriber;
-					sub.positionUpdate(calculatePosition((RMC) objSentence));
-				}
+					if (subscriber instanceof INMEASentenceSubscriber) {
+						INMEASentenceSubscriber sub = (INMEASentenceSubscriber) subscriber;
+						sub.sentenceReceived(objSentence);
+					} else if (subscriber instanceof IPositionSubscriber && objSentence instanceof RMC) {
+						IPositionSubscriber sub = (IPositionSubscriber) subscriber;
+						sub.positionUpdate(calculatePosition((RMC) objSentence));
+					}
 				} catch (RuntimeException e) {
 					LogServiceUtil.logBundleException(log, "GPS Position subscriber threw an unchecked exception in sentenceRecieved()", e);
+				}
 			}
 		}
 	}
-	}
-	
+
 	private Position calculatePosition(RMC rmc) {
 		return new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS().toDecimalDegrees()
 				* Math.PI / 180.0, Unit.rad), new Measurement(0.0d, Unit.m), null, null);
@@ -201,7 +204,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	}
 
 	public void serviceChanged(ServiceEvent event) {
-		
+
 		switch (event.getType()) {
 		case ServiceEvent.REGISTERED:
 			if (subscribers == null) {

@@ -31,8 +31,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
@@ -69,10 +67,8 @@ import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.RemoteOSGiServiceConstants;
-import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.xml.XmlNode;
 
 /**
  * The Modlet exports the hardware-level services to the OSGi runtime.
@@ -186,7 +182,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		timer = new Timer();
 		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
 
-		positionRef = context.registerService(IPositionProvider.class.getName(), this, createRemotableProperties(null));
+		positionRef = context.registerService(IPositionProvider.class.getName(), this, createBasicServiceProperties());
 		context.addServiceListener(nmeaProvider, "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "="
 				+ IPositionSubscriber.class.getName() + "))");
 	}
@@ -215,17 +211,6 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		return p;
 	}
 
-	/**
-	 * @return A dictionary with R-OSGi enable property.
-	 */
-	private Dictionary createRemotableProperties(Dictionary ht) {
-		if (ht == null) {
-			ht = new Hashtable();
-		}
-		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-
-		return ht;
-	}
 	private void updateIModuleControlProperties(){
 		if (moduleRef!=null){
 			Properties modProperties = createBasicServiceProperties();
@@ -426,37 +411,34 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		Position p = getPosition();
 
 		XmlNode root = new XmlNode("Location");
-		try {
 
-			if (p != null) {
-				if (p.getLatitude() != null) {
-					root.addChildElement(new XmlNode("Latitude", p.getLatitude().toString()));
-				}
-
-				if (p.getLongitude() != null) {
-					root.addChildElement(new XmlNode("Longitude", p.getLongitude().toString()));
-				}
-
-				if (p.getAltitude() != null) {
-					root.addChildElement(new XmlNode("Altitude", p.getAltitude().toString()));
-				}
-
-				RMC rmc = nmeaProvider.getLastRMC();
-
-				DegreesMinutesSeconds dmsLat = rmc.getLatitudeAsDMS();
-				DegreesMinutesSeconds dmsLon = rmc.getLongitudeAsDMS();
-
-				if (dmsLat != null) {
-					root.addChildElement(new XmlNode("LatitudeDegrees", Double.toString(dmsLat.toDecimalDegrees())));
-				}
-
-				if (dmsLon != null) {
-					root.addChildElement(new XmlNode("LongitudeDegrees", Double.toString(dmsLon.toDecimalDegrees())));
-				}
+		if (p != null) {
+			if (p.getLatitude() != null) {
+				root.addChild(new XmlNode("Latitude", p.getLatitude().toString()));
 			}
-		} catch (SelfReferenceException e) {
-			log.log(LogService.LOG_ERROR, "Xml error", e);
+
+			if (p.getLongitude() != null) {
+				root.addChild(new XmlNode("Longitude", p.getLongitude().toString()));
+			}
+
+			if (p.getAltitude() != null) {
+				root.addChild(new XmlNode("Altitude", p.getAltitude().toString()));
+			}
+
+			RMC rmc = nmeaProvider.getLastRMC();
+
+			DegreesMinutesSeconds dmsLat = rmc.getLatitudeAsDMS();
+			DegreesMinutesSeconds dmsLon = rmc.getLongitudeAsDMS();
+
+			if (dmsLat != null) {
+				root.addChild(new XmlNode("LatitudeDegrees", Double.toString(dmsLat.toDecimalDegrees())));
+			}
+
+			if (dmsLon != null) {
+				root.addChild(new XmlNode("LongitudeDegrees", Double.toString(dmsLon.toDecimalDegrees())));
+			}
 		}
+		
 		return root.toString();
 	}
 
