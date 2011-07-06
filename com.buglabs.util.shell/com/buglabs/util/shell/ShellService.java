@@ -6,6 +6,7 @@ import java.io.Writer;
 
 import com.buglabs.util.shell.pub.IShellService;
 import com.buglabs.util.shell.pub.IShellSession;
+import com.buglabs.util.shell.pub.ShellSession;
 
 
 /**

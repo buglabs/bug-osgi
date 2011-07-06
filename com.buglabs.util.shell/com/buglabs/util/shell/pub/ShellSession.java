@@ -1,4 +1,4 @@
-package com.buglabs.util.shell;
+package com.buglabs.util.shell.pub;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,8 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
 
-import com.buglabs.util.shell.pub.ICommandResponseHandler;
-import com.buglabs.util.shell.pub.IShellSession;
 
 /**
  * Default implementation of ShellSession.
@@ -60,6 +58,13 @@ public class ShellSession implements IShellSession {
 		} else {
 			this.out = out;
 		}
+
+		initializeShell();
+	}
+	
+	public ShellSession(File root) throws IOException {
+		this.root = root;
+		this.out = new NullWriter();
 
 		initializeShell();
 	}
