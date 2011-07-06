@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project name="com.buglabs.bug.networking" basedir=".">
+	<!-- PROJECT CONSTANTS -->
+	<property name="project" value="com.buglabs.bug.networking" />
+	<!-- PROJECT IMPORTS -->
+	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml"/>
+	<import file="${common.ant.file}"/>
+
+</project>
