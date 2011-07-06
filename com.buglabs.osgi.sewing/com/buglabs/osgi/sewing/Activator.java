@@ -35,8 +35,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.buglabs.osgi.sewing.pub.ISewingService;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
-import com.buglabs.util.osgi.ServiceTrackerHelper;
-import com.buglabs.util.osgi.ServiceTrackerHelper.ManagedInlineRunnable;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
 
 /**
  * BundleActivator for Sewing.
@@ -64,7 +64,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 		LogManager.setContext(context);
 		log = LogServiceUtil.getLogService(context);
 		// Create the service tracker and run it.
-		stc = ServiceTrackerHelper.openServiceTracker(context, HttpService.class.getName(), this);		
+		stc = ServiceTrackerUtil.openServiceTracker(context, HttpService.class.getName(), this);		
 	}
 
 	/*

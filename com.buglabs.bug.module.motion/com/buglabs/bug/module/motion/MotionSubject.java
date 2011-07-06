@@ -36,10 +36,10 @@ import java.util.TimerTask;
 
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.jni.motion.Motion;
 import com.buglabs.bug.module.motion.pub.IMotionObserver;
 import com.buglabs.bug.module.motion.pub.IMotionSubject;
-import com.buglabs.module.IModuleLEDController;
 
 /**
  * 

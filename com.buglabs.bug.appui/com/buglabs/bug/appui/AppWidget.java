@@ -39,7 +39,7 @@ import java.util.Map;
 
 import org.osgi.framework.Bundle;
 
-import com.buglabs.application.IDesktopApp;
+import com.buglabs.util.ui.IDesktopApp;
 
 
 /**

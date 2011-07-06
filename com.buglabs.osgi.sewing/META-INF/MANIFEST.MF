@@ -4,9 +4,9 @@ Bundle-Activator: com.buglabs.osgi.sewing.Activator
 Bundle-SymbolicName: com.buglabs.osgi.sewing
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
-Import-Package: com.buglabs.application,
+Import-Package: com.buglabs.util.osgi,
+ com.buglabs.util.ui,
  com.buglabs.util.xml,
- com.buglabs.util.osgi,
  javax.servlet,
  javax.servlet.http,
  org.osgi.framework,

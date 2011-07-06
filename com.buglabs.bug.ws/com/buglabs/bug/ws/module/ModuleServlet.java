@@ -42,10 +42,10 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.dragonfly.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleProperty;
+import com.buglabs.bug.dragonfly.module.MutableModuleProperty;
 import com.buglabs.bug.ws.Activator;
-import com.buglabs.module.IModuleControl;
-import com.buglabs.module.IModuleProperty;
-import com.buglabs.module.MutableModuleProperty;
 import com.buglabs.util.xml.XmlNode;
 
 public class ModuleServlet extends HttpServlet implements ServiceListener {

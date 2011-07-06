@@ -38,7 +38,7 @@ import java.util.Map.Entry;
 
 import org.osgi.framework.Bundle;
 
-import com.buglabs.application.IDesktopApp;
+import com.buglabs.util.ui.IDesktopApp;
 
 /**
  * AppUI Frame.

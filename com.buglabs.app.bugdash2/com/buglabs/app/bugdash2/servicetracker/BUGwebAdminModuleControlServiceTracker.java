@@ -5,7 +5,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.buglabs.app.bugdash2.Activator;
-import com.buglabs.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 
 public class BUGwebAdminModuleControlServiceTracker implements
 		ServiceTrackerCustomizer {

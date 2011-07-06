@@ -49,8 +49,8 @@ import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.util.osgi.ServiceTrackerHelper;
-import com.buglabs.util.osgi.ServiceTrackerHelper.ManagedRunnable;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable;
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
 import com.buglabs.bug.base.pub.ITimeProvider;
 import com.buglabs.bug.input.pub.InputEventProvider;
@@ -213,7 +213,7 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 
 		registerServices(context);
 
-		httpTracker = ServiceTrackerHelper.openServiceTracker(context, new String[] { HttpService.class.getName() }, this);
+		httpTracker = ServiceTrackerUtil.openServiceTracker(context, new String[] { HttpService.class.getName() }, this);
 
 		signalStartup();
 	}

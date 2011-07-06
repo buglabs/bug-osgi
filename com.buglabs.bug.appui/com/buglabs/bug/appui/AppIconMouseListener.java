@@ -31,7 +31,7 @@ import java.awt.PopupMenu;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import com.buglabs.application.IDesktopApp;
+import com.buglabs.util.ui.IDesktopApp;
 
 /**
  * This class handles logic of either calling IDesktopApp.click() or 

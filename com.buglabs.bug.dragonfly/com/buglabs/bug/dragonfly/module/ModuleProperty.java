@@ -25,49 +25,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.application;
+package com.buglabs.bug.dragonfly.module;
 
-import java.net.URL;
+public class ModuleProperty implements IModuleProperty {
 
-/**
- * A service that can be utilized to create a Desktop UI like experience for
- * OSGi bundles. Loosely based on the ConciergeGUI bundle at
- * http://concierge.sourceforge.net
- * 
- * @author kgilmer
- * 
- */
-public interface IDesktopApp {
+	private String name;
 
-	/**
-	 * Application icon has been clicked. Applications will typically want to
-	 * create or set focus to their primary UIs in here.
-	 */
-	public void click();
+	private String type;
 
-	/**
-	 * A custom icon can be displayed. If null returned a default image will be
-	 * used.
-	 * 
-	 * @return URL to an icon to be displayed
-	 */
-	public URL getIcon(int width, int height, int depth);
+	private Object value;
 
-	/**
-	 * Apps can optionally contribute a flat set of menu items that are
-	 * displayed in the App Icon view.
-	 * 
-	 * IDesktopApp.menuSelected() will be called with the name of item when user
-	 * selects that entry.
-	 * 
-	 * @return a list of menu items for this application.
-	 */
-	public String[] getMenuItems();
+	private boolean mutable;
 
-	/**
-	 * Call back for when an item is selected by user.
-	 * 
-	 * @param item
-	 */
-	public void menuSelected(String item);
+	public ModuleProperty(String name, Object value) {
+		this.name = name;
+		this.value = value;
+		this.type = "String";
+		this.mutable = false;
+	}
+
+	public ModuleProperty(String name, Object value, String type, boolean mutable) {
+		this.name = name;
+		this.value = value;
+		this.type = type;
+		this.mutable = mutable;
+	}
+
+	public boolean isMutable() {
+		return mutable;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+
+	public void setValue(Object value) {
+		this.value = value;
+	}
+
+	public boolean equals(Object arg0) {
+		if (arg0 instanceof ModuleProperty) {
+			return this.name.equals(((ModuleProperty) arg0).name);
+		}
+
+		return super.equals(arg0);
+	}
 }

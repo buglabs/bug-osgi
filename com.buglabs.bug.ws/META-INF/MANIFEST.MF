@@ -7,11 +7,11 @@ Bundle-Activator: com.buglabs.bug.ws.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: 
- com.buglabs.application,
+ com.buglabs.bug.dragonfly.module,
  com.buglabs.bug.sysfs,
- com.buglabs.module,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
+ com.buglabs.util.ui,
  com.buglabs.util.xml,
  javax.servlet,
  javax.servlet.http,

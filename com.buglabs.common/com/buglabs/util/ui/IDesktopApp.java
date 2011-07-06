@@ -25,58 +25,49 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.menu;
+package com.buglabs.util.ui;
+
+import java.net.URL;
 
 /**
- * Implementors provide a menu system to the end user. Clients can provide
- * sub-menus.
+ * A service that can be utilized to create a Desktop UI like experience for
+ * OSGi bundles. Loosely based on the ConciergeGUI bundle at
+ * http://concierge.sourceforge.net
  * 
- * @author ken
- * @deprecated The menu system is not used in BUG 2.0.  API present for compatibility.
+ * @author kgilmer
  * 
  */
-public interface IMenuProvider {
-	/**
-	 * @param path
-	 *            String denotion of path using '.' character as seperator. To
-	 *            contribute to the root menu pass an empty string or
-	 *            <code>null</code>. Example: "child1.subchild1.me".
-	 * @param menu
-	 *            Reference to the sub-root menu.
-	 */
-	public void registerMenu(String path, IMenuNode menu);
+public interface IDesktopApp {
 
 	/**
-	 * Notify the menu provider that a menu node has changed. Should cause the
-	 * menu system to refresh if the path is visible on the screen.
+	 * Application icon has been clicked. Applications will typically want to
+	 * create or set focus to their primary UIs in here.
+	 */
+	public void click();
+
+	/**
+	 * A custom icon can be displayed. If null returned a default image will be
+	 * used.
 	 * 
-	 * @param path
+	 * @return URL to an icon to be displayed
 	 */
-	public void notifyMenuUpdate(String path);
+	public URL getIcon(int width, int height, int depth);
 
 	/**
-	 * Remove a submenu.
+	 * Apps can optionally contribute a flat set of menu items that are
+	 * displayed in the App Icon view.
 	 * 
-	 * @param path
+	 * IDesktopApp.menuSelected() will be called with the name of item when user
+	 * selects that entry.
+	 * 
+	 * @return a list of menu items for this application.
 	 */
-	public void unregisterMenu(String path);
+	public String[] getMenuItems();
 
 	/**
-	 * Moves up the tree towards the root.
+	 * Call back for when an item is selected by user.
 	 * 
-	 * @param numLevels
-	 *            The number of times to move up. If this is greater than the
-	 *            number of steps to the root, the current node will be set to
-	 *            the root.
+	 * @param item
 	 */
-	public void selectParent(int numLevels);
-
-	/**
-	 * 
-	 * @param path
-	 * @return <code>true</code> if path is the current node, <code>false</code>
-	 *         otherwise.
-	 */
-	public boolean isCurrentNode(String path);
-
+	public void menuSelected(String item);
 }

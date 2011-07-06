@@ -29,8 +29,8 @@ package com.buglabs.bug.module.gps.pub;
 
 import java.io.IOException;
 
-import com.buglabs.module.IModuleControl;
-import com.buglabs.module.IModuleLEDController;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 
 /**
  * This is the module control interface for the GPS module.

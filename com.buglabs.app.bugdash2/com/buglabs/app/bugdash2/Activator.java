@@ -8,9 +8,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.app.bugdash2.servicetracker.BUGwebAdminServiceTracker;
-import com.buglabs.application.IDesktopApp;
-import com.buglabs.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.util.ServiceFilterGenerator;
+import com.buglabs.util.ui.IDesktopApp;
 
 public class Activator implements BundleActivator, IDesktopApp {
 	

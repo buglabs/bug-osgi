@@ -27,8 +27,8 @@
  *******************************************************************************/
 package com.buglabs.bug.module.motion.pub;
 
-import com.buglabs.module.IModuleControl;
-import com.buglabs.module.IModuleLEDController;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 
 /**
  * Module control service for Motion Module.

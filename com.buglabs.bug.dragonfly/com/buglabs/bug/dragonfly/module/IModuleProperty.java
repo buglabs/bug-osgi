@@ -25,60 +25,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.menu;
+package com.buglabs.bug.dragonfly.module;
 
 /**
- * An interface for menu controllers.
+ * Represents a single property that a BUG hardware module exposes externally.
  * 
  * @author ken
- * @deprecated The menu system is not used in BUG 2.0.  API present for compatibility.
  * 
  */
-public interface IMenuController {
+public interface IModuleProperty {
+	/**
+	 * @return Name of property
+	 */
+	public String getName();
 
 	/**
-	 * Tell the controller that a button event has occurred.
-	 * 
-	 * @param buttonId
+	 * @return Value of property. Refer to getType() for type information.
 	 */
-	public abstract void buttonPress(int buttonId);
+	public Object getValue();
 
 	/**
-	 * Redraw existing content on the menu display.
+	 * @return Type as a String (java named types are used)
 	 */
-	public abstract void refreshDisplay();
+	public String getType();
 
 	/**
-	 * Reset menu to root and refresh the display.
+	 * @return true if this property in the module can be changed.
 	 */
-	public abstract void resetDisplay();
-
-	/**
-	 * Clean up the display.
-	 */
-	public abstract void clearDisplay();
-
-	/**
-	 * @return <code>true</code> if the menu is on the root node (at rest).
-	 */
-	public abstract boolean isRoot();
-
-	/**
-	 * 
-	 * @param path
-	 *            The path to check the current node against
-	 * @return <code>true</code> if the current node corresponds to this path
-	 */
-	public abstract boolean isCurrentNode(String path);
-
-	/**
-	 * Moves up the tree towards the root.
-	 * 
-	 * @param numLevels
-	 *            The number of times to move up. If this is greater than the
-	 *            number of steps to the root, the current node will be set to
-	 *            the root.
-	 */
-	public abstract void selectParent(int numLevels);
-
+	public boolean isMutable();
 }

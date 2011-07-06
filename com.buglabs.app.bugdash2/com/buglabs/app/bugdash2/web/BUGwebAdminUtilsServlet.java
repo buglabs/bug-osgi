@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.buglabs.app.bugdash2.Activator;
 import com.buglabs.app.bugdash2.ShellUtil;
 import com.buglabs.app.bugdash2.controller.AdminControllerFactory;
-import com.buglabs.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.osgi.sewing.pub.SewingController;
 import com.buglabs.osgi.sewing.pub.SewingHttpServlet;
 import com.buglabs.osgi.sewing.pub.util.ControllerMap;

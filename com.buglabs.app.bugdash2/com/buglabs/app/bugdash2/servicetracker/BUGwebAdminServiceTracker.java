@@ -28,7 +28,7 @@ import com.buglabs.app.bugdash2.web.BUGwebAdminSystemServlet;
 import com.buglabs.app.bugdash2.web.BUGwebAdminUtilsServlet;
 import com.buglabs.app.bugdash2.web.BUGwebFileServlet;
 import com.buglabs.application.AbstractServiceTracker;
-import com.buglabs.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.osgi.sewing.pub.ISewingService;
 import com.buglabs.util.ServiceFilterGenerator;
 

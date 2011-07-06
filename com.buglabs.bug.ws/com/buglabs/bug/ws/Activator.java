@@ -20,15 +20,15 @@ import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.util.osgi.ServiceTrackerHelper;
-import com.buglabs.util.osgi.ServiceTrackerHelper.ManagedInlineRunnable;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.ws.module.ModuleServlet;
 import com.buglabs.bug.ws.module.PackageServlet;
 import com.buglabs.bug.ws.program.ConfigAdminServlet;
 import com.buglabs.bug.ws.program.ProgramServlet;
 import com.buglabs.bug.ws.service.WSHtmlServlet;
 import com.buglabs.bug.ws.service.WSServlet;
-import com.buglabs.module.IModuleControl;
 import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.osgi.FilterUtil;
 
@@ -90,7 +90,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 		log = LogServiceUtil.getLogService(bundleContext);
-		st = ServiceTrackerHelper.openServiceTracker(bundleContext, services , this);
+		st = ServiceTrackerUtil.openServiceTracker(bundleContext, services , this);
 		serviceMap = new Hashtable();
 	}
 

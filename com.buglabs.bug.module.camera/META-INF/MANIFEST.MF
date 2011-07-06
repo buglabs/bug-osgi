@@ -5,11 +5,11 @@ Bundle-Version: 1.0.0
 Bundle-Activator: com.buglabs.bug.module.camera.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.module.camera.pub
-Import-Package: com.buglabs.bug.jni.camera,
+Import-Package: com.buglabs.bug.dragonfly.module,
+ com.buglabs.bug.jni.camera,
  com.buglabs.bug.module.pub,
  com.buglabs.bug.sysfs,
  com.buglabs.device,
- com.buglabs.module,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
  com.buglabs.util.xml,

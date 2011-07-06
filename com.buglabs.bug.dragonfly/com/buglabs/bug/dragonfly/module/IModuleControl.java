@@ -25,55 +25,55 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.module;
+package com.buglabs.bug.dragonfly.module;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
- * Defines a property that can be changed by a client.
+ * An implementor exposes a BUG module to the runtime. This module can be
+ * queried and manipulated by clients such as the IDE.
  * 
- * @author kgilmer
+ * @author ken
  * 
  */
-public class MutableModuleProperty implements IModuleProperty {
+public interface IModuleControl {
 
-	private String name;
+	/**
+	 * Return a list of <code>IModuleProperty</code> elements.
+	 * 
+	 * @return
+	 */
+	public List getModuleProperties();
 
-	private String type;
+	/**
+	 * Get the human-readable name of this module.
+	 * 
+	 * @return
+	 */
+	public String getModuleName();
 
-	private Object value;
+	public int getSlotId();
 
-	private boolean mutable;
+	/**
+	 * Set a property. This is from a client request.
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public boolean setModuleProperty(IModuleProperty property);
 
-	public MutableModuleProperty(String name, Object value) {
-		this.name = name;
-		this.value = value;
-		this.type = "String";
-		this.mutable = true;
-	}
+	/**
+	 * Suspend the module.
+	 * 
+	 * @throws IOException
+	 */
+	public int suspend() throws IOException;
 
-	public MutableModuleProperty(String name, Object value, String type, boolean mutable) {
-		this.name = name;
-		this.value = value;
-		this.type = type;
-		this.mutable = mutable;
-	}
-
-	public boolean isMutable() {
-		return mutable;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public Object getValue() {
-		return value;
-	}
-
-	public void setValue(Object value) {
-		this.value = value;
-	}
+	/**
+	 * Resume the module.
+	 * 
+	 * @throws IOException
+	 */
+	public int resume() throws IOException;
 }

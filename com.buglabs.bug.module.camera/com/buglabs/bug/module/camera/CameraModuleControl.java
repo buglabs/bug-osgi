@@ -31,10 +31,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.jni.camera.CameraControl;
 import com.buglabs.bug.module.camera.pub.ICamera2ModuleControl;
 import com.buglabs.bug.module.camera.pub.ICameraModuleControl;
-import com.buglabs.module.IModuleLEDController;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider2;

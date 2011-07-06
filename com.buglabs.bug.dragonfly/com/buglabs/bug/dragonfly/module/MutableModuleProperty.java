@@ -25,28 +25,55 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.device;
+package com.buglabs.bug.dragonfly.module;
 
 /**
- * This defines how to display information on the BUG base LCD. This interface
- * is used to lock the display. This ensures only one client at a time and write
- * to the base display.
+ * Defines a property that can be changed by a client.
  * 
- * @author ken
+ * @author kgilmer
  * 
  */
-public interface IBaseDisplay {
-	/**
-	 * A client must first lock the display before writing.
-	 * 
-	 * @return
-	 */
-	public IFramebufferDevice lock(String clientId);
+public class MutableModuleProperty implements IModuleProperty {
 
-	/**
-	 * A client unlocks the display after use for other clients.
-	 * 
-	 * @throws InvalidClientException
-	 */
-	public void unlock(String clientId) throws InvalidClientException;
+	private String name;
+
+	private String type;
+
+	private Object value;
+
+	private boolean mutable;
+
+	public MutableModuleProperty(String name, Object value) {
+		this.name = name;
+		this.value = value;
+		this.type = "String";
+		this.mutable = true;
+	}
+
+	public MutableModuleProperty(String name, Object value, String type, boolean mutable) {
+		this.name = name;
+		this.value = value;
+		this.type = type;
+		this.mutable = mutable;
+	}
+
+	public boolean isMutable() {
+		return mutable;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+
+	public void setValue(Object value) {
+		this.value = value;
+	}
 }

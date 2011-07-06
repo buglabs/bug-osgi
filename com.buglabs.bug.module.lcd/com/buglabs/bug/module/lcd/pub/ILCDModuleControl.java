@@ -29,7 +29,7 @@ package com.buglabs.bug.module.lcd.pub;
 
 import java.io.IOException;
 
-import com.buglabs.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 
 /**
  * The interface that controls functions of the LCD module.

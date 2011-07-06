@@ -2,15 +2,14 @@ package com.buglabs.common.tests.junit;
 
 import junit.framework.TestCase;
 
-import com.buglabs.application.IDesktopApp;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleLEDController;
+import com.buglabs.bug.dragonfly.module.IModuleProperty;
+import com.buglabs.bug.dragonfly.module.ModuleProperty;
+import com.buglabs.bug.dragonfly.module.MutableModuleProperty;
 import com.buglabs.device.ButtonEvent;
 import com.buglabs.device.IButtonEventListener;
 import com.buglabs.device.IButtonEventProvider;
-import com.buglabs.module.IModuleControl;
-import com.buglabs.module.IModuleLEDController;
-import com.buglabs.module.IModuleProperty;
-import com.buglabs.module.ModuleProperty;
-import com.buglabs.module.MutableModuleProperty;
 import com.buglabs.osgi.shell.ICommand;
 import com.buglabs.osgi.shell.IShellCommandProvider;
 import com.buglabs.services.ws.DefaultWSImplementation;
@@ -29,7 +28,7 @@ import com.buglabs.util.osgi.ConfigAdminUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.osgi.OSGiServiceLoader;
 import com.buglabs.util.osgi.FilterUtil;
-import com.buglabs.util.osgi.ServiceTrackerHelper;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
 import com.buglabs.util.xml.XmlNode;
 import com.buglabs.util.xml.XmlParser;
 import com.buglabs.util.xml.XpathQuery;
@@ -41,6 +40,7 @@ import com.buglabs.util.simplerestclient.HTTPRequest;
 import com.buglabs.util.simplerestclient.HTTPResponse;
 import com.buglabs.util.simplerestclient.IConnectionProvider;
 import com.buglabs.util.simplerestclient.IFormFile;
+import com.buglabs.util.ui.IDesktopApp;
 
 /**
  * This test case simply loads BUG contributed classes to verify they are on the
@@ -93,7 +93,7 @@ public class ClassAvailableTests extends TestCase {
 	
 	public void testPackageUtilOSGi() {
 		testClass(BUGBundleConstants.class);
-		testClass(ServiceTrackerHelper.class);
+		testClass(ServiceTrackerUtil.class);
 		testClass(ConfigAdminUtil.class);
 		testClass(LogServiceUtil.class);
 		testClass(OSGiServiceLoader.class);

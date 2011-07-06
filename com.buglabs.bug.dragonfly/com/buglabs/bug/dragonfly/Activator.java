@@ -47,8 +47,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.util.osgi.ServiceTrackerHelper.ManagedInlineRunnable;
-import com.buglabs.module.IModuleControl;
+import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.xml.XmlNode;

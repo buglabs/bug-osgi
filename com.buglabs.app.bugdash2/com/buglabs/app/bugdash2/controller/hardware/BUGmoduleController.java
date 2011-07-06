@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.buglabs.app.bugdash2.Activator;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
-import com.buglabs.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 
 import freemarker.template.SimpleHash;

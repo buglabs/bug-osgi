@@ -33,7 +33,7 @@ import java.awt.event.ActionListener;
 import org.osgi.framework.Bundle;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.application.IDesktopApp;
+import com.buglabs.util.ui.IDesktopApp;
 
 
 /**

@@ -5,15 +5,14 @@ Bundle-Version: 1.0.0
 Bundle-Activator: com.buglabs.bug.module.video.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.module.video.pub
-Import-Package: com.buglabs.bug.module.lcd.pub,
+Import-Package: com.buglabs.bug.dragonfly.module,
+ com.buglabs.bug.module.lcd.pub,
  com.buglabs.bug.module.pub,
  com.buglabs.bug.sysfs,
  com.buglabs.device,
- com.buglabs.module,
  com.buglabs.services.ws,
- com.buglabs.status,
- com.buglabs.util.xml,
  com.buglabs.util.osgi,
+ com.buglabs.util.xml,
  org.osgi.framework,
  org.osgi.service.log,
  org.osgi.util.tracker

@@ -46,7 +46,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @author kgilmer
  * 
  */
-public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
+public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 
 	private final ManagedRunnable runnable;
 	//private final String[] services;
@@ -92,7 +92,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @param t
 	 * @param serviceCount
 	 */
-	public ServiceTrackerHelper(BundleContext bc, ManagedRunnable t, int serviceCount) {
+	public ServiceTrackerUtil(BundleContext bc, ManagedRunnable t, int serviceCount) {
 		this.bc = bc;
 		this.runnable = t;
 		this.serviceCount = serviceCount;
@@ -198,7 +198,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @throws InvalidSyntaxException
 	 */
 	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, ManagedRunnable runnable) throws InvalidSyntaxException {
-		ServiceTracker st = new ClosingServiceTracker(context, FilterUtil.generateServiceFilter(context, services), new ServiceTrackerHelper(context, runnable, services.length), services);
+		ServiceTracker st = new ClosingServiceTracker(context, FilterUtil.generateServiceFilter(context, services), new ServiceTrackerUtil(context, runnable, services.length), services);
 		st.open();
 		
 		return st;
@@ -230,7 +230,7 @@ public class ServiceTrackerHelper implements ServiceTrackerCustomizer {
 	 * @throws InvalidSyntaxException
 	 */
 	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, Filter filter, ManagedRunnable runnable) throws InvalidSyntaxException {
-		ServiceTracker st = new ClosingServiceTracker(context, filter, new ServiceTrackerHelper(context, runnable, services.length), services);
+		ServiceTracker st = new ClosingServiceTracker(context, filter, new ServiceTrackerUtil(context, runnable, services.length), services);
 		st.open();
 
 		return st;

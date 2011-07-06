@@ -12,16 +12,13 @@ Import-Package:
  org.sprinkles,
  org.apache.commons.io
 Export-Package: 
- com.buglabs.application,
  com.buglabs.bug.sysfs,
  com.buglabs.device,
- com.buglabs.menu,
- com.buglabs.module,
  com.buglabs.osgi.shell,
  com.buglabs.services.ws,
- com.buglabs.status,
  com.buglabs.support,
  com.buglabs.util,
  com.buglabs.util.osgi,
  com.buglabs.util.simplerestclient,
+ com.buglabs.util.ui,
  com.buglabs.util.xml
