@@ -136,9 +136,9 @@
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
 
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="build.jars" />
