@@ -135,6 +135,7 @@
 	<target name="jar" description="compile the Java source code to class files">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="build.jars" />
@@ -157,7 +158,6 @@
 
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="build.jars" />
 
 		<!-- BUG hardware module APIs -->
@@ -175,6 +175,7 @@
 	<target name="test" description="Test the code">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test" />
@@ -197,7 +198,7 @@
 
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="test" />
+		
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="test" />
 
 		<!-- BUG hardware module APIs -->
@@ -215,15 +216,22 @@
 	<target name="test-osgi" description="Test the code via OSGi context">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test-osgi" />
+		
+		<!--
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test-osgi" />
+		-->
 
 		<!-- project depended on to run build -->
+		<!--
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test-osgi" />
+		-->
 
 		<!-- BUG hardware module driver integration -->
+		<!--
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="test-osgi" />
@@ -234,22 +242,25 @@
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="test-osgi" />
-
+		-->
 		<!-- BUG hardware base APIs -->
+		<!--
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="test-osgi" />
-
+		-->
 		<!-- BUG hardware module APIs -->
+		<!--
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="test-osgi" />
-
+		-->
 		<!-- BUG Applications -->
+		<!--
 		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="test-osgi" />
+		-->
 	</target>
 
 	<target name="document" description="Generate javadoc for entire codebase.">
@@ -343,6 +354,7 @@
 	<target name="checkstyle" description="Checkstyle the code">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="checkstyle" />
@@ -365,7 +377,6 @@
 
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="checkstyle" />
 
 		<!-- BUG hardware module APIs -->
@@ -383,6 +394,7 @@
 	<target name="cpd" description="Check the code for duplications">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="cpd" />
@@ -405,7 +417,6 @@
 
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="cpd" />
 
 		<!-- BUG hardware module APIs -->
@@ -423,6 +434,7 @@
 	<target name="pmd" description="Check the code with pmd">
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="pmd" />
@@ -445,7 +457,6 @@
 
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="pmd" />
 
 		<!-- BUG hardware module APIs -->
@@ -469,6 +480,7 @@
 
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="clean" />
@@ -491,7 +503,6 @@
 
 		<!-- BUG hardware base APIs -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="clean" />
 
 		<!-- BUG hardware module APIs -->
