@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.buglabs.app.bugdash2.ShellUtil;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
@@ -53,7 +52,7 @@ public class DeviceRenameController extends ApplicationController {
         hostnameFile = hostnameFile.substring(0, hostnameFile.length() - 1);
         //replace the old hostname file with the new hostbname from user input
         //and write the new file
-        String newHostnameFile = StringUtil.replace(hostnameFile, oldName, newName);
+        String newHostnameFile = hostnameFile.replace(oldName, newName);
         ShellUtil.getSimpleScalar("echo \"" + newHostnameFile + "\" > /etc/hostname").toString();
         //hostnameCheck used to ensure that the UNIX write process didn't wrongly interfere with anything
         String hostnameCheck = ShellUtil.getSimpleScalar("cat /etc/hostname").toString();

@@ -1,4 +1,4 @@
-package lib;
+package com.buglabs.app.bugdash2.utils;
 
 import java.io.BufferedInputStream;
 import java.io.File;

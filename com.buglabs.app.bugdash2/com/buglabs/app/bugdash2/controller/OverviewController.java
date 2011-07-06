@@ -14,7 +14,6 @@ import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.app.bugdash2.ShellUtil;
 import com.buglabs.osgi.sewing.pub.SewingController;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
@@ -50,14 +49,14 @@ public abstract class OverviewController extends SewingController {
 		SimpleScalar output = ShellUtil.getSimpleScalar(getBuildInfoCommand());
 		String str_output = output.toString();
 		// TODO: would be more accurate to use regexp
-		String[] buildinfo = StringUtil.split(str_output, "\n");
+		String[] buildinfo = str_output.split("\n");
 		if (str_output.indexOf("bug-image-production") > -1) { // check if it's older format 
  			result += buildinfo[2] + "<br />"; 
 			result += "<span class='quiet'>" + buildinfo[1] + "</span>";
 		} else {
 			String[] line; 
 			for (int i=0; i<buildinfo.length; i++) {
-				line = StringUtil.split(buildinfo[i], ":");
+				line = buildinfo[i].split(":");
 				if (line[0].equals("Version")) {
 					result += buildinfo[i] + "<br />";
 				} else if (line[0].equals("Build Time") || line[0].equals("Revision")) {
@@ -70,7 +69,7 @@ public abstract class OverviewController extends SewingController {
 	
 	private SimpleScalar getDeviceName() {
 		String output = ShellUtil.getSimpleScalar(getHostName()).toString();
-		return new SimpleScalar(StringUtil.replace(output, "\n",""));
+		return new SimpleScalar(output.replace("\n",""));
 	}
 	
 	/**
@@ -79,7 +78,7 @@ public abstract class OverviewController extends SewingController {
 	private SimpleScalar getKernelInfo() {
 		String result = ""; 
 		SimpleScalar output = ShellUtil.getSimpleScalar(getKernelInfoCommand()); 
-		String[] info = StringUtil.split(output.toString(), " ");
+		String[] info = output.toString().split(" ");
 		if (info.length > 3)
 			result += info[0] + " " + info[1] + " " + info[2];  
 		return new SimpleScalar(result); 		
@@ -89,9 +88,9 @@ public abstract class OverviewController extends SewingController {
 		String result = ""; 
 		SimpleScalar output = ShellUtil.getSimpleScalar(getDiskUsageCommand()); 
 		
-		String[] diskinfo = StringUtil.split(output.toString(), "\n"); 
+		String[] diskinfo = output.toString().split("\n"); 
 		if (diskinfo.length > 1) { 
-			String[] usageinfo = StringUtil.split(StringUtil.squeeze(diskinfo[1]), " "); 
+			String[] usageinfo = diskinfo[1].trim().split(" "); 
 
 			result += "<table>"; 
 			if (usageinfo.length > 5) {

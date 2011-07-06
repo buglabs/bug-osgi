@@ -3,8 +3,6 @@ package com.buglabs.app.bugdash2;
 import java.util.Iterator;
 import java.util.List;
 
-import com.buglabs.util.StringUtil;
-
 /**
  * This class contains a number of static methods to help string formatting in Sewing templates.
  * @author akweon
@@ -32,9 +30,9 @@ public class TemplateHelper {
 	
 	public static String makeJSFriendly(String input) {
 		String output = "";
-		output = StringUtil.replace(input, "\r\n", "<br />");
-		output = StringUtil.replace(output, "\n", "<br />");
-		output = StringUtil.replace(output, "'", "\\'");
+		output = input.replace("\r\n", "<br />");
+		output = output.replace("\n", "<br />");
+		output = output.replace("'", "\\'");
 		
 		return output; 
 	}

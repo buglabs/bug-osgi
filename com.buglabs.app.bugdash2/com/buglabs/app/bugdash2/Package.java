@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import com.buglabs.nmea.StringUtil;
-
 import freemarker.template.SimpleScalar;
 
 
@@ -56,7 +54,7 @@ public class Package {
 		while (itr.hasNext()) {
 			line = (String)itr.next(); 
 			if (line.length() == 0) break; 
-			line_data = StringUtil.split(line, ": "); 	// key and value are separated by ": "
+			line_data = line.split(": "); 	// key and value are separated by ": "
 			if (line_data.length == 0) break; 
 			
 			if (line_data.length > 1) {

@@ -19,7 +19,6 @@ import com.buglabs.app.bugdash2.ShellUtil;
 import com.buglabs.app.bugdash2.TemplateHelper;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleList;
@@ -65,14 +64,14 @@ public class DateTimeController extends ApplicationController {
 			String zoneinfoDirectory = "/usr/share/zoneinfo/";
 
 			String localtimeLink = ShellUtil.getSimpleScalar("ls -haltr /etc/localtime").toString().trim();
-			String[] linkParts = StringUtil.split(localtimeLink, "-> ");
+			String[] linkParts = localtimeLink.split("-> ");
 			String currentTZdir = "";
 			if(linkParts.length > 1)
 			{
-				currentTZdir = StringUtil.replace(linkParts[1], zoneinfoDirectory, "");
+				currentTZdir = linkParts[1].replace(zoneinfoDirectory, "");
 			}
-			String currentTZ = StringUtil.replace(currentTZdir, "/", " - ");
-			currentTZ = StringUtil.replace(currentTZ, "_", " ");
+			String currentTZ = currentTZdir.replace("/", " - ");
+			currentTZ = currentTZ.replace("_", " ");
 			
 			String[] zidItems = zoneinfoDir.list();
 			Arrays.sort(zidItems);
@@ -104,12 +103,12 @@ public class DateTimeController extends ApplicationController {
 			while(tzIterator.hasNext())
 			{
 				String timezone = (String) tzIterator.next();
-				timezone = StringUtil.replace(timezone, "_", " ");
-				String[] tzParts = StringUtil.split(timezone, "-");
+				timezone = timezone.replace("_", " ");
+				String[] tzParts = timezone.split("-");
 				tzParts[0] = tzParts[0].trim();
 				tzParts[1] = tzParts[1].trim();
-				tzParts[0] = StringUtil.replace(tzParts[0], " ", "_");
-				tzParts[1] = StringUtil.replace(tzParts[1], " ", "_");
+				tzParts[0] = tzParts[0].replace(" ", "_");
+				tzParts[1] = tzParts[1].replace(" ", "_");
 				SimpleHash timezoneHash = new SimpleHash();
 				if(timezone.equals(currentTZ))
 				{

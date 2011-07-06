@@ -6,11 +6,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lib.Utils;
 
 import com.buglabs.app.bugdash2.AdminConfigManager;
 import com.buglabs.app.bugdash2.ConfigPropEntry;
 import com.buglabs.app.bugdash2.WebAdminSettings;
+import com.buglabs.app.bugdash2.utils.Utils;
 import com.buglabs.osgi.sewing.pub.SewingController;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 

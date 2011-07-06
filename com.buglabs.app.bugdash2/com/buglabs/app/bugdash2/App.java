@@ -16,14 +16,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import lib.Utils;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.buglabs.app.bugdash2.utils.Utils;
 import com.buglabs.bug.program.pub.IUserAppManager;
-import com.buglabs.util.XmlNode;
-import com.buglabs.util.XmlParser;
+import com.buglabs.util.xml.XmlNode;
+import com.buglabs.util.xml.XmlParser;
 import com.buglabs.util.simplerestclient.BasicAuthenticationConnectionProvider;
 import com.buglabs.util.simplerestclient.HTTPRequest;
 import com.buglabs.util.simplerestclient.HTTPResponse;

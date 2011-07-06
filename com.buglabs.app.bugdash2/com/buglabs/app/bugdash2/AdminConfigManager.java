@@ -14,8 +14,7 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.buglabs.util.Base64;
-import com.buglabs.util.ConfigAdminUtil;
-import com.buglabs.util.StringUtil;
+import com.buglabs.util.osgi.ConfigAdminUtil;
 
 /**
  * @author iocanto
@@ -271,7 +270,7 @@ public class AdminConfigManager {
 	}	
 	
 	private static boolean is_secure(String key) {
-		String[] arr_prop_key = StringUtil.split(key, ".");
+		String[] arr_prop_key = key.split(".");
 		return (arr_prop_key.length > 2 && arr_prop_key[2].equals("secure"));
 	}
 }

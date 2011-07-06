@@ -7,15 +7,17 @@ Bundle-Name: BUGDash
 Bundle-Activator: com.buglabs.app.bugdash2.Activator
 Bundle-SymbolicName: com.buglabs.app.bugdash2
 Import-Package: 
+ com.buglabs.util,
+ com.buglabs.util.xml,
  com.buglabs.bug.dragonfly.module,
  com.buglabs.bug.program.pub,
- com.buglabs.nmea,
  com.buglabs.osgi.sewing.pub,
  com.buglabs.osgi.sewing.pub.util,
  com.buglabs.util.osgi,
  com.buglabs.util.shell.pub,
  com.buglabs.util.simplerestclient,
  com.buglabs.util.ui,
+ org.sprinkles.functions,
  freemarker.template,
  javax.servlet,
  javax.servlet.http,

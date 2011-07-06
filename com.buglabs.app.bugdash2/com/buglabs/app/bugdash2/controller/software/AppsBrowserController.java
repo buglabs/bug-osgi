@@ -18,7 +18,6 @@ import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleList;
@@ -64,7 +63,15 @@ public class AppsBrowserController extends ApplicationController {
 		if (params.get("filter_by_packages") != null)
 			filter_by_packages = params.get("filter_by_packages"); 
 		if (filter_by_packages.equals("true")) {
-			packages = StringUtil.join(getPackages(), ",");
+			StringBuilder sb = new StringBuilder();
+			
+			for (String pkg : getPackages()) {
+				sb.append(pkg);
+				sb.append(',');
+			}
+				
+			packages = sb.toString();
+			packages = packages.substring(0, packages.length() - 2);
 		}
 	
 		AppResultManager manager = new AppResultManager(); 
@@ -142,15 +149,15 @@ public class AppsBrowserController extends ApplicationController {
 	}
 	
 	
-	private List getPackages() {
+	private List<String> getPackages() {
 		Bundle[] bundles = Activator.getContext().getBundles();
 		String[] ps;
 		String p; 
-		List packages = new ArrayList(); 
+		List<String> packages = new ArrayList<String>(); 
 		for(int i=0; i<bundles.length; i++) {
 			p = (String)bundles[i].getHeaders().get("Export-Package"); 
 			if (p != null) {
-				ps = StringUtil.split(p, ",");
+				ps = p.split(",");
 				for (int j=0; j<ps.length; j++) {
 					if (!omitPackage(ps[j])) {
 						packages.add(stripName(ps[j]).trim());
@@ -201,7 +208,7 @@ public class AppsBrowserController extends ApplicationController {
 	}
 	
 	private String stripName(String headerValue) {
-		return StringUtil.split(headerValue, ";")[0];
+		return headerValue.split(";")[0];
 	}	
 	private String getModuleIconList(List list) {
 		String result = "";

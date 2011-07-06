@@ -3,19 +3,29 @@ import java.net.URL;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.buglabs.app.bugdash2.servicetracker.BUGwebAdminServiceTracker;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
-import com.buglabs.util.ServiceFilterGenerator;
+import com.buglabs.osgi.sewing.pub.ISewingService;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
 import com.buglabs.util.ui.IDesktopApp;
 
 public class Activator implements BundleActivator, IDesktopApp {
 	
-	private BUGwebAdminServiceTracker stc;
-	private ServiceTracker st;
+	/**
+	 * List of OSGi services that must be available before dash will run.
+	 */
+	private static final String [] services = {
+		com.buglabs.osgi.sewing.pub.ISewingService.class.getName(),
+		org.osgi.service.cm.ConfigurationAdmin.class.getName(),
+		com.buglabs.util.shell.pub.IShellService.class.getName(),
+		com.buglabs.app.bugdash2.IBatteryInfoProvider.class.getName(),
+		LogService.class.getName()
+	};
+	
 	private ServiceRegistration appReg;
 	private static boolean isVirtualBUG = false;
 	private static BundleContext context;
@@ -23,6 +33,12 @@ public class Activator implements BundleActivator, IDesktopApp {
 
 	private static IBatteryInfoProvider batteryProvider = null;
 	private ServiceRegistration batteryReg;
+
+	private ServiceTracker stc;
+
+	private ServiceTracker moduleTracker;
+
+	private ISewingService service;
 	
 	public void start(BundleContext context) throws Exception {		
 		Activator.context = context;
@@ -31,10 +47,9 @@ public class Activator implements BundleActivator, IDesktopApp {
 		
 		batteryProvider = new BatteryInfoProvider();
 		batteryReg = context.registerService(IBatteryInfoProvider.class.getName(), batteryProvider, null);
-		stc = new BUGwebAdminServiceTracker(context);
-		Filter f = context.createFilter(ServiceFilterGenerator.generateServiceFilter(stc.getServices()));
-		st = new ServiceTracker(context, f, stc);
-		st.open();
+		stc = ServiceTrackerUtil.openServiceTracker(context, services, new DashApplication(context));
+		
+		new BUGwebAdminServiceTracker(context);
 		
 		appReg = context.registerService(IDesktopApp.class.getName(), this, null);	
 	}
@@ -42,8 +57,8 @@ public class Activator implements BundleActivator, IDesktopApp {
 	public void stop(BundleContext context) throws Exception {
 		appReg.unregister();
 		ShellUtil.destroySession();
-		stc.stop();
-		st.close();
+		stc.close();
+		
 		if (batteryReg != null)
 			batteryReg.unregister();
 	}

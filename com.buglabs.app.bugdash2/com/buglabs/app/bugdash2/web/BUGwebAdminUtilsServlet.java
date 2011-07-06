@@ -6,6 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sprinkles.functions.StringFunctions;
+
 import com.buglabs.app.bugdash2.Activator;
 import com.buglabs.app.bugdash2.ShellUtil;
 import com.buglabs.app.bugdash2.controller.AdminControllerFactory;
@@ -14,7 +16,6 @@ import com.buglabs.osgi.sewing.pub.SewingController;
 import com.buglabs.osgi.sewing.pub.SewingHttpServlet;
 import com.buglabs.osgi.sewing.pub.util.ControllerMap;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
@@ -82,8 +83,9 @@ public class BUGwebAdminUtilsServlet extends SewingHttpServlet {
 							modules_attached.add(list[i].getModuleName());
 						}
 					}	
+					
 					//com.buglabs.util.StringUtilStringUtils.join(modules_attached, "','");
-					result = new SimpleScalar("['" + StringUtil.join(modules_attached, "','") + "']");
+					result = new SimpleScalar("['" + StringFunctions.join(modules_attached, "','") + "']");
 				}
 				else 
 					result = new SimpleScalar("task not found"); 

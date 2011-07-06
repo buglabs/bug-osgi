@@ -12,7 +12,6 @@ import com.buglabs.app.bugdash2.ConfigPropEntry;
 import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleList;
@@ -92,9 +91,9 @@ public class ConfigurationPropertyController extends ApplicationController {
 			String txt_new_property_key			= params.get("txt_new_property_key");
 			String txt_new_property_value		= params.get("txt_new_property_value"); 
 			
-			String[] arr_properties_to_delete 	= StringUtil.split(properties_to_delete, ",");
-			String[] arr_prop_values 			= StringUtil.split(prop_value, ",");
-			String[] arr_prop_keys 				= StringUtil.split(prop_key, ",");
+			String[] arr_properties_to_delete 	= properties_to_delete.split(",");
+			String[] arr_prop_values 			= prop_value.split(",");
+			String[] arr_prop_keys 				= prop_key.split(",");
 			
 			// delete properties 
 			for (int i=0; i<arr_properties_to_delete.length; i++) {

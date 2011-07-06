@@ -17,7 +17,6 @@ import com.buglabs.app.bugdash2.Package;
 import com.buglabs.app.bugdash2.ShellUtil;
 import com.buglabs.app.bugdash2.TemplateHelper;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
-import com.buglabs.nmea.StringUtil;
 import com.buglabs.osgi.sewing.pub.util.FormFile;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 
@@ -165,7 +164,7 @@ public abstract class PackageInstallController extends ApplicationController {
 		String[] source_entry; 
 		for (int i=0; i<repo_main.size(); i++) {
 			item = new SimpleHash();
-			source_entry = StringUtil.split(repo_main.get(i).toString(), " "); 
+			source_entry = repo_main.get(i).toString().split(" "); 
 			item.put("name", source_entry[1]);
 			item.put("url", source_entry[2]);
 			item.put("readonly", "true");
@@ -184,7 +183,7 @@ public abstract class PackageInstallController extends ApplicationController {
 					ipkg_sources.addAll(repo_universe); 
 				for (int j=0; j<repo_universe.size(); j++) {
 					item = new SimpleHash();
-					source_entry = StringUtil.split(repo_universe.get(j).toString(), " "); 
+					source_entry = repo_universe.get(j).toString().split(" "); 
 					item.put("name", source_entry[1]);
 					item.put("url", source_entry[2]);
 					item.put("readonly", (!files[i].getName().startsWith(CUSTOM_CONFIG_PREFIX + "_"))+""); // hackish way to pass in "false"

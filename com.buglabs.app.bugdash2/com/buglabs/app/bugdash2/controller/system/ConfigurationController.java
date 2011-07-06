@@ -12,7 +12,6 @@ import com.buglabs.app.bugdash2.AdminConfigManager;
 import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleList;
@@ -44,7 +43,7 @@ public class ConfigurationController extends ApplicationController {
 			pid = configs[i].getPid(); 
 			item = new SimpleHash(); 
 			item.put("pid", pid); 
-			item.put("pid_cleaned", StringUtil.replace(pid, ".", "_"));
+			item.put("pid_cleaned", pid.replace('.', '_'));
 			config_list.add(item); 
 		}
 		root.put("config_list", config_list); 

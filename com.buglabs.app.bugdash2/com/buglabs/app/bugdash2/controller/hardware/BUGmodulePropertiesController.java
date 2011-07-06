@@ -11,7 +11,6 @@ import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
 import com.buglabs.bug.dragonfly.module.MutableModuleProperty;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
-import com.buglabs.util.StringUtil;
 
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleList;
@@ -40,11 +39,11 @@ public class BUGmodulePropertiesController extends ApplicationController {
 		int slot = Integer.valueOf(params.get("slot")).intValue(); // retrieve slot
 		IModuleControl mc = Activator.getModule(slot); // retrieve module
 		
-		String[] names = StringUtil.split(params.get("name"), ",");
+		String[] names = params.get("name").split(",");
 		if (names == null) System.out.println("names[] == null");
 		else for (int i=0; i<names.length; i++) System.out.println("names["+i+"]:"+names[i]);
 		
-		String[] types = StringUtil.split(params.get("type"), ",");
+		String[] types = params.get("type").split(",");
 		if (types == null) System.out.println("types[] == null");
 		else for (int i=0; i<types.length; i++) System.out.println("types["+i+"]:"+types[i]);
 		
