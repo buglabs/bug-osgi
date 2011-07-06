@@ -47,7 +47,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	private HttpService httpService;
 	private LogService log;
 	private BundleContext context;
-	private ServiceRegistration<?> sewingRegistration;
+	private ServiceRegistration sewingRegistration;
 	private ServiceTracker stc;
 
 	//private SewingServiceTracker stc;
