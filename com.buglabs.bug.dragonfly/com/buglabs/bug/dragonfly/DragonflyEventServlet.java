@@ -25,92 +25,58 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.bug.dragonfly;
 
-/**
- * An XPath attribute.
- * 
- * @author kgilmer
- * @deprecated use the com.buglabs.util.xml package.
- */
-class AttribExpression {
-	public static final int EQUAL_OPERATOR = 1;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-	public static final int NOT_EQUAL_OPERATOR = 2;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-	private String name;
+import com.buglabs.util.xml.XmlNode;
+import com.buglabs.util.xml.XmlParser;
 
-	private String value;
+public class DragonflyEventServlet extends HttpServlet {
+	private static final long serialVersionUID = -6041541048676568932L;
 
-	private String tagName;
+	private final Map eventMap;
 
-	private int operator;
+	public DragonflyEventServlet(Map eventMap) {
+		this.eventMap = eventMap;
+	}
 
-	boolean exists = false;
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		BufferedReader br = new BufferedReader(req.getReader());
+		StringBuffer reqStr = new StringBuffer();
+		String line;
+		while ((line = br.readLine()) != null) {
+			reqStr.append(line);
+		}
 
-	public AttribExpression(String exprToken) {
-		String[] b;
-		String[] s = StringUtil.split(exprToken, "[@");
+		XmlNode reqXml = XmlParser.parse(reqStr.toString());
 
-		if (s.length == 2) {
-			tagName = s[0];
-			b = StringUtil.split(s[1], "=");
+		for (Iterator i = reqXml.getChildren().iterator(); i.hasNext();) {
+			XmlNode eventXml = (XmlNode) i.next();
+			DragonflyEventSubscriber subscriber = new DragonflyEventSubscriber(eventXml);
 
-			if (b.length == 2) {
-				name = b[0];
-				value = resolveValue(b[1].substring(0, b[1].length() - 1));
-				operator = EQUAL_OPERATOR;
-				exists = true;
-			} else {
-				b = StringUtil.split(s[1], "!=");
+			if (subscriber.isValid()) {
+				List subList = (List) eventMap.get(subscriber.getTopic());
 
-				if (b.length == 2) {
-					name = b[0];
-					value = b[1];
-					operator = NOT_EQUAL_OPERATOR;
-					exists = true;
+				if (subList == null) {
+					subList = new ArrayList();
+					eventMap.put(subscriber.getTopic(), subList);
+				}
+
+				if (!subList.contains(subscriber)) {
+					subList.add(subscriber);
 				}
 			}
 		}
-	}
-
-	private String resolveValue(String string) {
-		// this may resolve a variable to a literal.
-
-		return string.substring(1, string.length() - 1);
-	}
-
-	public String toString() {
-		if (!exists) {
-			return super.toString();
-		}
-		String op = "?";
-		if (operator == EQUAL_OPERATOR) {
-			op = "=";
-		} else if (operator == NOT_EQUAL_OPERATOR) {
-			op = "!=";
-		}
-
-		return tagName + "[@" + name + op + value + "]";
-	}
-
-	public String getTagName() {
-		return tagName;
-	}
-
-	public boolean isExists() {
-		return exists;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public int getOperator() {
-		return operator;
-	}
-
-	public String getValue() {
-		return value;
 	}
 }

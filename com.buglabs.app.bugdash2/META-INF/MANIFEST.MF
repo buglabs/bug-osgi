@@ -14,7 +14,6 @@ Import-Package:
  com.buglabs.nmea,
  com.buglabs.osgi.sewing.pub,
  com.buglabs.osgi.sewing.pub.util,
- com.buglabs.util,
  com.buglabs.util.osgi,
  com.buglabs.util.simplerestclient,
  freemarker.template,

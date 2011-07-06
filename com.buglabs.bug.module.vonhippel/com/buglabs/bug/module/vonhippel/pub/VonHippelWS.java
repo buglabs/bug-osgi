@@ -35,8 +35,7 @@ import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.xml.XmlNode;
 
 public class VonHippelWS implements PublicWSProvider2 {
 
@@ -82,7 +81,7 @@ public class VonHippelWS implements PublicWSProvider2 {
 			//                <Pin number="0">0</Pin>
 			// 			      <Pin number="1">0</Pin> ...
 			XmlNode gpio = new XmlNode("GPIO");
-			root.addChildElement(gpio);
+			root.addChild(gpio);
 			XmlNode pin0 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>8 & 1));
 			XmlNode pin1 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>9 & 1));
 			XmlNode pin2 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>10 & 1));
@@ -91,15 +90,15 @@ public class VonHippelWS implements PublicWSProvider2 {
 			pin1.addAttribute("number", "1");
 			pin2.addAttribute("number", "2");
 			pin3.addAttribute("number", "3");
-			gpio.addChildElement(pin0);
-			gpio.addChildElement(pin1);
-			gpio.addChildElement(pin2);
-			gpio.addChildElement(pin3);
+			gpio.addChild(pin0);
+			gpio.addChild(pin1);
+			gpio.addChild(pin2);
+			gpio.addChild(pin3);
 			//iox.  style = <IOX>
 			//                <Pin number="0">0</Pin>
 			// 			      <Pin number="1">0</Pin> ...
 			XmlNode iox = new XmlNode("IOX");
-			root.addChildElement(iox);
+			root.addChild(iox);
 			XmlNode ioxpin0 = new XmlNode("Pin", Integer.toString(vhctl.getStatus() & 1));
 			XmlNode ioxpin1 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>1 & 1));
 			XmlNode ioxpin2 = new XmlNode("Pin", Integer.toString(vhctl.getStatus()>>>2 & 1));
@@ -112,14 +111,12 @@ public class VonHippelWS implements PublicWSProvider2 {
 			ioxpin3.addAttribute("number", "3");
 			ioxpin4.addAttribute("number", "4");
 			ioxpin5.addAttribute("number", "5");
-			iox.addChildElement(ioxpin0);
-			iox.addChildElement(ioxpin1);
-			iox.addChildElement(ioxpin2);
-			iox.addChildElement(ioxpin3);
-			iox.addChildElement(ioxpin4);
-			iox.addChildElement(ioxpin5);
-		} catch (SelfReferenceException e) {
-			e.printStackTrace();
+			iox.addChild(ioxpin0);
+			iox.addChild(ioxpin1);
+			iox.addChild(ioxpin2);
+			iox.addChild(ioxpin3);
+			iox.addChild(ioxpin4);
+			iox.addChild(ioxpin5);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

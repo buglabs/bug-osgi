@@ -37,7 +37,7 @@ import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.xml.XmlNode;
 
 /**
  * A web service for acceleration data.
@@ -90,7 +90,7 @@ public class AccelerationWS implements PublicWSProvider2 {
 				sample.addAttribute("y", Float.toString(accSample.getAccelerationY()));
 				sample.addAttribute("z", Float.toString(accSample.getAccelerationZ()));
 
-				root.addChildElement(sample);
+				root.addChild(sample);
 			}
 		} catch (Exception e) {
 			log.log(LogService.LOG_ERROR, "Error occurred while geting acceleration XML.", e);

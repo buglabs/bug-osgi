@@ -20,8 +20,8 @@ import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.application.ServiceTrackerHelper;
-import com.buglabs.application.ServiceTrackerHelper.ManagedInlineRunnable;
+import com.buglabs.util.osgi.ServiceTrackerHelper;
+import com.buglabs.util.osgi.ServiceTrackerHelper.ManagedInlineRunnable;
 import com.buglabs.bug.ws.module.ModuleServlet;
 import com.buglabs.bug.ws.module.PackageServlet;
 import com.buglabs.bug.ws.program.ConfigAdminServlet;

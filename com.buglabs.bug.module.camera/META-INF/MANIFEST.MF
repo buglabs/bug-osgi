@@ -5,20 +5,16 @@ Bundle-Version: 1.0.0
 Bundle-Activator: com.buglabs.bug.module.camera.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.module.camera.pub
-Import-Package: org.osgi.framework,
- org.osgi.util.tracker,
- com.buglabs.module,
- com.buglabs.util,
- com.buglabs.services.ws,
- com.buglabs.status,
- com.buglabs.device,
+Import-Package: com.buglabs.bug.jni.camera,
  com.buglabs.bug.module.pub,
- com.buglabs.bug.input.pub,
- com.buglabs.bug.jni.common,
- com.buglabs.bug.jni.camera,
- org.osgi.service.log,
- com.buglabs.bug.jni.input,
- com.buglabs.bug.sysfs
+ com.buglabs.bug.sysfs,
+ com.buglabs.device,
+ com.buglabs.module,
+ com.buglabs.services.ws,
+ com.buglabs.util.osgi,
+ com.buglabs.util.xml,
+ org.osgi.framework,
+ org.osgi.service.log
 Bug-Bundle-Type: Module
 Bug-Module-Id: 000F
 Bug-Module-Driver-Id: bmi_camera

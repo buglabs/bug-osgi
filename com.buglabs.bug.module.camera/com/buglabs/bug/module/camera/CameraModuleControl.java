@@ -30,7 +30,6 @@ package com.buglabs.bug.module.camera;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.osgi.framework.ServiceRegistration;
 
 import com.buglabs.bug.jni.camera.CameraControl;
 import com.buglabs.bug.module.camera.pub.ICamera2ModuleControl;
@@ -41,8 +40,7 @@ import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.PublicWSProviderWithParams;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.xml.XmlNode;
 
 public class CameraModuleControl implements ICameraModuleControl, ICamera2ModuleControl, IModuleLEDController, PublicWSProviderWithParams {
 
@@ -386,27 +384,25 @@ public class CameraModuleControl implements ICameraModuleControl, ICamera2Module
 	
 	private String getCameraInfoXml() {
 		XmlNode root = new XmlNode("CameraInfo");
-		try {
-			if (cameraModlet.isCameraOpen()) {
-				if (cameraModlet.isCameraStarted()) {
-					root.addChildElement(new XmlNode("CameraInfo", "Camera is open and started"));
-				} else {
-					root.addChildElement(new XmlNode("CameraInfo", "Camera is open but not yet started"));
-				}
+
+		if (cameraModlet.isCameraOpen()) {
+			if (cameraModlet.isCameraStarted()) {
+				root.addChild(new XmlNode("CameraInfo", "Camera is open and started"));
 			} else {
-				root.addChildElement(new XmlNode("CameraInfo", "Camera is not open."));
+				root.addChild(new XmlNode("CameraInfo", "Camera is open but not yet started"));
 			}
-			
-			root.addChildElement(new XmlNode("TestPattern", testPatternString(getTestPattern())));
-			root.addChildElement(new XmlNode("ColorEffects", colorEffectsString(getColorEffects())));
-			root.addChildElement(new XmlNode("VerticalFlip", positiveValueOkayString(getVerticalFlip())));
-			root.addChildElement(new XmlNode("HorizontalMirror", positiveValueOkayString(getHorizontalMirror())));
-			root.addChildElement(new XmlNode("ExposureLevel", positiveValueOkayString(getExposureLevel())));
-			root.addChildElement(new XmlNode("FullFramesTaken", Integer.toString(cameraModlet.getFullsGrabbed())));
-			root.addChildElement(new XmlNode("PreviewsTaken", Integer.toString(cameraModlet.getPreviewsGrabbed())));
-		} catch (SelfReferenceException e) {
-			System.err.println("Xml error " + e);
+		} else {
+			root.addChild(new XmlNode("CameraInfo", "Camera is not open."));
 		}
+		
+		root.addChild(new XmlNode("TestPattern", testPatternString(getTestPattern())));
+		root.addChild(new XmlNode("ColorEffects", colorEffectsString(getColorEffects())));
+		root.addChild(new XmlNode("VerticalFlip", positiveValueOkayString(getVerticalFlip())));
+		root.addChild(new XmlNode("HorizontalMirror", positiveValueOkayString(getHorizontalMirror())));
+		root.addChild(new XmlNode("ExposureLevel", positiveValueOkayString(getExposureLevel())));
+		root.addChild(new XmlNode("FullFramesTaken", Integer.toString(cameraModlet.getFullsGrabbed())));
+		root.addChild(new XmlNode("PreviewsTaken", Integer.toString(cameraModlet.getPreviewsGrabbed())));
+	
 		return root.toString();
 	}
 }

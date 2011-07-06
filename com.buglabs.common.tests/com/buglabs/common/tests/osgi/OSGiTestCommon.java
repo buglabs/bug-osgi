@@ -9,8 +9,8 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.common.tests.Activator;
 import com.buglabs.common.tests.osgi.pub.ServiceA;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.OSGiServiceLoader;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.OSGiServiceLoader;
 
 import junit.framework.TestCase;
 

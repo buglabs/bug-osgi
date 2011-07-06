@@ -56,8 +56,7 @@ import com.buglabs.module.IModuleLEDController;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
 import com.buglabs.services.ws.PublicWSProvider;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.RemoteOSGiServiceConstants;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
  * LCD Modlet class for 1x LCD module.
@@ -119,11 +118,11 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	}
 
 	public void start() throws Exception {
-		Dictionary modProperties = createBasicServiceProperties();
+		Dictionary modProperties = createBasicServiceProperties(null);
 		modProperties.put("Power State", suspended ? "Suspended" : "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 
-		lcdRef = context.registerService(IModuleLEDController.class.getName(), this, createRemotableProperties(null));
+		lcdRef = context.registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties(null));
 		props = new Hashtable();
 		props.put("width", new Integer(LCD_WIDTH));
 		props.put("height", new Integer(LCD_HEIGHT));
@@ -133,14 +132,14 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		
 		ml8953AccelerometerRef = context.registerService(
 				IML8953Accelerometer.class.getName(), ml8953Control,
-				createBasicServiceProperties());
+				createBasicServiceProperties(null));
 		
 		createAccelerationWS();
 
-		lcdControlServReg = context.registerService(ILCDModuleControl.class.getName(), this, createRemotableProperties(null));
+		lcdControlServReg = context.registerService(ILCDModuleControl.class.getName(), this, createBasicServiceProperties(null));
 		
 		//no calibration process for new LCD
-		moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), LCDModlet.this, createRemotableProperties(props));
+		moduleDisplayServReg = context.registerService(IModuleDisplay.class.getName(), LCDModlet.this, createBasicServiceProperties(props));
 	}
 
 
@@ -169,24 +168,12 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 		
 	}
 
-	/**
-	 * @return A dictionary with R-OSGi enable property.
-	 */
-	private Dictionary createRemotableProperties(Dictionary ht) {
-		if (ht == null) {
-			ht = new Hashtable();
-			ht.put("Slot", "" + slotId);
+	private Dictionary createBasicServiceProperties(Dictionary p) {
+		if (p == null) {
+			p = new Hashtable();
+			p.put("Provider", this.getClass().getName());
+			p.put("Slot", Integer.toString(slotId));
 		}
-
-		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-
-		return ht;
-	}
-
-	private Dictionary createBasicServiceProperties() {
-		Dictionary p = new Hashtable();
-		p.put("Provider", this.getClass().getName());
-		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {
 			if (properties.getDescription() != null) {
@@ -208,7 +195,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 	private void updateIModuleControlProperties() {
 		if (moduleRef != null) {
-			Dictionary modProperties = createBasicServiceProperties();
+			Dictionary modProperties = createBasicServiceProperties(null);
 			modProperties.put("Power State", suspended ? "Suspended" : "Active");
 			moduleRef.setProperties(modProperties);
 		}

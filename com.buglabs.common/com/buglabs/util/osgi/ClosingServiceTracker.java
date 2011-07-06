@@ -1,4 +1,4 @@
-package com.buglabs.application;
+package com.buglabs.util.osgi;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;

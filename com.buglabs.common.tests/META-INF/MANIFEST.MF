@@ -10,6 +10,8 @@ Import-Package:
  com.buglabs.osgi.shell,
  com.buglabs.services.ws,
  com.buglabs.util,
+ com.buglabs.util.xml,
+ com.buglabs.util.osgi,
  com.buglabs.util.simplerestclient,
  junit.framework,
  junit.textui,

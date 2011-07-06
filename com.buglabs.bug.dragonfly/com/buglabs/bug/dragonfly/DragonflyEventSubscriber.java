@@ -25,21 +25,47 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.util;
+package com.buglabs.bug.dragonfly;
 
-import java.io.IOException;
+import com.buglabs.util.xml.XmlNode;
 
-/**
- * This exception is thrown when an attempt is made to add itself as a child (to
- * itself).
- * 
- * @author ken
- * @deprecated use the com.buglabs.util.xml package.
- */
-public class SelfReferenceException extends IOException {
-	private static final long serialVersionUID = -7313712854018859157L;
+public class DragonflyEventSubscriber {
 
-	public SelfReferenceException(XmlNode node) {
-		super(node.getName() + " tried to add itself as a child.");
+	private String url;
+
+	private String topic;
+
+	public DragonflyEventSubscriber(XmlNode node) {
+		url = node.getAttribute("url");
+		topic = node.getAttribute("topic");
 	}
+
+	public boolean isValid() {
+		if (url == null || topic == null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public boolean equals(Object arg0) {
+		if (arg0 instanceof DragonflyEventSubscriber) {
+			DragonflyEventSubscriber othersub = (DragonflyEventSubscriber) arg0;
+			if (url.equals(othersub.getUrl()) && topic.equals(othersub.getTopic())) {
+				return true;
+			}
+
+			return false;
+		}
+		return super.equals(arg0);
+	}
+
 }

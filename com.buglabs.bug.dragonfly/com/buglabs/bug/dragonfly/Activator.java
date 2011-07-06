@@ -41,14 +41,13 @@ import java.util.Map;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
+import com.buglabs.util.osgi.ServiceTrackerHelper.ManagedInlineRunnable;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
@@ -61,12 +60,10 @@ import com.buglabs.util.xml.XmlNode;
  * @author ken
  * 
  */
-public class Activator implements BundleActivator, ServiceListener {
+public class Activator implements BundleActivator, ServiceListener, ManagedInlineRunnable {
 	public static final int MODEL_CHANGE_EVENT_LISTEN_PORT = 8990;
 
-	private ServiceTracker httpTracker;
-
-	private EventServlet eventServlet;
+	private static final String DRAGONFLY_WS_PATH = "/event";
 
 	private Map eventMap;
 
@@ -74,33 +71,29 @@ public class Activator implements BundleActivator, ServiceListener {
 
 	private LogService logService;
 
+	private HttpService httpService;
+	
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 */
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 		logService = LogServiceUtil.getLogService(context);
 		eventMap = new Hashtable();
 
-		// Register to contribute servlet to http service.
-		Hashtable config = new Hashtable();
-		Filter f = context.createFilter("(" + Constants.OBJECTCLASS + "=org.osgi.service.http.HttpService)");
-		Map servlets = new Hashtable();
-		eventServlet = new EventServlet(eventMap);
-		servlets.put("/event", eventServlet);
-
-		httpTracker = new ServiceTracker(context, f, new HttpServiceTracker(context, config, servlets, logService));
-		httpTracker.open();
-
 		context.addServiceListener(this, FilterUtil.generateServiceFilter(IModuleControl.class.getName()));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
-		httpTracker.close();
-		context.removeServiceListener(this);
+		context.removeServiceListener(this);		
 	}
 
 	/**
 	 * Generate XML message based on event.
-	 * 
-	 * @param event
+	 * @param topic
 	 * @param type
 	 * @param module
 	 * @return
@@ -121,7 +114,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	 * @param message
 	 * @throws IOException
 	 */
-	private void notifySubscriber(Subscriber s, String message) throws IOException {
+	private void notifySubscriber(DragonflyEventSubscriber s, String message) throws IOException {
 		logService.log(LogService.LOG_DEBUG, "Notifying " + s.getUrl() + " of model update.");
 
 		URL url = new URL(s.getUrl());
@@ -167,7 +160,7 @@ public class Activator implements BundleActivator, ServiceListener {
 
 		if (subList != null) {
 			for (Iterator i = subList.iterator(); i.hasNext();) {
-				Subscriber s = (Subscriber) i.next();
+				DragonflyEventSubscriber s = (DragonflyEventSubscriber) i.next();
 
 				try {
 					notifySubscriber(s, createMessage(topic, type, module));
@@ -189,4 +182,20 @@ public class Activator implements BundleActivator, ServiceListener {
 			}
 		}
 	}
+
+	public void run(Map services) {
+		httpService = (HttpService) services.get(HttpService.class.getName());
+
+		try {
+			httpService.registerServlet(DRAGONFLY_WS_PATH, new DragonflyEventServlet(eventMap), null , null);
+			logService.log(LogService.LOG_INFO, "Registered servlet at: " + DRAGONFLY_WS_PATH);			
+		} catch (Exception e) {
+			logService.log(LogService.LOG_ERROR, "Failed to register servlet.", e);
+		}
+	}
+
+	public void shutdown() {
+		if (httpService != null)
+			httpService.unregister(DRAGONFLY_WS_PATH);
+	}	
 }

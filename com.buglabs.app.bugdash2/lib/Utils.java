@@ -19,8 +19,6 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.Cookie;
 
-import com.buglabs.app.bugdash2.WebAdminSettings;
-
 
 /**
  * Network utilities -- provided by jconnolly 

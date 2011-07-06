@@ -2,14 +2,7 @@ package com.buglabs.common.tests.junit;
 
 import junit.framework.TestCase;
 
-import com.buglabs.application.AbstractServiceTracker;
-import com.buglabs.application.AbstractServiceTracker2;
 import com.buglabs.application.IDesktopApp;
-import com.buglabs.application.IServiceProvider;
-import com.buglabs.application.MainApplicationThread;
-import com.buglabs.application.RunnableWithServices;
-import com.buglabs.application.ServiceChangeListener;
-import com.buglabs.application.ServiceTrackerHelper;
 import com.buglabs.device.ButtonEvent;
 import com.buglabs.device.IButtonEventListener;
 import com.buglabs.device.IButtonEventProvider;
@@ -31,16 +24,15 @@ import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.PublicWSProviderWithParams;
 import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.Base64;
-import com.buglabs.util.BugBundleConstants;
-import com.buglabs.util.ConfigAdminUtil;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.OSGiServiceLoader;
-import com.buglabs.util.RemoteOSGiServiceConstants;
-import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.ServiceFilterGenerator;
-import com.buglabs.util.XmlNode;
-import com.buglabs.util.XmlParser;
-import com.buglabs.util.XpathQuery;
+import com.buglabs.util.osgi.BUGBundleConstants;
+import com.buglabs.util.osgi.ConfigAdminUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.OSGiServiceLoader;
+import com.buglabs.util.osgi.FilterUtil;
+import com.buglabs.util.osgi.ServiceTrackerHelper;
+import com.buglabs.util.xml.XmlNode;
+import com.buglabs.util.xml.XmlParser;
+import com.buglabs.util.xml.XpathQuery;
 import com.buglabs.util.simplerestclient.BasicAuthenticationConnectionProvider;
 import com.buglabs.util.simplerestclient.DefaultConnectionProvider;
 import com.buglabs.util.simplerestclient.FormFile;
@@ -65,14 +57,7 @@ public class ClassAvailableTests extends TestCase {
 	}
 
 	public void testPackageApplication() {
-		testClass(AbstractServiceTracker.class);
-		testClass(AbstractServiceTracker2.class);
-		testClass(IDesktopApp.class);
-		testClass(IServiceProvider.class);
-		testClass(MainApplicationThread.class);
-		testClass(RunnableWithServices.class);
-		testClass(ServiceChangeListener.class);
-		testClass(ServiceTrackerHelper.class);
+		testClass(IDesktopApp.class);	
 	}
 
 	public void testPackageModule() {
@@ -103,15 +88,19 @@ public class ClassAvailableTests extends TestCase {
 
 
 	public void testPackageUtil() {
-		testClass(Base64.class);
-		testClass(BugBundleConstants.class);
+		testClass(Base64.class);	
+	}
+	
+	public void testPackageUtilOSGi() {
+		testClass(BUGBundleConstants.class);
 		testClass(ServiceTrackerHelper.class);
 		testClass(ConfigAdminUtil.class);
 		testClass(LogServiceUtil.class);
 		testClass(OSGiServiceLoader.class);
-		testClass(RemoteOSGiServiceConstants.class);
-		testClass(SelfReferenceException.class);
-		testClass(ServiceFilterGenerator.class);
+		testClass(FilterUtil.class);		
+	}
+	
+	public void testPackageUtilXml() {	
 		testClass(XmlNode.class);
 		testClass(XmlParser.class);
 		testClass(XpathQuery.class);

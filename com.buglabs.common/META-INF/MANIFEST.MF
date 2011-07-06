@@ -13,6 +13,7 @@ Import-Package:
  org.apache.commons.io
 Export-Package: 
  com.buglabs.application,
+ com.buglabs.bug.sysfs,
  com.buglabs.device,
  com.buglabs.menu,
  com.buglabs.module,
@@ -22,6 +23,5 @@ Export-Package:
  com.buglabs.support,
  com.buglabs.util,
  com.buglabs.util.osgi,
- com.buglabs.util.xml,
  com.buglabs.util.simplerestclient,
- com.buglabs.bug.sysfs
+ com.buglabs.util.xml

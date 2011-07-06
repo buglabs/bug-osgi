@@ -14,7 +14,8 @@ Import-Package:
  com.buglabs.services.ws,
  com.buglabs.status,
  com.buglabs.bug.module.pub,
- com.buglabs.util,
+ com.buglabs.util.xml,
+ com.buglabs.util.osgi,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.vonhippel,
  gnu.io

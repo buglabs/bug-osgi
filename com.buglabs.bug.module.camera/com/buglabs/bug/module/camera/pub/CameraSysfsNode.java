@@ -3,7 +3,6 @@ package com.buglabs.bug.module.camera.pub;
 import java.io.File;
 
 import com.buglabs.bug.sysfs.BMIDevice;
-import com.buglabs.bug.sysfs.BMIDeviceNodeFactory;
 
 /**
  * A work-in-progress for sysfs class for java clients for the Camera BMI module.

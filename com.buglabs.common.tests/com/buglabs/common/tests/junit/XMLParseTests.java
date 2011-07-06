@@ -5,9 +5,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.buglabs.util.XmlNode;
-import com.buglabs.util.XmlParser;
-import com.buglabs.util.XpathQuery;
+import com.buglabs.util.xml.XmlNode;
+import com.buglabs.util.xml.XmlParser;
+import com.buglabs.util.xml.XpathQuery;
 
 /**
  * Test the xml parser.

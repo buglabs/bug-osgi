@@ -22,22 +22,36 @@
 
 package com.buglabs.osgi.sewing;
 
+import java.util.Map;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.http.HttpService;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.osgi.sewing.servicetracker.SewingServiceTracker;
-import com.buglabs.util.ServiceFilterGenerator;
+import com.buglabs.osgi.sewing.pub.ISewingService;
+import com.buglabs.util.osgi.FilterUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.ServiceTrackerHelper;
+import com.buglabs.util.osgi.ServiceTrackerHelper.ManagedInlineRunnable;
 
 /**
  * BundleActivator for Sewing.
  * 
  */
-public class Activator implements BundleActivator {
+public class Activator implements BundleActivator, ManagedInlineRunnable {
 
-	private SewingServiceTracker stc;
-	private ServiceTracker st;
+	private HttpService httpService;
+	private LogService log;
+	private BundleContext context;
+	private ServiceRegistration<?> sewingRegistration;
+	private ServiceTracker stc;
+
+	//private SewingServiceTracker stc;
+	//private ServiceTracker st;
 
 	/*
 	 * (non-Javadoc)
@@ -46,12 +60,11 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
+		this.context = context;
 		LogManager.setContext(context);
+		log = LogServiceUtil.getLogService(context);
 		// Create the service tracker and run it.
-		stc = new SewingServiceTracker(context);
-		Filter f = context.createFilter(ServiceFilterGenerator.generateServiceFilter(stc.getServices()));
-		st = new ServiceTracker(context, f, stc);
-		st.open();
+		stc = ServiceTrackerHelper.openServiceTracker(context, HttpService.class.getName(), this);		
 	}
 
 	/*
@@ -61,7 +74,20 @@ public class Activator implements BundleActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		stc.stop();
-		st.close();
+		stc.close();
+	}
+
+	@Override
+	public void run(Map<Object, Object> services) {
+		httpService = (HttpService) services.get(HttpService.class.getName());
+		sewingRegistration = context.registerService(ISewingService.class.getName(), new SewingServiceImpl(httpService), null);
+	}
+
+	@Override
+	public void shutdown() {
+		if (sewingRegistration != null) {
+			sewingRegistration.unregister();
+			sewingRegistration = null;
+		}
 	}
 }
