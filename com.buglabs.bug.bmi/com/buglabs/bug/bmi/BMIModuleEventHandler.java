@@ -163,5 +163,4 @@ public class BMIModuleEventHandler {
 			logService.log(LogService.LOG_ERROR, sw.getBuffer().toString());
 		}
 	}
-
 }

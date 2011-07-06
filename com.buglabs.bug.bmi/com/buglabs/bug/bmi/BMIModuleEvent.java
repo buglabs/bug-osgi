@@ -58,17 +58,17 @@ public class BMIModuleEvent {
 	private BMIDevice bmiDevice;
 
 	/**
-	 * @param raw
+	 * @param raw raw event string
 	 */
 	public BMIModuleEvent(String raw) {
 		this.raw = raw;
 	}
 
 	/**
-	 * @param moduleId
-	 * @param version
-	 * @param slot
-	 * @param event
+	 * @param moduleId id of module (product id)
+	 * @param version module revision
+	 * @param slot slot index
+	 * @param event type of event
 	 */
 	public BMIModuleEvent(String moduleId, String version, int slot, EVENT_TYPE event) {
 		this.moduleId = moduleId;
@@ -78,8 +78,8 @@ public class BMIModuleEvent {
 	}
 	
 	/**
-	 * @param device
-	 * @param slot
+	 * @param device sysfs device
+	 * @param slot slot number, overrides value in device.
 	 */
 	public BMIModuleEvent(BMIDevice device, int slot) {
 		this.moduleId = device.getProductId();
@@ -89,7 +89,7 @@ public class BMIModuleEvent {
 	}
 	
 	/**
-	 * @param device
+	 * @param device sysfs device
 	 */
 	public BMIModuleEvent(BMIDevice device) {
 		this.moduleId = device.getProductId();
