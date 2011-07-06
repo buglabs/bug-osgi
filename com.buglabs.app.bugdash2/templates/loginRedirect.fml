@@ -1,0 +1,11 @@
+<script type="text/javascript">
+if("${redirect}" == "login")
+{
+	this.window.location = "/admin/login";
+}
+else
+{
+	this.window.location = "/admin";
+}
+</script>
+redirecting...

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BUG JNI Accelerometer
+Bundle-SymbolicName: com.buglabs.bug.jni.accelerometer
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Import-Package: com.buglabs.bug.jni.common
+Export-Package: com.buglabs.bug.jni.accelerometer,
+ com.buglabs.bug.accelerometer.pub
+Bundle-NativeCode: lib/libAccelerometer.so;
+ osname=linux; processor=armv7l

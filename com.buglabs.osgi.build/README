@@ -1,0 +1,98 @@
+This package contains the scripts for building Bug Labs java end-user tools.
+
+com.buglabs.bug.emulator.xml
+	The Virtual Bug and module emulation packages
+
+com.buglabs.dragonfly.xml
+	The BUG SDK Eclipse plug-in. 
+	Depends on com.buglabs.bug.emulator and will build it if it doesn't find it.
+	
+com.buglabs.osgi.concierge.xml
+	Concierge, the light OSGi runtime for BUG
+	
+com.buglabs.sdk.xml
+	The all of the above wrapped up with Eclipse for instant install.
+	Currently uses Eclipse 3.5 and builds for all platforms, linux, windows, mac
+	NOTE: This build requires versions of eclipse in a certain format (zipped) 
+		in certain folders on the build machine, usually the builder's home dir.
+		See below for more info
+		
+		
+Prerequisites
+
+* linux build machine
+* eclipse v3.5 as a tarball file called eclipse-lin.tar.gz in ~/com.eclipse.sdk/ on build machine
+* other versions of eclipse for full sdk build.  See notes below for more info.
+* ant-contrib & svnant -- See common.xml where it loads these tasks to see where it looks.
+
+
+Preparing to build
+
+You must do a couple of things in the dragonfly bundles to prepare for a new build
+* Set the build number
+** Modify com.buglabs.feature/feature.xml, com.buglabs.dragonfly.ui/META-INF/MANIFEST.MF, and com.buglabs.dragonfly.updatesite/site.xml
+** The easiest way to find where to update the version number is to do a search for the current version on all the files in eclipse.
+** Change build number the default.properties file, see below  
+* Modify about.properties in com.buglabs.dragonfly.ui
+** Set correct version number to M.m
+** Update the release notes link
+* Modify the properties files in the com.buglabs.build (this) project
+** Modify default.properties to set the correct version number for the different components you are building against
+** Modify the system.<build.level>.properties file for the build level you are working on
+*** Make sure the svn.url.* properties are correct in the build level properties file
+* Check in all changes
+
+Integration Build:
+Integration builds are run from trunk, so svn.url.dragonfly=svn://svn.buglabs.net/dragonfly/trunk
+
+Testing Build:
+Test builds are run from a testing branch
+* After a successful build and smoke-test of an integration build, create a testing branch
+* A testing build should be run against a testing branch, so in system.testing.properties, you should see: svn.url.dragonfly=svn://svn.buglabs.net/dragonfly/branches/testing
+* During a testing cycle, the revision (Major.minor.revision) number is incremented for consecutive test builds.
+
+Production Buld:
+Production builds run from a release tag, i.e. - svn://svn.buglabs.net/dragonfly/tags/releases/1.5.2
+* It is typical to create the tag from the final testing branch (the one that passed QA).  
+* This production build tag likely have the same M.m.r number as the passing testing branch
+
+
+How to build
+
+* Check out build project: svn co svn://svn.buglabs.net/dragonfly/trunk/com.buglabs.build and cd into the dir
+* run and like this: ant -Dbuild.level=[integration, testing, or production] -f [build.xml file]
+** For Example: ant -Dbuild.level=integration -f com.buglabs.sdk.xml
+* build files are created in the artifacts directory
+
+
+Set up of Eclipse installs for one-click build (com.buglabs.sdk.xml)
+
+If you run a full sdk build, i.e. ant -Dbuild.level=integration -f com.buglabs.sdk.xml you need to have the different platform eclipse installs ready on the build machine
+You can see an example of this setup on darner at /home/bballantine (all the dirs begin w/ com.eclipse.sdk)
+* First download all the installs for the platforms we are supporting. Currently, we are dealing only w/ 32 bit versions of Eclipse.
+* Unzip the eclipse download
+* Create a folder in the eclipse/dropins directory called GEF
+* Inside GEF, create features and plugins directories
+* Copy the GEF features and plugins files into the correct directory
+* Copy the launcher scripts (found in this project) into the root of each directory (.sh is linux, .command is os x, and .bat is windows)
+* Zip up the modified eclipse install using the following naming convension:
+** For Linux: eclipse-lin.tar.gz
+** For Windows: eclipse-win.tar.gz
+** For OS X: eclipse-mac.tar.gz
+* Create directories to put these eclipse bundles
+** com.eclipse.sdk.lin, com.eclipse.sdk.mac, com.eclispe.sdk.win
+** Add the tarballs into the proper directory and put these in the home directory of the root machine
+* Finally you need a default eclipse install to build against
+** The best way to do this is just to copy com.eclipse.sdk.lin and name it com.eclipse.sdk
+** i.e. cp -r com.eclipse.sdk.lin com.eclipse.sdk
+ 
+
+Deploying a build to buglabs.net/sdk page (newkeds)
+
+There is a combination of scripts that do this.  On the build machine, scp-publish, and on the server, setup_sdk_dirs.rb
+setup_sdk_dirs currently sits on newkeds in the /home/web/ directory and that is where scp-publish expects it
+Both files can be found in thie com.buglabs.build (this) project
+* run ./scp-publish <build.level>
+** build.level should be integration, testing, production
+** NOTE 1: that we no longer have an ssh key on darner, so you need to type in a password a couple times when doing this.  It's a real pain so I suggest setting up the ssh key.
+** NOTE 2: ./scp-publish production uploads all three full installs, which takes FOREVER!

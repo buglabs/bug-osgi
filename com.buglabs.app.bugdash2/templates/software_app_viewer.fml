@@ -1,0 +1,75 @@
+<include "header">
+<style>
+	body {background-color:#fff}
+</style>
+<table style="width:99%">
+<tr>
+	<td colspan="2"><h3><a href="${url}" target="_bugnet" class="quiet">${title}</a></h3></td>
+</tr>
+<tr>
+	<td style="width:250px;">
+		<img src="${screenshot}" class="medium polaroid" /><br />
+		<!-- modules used -->
+		<div style="padding-top:10px">
+		${modules}
+		</div>
+	</td>
+	<td style="padding-left:10px;">
+		<b>${createdAtFormatted}</b><br />
+		<span class="quiet">${download} downloads</span><br />
+		<if rating != "">
+			${rating} out of 5.0
+			<br />
+		</if>
+		
+		<hr class="subtle" />
+
+		Administrators: 
+		<if admins == "">
+			<span class="quiet">not specified</span> 
+		<else>
+			${admins} 
+		</if>
+		<br />
+		
+		<if collaborators != "">
+			Collaborators: 
+			${collaborators} 
+			<br />
+		</if>		
+		
+		<hr class="subtle" />
+		
+		<span class="label">Category:</span>
+		<if category == "">
+			<span class="quiet">not specified</span> 
+		<else> 
+			${category} 
+		</if>
+		&nbsp;&nbsp;&nbsp;
+		<span class="label">Maturity:</span> 
+		<if maturity == "">
+			<span class="quiet">not specified</span> 
+		<else> 
+			${maturity} 
+		</if>
+		<br />
+		 
+		<span class="label">API version:</span> 
+		<if apiVersion == "">
+			<span class="quiet">not specified</span> 
+		<else> 
+			${apiVersion} 
+		</if>		
+		<br />
+	</td>
+</tr>
+<tr>
+	<td colspan="2">
+		<div style="height: 140px; overflow-y: auto; padding: 10px 5px;">
+		${description}
+		</div>	
+	</td>
+</tr>
+</table>
+<include "footer">

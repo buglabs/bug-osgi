@@ -1,0 +1,47 @@
+<include "header">
+<h1>View logs</h1>
+
+<script type="text/javascript">
+	var logs = new Array(); 
+	// register unload event here-- stop all threads 
+	$(window).unload( function () { 
+		parent.log_cleanup(logs);
+	} );
+</script>
+<div class="main">
+<table style="width:750px;">
+	<thead>
+		<tr>
+			<th style="width:20%">&nbsp;</th>
+			<th style="width:35%">Path</th>
+			<th style="width:30%">Last updated</th>
+			<th style="width:15%">Size</th>
+		</tr>
+	</thead>
+	<tbody>
+	<foreach log in logs_list>
+		<tr>
+			<td class="nowrap">${log.description}</td>
+			<td><a href="javascript:void(0);" onclick="log_${log.key}.open();">${log.path}</a></td>
+			<td>${log.updatedAt}</td>
+			<td>${log.size/1000} KB</td>
+		</tr>	
+		<tr>
+			<td colspan="4">
+				<div id="log_reader_${log.key}" class="reader" style="display:none;">
+					<div class="menu"></div>
+					<div class="message"></div>
+				</div>
+			</td>
+		</tr>			
+		<script type="text/javascript">
+			var log_${log.key} = new BL.BUGdash.LogViewer();
+			log_${log.key}.init('${log.key}', 'log_reader_${log.key}', '{log.path}'); 
+			logs.push(log_${log.key});
+		</script>
+	</foreach>
+	</tbody>
+</table>
+</div>
+
+<include "footer">

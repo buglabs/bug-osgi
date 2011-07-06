@@ -1,0 +1,151 @@
+<include "header">
+<style>
+	div.module {float:none; height:auto; width:auto; margin:0px;}
+	table.general tbody tr td.title div.name { width: 200px; overflow:hidden;}
+</style>
+<script type="text/javascript">
+	// not used 
+	function refresh_modules() {
+		$.ajax({
+			url: "/admin_util/task?task=display_modules",
+			cache: false, 
+			success: function(text) {
+				var modules = eval('('+text+')');
+				var icon; 
+				$('#span_modules').text('');
+				jQuery.each(modules, function(index,item) {
+					icon = $('<img src="/admin.images/module_' + item.toLowerCase() + '.jpg" />&nbsp;'); 
+					icon.appendTo($('#span_modules'));				
+				});
+			},
+			error: function() {
+			}
+		}); 		
+	}
+
+	$(function() {
+		$('.module').corner('7px tl'); 		
+		if (parent.manager) {
+		  parent.manager.paging.result_count = ${result_count};
+		  parent.manager.paging.page_size = ${page_size};
+		  parent.manager.paging.page = ${page};
+	  }
+	});
+</script>
+
+<if connected == "true">
+
+<div class="module">
+	<div class="content" style="padding:0px;">
+		<table>
+			<tbody>
+			<tr class="header">
+				<form action="" method="get" onsubmit="return false;">
+				<td class="nowrap">Browse apps</td>
+				<td class="small nowrap" style="padding-top:13px;">
+					<if page gt 1 > 
+						<a href="javascript:void(0);" onclick="parent.manager.prevPage();">Prev</a> 
+					</if>&nbsp;
+					${page} of ${last_page} &nbsp;
+					<if last_page != page >
+						<a href="javascript:void(0);" onclick="parent.manager.nextPage();">Next</a>
+					</if>	
+				</td>
+				<td class="small nowrap" style="padding-top:9px;">
+					<input type="checkbox" name="chb_check_packages" id="chb_check_packages" onclick="parent.manager.filterPackages(this.checked);" <if filter_by_packages == "true">checked="true"</if> /><label for="chb_check_packages"> Display apps based<br /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on current modules</label>
+				</td>
+				<td class="small nowrap" style="padding-top:13px;"><span class="quiet" id="span_modules">${modules}</span></td>
+				<td style="padding-top:13px;"><input type="text" name="query" id="query" value="${search}" autocomplete="off" onKeyPress="BL.BUGdash.Utilities.checkEnter(event, function() {parent.manager.lookup($('#query')[0].value);});" /></td>
+				<td id="bugnet_count" style="background-color:#fc8252; vertical-align:middle;">${result_count}</td>
+				</form>	
+			</tr>
+			<tr>
+				<td colspan="6" style="padding:0px;">
+				
+	<!-- apps list starts here -->
+	<table class="general aligntop">
+		<thead>
+			<tr>
+				<th>&nbsp;</th>
+				<th>&nbsp;</th>
+				<th>Title</th>
+				<th>Author</th>
+				<th>Downloads</th>
+				<th>Rating</th>
+				<th>API</th>
+			</tr>
+		</thead>
+		<tbody>
+			<foreach app in apps_list>
+				<tr <if app.index%2==0 >class="alternate"</if> >
+					<td class="quieter center" style="padding: 5px 10px;">
+						${app.index}<br /><br />
+						<img src="/admin.images/download-icn.gif" alt="install" /><br />
+						<a href="javascript:void(0);" onclick="parent.manager.install('${app.title}');">Install</a>						
+					</td>
+					<td>
+						<a href="javascript:void(0);" onclick="parent.preview_app('${app.title}')"><img src="${app.thumbnail}" class="polaroid thumbnail" style="margin-bottom:20px;" /></a>
+					</td>
+					<td class="title">
+						<div class="name"><a href="javascript:void(0);" onclick="parent.preview_app('${app.title}')">${app.title}</a></div>
+						<if app.module_icons != "">${app.module_icons}<br /></if>
+						<div class="quiet fineprint">
+							<span class="program-category">&nbsp; </span>&nbsp; <if app.category != ""> ${app.category} <else> <span class="quieter">Category</span> </if>	<br />
+							<span class="program-maturity">&nbsp; </span>&nbsp; <if app.maturity != ""> ${app.maturity} <else> <span class="quieter">Maturity</span> </if>						
+						</div>
+					</td>
+					<td>${app.author}</td>
+					<td>${app.downloads}&nbsp;</td>
+					<td>${app.rating}&nbsp;</td>
+					<td>${app.api_version}&nbsp;</td>
+				</tr>
+			</foreach>	
+		</tbody>
+	</table>
+
+	<table>
+		<tr class="footer">
+			<td class="small" style="width:140px;">&nbsp;</td>
+			<td class="small nowrap">
+				<if page gt 1 > 
+					<a href="javascript:void(0);" onclick="parent.manager.prevPage();">Prev</a> 
+				</if>&nbsp;
+				${page} of ${last_page} &nbsp;
+				<if last_page != page >
+					<a href="javascript:void(0);" onclick="parent.manager.nextPage();">Next</a>
+				</if>	
+			</td>
+		</tr>
+	</table>
+
+	<!-- apps list ends here -->
+
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+	
+<else>
+	<div class="module">
+		<div class="content" style="padding:0px;">
+			<table>
+				<tbody>
+				<tr class="header">
+						<td class="nowrap">Browse apps</td>
+						<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div class="center"><br />No network connection</div>			
+					</td>
+				</tr>
+				</tbody>			
+			</table>			
+		</div>
+	</div>
+</if>
+
+<include "footer">

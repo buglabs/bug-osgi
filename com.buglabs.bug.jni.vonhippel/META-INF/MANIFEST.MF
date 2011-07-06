@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BUG JNI Von Hippel
+Bundle-SymbolicName: com.buglabs.bug.jni.vonhippel
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Import-Package: com.buglabs.bug.jni.common
+Export-Package: com.buglabs.bug.jni.vonhippel
+Bundle-NativeCode: /lib/libVonHippel.so;
+ osname=linux; processor=armv7l

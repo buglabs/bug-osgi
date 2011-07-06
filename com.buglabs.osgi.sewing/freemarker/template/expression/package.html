@@ -1,0 +1,25 @@
+<html>
+<head>
+</head>
+<body bgcolor="white">
+<p>The mechanics of FM-Classic expressions are implemented
+in this package. Expressions are represented as a syntax tree,
+of which each node implements the 
+{@link freemarker.template.expression.Expression} interface.
+Expressions can then be divided up in two ways:</p>
+<ul>
+<li>Parser symbols versus runtime expression elements, or</li>
+<li>Unary versus binary operators</li>
+</ul>
+<p>Runtime expression elements are a subset of the parser symbols.
+The special cases are the symbols generated for parenthesized
+operators. These are emitted by the parser in order for the
+{@link freemarker.template.expression.ExpressionBuilder} class 
+to generate the expression tree with the correct hierarchy.</p>
+<p>Other expression elements are either binary or unary operators,
+indicating how they should be associated with the operators around
+them. Operator precedence is handled by the 
+{@link freemarker.template.expression.ExpressionBuilder}
+when expressions are constructed.</p>
+</body>
+</html>

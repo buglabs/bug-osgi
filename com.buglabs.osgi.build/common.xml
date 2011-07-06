@@ -1,0 +1,36 @@
+<project name="common">
+    
+    <!-- properties cannot be changed, so load this first,
+        which overrides values in the default.properties file -->
+    <property file="system.${build.level}.properties" />
+    <property file="default.properties"/> 
+    <property name="base.build.dir" location="${basedir}" />
+    <property name="checkout.dir" location="${user.home}/checkout-${build.level}" />
+	
+	<property name="javacFailOnError" value="true" />
+	<property name="javacDebugInfo" value="on" />
+	<property name="javacVerbose" value="true" />
+	<property name="logExtension" value=".log" />
+	<property name="compilerArg" value="" />
+	<property name="javacSource" value="1.6" />
+	<property name="javacTarget" value="1.6" />
+    
+	<!-- Setup ant-contrib libraries -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+<!--
+		<classpath>
+			<pathelement location="/usr/share/ant/lib/ant-contrib-0.6.jar" />
+		</classpath>
+-->
+	</taskdef>
+    
+    <!-- add SVN task -->
+    <path id="svnant.classpath"  >
+        <fileset dir="/usr/share/ant/lib/svn/" >
+                <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+
+</project>

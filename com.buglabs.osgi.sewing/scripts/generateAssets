@@ -1,0 +1,6 @@
+#!/bin/sh
+mkdir templates
+mkdir images
+mkdir javascripts
+mkdir stylesheets
+mkdir includes

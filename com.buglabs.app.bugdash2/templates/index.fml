@@ -1,0 +1,167 @@
+<include "header">
+<script type="text/javascript">
+	// this is a test for stopping log threads
+	function log_cleanup(logs) {
+		for (var i=0; i<logs.length; i++) {
+			logs[i].unload(); 
+		}
+	}
+	function refresh_main_iframe(url) {
+		if (url) 
+			$('#iframe_main').attr('src', url);
+		else 
+			$('#iframe_main').attr('src', $('#iframe_main').attr('src'));
+	}
+	function checkInternetConnForNav() {
+		var CONNECTED 		= '<img class="led" src="/admin.images/online_LED.jpg" /> <a href="javascript:void(0);" onclick="checkInternetConnForNav();" title="Check internet connectivity">Online</a>'; 
+		var NOT_CONNECTED = '<img class="led" src="/admin.images/offline_LED.jpg" /> <a href="javascript:void(0);" onclick="checkInternetConnForNav();" title="Check internet connectivity">Offline</a>'; 
+		var MSG_CONNECTED = 'Good. You\'re connected.';
+		var MSG_NOT_CONNECTED = 'There\'s no network connectivity. You may not be able to use all features.';
+		$('#network_status').html('<img class="led" src="/admin.images/offline_LED.jpg" /> Connecting');
+		BL.BUGdash.Utilities.checkConnectivity(
+			function(text) {
+					var status = eval('('+text+')'); 
+					$('#network_status').html( (status && status.connected) ? CONNECTED : NOT_CONNECTED ); 	
+					if (status && status.connected) {
+						announcer.tell({category: 'info', message: MSG_CONNECTED, animate: true}, true);
+					} else {
+						announcer.tell({category: 'warning', message: MSG_NOT_CONNECTED, animate: true}, true);
+					}
+			},
+			function() {
+				$('#network_status').html(NOT_CONNECTED); 
+				announcer.tell({category: 'warning', message: MSG_NOT_CONNECTED, animate: true}, true);
+			}
+		);
+	}
+	var announcer = new BL.BUGdash.AnnouncementManager(); 
+	$(function() {
+		announcer.tell({category: 'info', message: 'Welcome!'}, true);	
+		checkInternetConnForNav();
+	});
+	
+</script>
+
+<noscript>
+	<div>It looks like JavaScript is turned off. The tool may not work properly.</div>
+</noscript>
+<table id="container" cellspacing="0" cellpadding="0" class="structure">
+<tbody>	
+<tr>
+	<td colspan="2"><div id="header"></div></td>
+</tr>
+<tr>
+	<td class="overview-status">&nbsp;</td>
+	<td class="status" style="padding:0px;">
+		<table class="structure" style="height:27px;">
+			<tr>
+				<td style="width:110px; padding-left:7px;">
+					<!-- online/offline -->
+					<div id="network_status"><img class="led" src="/admin.images/offline_LED.jpg" /> Connecting</div>
+				</td>
+				<td id="td_announce">
+					<!-- announcement -->
+					<div id="div_announcement" style="width:560px; position:relative; top:4px; left: 5px;"></div>
+				</td>
+				<td style="padding-left:5px;">
+					<div id="div_announce_more" style="position:relative; top:4px;"><a href="javascript:void(0);" onclick="announcer.toggle_history();">More</a>	<img src="/admin.images/statusbar-arrow_down.jpg" /></div>	
+				</td>
+			</tr>
+		</table>
+		<div id="div_announce_history">
+			<table id="table_announcement_history">
+				<tbody>
+					<tr></tr>
+				</tbody>
+			</table>
+		</div> 
+	</td>
+</tr>
+<tr>
+	<td>
+		<table id="menu"> 
+			<tbody>
+				<tr>
+					<td class="overview">&nbsp;</td>
+					<td>
+					<ul>
+						<if require_login == "true" >
+						<li style="margin-bottom:10px;"><a href="/admin/logout" style="font-size:12px;">Logout</a></li>
+						</if>					
+						<li><a class="title" href="/admin/dashboard" target="iframe_main">Overview</a></li>
+					</ul>
+					</td>
+				</tr>
+				<tr>
+					<td class="hardware">&nbsp;</td>
+					<td>
+						<h4>Hardware</h4>
+			    	<ul>
+			    		<li><a href="/admin_hardware/display_bugmodules" target="iframe_main">BUGmodules</a></li>
+			    		<li><a href="/admin_hardware/reboot" target="iframe_main">Reboot</a></li>
+			    	</ul>
+					</td>
+				</tr>			
+				<tr>
+					<td class="software">&nbsp;</td>
+					<td>
+						<h4>Software</h4>
+			    	<ul>
+			    		<li>
+			    			<a href="/admin_software/apps" target="iframe_main">BUG apps</a>
+			    		</li>			    	
+			    		<li>
+			    			<a href="javascript:void(0);" onclick="$('#ul_ipkg').toggle();">ipkg</a>
+			    			<ul style="display:none" id="ul_ipkg">
+			    				<li><a href="/admin_software/install_package" target="iframe_main">Install</a></li>
+			    				<li><a href="/admin_software/display_installed_packages" target="iframe_main">Installed</a></li>
+			    				<li><a href="/admin_software/introduce_package_update" target="iframe_main">Upgrade</a>&nbsp;&nbsp;&nbsp;</li>
+			    			</ul>
+			    		</li>
+			    	</ul>
+					</td>
+				</tr>							
+				<tr>
+					<td class="system">&nbsp;</td>
+					<td>
+						<h4>System</h4>
+			    	<ul>
+		          <li><a href="/admin_system/display_system_info" target="iframe_main">System Info</a></li>	    	
+			    		<li><a href="/admin_system/display_logs" target="iframe_main">Logs</a></li>
+			    		<li><a href="/admin_system/manage_configuration" target="iframe_main">Configuration</a></li>
+			    		<!-- <li><a href="/admin_system/ipv6_setup" target="iframe_main">IPv6 Setup</a></li> -->
+			    		<!-- <li><a href="/admin_system/rename_device" target="iframe_main">Rename Device</a></li> -->
+			    		<li><a href="/admin_system/login" target="iframe_main">Dash Login</a></li>
+			    		<li><a href="/admin_system/fileBrowser" target="iframe_main">File Browser</a></li>
+			    		<li><a href="/admin_system/display_datetime" target="iframe_main">Date/Time</a></li>			    		
+			    	</ul>
+					</td>
+				</tr>	
+				<!--
+				<tr>
+					<td class="bugnet">&nbsp;</td>
+					<td>
+						<h4>BUGnet</h4>
+						<ul>
+			    		<li><a href="/admin_bugnet/bugswarm" target="iframe_main">BUGswarm</a></li>		
+						</ul>
+					</td>
+				</tr>		
+				-->
+				<tr>
+					<td colspan="2" class="menu-footer">&nbsp;</td>
+				</tr>			
+				<tr>
+					<td colspan="2" style="background-color:#e9e9e9;padding:5px 0px;"><img src="/admin.images/optimized_for_ff.gif" style="width:136px; height:26px;" /></td>
+				</tr>
+			</tbody>
+		</table>		
+	</td>
+	<td style="width:100%; height:100%; padding-left:40px;">
+		<iframe name="iframe_main" id="iframe_main" src="/admin/dashboard" style="width:100%; height:100%;"></iframe>
+	</td>
+</tr>
+</tbody>
+</table>
+
+<include "footer">

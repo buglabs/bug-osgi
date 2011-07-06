@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-Name: com.buglabs.osgi.tester
+Bundle-Activator: com.buglabs.osgi.tester.Activator
+Bundle-SymbolicName: com.buglabs.osgi.tester
+Bundle-Version: 2.0.0
+Import-Package: 
+ org.osgi.framework,
+ junit.extensions,
+ junit.framework,
+ junit.runner,
+ junit.textui

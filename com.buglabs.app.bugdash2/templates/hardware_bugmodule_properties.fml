@@ -1,0 +1,52 @@
+<include "header">
+<script>
+$(function() {
+	$("#div_mod_properties").corner("5px");
+});
+</script>
+<style>
+	#div_mod_properties {background-color:#444; width:370px;}
+	#tbl_mod_properties {width:100%;}
+	#tbl_mod_properties tbody tr th {color:#fff; text-align:center; border-bottom:1px solid #999;}
+	#tbl_mod_properties tbody tr td {color:#fff; padding: 4px 7px 3px 7px;}
+	#tbl_mod_properties tbody tr.header td {color:#ccc;}
+	.readonly {color:#666;}
+</style>
+
+<h3>${module_name}</h3>
+
+<form action="" method="post" enctype="multipart/form-data">
+<input type="hidden" name="slot" value="${slot}" />
+<div id="div_mod_properties">
+<table id="tbl_mod_properties" border="1">
+	<tr>
+		<th colspan="3">Module Properties</th>
+	</tr>
+	<tr class="header">
+		<td>Name</td>
+		<td>Value</td>
+		<td>Type</td>
+	</tr>
+	<foreach prop in properties_list>
+		<tr>
+			<td>${prop.name}</td>
+			<if prop.isMutable>
+				<td>
+					<input type="text" name="${prop.name}" value="${prop.value}" />
+					<input type="hidden" name="name" value="${prop.name}" />
+					<input type="hidden" name="type" value="${prop.type}" />
+				</td>
+			<else>
+				<td><input type="text" value="${prop.value}" readonly="true" class="readonly" /></td>
+			</if>
+			<td>${prop.type}</td>
+		</tr>
+	</foreach>
+	<tr>
+		<td></td>
+		<td colspan="2"><input type="submit" value="Save" class="submit-small" /></td>
+	</tr>
+</table>
+</form>
+</div>
+<include "footer">

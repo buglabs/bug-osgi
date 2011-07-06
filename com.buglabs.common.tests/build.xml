@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project name="com.buglabs.common.tests" basedir=".">
+	<!-- PROJECT CONSTANTS -->
+	<property name="package.version" value="2.5" />
+
+	<!-- JUnit tests -->
+	<property name="report.src" location="." />
+
+	<!-- OSGi tests -->
+	<property name="testBundles" value="
+			file:${externalDirectory}/${configadmin.jar.name}
+			file:${externalDirectory}/${junit.jar.name}
+			file:${externalDirectory}/${log.jar.name}
+			file:${externalDirectory}/com.buglabs.osgi.tester.jar
+			file:${distDirectory}/com.buglabs.common.jar
+			file:${distDirectory}/com.buglabs.common.tests.jar
+			">
+	</property>
+
+	<!-- PROJECT IMPORTS -->
+	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
+	<import file="${common.ant.file}" />
+</project>

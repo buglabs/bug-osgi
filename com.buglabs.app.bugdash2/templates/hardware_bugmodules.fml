@@ -1,0 +1,45 @@
+<include "header">
+<h1>BUGmodules &nbsp;<a href="/admin_hardware/display_bugmodules" style="font-size:14px; font-weight:normal;" class="secondary">Refresh</a></h1> 
+
+<script>
+$(function() {
+	<if modules_hash.slot0 != "">$('.mod-slot0').show();</if>
+	<if modules_hash.slot1 != "">$('.mod-slot1').show();</if>
+	<if modules_hash.slot2 != "">$('.mod-slot2').show();</if>
+	<if modules_hash.slot3 != "">$('.mod-slot3').show();</if>
+});
+function display_properties(slot) {
+	$("#iframe_properties").attr('src', "/admin_hardware/display_bugmodule_properties?slot=" + slot);
+}
+</script>
+
+<style>
+	.figure {position:absolute;}
+	.base {top:130px; left: 60px; width:384px; height:156px; z-index: 5;}
+	.module {width:249px; height:107px; display:none;}
+	.mod-slot0 {top:101px; left: 60px; z-index: 5; }
+	.mod-slot1 {top:141px; left: 193px; z-index: 5; }
+	.mod-slot2 {top:170px; left: 60px; z-index: 3; }
+	.mod-slot3 {top:212px; left: 195px; z-index: 3; }
+	div.label {position:absolute; z-index: 7; }
+	div.label span.label { color:#333; }
+	div.label span.module { font-weight:bold; }
+	.lb-slot0 {top:100px; left: 20px;}
+	.lb-slot1 {top:120px; left: 310px;}
+	.lb-slot2 {top:260px; left: 20px;}
+	.lb-slot3 {top:320px; left: 280px;}
+	#iframe_properties {position:absolute; top:50px; left: 500px; height: 600px; width: 375px;}
+</style>
+<div class="main">
+	<img src="/admin.images/base.png" class="figure base" />
+	<img src="/admin.images/module.png" class="figure module mod-slot0" />		
+	<img src="/admin.images/module.png" class="figure module mod-slot1" />	
+	<img src="/admin.images/module.png" class="figure module mod-slot2" />	
+	<img src="/admin.images/module.png" class="figure module mod-slot3" />	
+	<div id="div_label0" class="label lb-slot0"><span class="label">Slot 0: </span><if modules_hash.slot0 != ""><a href="javascript:void(0);" onclick="display_properties(0)">${modules_hash.slot0}</a><else><span class="quiet">empty</span></if></div>
+	<div id="div_label0" class="label lb-slot1"><span class="label">Slot 1: </span><if modules_hash.slot1 != ""><a href="javascript:void(0);" onclick="display_properties(1)">${modules_hash.slot1}</a><else><span class="quiet">empty</span></if></div>
+	<div id="div_label0" class="label lb-slot2"><span class="label">Slot 2: </span><if modules_hash.slot2 != ""><a href="javascript:void(0);" onclick="display_properties(2)">${modules_hash.slot2}</a><else><span class="quiet">empty</span></if></div>
+	<div id="div_label0" class="label lb-slot3"><span class="label">Slot 3: </span><if modules_hash.slot3 != ""><a href="javascript:void(0);" onclick="display_properties(3)">${modules_hash.slot3}</a><else><span class="quiet">empty</span></if></div>
+</div>
+<iframe id="iframe_properties"></iframe>
+<include "footer">

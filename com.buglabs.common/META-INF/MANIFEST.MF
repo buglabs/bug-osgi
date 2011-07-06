@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG Common Bundle
+Bundle-SymbolicName: com.buglabs.common
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Bundle-ManifestVersion: 2
+Import-Package: 
+ org.osgi.framework,
+ org.osgi.service.cm;resolution:=optional,
+ org.osgi.util.tracker,
+ org.osgi.service.log,
+ org.sprinkles,
+ org.apache.commons.io
+Export-Package: 
+ com.buglabs.bug.sysfs,
+ com.buglabs.device,
+ com.buglabs.osgi.shell,
+ com.buglabs.services.ws,
+ com.buglabs.support,
+ com.buglabs.util,
+ com.buglabs.util.osgi,
+ com.buglabs.util.simplerestclient,
+ com.buglabs.util.ui,
+ com.buglabs.util.xml

@@ -1,0 +1,91 @@
+<include "header">
+<h1>Installed packages</h1>
+
+<div class="main" style="width:670px; float:left;">
+	<div style="float:right; padding-bottom:10px;">
+		<form name="frm" method="get" action="" onsubmit="return false">
+			<span id="span_result_count"></span>&nbsp;
+			<input type="text" name="search" id="search" onKeyPress="BL.BUGdash.Utilities.checkEnter(event, function() {lookup($('#search')[0].value)});" /> <input type="button" onclick="lookup($('#search')[0].value);" value="search" class="submit-small" />
+		</form>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th>&nbsp;</th>
+				<th>Package</th>
+				<th>Version</th>
+				<th>Dependency</th>
+			</tr>
+		</thead>
+		<tbody>
+		<foreach package in packages>
+			<tr class="row">
+				<td class="quieter align-right">${package.index}<br /></td>
+				<td> 
+					<a name="${package.name}" ></a>
+					${package.name}<br />
+					<span class="quieter">${package.architecture}</span>
+				</td>
+				<td><div style="width:150px; overflow:hidden;">${package.version}</div></td>
+				<td class="dependency">${package.dependency}&nbsp;</td>
+			</tr>
+		</foreach>
+		</tbody>
+	</table>
+
+</div>
+<script type="text/javascript">
+	// after it finishes loading, go thru dependency list and create a link 
+	// this is messy.. clean this up later.. 	
+	var content, ps, result, pi; 
+	$(function() {
+		jQuery.each($('.dependency'), function(index, item) {
+			content = item.innerHTML;
+			if (content != "&nbsp;") {  
+				ps = content.split(',');
+				result = ''; 
+				jQuery.each(ps, function(i0, p) {
+					pi = $.trim(p).split('(');
+					if (pi.length > 1) 
+						result += "<a href='#" + pi[0] + "'>" + pi[0] + "</a> (" + pi[1];
+					else 
+						result += "<a href='#" + pi[0] + "'>" + pi[0] + "</a>";
+					if (i0 < ps.length-1) {
+						result += ", ";
+					}
+				});
+				item.innerHTML = result; 
+			}
+		});
+	});
+	
+	
+	function lookup(term) {
+		$('.hilite').attr('class','');
+
+		var re = new RegExp('('+term+')','gi');
+		b = document.body.innerHTML;
+		b = b.replace(re,'<span class=\'hilite\'>$1</span>');
+		document.body.innerHTML=b;
+		
+		var items = $('.hilite'); 
+		$('#span_result_count').text(items.length + ' found');
+		if (items[0]) { 
+			scrollToElement(items[0]); 
+		}
+	}
+	
+	function scrollToElement(theElement){
+  	var selectedPosX = 0;
+ 	 	var selectedPosY = 0;
+  	while(theElement != null){
+    	selectedPosX += theElement.offsetLeft;
+    	selectedPosY += theElement.offsetTop;
+    	theElement = theElement.offsetParent;
+  	}
+ 		window.scrollTo(selectedPosX,selectedPosY);
+	}
+	
+</script>
+
+<include "footer">

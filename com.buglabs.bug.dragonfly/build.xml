@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<project name="com.buglabs.bug.dragonfly" basedir=".">
+	<!-- PROJECT CONSTANTS -->
+	
+	<!-- PROJECT IMPORTS -->
+	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
+	<import file="${common.ant.file}" />
+</project>
