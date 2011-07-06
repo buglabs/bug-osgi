@@ -44,7 +44,6 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIModuleEvent;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
 import com.buglabs.bug.sysfs.BMIDevice;
@@ -137,7 +136,7 @@ public class Activator implements BundleActivator, ServiceListener {
 		context.removeServiceListener(this);
 		stopModlets(activeModlets.values());
 		if (pipeReader != null) {
-			pipeReader.cancel();
+			pipeReader.shutdown();
 			pipeReader.interrupt();
 			logService.log(LogService.LOG_DEBUG, "Deleting pipe " + pipeFilename);
 			destroyPipe(new File(pipeFilename));
@@ -158,7 +157,7 @@ public class Activator implements BundleActivator, ServiceListener {
 			logService.log(LogService.LOG_DEBUG, "(coldplug) Initializing existing modules.");
 			for (BMIDevice bmiMessage : devices) {
 				logService.log(LogService.LOG_DEBUG, "Registering existing module with message: " + bmiMessage.toString());
-				eventHandler.processMessage(new BMIModuleEvent(bmiMessage));
+				eventHandler.handleEvent(new BMIModuleEvent(bmiMessage));
 			}
 		} else {
 			logService.log(LogService.LOG_DEBUG, "(coldplug) Not registering existing modules, none found.");

@@ -34,31 +34,45 @@ import java.io.IOException;
 
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIModuleEvent;
-
 /**
- * This class listens to a pipe for events from Hotplug.  These events are passed to the BMIManager.
+ * This class listens to a pipe for events from Hotplug. These events are passed
+ * to the BMIManager.
+ * 
  * @author kgilmer
- *
+ * 
  */
 public class PipeReader extends Thread {
+	/**
+	 * Special input message that will cause the reader Thread to shutdown.
+	 */
 	private static final String POISON_PILL = "exit\n";
 
-	private volatile FileInputStream ifs = null;
+	private volatile FileInputStream stream = null;
 
 	private final String pipeFilename;
 
-	private final BMIModuleEventHandler manager;
+	private final BMIModuleEventHandler eventHandler;
 
 	private final LogService logService;
 
-	public PipeReader(String pipeFilename, BMIModuleEventHandler manager, LogService logService) {
+	/**
+	 * @param pipeFilename
+	 *            absolute path to pipe file
+	 * @param eventHandler
+	 *            reference to event handler
+	 * @param logService
+	 *            reference to log service
+	 */
+	public PipeReader(String pipeFilename, BMIModuleEventHandler eventHandler, LogService logService) {
 		this.pipeFilename = pipeFilename;
-		this.manager = manager;
+		this.eventHandler = eventHandler;
 		this.logService = logService;
 	}
 
-	public void cancel() {
+	/**
+	 * Shutdown reader thread.
+	 */
+	public void shutdown() {
 
 		try {
 			FileOutputStream fos = new FileOutputStream(pipeFilename);
@@ -69,34 +83,41 @@ public class PipeReader extends Thread {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
 	public void run() {
 		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
-		while(!Thread.currentThread().isInterrupted()) {
+		while (!Thread.currentThread().isInterrupted()) {
 			try {
 
-				ifs = new FileInputStream(pipeFilename);
+				stream = new FileInputStream(pipeFilename);
 
 				int c = 0;
 
 				StringBuilder sb = new StringBuilder();
 
-				while((c = ifs.read()) != -1) {
+				while ((c = stream.read()) != -1) {
 					sb.append((char) c);
-					if(c == '\n' || c == '\r') {
-						if(sb.toString().equals(POISON_PILL)) {
+					if (c == '\n' || c == '\r') {
+						if (sb.toString().equals(POISON_PILL)) {
 							return;
 						}
 						if (logService != null) {
-							logService.log(LogService.LOG_DEBUG, "Received message from event pipe: " + sb.toString());
+							logService.log(LogService.LOG_DEBUG
+									, "Received message from event pipe: " + sb.toString());
 						}
 						BMIModuleEvent m = new BMIModuleEvent(sb.toString());
-						
-						if (m.parse()) {							
-							manager.processMessage(m);
+
+						if (m.parse()) {
+							eventHandler.handleEvent(m);
 						} else {
-							logService.log(LogService.LOG_ERROR, "Unable to parse message from event pipe: " + sb.toString());
+							logService.log(LogService.LOG_ERROR
+									, "Unable to parse message from event pipe: " + sb.toString());
 						}
-						
+
 						break;
 					}
 				}
@@ -106,8 +127,8 @@ public class PipeReader extends Thread {
 				logService.log(LogService.LOG_ERROR, e.getMessage());
 			} finally {
 				try {
-					if (ifs != null) {
-						ifs.close();
+					if (stream != null) {
+						stream.close();
 					}
 				} catch (IOException e) {
 				}

@@ -37,7 +37,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIModuleEvent;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
@@ -56,14 +55,23 @@ public class BMIModuleEventHandler {
 
 	private static Map<String, List<IModlet>> activeModlets;
 
+	/**
+	 * @return Map of active IModlets
+	 */
 	public static Map<String, List<IModlet>> getActiveModlets() {
 		return activeModlets;
 	}
 
 	private final BundleContext context;
 
-	protected BMIModuleEventHandler(BundleContext context, LogService logService2, Map<String, List<IModletFactory>> modletFactories, Map<String, List<IModlet>> activeModlets) {
-		BMIModuleEventHandler.logService = logService2;
+	/**
+	 * @param context BundleContext
+	 * @param logService log service
+	 * @param modletFactories map of modlet factories
+	 * @param activeModlets map of active modlets
+	 */
+	protected BMIModuleEventHandler(BundleContext context, LogService logService, Map<String, List<IModletFactory>> modletFactories, Map<String, List<IModlet>> activeModlets) {
+		BMIModuleEventHandler.logService = logService;
 		BMIModuleEventHandler.modletFactories = modletFactories;
 		BMIModuleEventHandler.activeModlets = activeModlets;
 		this.context = context;
@@ -77,9 +85,9 @@ public class BMIModuleEventHandler {
 	 * BMI activator then listens for modlets. Upon new modlet creation, the
 	 * setup is called.
 	 * 
-	 * @param msg
+	 * @param event event to handle
 	 */
-	public void processMessage(BMIModuleEvent event) {
+	public void handleEvent(BMIModuleEvent event) {
 		if (!modletFactories.containsKey(event.getModuleId())) {
 			logService.log(LogService.LOG_ERROR, "No modlet factories support module, aborting event: " + event.getModuleId());
 			return;
@@ -135,18 +143,21 @@ public class BMIModuleEventHandler {
 				break;
 			}
 		} catch (BundleException e) {
-			logService.log(LogService.LOG_ERROR, "Bundle/Modlet error occurred: " + e.getClass().getName() + ", " + e.getMessage());
+			logService.log(LogService.LOG_ERROR
+					, "Bundle/Modlet error occurred: " + e.getClass().getName() + ", " + e.getMessage());
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			logService.log(LogService.LOG_ERROR, sw.getBuffer().toString());
 
 			if (e.getNestedException() != null) {
-				logService.log(LogService.LOG_ERROR, "Nested Exception: " + e.getNestedException().getClass().getName() + ", " + e.getNestedException().getMessage());
+				logService.log(LogService.LOG_ERROR
+						, "Nested Exception: " + e.getNestedException().getClass().getName() + ", " + e.getNestedException().getMessage());
 			}
 
 			e.printStackTrace();
 		} catch (Exception e) {
-			logService.log(LogService.LOG_ERROR, "Bundle/Modlet error occurred: " + e.getClass().getName() + ", " + e.getMessage());
+			logService.log(LogService.LOG_ERROR
+					, "Bundle/Modlet error occurred: " + e.getClass().getName() + ", " + e.getMessage());
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			logService.log(LogService.LOG_ERROR, sw.getBuffer().toString());

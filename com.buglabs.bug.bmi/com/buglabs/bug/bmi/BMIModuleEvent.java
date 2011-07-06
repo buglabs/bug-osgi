@@ -25,11 +25,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.bmi.pub;
+package com.buglabs.bug.bmi;
 
 import java.io.IOException;
 
-import com.buglabs.bug.bmi.Activator;
 import com.buglabs.bug.sysfs.BMIDevice;
 import com.buglabs.bug.sysfs.BMIDeviceHelper;
 
