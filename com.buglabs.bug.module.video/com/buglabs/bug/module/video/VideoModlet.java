@@ -45,6 +45,7 @@ import org.osgi.service.log.LogService;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.video.pub.IVideoModuleControl;
+import com.buglabs.bug.module.video.pub.VideoOutBMIDevice;
 import com.buglabs.module.IModuleControl;
 import com.buglabs.module.IModuleProperty;
 import com.buglabs.module.ModuleProperty;
@@ -54,12 +55,9 @@ import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProviderWithParams;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.util.RemoteOSGiServiceConstants;
-import com.buglabs.util.SelfReferenceException;
-import com.buglabs.util.XmlNode;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.xml.XmlNode;
 import com.buglabs.bug.sysfs.BMIDeviceHelper;
-import com.buglabs.bug.sysfs.VideoOutDevice;
 
 /**
  * Video Modlet class.
@@ -87,7 +85,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	private final BMIModuleProperties properties;
 	private ServiceRegistration wsReg;
 	
-	private VideoOutDevice videoOutDevice;
+	private VideoOutBMIDevice videoOutDevice;
 	
 	public VideoModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -111,7 +109,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 
 	public void setup() throws Exception {
-		this.videoOutDevice = (VideoOutDevice) BMIDeviceHelper.getDevice(slotId);
+		this.videoOutDevice = (VideoOutBMIDevice) BMIDeviceHelper.getDevice(context, slotId);
 	}
 
 	public void start() throws Exception {
@@ -124,8 +122,8 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		props.put("height", new Integer(LCD_HEIGHT));
 		props.put("Slot", "" + slotId);
 
-		videoControlServReg = context.registerService(IVideoModuleControl.class.getName(), this, createRemotableProperties(null));
-		moduleDisplayServReg = context.registerService(com.buglabs.bug.module.lcd.pub.IModuleDisplay.class.getName(), this, createRemotableProperties(props));
+		videoControlServReg = context.registerService(IVideoModuleControl.class.getName(), this, createBasicServiceProperties());
+		moduleDisplayServReg = context.registerService(com.buglabs.bug.module.lcd.pub.IModuleDisplay.class.getName(), this, createBasicServiceProperties());
 		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
 	}
 
@@ -135,22 +133,8 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		moduleDisplayServReg.unregister();
 		wsReg.unregister();
 	}
-
-	/**
-	 * @return A dictionary with R-OSGi enable property.
-	 */
-	private Dictionary createRemotableProperties(Dictionary ht) {
-		if (ht == null) {
-			ht = new Hashtable();
-			ht.put("Slot", "" + slotId);
-		}
-
-		ht.put(RemoteOSGiServiceConstants.R_OSGi_REGISTRATION, "true");
-
-		return ht;
-	}
 	
-	private Properties createBasicServiceProperties() {
+	private Dictionary createBasicServiceProperties() {
 		Properties p = new Properties();
 		p.put("Provider", this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
@@ -213,19 +197,13 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		if (property.getName().equals("Power State")) {
 			if (((String) property.getValue()).equals("Suspend")) {
 
-				try {
-					suspend();
-				} catch (IOException e) {
-					LogServiceUtil.logBundleException(log, "An error occured while changing suspend state.", e);
+				if (! (suspend() == 1)) {
+					log.log(LogService.LOG_ERROR, "An error occured while changing suspend state.");
 				}
 			} else if (((String) property.getValue()).equals("Resume")) {
-
-				try {
-					resume();
-
-				} catch (IOException e) {
-					LogServiceUtil.logBundleException(log, "An error occured while changing suspend state.", e);
-				}
+				if (! (resume() == 1)) {
+					log.log(LogService.LOG_ERROR, "An error occured while changing suspend state.");
+				} 
 			}
 		}
 
@@ -236,12 +214,22 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		return slotId;
 	}
 
-	public int resume() throws IOException {
-		return videoOutDevice.resume() ? 1 : 0;
+	public int resume() {
+		try {
+			videoOutDevice.resume();
+			return 1;
+		} catch (IOException e) {
+			return 0;
+		}
 	}
 
-	public int suspend() throws IOException {
-		return videoOutDevice.suspend() ? 1 : 0;
+	public int suspend() {
+		try {
+			videoOutDevice.suspend();
+			return 1;
+		} catch (IOException e) {
+			return 0;
+		}		
 	}
 	
 	public Frame getFrame() {
@@ -302,31 +290,36 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 
 	@Override
 	public IWSResponse execute(int operation, String input, Map get, Map post) {
-		if (get.containsKey("suspend")) {
-			videoOutDevice.suspend();
+		try {
+			if (get.containsKey("suspend")) {
+				videoOutDevice.suspend();
+			}
+			if (get.containsKey("resume")) {
+				videoOutDevice.resume();
+			}
+			if (get.containsKey("dvi")) {
+				videoOutDevice.setDVI();
+			}
+			if (get.containsKey("vga")) {
+				videoOutDevice.setVGA();
+			}
+			
+			for (Object key : get.keySet()) {
+				System.out.println(key + "=" + get.get(key));
+			}
+			System.out.println("post map");
+			for (Object key : post.keySet()) {
+				System.out.println(key + "=" + post.get(key));
+			}
+			
+			if (operation == PublicWSProvider2.GET) {
+				return new WSResponse(getVideoInfoXml(), "text/xml");
+			}
+			return null;
+		} catch (IOException e) {
+			log.log(LogService.LOG_ERROR, "Failed to execute web service.", e);
+			return new WSResponse(0, "Failed to execute web service: " + e.getMessage());
 		}
-		if (get.containsKey("resume")) {
-			videoOutDevice.resume();
-		}
-		if (get.containsKey("dvi")) {
-			videoOutDevice.setDVI();
-		}
-		if (get.containsKey("vga")) {
-			videoOutDevice.setVGA();
-		}
-		
-		for (Object key : get.keySet()) {
-			System.out.println(key + "=" + get.get(key));
-		}
-		System.out.println("post map");
-		for (Object key : post.keySet()) {
-			System.out.println(key + "=" + post.get(key));
-		}
-		
-		if (operation == PublicWSProvider2.GET) {
-			return new WSResponse(getVideoInfoXml(), "text/xml");
-		}
-		return null;
 	}
 
 	@Override
@@ -347,13 +340,10 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	
 	private String getVideoInfoXml() {
 		XmlNode root = new XmlNode("VideoInfo");
-		try {
-			root.addChildElement(new XmlNode("Mode", isVGA() ? "VGA" : "DVI"));
-			root.addChildElement(new XmlNode("Resolution", getResolution()));
 
-		} catch (SelfReferenceException e) {
-			log.log(LogService.LOG_ERROR, "Xml error", e);
-		}
+		root.addChild(new XmlNode("Mode", isVGA() ? "VGA" : "DVI"));
+		root.addChild(new XmlNode("Resolution", getResolution()));
+		
 		return root.toString();
 	}
 

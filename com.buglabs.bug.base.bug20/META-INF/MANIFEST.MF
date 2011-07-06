@@ -4,8 +4,7 @@ Bundle-Activator: com.buglabs.bug.base.Activator
 Bundle-SymbolicName: com.buglabs.bug.base.bug20
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
-Export-Package: com.buglabs.bug.base.pub,
- com.buglabs.bug.sysfs
+Export-Package: com.buglabs.bug.base.pub
 Import-Package: com.buglabs.status,
  com.buglabs.device,
  com.buglabs.application,
@@ -18,4 +17,5 @@ Import-Package: com.buglabs.status,
  org.osgi.service.http,
  org.osgi.framework,
  com.buglabs.bug.input.pub,
- org.apache.commons.io
+ org.apache.commons.io,
+ com.buglabs.bug.sysfs

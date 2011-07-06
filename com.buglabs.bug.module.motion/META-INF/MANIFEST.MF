@@ -19,7 +19,8 @@ Import-Package:
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.motion,
  com.buglabs.bug.jni.accelerometer,
- com.buglabs.bug.accelerometer.pub
+ com.buglabs.bug.accelerometer.pub,
+ com.buglabs.bug.sysfs
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0002
 Bug-Module-Driver-Id: bmi_motion

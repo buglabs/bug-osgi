@@ -1,9 +1,9 @@
-package com.buglabs.bug.sysfs;
+package com.buglabs.bug.base.pub;
 
 import java.io.File;
 import java.io.IOException;
 
-import com.buglabs.bug.base.pub.IBUG20BaseControl;
+import com.buglabs.bug.sysfs.SysfsNode;
 
 /**
  * A class to control a single-color or multi-color LED.  

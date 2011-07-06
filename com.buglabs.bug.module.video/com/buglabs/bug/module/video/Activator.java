@@ -27,36 +27,42 @@
  *******************************************************************************/
 package com.buglabs.bug.module.video;
 
+import java.io.File;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.bug.module.video.pub.VideoOutBMIDevice;
+import com.buglabs.bug.sysfs.BMIDevice;
+import com.buglabs.bug.sysfs.BMIDeviceNodeFactory;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 public class Activator implements BundleActivator, IModletFactory {
 	private BundleContext context;
 	private ServiceRegistration sr;
-	private static Activator instance;
-
-	public Activator() {
-		instance = this;
-	}
+	private ServiceRegistration<?> sysfsSr;
+	private static LogService log;
 
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
+		this.log = LogServiceUtil.getLogService(context);
 		sr = context.registerService(IModletFactory.class.getName(), this, null);
+		
+		Dictionary d = new Hashtable();
+		d.put(BMIDeviceNodeFactory.MODULE_ID_SERVICE_PROPERTY, getModuleId());
+		sysfsSr = context.registerService(BMIDeviceNodeFactory.class.getName(), new VideoBMIDeviceNodeFactory(), d);
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		sysfsSr.unregister();
 		sr.unregister();
-	}
-
-	public static Activator getInstance() {
-		synchronized (instance) {
-			return instance;
-		}
 	}
 
 	public IModlet createModlet(BundleContext context, int slotId) {
@@ -85,5 +91,17 @@ public class Activator implements BundleActivator, IModletFactory {
 
 	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
 		return new VideoModlet(context, slotId, getModuleId(), properties);
+	}
+
+	public static LogService getLog() {		
+		return log;
+	}
+	
+	private class VideoBMIDeviceNodeFactory implements BMIDeviceNodeFactory {
+
+		@Override
+		public BMIDevice createBMIDeviceNode(File baseDirectory, int slotIndex) {
+			return new VideoOutBMIDevice(baseDirectory, slotIndex);
+		}
 	}
 }

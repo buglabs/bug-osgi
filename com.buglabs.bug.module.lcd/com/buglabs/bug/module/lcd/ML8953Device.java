@@ -58,5 +58,4 @@ public class ML8953Device extends SysfsNode {
 		return instance;
 
 	}
-
 }

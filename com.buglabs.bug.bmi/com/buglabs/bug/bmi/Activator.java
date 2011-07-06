@@ -92,7 +92,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	 */
 	private Map<String, List<IModlet>> activeModlets;
 
-	private BundleContext context;
+	private static BundleContext context;
 
 	private BMIModuleEventHandler eventHandler;
 
@@ -152,7 +152,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	 *             on File I/O error
 	 */
 	private void coldPlug() throws IOException {
-		List<BMIDevice> devices = Arrays.asList(BMIDeviceHelper.getDevices());
+		List<BMIDevice> devices = Arrays.asList(BMIDeviceHelper.getDevices(context));
 
 		if (devices != null) {
 			logService.log(LogService.LOG_DEBUG, "(coldplug) Initializing existing modules.");
@@ -340,5 +340,9 @@ public class Activator implements BundleActivator, ServiceListener {
 		if (isEmpty(factory.getName())) {
 			throw new RuntimeException("IModletFactory has empty Name.");
 		}
+	}
+
+	public static BundleContext getContext() {	
+		return context;
 	}
 }

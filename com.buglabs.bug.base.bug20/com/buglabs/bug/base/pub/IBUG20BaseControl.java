@@ -30,7 +30,6 @@ package com.buglabs.bug.base.pub;
 import java.io.IOException;
 import java.util.List;
 
-import com.buglabs.bug.sysfs.LEDDevice;
 
 /**
  * Provides control of BUGbase 20 LEDs.

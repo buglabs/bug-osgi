@@ -5,17 +5,18 @@ Bundle-Version: 1.0.0
 Bundle-Activator: com.buglabs.bug.module.video.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.module.video.pub
-Import-Package: org.osgi.framework,
- com.buglabs.device,
- org.osgi.util.tracker,
+Import-Package: com.buglabs.bug.module.lcd.pub,
  com.buglabs.bug.module.pub,
+ com.buglabs.bug.sysfs,
+ com.buglabs.device,
  com.buglabs.module,
- com.buglabs.bug.module.lcd.pub,
  com.buglabs.services.ws,
  com.buglabs.status,
- com.buglabs.util,
- com.buglabs.bug.sysfs,
- org.osgi.service.log
+ com.buglabs.util.xml,
+ com.buglabs.util.osgi,
+ org.osgi.framework,
+ org.osgi.service.log,
+ org.osgi.util.tracker
 Bug-Bundle-Type: Module
 Bug-Module-Id: 000D
 Bug-Module-Driver-Id: bmi_video

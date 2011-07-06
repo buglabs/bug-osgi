@@ -27,13 +27,20 @@
  *******************************************************************************/
 package com.buglabs.bug.module.camera;
 
+import java.io.File;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import com.buglabs.bug.module.camera.pub.CameraSysfsNode;
 import com.buglabs.bug.module.pub.BMIModuleProperties;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.bug.sysfs.BMIDevice;
+import com.buglabs.bug.sysfs.BMIDeviceNodeFactory;
 
 /**
  * Java API bundle for Camera module.
@@ -45,14 +52,19 @@ public class Activator implements BundleActivator, IModletFactory {
 
 	private BundleContext context;
 	private ServiceRegistration sr;
+	private ServiceRegistration sysfsSr;
 
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 
 		sr = context.registerService(IModletFactory.class.getName(), this, null);
+		Dictionary d = new Hashtable();
+		d.put(BMIDeviceNodeFactory.MODULE_ID_SERVICE_PROPERTY, getModuleId());
+		sysfsSr = context.registerService(BMIDeviceNodeFactory.class.getName(), new CameraSysfsFactoryImpl(), d);
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		sysfsSr.unregister();
 		sr.unregister();
 	}
 
@@ -79,5 +91,13 @@ public class Activator implements BundleActivator, IModletFactory {
 
 	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
 		return new CameraModlet(context, slotId, getModuleId(), properties);
+	}
+	
+	private class CameraSysfsFactoryImpl implements BMIDeviceNodeFactory {
+		@Override
+		public BMIDevice createBMIDeviceNode(File baseDirectory, int slotIndex) {
+			
+			return new CameraSysfsNode(baseDirectory, slotIndex);
+		}
 	}
 }

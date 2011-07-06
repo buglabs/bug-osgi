@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
-import com.buglabs.bug.sysfs.LEDDevice;
+import com.buglabs.bug.base.pub.LEDDevice;
 import com.buglabs.bug.sysfs.SysfsNode;
 
 /**

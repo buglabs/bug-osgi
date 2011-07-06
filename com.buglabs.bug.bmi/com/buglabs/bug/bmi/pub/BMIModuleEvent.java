@@ -29,6 +29,7 @@ package com.buglabs.bug.bmi.pub;
 
 import java.io.IOException;
 
+import com.buglabs.bug.bmi.Activator;
 import com.buglabs.bug.sysfs.BMIDevice;
 import com.buglabs.bug.sysfs.BMIDeviceHelper;
 
@@ -151,7 +152,7 @@ public class BMIModuleEvent {
 
 		if (action.equals("ADD")) {
 			this.event = EVENT_TYPE.INSERT;
-			this.bmiDevice = BMIDeviceHelper.getDevice(slot);
+			this.bmiDevice = BMIDeviceHelper.getDevice(Activator.getContext(), slot);
 		} else if (action.equals("REMOVE")) {
 			this.event = EVENT_TYPE.REMOVE;
 		} else {

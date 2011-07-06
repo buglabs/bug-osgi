@@ -3,9 +3,12 @@ package com.buglabs.bug.sysfs;
 import java.io.File;
 import java.io.IOException;
 
-import org.osgi.service.log.LogService;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.sprinkles.Fn;
 
-import com.buglabs.bug.base.Activator;
+import com.buglabs.util.osgi.OSGiServiceLoader;
 
 /**
  * A for properties associated with a BMI module attached to
@@ -61,20 +64,31 @@ public class BMIDevice extends SysfsNode {
 	 * @param slot slot index
 	 * @return BMIDevice
 	 */
-	protected static BMIDevice createFromSYSDirectory(File directory, int slot) {
+	protected static BMIDevice createFromSYSDirectory(final BundleContext context, File directory, int slot) {
 		if (directory == null || !directory.exists() || !directory.isDirectory()) {
 			return null;
 		}
 		
-		String productId = parseHexInt(getFirstLineofFile(new File(directory, "product")));
-
-		if (productId.equals("000F")) {
-			return new CameraDevice(directory, slot);
-		} 
+		final String productId = parseHexInt(getFirstLineofFile(new File(directory, "product")));
 		
-		if (productId.equals("000D")) {
-			return new VideoOutDevice(directory, slot);
-		} 
+		BMIDeviceNodeFactory factory;
+		try {
+			factory = Fn.find(new Fn.Function<ServiceReference, BMIDeviceNodeFactory>() {
+
+				@Override
+				public BMIDeviceNodeFactory apply(ServiceReference element) {
+					if (element.getProperty("PRODUCT.ID") != null && element.getProperty("PRODUCT.ID").equals(productId))
+						return context.getService(element);
+					
+					return null;
+				}
+			}, context.getAllServiceReferences(BMIDeviceNodeFactory.class.getName(), null));
+			
+			if (factory != null)
+				return factory.createBMIDeviceNode(directory, slot);
+		} catch (InvalidSyntaxException e) {
+			//Ignore
+		}
 		
 		return new BMIDevice(directory, slot);
 	}
@@ -158,27 +172,17 @@ public class BMIDevice extends SysfsNode {
 	
 	/**
 	 * @return true if device was successfully suspended, false otherwise.
+	 * @throws IOException 
 	 */
-	public boolean suspend() {
-		try {
-			println(new File(root, SUSPEND_FILENAME), "1");
-		} catch (IOException e) {
-			Activator.getLog().log(LogService.LOG_ERROR, "Unable to suspend device.", e);
-			return false;
-		}
-		return true;
+	public void suspend() throws IOException {
+		println(new File(root, SUSPEND_FILENAME), "1");		
 	}
 	
 	/**
 	 * @return true if device was successfully resumed, false otherwise.
+	 * @throws IOException 
 	 */
-	public boolean resume() {
-		try {
-			println(new File(root, SUSPEND_FILENAME), "0");
-		} catch (IOException e) {
-			Activator.getLog().log(LogService.LOG_ERROR, "Unable to suspend device.", e);
-			return false;
-		}
-		return true;
+	public void resume() throws IOException {		
+		println(new File(root, SUSPEND_FILENAME), "0");		
 	}
 }

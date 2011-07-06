@@ -1,7 +1,10 @@
-package com.buglabs.bug.sysfs;
+package com.buglabs.bug.module.motion.pub;
 
 import java.io.File;
 import java.io.FilenameFilter;
+
+import com.buglabs.bug.sysfs.BMIDevice;
+import com.buglabs.bug.sysfs.SysfsNode;
 
 /**
  * Exposes sysfs entry for ADXL34x devices to Java clients.

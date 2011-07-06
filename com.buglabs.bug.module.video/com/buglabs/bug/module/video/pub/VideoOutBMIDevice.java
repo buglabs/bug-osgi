@@ -1,11 +1,12 @@
-package com.buglabs.bug.sysfs;
+package com.buglabs.bug.module.video.pub;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.base.Activator;
+import com.buglabs.bug.module.video.Activator;
+import com.buglabs.bug.sysfs.BMIDevice;
 
 /**
  * Access sysfs items for video module.
@@ -14,14 +15,14 @@ import com.buglabs.bug.base.Activator;
  * @author kgilmer
  *
  */
-public final class VideoOutDevice extends BMIDevice {
+public final class VideoOutBMIDevice extends BMIDevice {
 
 	
 	/**
 	 * @param directory of BMI device
 	 * @param slot slot index
 	 */
-	public VideoOutDevice(File directory, int slot) {
+	public VideoOutBMIDevice(File directory, int slot) {
 		super(directory, slot);
 	}
 

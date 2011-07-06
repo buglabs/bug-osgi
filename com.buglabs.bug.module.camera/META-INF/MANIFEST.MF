@@ -17,7 +17,8 @@ Import-Package: org.osgi.framework,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.camera,
  org.osgi.service.log,
- com.buglabs.bug.jni.input
+ com.buglabs.bug.jni.input,
+ com.buglabs.bug.sysfs
 Bug-Bundle-Type: Module
 Bug-Module-Id: 000F
 Bug-Module-Driver-Id: bmi_camera
