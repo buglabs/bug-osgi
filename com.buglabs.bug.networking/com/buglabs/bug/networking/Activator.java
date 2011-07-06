@@ -57,7 +57,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
 import org.osgi.service.log.LogService;		
-import com.buglabs.util.LogServiceUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 public class Activator implements BundleActivator {
 	private static LogService logger = null;
