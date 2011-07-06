@@ -87,7 +87,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	private final BMIModuleProperties properties;
 	private ServiceRegistration wsReg;
 	
-	private final VideoOutDevice videoOutDevice;
+	private VideoOutDevice videoOutDevice;
 	
 	public VideoModlet(BundleContext context, int slotId, String moduleId) {
 		this.context = context;
@@ -98,7 +98,6 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		this.moduleName = "VIDEO";
 		this.log = LogServiceUtil.getLogService(context);
 		System.out.println("Asking for video out device");
-		this.videoOutDevice = (VideoOutDevice) BMIDeviceHelper.getDevice(slotId);
 	}
 
 	public VideoModlet(BundleContext context, int slotId, String moduleId, BMIModuleProperties properties) {
@@ -109,10 +108,10 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		this.moduleName = "VIDEO";
 		this.log = LogServiceUtil.getLogService(context);
 		System.out.println("Asking for video out device");
-		this.videoOutDevice = (VideoOutDevice) BMIDeviceHelper.getDevice(slotId);
 	}
 
 	public void setup() throws Exception {
+		this.videoOutDevice = (VideoOutDevice) BMIDeviceHelper.getDevice(slotId);
 	}
 
 	public void start() throws Exception {
