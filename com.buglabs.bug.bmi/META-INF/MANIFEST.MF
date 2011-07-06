@@ -11,4 +11,5 @@ Import-Package:
  org.osgi.framework,
  org.osgi.service.log,
  com.buglabs.bug.module.pub,
- com.buglabs.bug.sysfs
+ com.buglabs.bug.sysfs,
+ com.buglabs.util.shell.pub

@@ -49,6 +49,7 @@ import com.buglabs.util.osgi.BUGBundleConstants;
  * runtime.
  * 
  * @author ken
+ * @deprecated moved to com.buglabs.bug.bmi.pub.BMIModuleEventHandler
  * 
  */
 public class Manager {
@@ -56,9 +57,9 @@ public class Manager {
 
 	private static LogService logService;
 
-	private static Map modletFactories;
+	private static Map<String, List<IModletFactory>> modletFactories;
 
-	private static Map activeModlets;
+	private static Map<String, List<IModlet>> activeModlets;
 
 	public static Map getActiveModlets() {
 		return activeModlets;
@@ -71,7 +72,7 @@ public class Manager {
 		return ref;
 	}
 
-	synchronized static public Manager getManager(BundleContext context, LogService logService, Map modletFactories, Map activeModlets) {
+	synchronized static public Manager getManager(BundleContext context, LogService logService, Map<String, List<IModletFactory>> modletFactories, Map activeModlets) {
 		if (ref == null) {
 			ref = new Manager(context, logService, modletFactories, activeModlets);
 		}
@@ -81,7 +82,7 @@ public class Manager {
 
 	private final BundleContext context;
 
-	private Manager(BundleContext context, LogService logService2, Map modletFactories, Map activeModlets) {
+	private Manager(BundleContext context, LogService logService2, Map<String, List<IModletFactory>> modletFactories, Map<String, List<IModlet>> activeModlets) {
 		Manager.logService = logService2;
 		Manager.modletFactories = modletFactories;
 		Manager.activeModlets = activeModlets;

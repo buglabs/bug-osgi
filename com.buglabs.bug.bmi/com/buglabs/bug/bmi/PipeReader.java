@@ -27,7 +27,6 @@
  *******************************************************************************/
 package com.buglabs.bug.bmi;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,9 +34,7 @@ import java.io.IOException;
 
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIMessage;
-import com.buglabs.bug.bmi.pub.Manager;
-import com.buglabs.bug.module.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.BMIModuleEvent;
 
 /**
  * This class listens to a pipe for events from Hotplug.  These events are passed to the BMIManager.
@@ -51,11 +48,11 @@ public class PipeReader extends Thread {
 
 	private final String pipeFilename;
 
-	private final Manager manager;
+	private final BMIModuleEventHandler manager;
 
 	private final LogService logService;
 
-	public PipeReader(String pipeFilename, Manager manager, LogService logService) {
+	public PipeReader(String pipeFilename, BMIModuleEventHandler manager, LogService logService) {
 		this.pipeFilename = pipeFilename;
 		this.manager = manager;
 		this.logService = logService;
@@ -73,6 +70,7 @@ public class PipeReader extends Thread {
 	}
 
 	public void run() {
+		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
 		while(!Thread.currentThread().isInterrupted()) {
 			try {
 
@@ -80,7 +78,7 @@ public class PipeReader extends Thread {
 
 				int c = 0;
 
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 
 				while((c = ifs.read()) != -1) {
 					sb.append((char) c);
@@ -91,11 +89,9 @@ public class PipeReader extends Thread {
 						if (logService != null) {
 							logService.log(LogService.LOG_DEBUG, "Received message from event pipe: " + sb.toString());
 						}
-						BMIMessage m = new BMIMessage(sb.toString());
-						if (m.parse()) {
-							if (m.getEvent() == BMIMessage.EVENT_INSERT) {
-								m.setBMIModuleProperties(BMIModuleProperties.createFromSYSDirectory(sysDirectory(m.getSlot())));
-							}
+						BMIModuleEvent m = new BMIModuleEvent(sb.toString());
+						
+						if (m.parse()) {							
 							manager.processMessage(m);
 						} else {
 							logService.log(LogService.LOG_ERROR, "Unable to parse message from event pipe: " + sb.toString());
@@ -117,14 +113,5 @@ public class PipeReader extends Thread {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Return a file represented the root directory of a BMI module given it's slot #.
-	 * @param slot
-	 * @return
-	 */
-	private File sysDirectory(int slot) {
-		return new File("/sys/class/bmi/bmi-"+slot+"/bmi-dev-"+slot);
 	}
 }

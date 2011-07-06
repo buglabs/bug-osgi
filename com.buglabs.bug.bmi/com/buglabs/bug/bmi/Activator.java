@@ -27,129 +27,150 @@
  *******************************************************************************/
 package com.buglabs.bug.bmi;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIMessage;
-import com.buglabs.bug.bmi.pub.Manager;
-import com.buglabs.bug.module.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.BMIModuleEvent;
 import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.pub.IModletFactory;
 import com.buglabs.bug.sysfs.BMIDevice;
 import com.buglabs.bug.sysfs.BMIDeviceHelper;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.shell.pub.ShellSession;
 
 /**
- * Activator for BMI Bundle.  BMI bundle handles event notification and IModlet initialization upon
- * hardware change events.  This bundle is specific to BUG hardware that has BMI ports.
+ * Activator for BMI Bundle. BMI bundle handles event notification and IModlet
+ * initialization upon hardware change events. This bundle is specific to BUG
+ * hardware that has BMI ports.
  * 
  * @author kgilmer
- *
+ * 
  */
 public class Activator implements BundleActivator, ServiceListener {
 	private static final String DEFAULT_PIPE_FILENAME = "/tmp/eventpipe";
 
 	/**
-	 * If present as a property, used as the name of the pipe used to communicate udev events
+	 * If present as a property, used as the name of the pipe used to
+	 * communicate udev events.
 	 */
 	public static final String PIPE_FILENAME_KEY = "com.buglabs.pipename";
 
-	private static Activator ref;
-
-	public static Activator getRef() {
-		return ref;
-	}
-
+	/**
+	 * Thread to read input from fs pipe.
+	 */
 	private PipeReader pipeReader;
 
+	/**
+	 * Filename of fs pipe.
+	 */
 	private String pipeFilename;
 
 	private LogService logService;
 
-	private Map modletFactories;
+	/**
+	 * Map of all IModletFactories.
+	 */
+	private Map<String, List<IModletFactory>> modletFactories;
 
-	private Map activeModlets;
+	/**
+	 * Map of all active (modules attached and running) IModlets.
+	 */
+	private Map<String, List<IModlet>> activeModlets;
 
 	private BundleContext context;
-	
 
-	/* (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	private BMIModuleEventHandler eventHandler;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext
+	 * )
 	 */
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
-		Activator.ref = this;
 
-		modletFactories = new Hashtable();
-		activeModlets = new Hashtable();
+		modletFactories = new Hashtable<String, List<IModletFactory>>();
+		activeModlets = new Hashtable<String, List<IModlet>>();
 		logService = LogServiceUtil.getLogService(context);
-		
+
 		context.addServiceListener(this, FilterUtil.generateServiceFilter(IModletFactory.class.getName()));
-		registerExistingServices(context);
+		registerExistingServices();
 
 		pipeFilename = context.getProperty(PIPE_FILENAME_KEY);
 
-		if (pipeFilename == null || pipeFilename.length() == 0) {
+		if (pipeFilename == null || pipeFilename.length() == 0)
 			pipeFilename = DEFAULT_PIPE_FILENAME;
-		}
 
-		logService.log(LogService.LOG_INFO, "Creating pipe " + pipeFilename);
 		createPipe(pipeFilename);
-		pipeReader = new PipeReader(pipeFilename, Manager.getManager(context, logService, modletFactories, activeModlets), logService);
+		eventHandler = new BMIModuleEventHandler(context, logService, modletFactories, activeModlets);
+		pipeReader = new PipeReader(pipeFilename, eventHandler, logService);
 
-		logService.log(LogService.LOG_INFO, "Initializing existing modules (coldplug)");
 		coldPlug();
-
-		logService.log(LogService.LOG_INFO, "Listening to event pipe. " + pipeFilename);
 
 		pipeReader.start();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
 		context.removeServiceListener(this);
-		stopModlets(activeModlets);
+		stopModlets(activeModlets.values());
 		if (pipeReader != null) {
 			pipeReader.cancel();
 			pipeReader.interrupt();
-			logService.log(LogService.LOG_INFO, "Deleting pipe " + pipeFilename);
+			logService.log(LogService.LOG_DEBUG, "Deleting pipe " + pipeFilename);
 			destroyPipe(new File(pipeFilename));
 		}
 		modletFactories.clear();
 	}
 
+	/**
+	 * Discover attached BMI devices and send INSERT events into system.
+	 * 
+	 * @throws IOException
+	 *             on File I/O error
+	 */
 	private void coldPlug() throws IOException {
-		Manager m = Manager.getManager();
+		List<BMIDevice> devices = Arrays.asList(BMIDeviceHelper.getDevices());
 
-		List modules = getSysFSModules();
-		
-		if (modules != null) {
-			for (Iterator i = modules.iterator(); i.hasNext();) {
-				BMIMessage bmiMessage = (BMIMessage) i.next();
-				logService.log(LogService.LOG_INFO, "Registering existing module with message: " + bmiMessage.toString());
-				m.processMessage(bmiMessage);
+		if (devices != null) {
+			logService.log(LogService.LOG_DEBUG, "(coldplug) Initializing existing modules.");
+			for (BMIDevice bmiMessage : devices) {
+				logService.log(LogService.LOG_DEBUG, "Registering existing module with message: " + bmiMessage.toString());
+				eventHandler.processMessage(new BMIModuleEvent(bmiMessage));
 			}
 		} else {
-			logService.log(LogService.LOG_DEBUG, "Not registering existing modules, none found.");
+			logService.log(LogService.LOG_DEBUG, "(coldplug) Not registering existing modules, none found.");
 		}
 	}
 
+	/**
+	 * @param factory
+	 *            factory to use to create modlet.
+	 * @throws Exception
+	 *             on bundle or system error
+	 */
 	private void createModlets(IModletFactory factory) throws Exception {
 		IModlet modlet = factory.createModlet(context, 0);
 		modlet.setup();
@@ -161,7 +182,9 @@ public class Activator implements BundleActivator, ServiceListener {
 	 * host system has the "mkfifo" program.
 	 * 
 	 * @param filename
+	 *            absolute path of pipe
 	 * @throws IOException
+	 *             on File I/O error
 	 */
 	private void createPipe(String filename) throws IOException {
 		File f = new File(filename);
@@ -174,105 +197,56 @@ public class Activator implements BundleActivator, ServiceListener {
 		}
 		String cmd = "/usr/bin/mkfifo " + f.getAbsolutePath();
 
-		String error = execute(cmd);
-		logService.log(LogService.LOG_INFO, "Execution Completed.  Response: " + error);
+		ShellSession shell = new ShellSession(f.getParentFile());
+		shell.execute(cmd);
+
+		logService.log(LogService.LOG_INFO, "Created pipe " + pipeFilename);
 	}
 
-	
 	/**
-	 * Deletes a file
+	 * Deletes a file.
 	 * 
 	 * @param file
+	 *            to delete
 	 * @throws IOException
+	 *             on File I/O error
 	 */
 	private void destroyPipe(File file) throws IOException {
 		if (!file.delete()) {
 			throw new IOException("Unable to delete file " + file.getAbsolutePath());
 		}
-		logService.log(LogService.LOG_INFO, "Deleted " + file.getAbsolutePath());
+		logService.log(LogService.LOG_DEBUG, "Deleted " + file.getAbsolutePath());
 	}
 
 	/**
-	 * @param cmd
-	 * @return null on success, or String of error message on failure.
-	 * @throws IOException
+	 * @return active IModlets.
 	 */
-	private String execute(String cmd) throws IOException {
-		String s = null;
-		StringBuffer sb = new StringBuffer();
-		boolean hasError = false;
-		
-		//logService.log(LogService.LOG_DEBUG, "Executing: " + cmd);
-		Process p = Runtime.getRuntime().exec(cmd);
-		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-		while ((s = stdError.readLine()) != null) {
-			sb.append(s);
-			hasError = true;
-		}
-
-		if (hasError) {
-			// temp fix for ADS board. All commands return with this error.
-			if (!sb.toString().equals("Using fallback suid method")) {
-				new IOException("Failed to execute command: " + sb.toString());
-			}
-		}
-
-		BufferedReader stdOut = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		sb = new StringBuffer();
-		while ((s = stdOut.readLine()) != null) {
-			sb.append(s);
-			sb.append('\n');
-		}
-
-		return sb.toString();
-	}
-
-	protected Map getActiveModlets() {
+	protected Map<String, List<IModlet>> getActiveModlets() {
 		return activeModlets;
 	}
 
-	protected Map getModletFactories() {
+	/**
+	 * @return all IModletFactories
+	 */
+	protected Map<String, List<IModletFactory>> getModletFactories() {
 		return modletFactories;
 	}
 
 	/**
-	 * Get a list of BMIMessage strings for existing modules based on entries in
-	 * the /sys filesystem.
-	 * 
-	 * @return
-	 * @throws IOException
+	 * @param element
+	 *            input
+	 * @return true if string is null or of 0 length.
 	 */
-	private List<BMIMessage> getSysFSModules() throws IOException {
-		List<BMIMessage> slots = null;
-
-		for (int i = 0; i < 4; ++i) {
-			BMIDevice device = BMIDeviceHelper.getDevice(i);
-			
-			if (device == null) {
-				logService.log(LogService.LOG_DEBUG, "No module was found in slot " + i);
-				continue;
-			}			
-			
-			// Lazily create data structure. If no modules then not needed.
-			if (slots == null) {
-				slots = new ArrayList<BMIMessage>();
-			}
-			
-			BMIMessage m = new BMIMessage(device, i);
-			
-			slots.add(m);
-		}
-
-		return slots;
-	}
-	
 	private boolean isEmpty(String element) {
 		return element == null || element.length() == 0;
 	}
 
-	private void registerExistingServices(BundleContext context2) throws InvalidSyntaxException {
-		ServiceReference sr[] = context2.getServiceReferences((String) null, "(" + Constants.OBJECTCLASS + "=" + IModletFactory.class.getName() + ")");
+	/**
+	 * @throws InvalidSyntaxException
+	 *             on Filter syntax error
+	 */
+	private void registerExistingServices() throws InvalidSyntaxException {
+		ServiceReference[] sr = context.getServiceReferences((String) null, FilterUtil.generateServiceFilter(IModletFactory.class.getName()));
 
 		if (sr != null) {
 			for (int i = 0; i < sr.length; ++i) {
@@ -289,12 +263,13 @@ public class Activator implements BundleActivator, ServiceListener {
 		switch (eventType) {
 		case ServiceEvent.REGISTERED:
 			if (!modletFactories.containsKey(factory.getModuleId())) {
-				modletFactories.put(factory.getModuleId(), new ArrayList());
+				modletFactories.put(factory.getModuleId(), new ArrayList<IModletFactory>());
 			} else {
 				logService.log(LogService.LOG_WARNING, "IModletFactory " + factory.getName() + " is already registered, ignoring registration.");
+				return;
 			}
 
-			List ml = (List) modletFactories.get(factory.getModuleId());
+			List<IModletFactory> ml = modletFactories.get(factory.getModuleId());
 
 			if (!ml.contains(factory)) {
 				ml.add(factory);
@@ -314,44 +289,49 @@ public class Activator implements BundleActivator, ServiceListener {
 			break;
 		case ServiceEvent.UNREGISTERING:
 			if (modletFactories.containsKey(factory.getModuleId())) {
-				List ml2 = (List) modletFactories.get(factory.getModuleId());
+				modletFactories.get(factory.getModuleId()).remove(factory);
 
-				if (ml2.contains(factory)) {
-					ml2.remove(factory);
-				}
+				logService.log(LogService.LOG_DEBUG, "Removed modlet factory " + factory.getName() + " to map.");
+			} else {
+				logService.log(LogService.LOG_ERROR, "Unable unregister non-existant module " + factory.getModuleId());
 			}
-			logService.log(LogService.LOG_INFO, "Removed modlet factory " + factory.getName() + " to map.");
 			break;
+		default:
+			logService.log(LogService.LOG_ERROR, "Unhandled BMI event type " + eventType);
 		}
 	}
 
-	public void serviceChanged(ServiceEvent event) {		
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.ServiceListener#serviceChanged(org.osgi.framework.
+	 * ServiceEvent)
+	 */
+	public void serviceChanged(ServiceEvent event) {
 		registerService(event.getServiceReference(), event.getType());
 	}
 
 	/**
 	 * Stop all active modlets.
 	 * 
-	 * @param activeModlets
+	 * @param modlets
+	 *            stop all modlets
 	 */
-	private void stopModlets(Map modlets) {
-		for (Iterator i = modlets.keySet().iterator(); i.hasNext();) {
-			String key = (String) i.next();
-
-			List modl = (List) modlets.get(key);
-
-			for (Iterator j = modl.iterator(); j.hasNext();) {
-				IModlet m = (IModlet) j.next();
-
+	private void stopModlets(Collection<List<IModlet>> modlets) {
+		for (List<IModlet> ml : modlets)
+			for (IModlet modlet : ml)
 				try {
-					m.stop();
+					modlet.stop();
 				} catch (Exception e) {
-					logService.log(LogService.LOG_ERROR, "Error occured while stopping " + m.getModuleId() + ": " + e.getMessage());
+					logService.log(LogService.LOG_ERROR, "Error occured while stopping " + modlet.getModuleId() + ": " + e.getMessage());
 				}
-			}
-		}
 	}
 
+	/**
+	 * @param factory
+	 *            factory to validate
+	 */
 	private void validateFactory(IModletFactory factory) {
 		if (isEmpty(factory.getModuleId())) {
 			throw new RuntimeException("IModletFactory has empty Module ID.");

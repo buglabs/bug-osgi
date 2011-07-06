@@ -34,6 +34,7 @@ import com.buglabs.bug.sysfs.BMIDevice;
  * A message from the BMI system. Format [moduleId] [version] [slot] [event]
  * 
  * @author ken
+ * @deprecated use com.buglabs.bug.bmi.pub.BMIModuleEvent instead.
  * 
  */
 public class BMIMessage {
