@@ -176,9 +176,9 @@
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
 
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test" />
@@ -216,9 +216,9 @@
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test-osgi" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test-osgi" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test-osgi" />
 
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test-osgi" />
@@ -344,9 +344,9 @@
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="checkstyle" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="checkstyle" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="checkstyle" />
 
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="checkstyle" />
@@ -384,9 +384,9 @@
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="cpd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="cpd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="cpd" />
 
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="cpd" />
@@ -424,9 +424,9 @@
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="pmd" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="pmd" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="pmd" />
 
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="pmd" />
@@ -470,9 +470,9 @@
 		<!-- BUG libraries -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="clean" />
 		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="clean" />
+		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="clean" />
 
 		<!-- project depended on to run build -->
 		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="clean" />
