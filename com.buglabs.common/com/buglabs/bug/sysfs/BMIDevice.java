@@ -82,7 +82,7 @@ public class BMIDevice extends SysfsNode {
 					
 					return null;
 				}
-			}, context.getAllServiceReferences(BMIDeviceNodeFactory.class.getName(), null));
+			}, context.getServiceReferences(BMIDeviceNodeFactory.class.getName(), null));
 			
 			if (factory != null)
 				return factory.createBMIDeviceNode(directory, slot);
