@@ -47,7 +47,7 @@ import com.buglabs.util.osgi.LogServiceUtil;
 public class Activator implements BundleActivator, IModletFactory {
 	private BundleContext context;
 	private ServiceRegistration sr;
-	private ServiceRegistration<?> sysfsSr;
+	private ServiceRegistration sysfsSr;
 	private static LogService log;
 
 	public void start(BundleContext context) throws Exception {
