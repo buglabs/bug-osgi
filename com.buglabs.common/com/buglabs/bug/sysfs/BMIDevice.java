@@ -78,7 +78,7 @@ public class BMIDevice extends SysfsNode {
 				@Override
 				public BMIDeviceNodeFactory apply(ServiceReference element) {
 					if (element.getProperty("PRODUCT.ID") != null && element.getProperty("PRODUCT.ID").equals(productId))
-						return context.getService(element);
+						return (BMIDeviceNodeFactory) context.getService(element);
 					
 					return null;
 				}
