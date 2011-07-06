@@ -1,6 +1,5 @@
 package com.buglabs.nmea2;
 
-import com.buglabs.nmea.StringUtil;
 import com.buglabs.nmea.sentences.NMEAParserException;
 
 /**
@@ -10,14 +9,14 @@ import com.buglabs.nmea.sentences.NMEAParserException;
  * 
  */
 public abstract class AbstractNMEASentence {
-	private char FIELD_SEPARATOR = ',';
-	private char CHECKSUM_SEPARATOR = '*';
+	private String FIELD_SEPARATOR = ",";
+	private String CHECKSUM_SEPARATOR = "*";
 	protected String checksum = null;
 	private String name = null;
 
 	public AbstractNMEASentence(String sentence) {
 		initialize();
-		String[] fields = StringUtil.split(parseChecksum(sentence), FIELD_SEPARATOR);
+		String[] fields = parseChecksum(sentence).split(FIELD_SEPARATOR);
 		name = fields[0];
 
 		for (int i = 1; i < fields.length; ++i) {
@@ -44,7 +43,7 @@ public abstract class AbstractNMEASentence {
 	}
 
 	private String parseChecksum(String sentence) {
-		String[] splitSentence = StringUtil.split(sentence, CHECKSUM_SEPARATOR);
+		String[] splitSentence = sentence.split(CHECKSUM_SEPARATOR);
 
 		if (splitSentence.length > 1) {
 			checksum = splitSentence[1];

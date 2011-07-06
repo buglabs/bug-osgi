@@ -27,7 +27,6 @@
  *******************************************************************************/
 package com.buglabs.nmea.sentences;
 
-import com.buglabs.nmea.StringUtil;
 
 /**
  * A NMEA sentence for position and other information.
@@ -63,13 +62,13 @@ public class RMC extends PositionSentence {
 	public Object parse(String sentence) {
 		magneticVariation = "";
 
-		String[] splitSentence = StringUtil.split(sentence, "*");
+		String[] splitSentence = sentence.split("*");
 
 		if (splitSentence.length > 1) {
 			setChecksum(splitSentence[1]);
 		}
 
-		String[] fields = StringUtil.split(splitSentence[0], ",");
+		String[] fields = splitSentence[0].split(",");
 
 		for (int i = 0; i < fields.length; ++i) {
 			switch (i) {

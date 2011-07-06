@@ -27,7 +27,6 @@
  *******************************************************************************/
 package com.buglabs.nmea.sentences;
 
-import com.buglabs.nmea.StringUtil;
 import com.buglabs.nmea.Time;
 
 public class GGA extends PositionSentence {
@@ -49,14 +48,14 @@ public class GGA extends PositionSentence {
 
 	public Object parse(String sentence) {
 
-		String[] splitSentence = StringUtil.split(sentence, "*");
+		String[] splitSentence = sentence.split("*");
 
 		if (splitSentence.length > 1) {
 			setChecksum(splitSentence[1]);
 		}
 
 		try {
-			String[] fields = StringUtil.split(splitSentence[0], ",");
+			String[] fields = splitSentence[0].split(",");
 
 			for (int i = 0; i < fields.length; ++i) {
 				switch (i) {

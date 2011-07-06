@@ -55,7 +55,7 @@ public class SV {
 		try {
 			if (SNR.indexOf('*') > -1) {
 				// Remove any CRC
-				this.SNR = Integer.parseInt(StringUtil.split(SNR, "*")[0]);
+				this.SNR = Integer.parseInt(SNR.split("*")[0]);
 			} else {
 				this.SNR = Integer.parseInt(SNR);
 			}

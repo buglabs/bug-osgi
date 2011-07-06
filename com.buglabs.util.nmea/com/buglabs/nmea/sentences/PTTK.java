@@ -27,7 +27,6 @@
  *******************************************************************************/
 package com.buglabs.nmea.sentences;
 
-import com.buglabs.nmea.StringUtil;
 
 public class PTTK extends NMEASentence {
 
@@ -55,7 +54,7 @@ public class PTTK extends NMEASentence {
 	}
 
 	public Object parse(String sentence) {
-		String[] fields = StringUtil.split(sentence, ",");
+		String[] fields = sentence.split(",");
 
 		for (int i = 0; i < fields.length; ++i) {
 			switch (i) {
@@ -63,7 +62,7 @@ public class PTTK extends NMEASentence {
 				setMessage(fields[i]);
 				break;
 			case 2:
-				String[] lastfield = StringUtil.split(fields[i], "*");
+				String[] lastfield = fields[i].split("*");
 				if (lastfield.length > 1) {
 					setErrorCode(Integer.parseInt(lastfield[0]));
 				}

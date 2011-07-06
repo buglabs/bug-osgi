@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.buglabs.nmea.SV;
-import com.buglabs.nmea.StringUtil;
 
 public class GSV extends NMEASentence {
 
@@ -78,7 +77,7 @@ public class GSV extends NMEASentence {
 	}
 
 	public Object parse(String sentence) {
-		String[] fields = StringUtil.split(sentence, ",");
+		String[] fields = sentence.split(",");
 		satellites.clear();
 
 		for (int i = 0; i < fields.length; ++i) {
@@ -120,7 +119,7 @@ public class GSV extends NMEASentence {
 			case 17:
 			case 18:
 			case 19:
-				String[] lastfield = StringUtil.split(fields[i + 3], "*");
+				String[] lastfield = fields[i + 3].split("*");
 				if (lastfield.length > 1) {
 					setChecksum(lastfield[1]);
 				}
