@@ -17,6 +17,7 @@
 	<property name="svn.bin" location="/usr/bin/svn" />
 	<property name="git.bin" location="/usr/bin/git" />
 	<property name="unzip.bin" location="/usr/bin/unzip" />
+	<property name="cp.bin" location="/bin/cp" />
 
 	<property name="framework.version" value="3.2.2" />
 	<property name="log.version" value="1.0.1" />
