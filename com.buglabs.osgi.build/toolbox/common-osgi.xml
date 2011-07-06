@@ -144,7 +144,7 @@
 	</target>
 
 	<!-- target: test-osgi   Run tests within an OSGi framework -->
-	<target name="test-osgi" depends="test">
+	<target name="test-osgi" depends="clean, test">
 		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test-osgi" />
 
 		<echo message="Generating osgi-test result output in ${report.dir}..." />
