@@ -16,6 +16,7 @@
 	<property name="wget.bin" location="/usr/bin/wget" />
 	<property name="svn.bin" location="/usr/bin/svn" />
 	<property name="git.bin" location="/usr/bin/git" />
+	<property name="unzip.bin" location="/usr/bin/unzip" />
 
 	<property name="framework.version" value="3.2.2" />
 	<property name="log.version" value="1.0.1" />
@@ -99,12 +100,35 @@
 			<arg line="${knapsack.jar.url}" />
 		</exec>
 
+		<exec executable="${wget.bin}">
+			<arg line="-P ${externalDirectory}" />
+			<arg line="--no-check-certificate" />
+			<arg line="https://leafcutter.ci.cloudbees.com/job/Sprinkles/lastSuccessfulBuild/artifact/Sprinkles.jar" />
+		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
 			<arg line="--no-check-certificate" />
 			<arg line="http://hamcrest.googlecode.com/files/hamcrest-all-1.3.0RC2.jar" />
 		</exec>
+
+		<!-- commons-io is not distributed as a jar, so have to unzip the archive and move the file manually. -->
+		<exec executable="${wget.bin}">
+			<arg line="-P ${externalDirectory}" />
+			<arg line="--no-check-certificate" />
+			<arg line="http://www.meisei-u.ac.jp/mirror/apache/dist//commons/io/binaries/commons-io-2.0.1-bin.zip" />
+		</exec>
+
+		<exec executable="${unzip.bin}">
+			<arg line="${externalDirectory}/commons-io-2.0.1-bin.zip" />
+			<arg line="-d ${externalDirectory}" />
+		</exec>
+
+		<exec executable="${cp.bin}">
+			<arg line="${externalDirectory}/commons-io-2.0.1/commons-io-2.0.1.jar" />
+			<arg line="${externalDirectory}" />
+		</exec>
+		<delete dir="${externalDirectory}/commons-io-2.0.1/" />
 	</target>
 
 	<target name="jar" description="compile the Java source code to class files">
