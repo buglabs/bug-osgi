@@ -1,0 +1,126 @@
+<include "header">
+<h1>BUG apps</h1>
+<style>
+#div_login { position:absolute; top: 30px; left: 670px; }
+#div_login #login_status { position:relative; left: -90px;}
+#div_login #login_form {background-color:#eee; padding: 10px; width: 300px; height: 50px; position:relative; left: -200px; border:1px solid #ccc;}
+#div_login #login_form p {float:left; margin-right: 10px;}
+#div_login #login_form p input {display:block;}
+#div_login #login_form p label {color:#666;}
+</style>
+
+<div id="div_login">
+<if logged_in == "true">
+	<div id="login_status">
+		Logged in as <a href="http://www.buglabs.net/users/${username}" target="_blank">${username}</a> | 
+		<a href="javascript:void(0);" onclick="manager.logout();">Log out</a>
+	</div>
+<else>
+	<a href="javascript:void(0);" onclick="$('#login_form').toggle(); $('#txt_username').focus();" >Log in to BUGnet</a>
+	<div id="login_form" style="display:none">
+		<form name="frm_login">
+		<p>
+			<input type="text" name="txt_username" id="txt_username" style="width:100px;" />
+			<label>Username</label>
+		</p>
+		<p>
+			<input type="password" name="txt_pwd" id="txt_pwd" style="width:100px;" 
+				onKeyPress="BL.BUGdash.Utilities.checkEnter(event, function() { $('#btn_login').click(); });" />
+			<label>Password</label>
+		</p>
+		<p>
+			<input type="button" name="btn_login" id="btn_login" value="Log in" class="submit-small" 
+				onclick="manager.login( $('#txt_username').val(), $('#txt_pwd').val() );" />
+		</p>
+		</form>
+	</div>
+</if>
+</div>
+
+<script type="text/javascript">
+	function resize_iframe(id) {
+	  var iframe = document.getElementById(id); 
+	  if (iframe) {
+	    var height = 0; 
+	    height = iframe.contentWindow.document.getElementById('content').clientHeight; 
+	    if (height == 0)
+	      height = iframe.contentWindow.document.getElementById('content').offsetHeight; 
+	    iframe.style.height = (height+10)+'px';
+	  }
+	}
+	function preview_app(title) {
+		$('#div_preview').show(); 
+		$('#ifrm_preview').attr('src','/admin_software/app_viewer?title='+title);
+		var height = (window.pageYOffset || document.body.scrollTop) + 50; 
+		$('#div_preview').css('top', height);
+	}
+	function close_preview_app() {
+		$('#ifrm_preview').attr('src','about:blank'); $('#div_preview').hide();  // change this to blank.htm later 
+	}
+	function update_count(which, counter) {
+		$('#'+which+'_count').text(counter);
+	}	
+		
+	var manager; 
+	$(function() {
+	  manager = new BL.BUGdash.AppManager(); 
+	  manager.init('frm_installed', 'frm_browser'); 
+		$('.module').corner('7px tl'); 	  	
+	});
+</script>
+
+<style>
+	div#div_preview {position:absolute; left: 30px; background:#fff; padding: 15px 20px; display:none; border:8px solid #ccc;}
+	div#div_preview div {display:block; text-align:right;}
+	div#div_preview iframe {width:665px; height: 480px;}
+	div.module {height:300px}
+</style>
+
+<div class="module">
+	<div class="content" style="padding:0px;">
+		<table class="structure">
+			<tbody>
+			<tr class="header">
+				<td>Installed on your BUG</td>
+				<td id="installed_count" style="background-color:#38e37e">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<iframe src="/admin_software/apps_installed" id="frm_installed" style="width: 380px; height: 250px; overflow-x:hidden; overflow-y:auto" frameborder="0" ></iframe>	
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="module">
+	<div class="content" style="padding:0px;">
+		<table class="structure">
+			<tbody>
+			<tr class="header">
+				<td>Recommended apps</td>
+				<td id="recommended_count" style="background-color:#00a8f7">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<iframe src="/admin_software/apps_recommended" id="frm_installed" style="width: 380px; height: 250px; overflow-x:hidden; overflow-y:auto" frameborder="0" ></iframe>	
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="clear"></div>
+
+<iframe src="/admin_software/apps_from_bugnet" id="frm_browser" onload="resize_iframe('frm_browser');" style="width: 780px;" frameborder="0" scrolling="no"></iframe>
+
+
+
+<div id="div_preview">
+	<div><a href="javascript:void(0);" onclick="close_preview_app();">Close</a></div>
+	<iframe id="ifrm_preview" src="" frameborder="0" ></iframe>
+</div>
+
+<include "footer">

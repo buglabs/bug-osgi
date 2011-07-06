@@ -1,0 +1,13 @@
+Manifest-Version: 2.0
+Bundle-Name: BMI Bundle
+Bundle-SymbolicName: com.buglabs.bug.bmi
+Bundle-Activator: com.buglabs.bug.bmi.Activator
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Import-Package: 
+ com.buglabs.bug.module.pub,
+ com.buglabs.bug.sysfs,
+ com.buglabs.util.osgi,
+ com.buglabs.util.shell.pub,
+ org.osgi.framework,
+ org.osgi.service.log

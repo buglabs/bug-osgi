@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<project name="common-osgi" default="build.jars" basedir="." xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
+	<property name="buildDirectory" value="${basedir}/build" />
+	<property name="srcDirectory" location="${basedir}" />
+
+	<fail unless="checkout.dir" message="Ant variable checkout.dir must be defined." />
+	<fail unless="base.build.dir" message="Ant variable base.build.dir must be defined." />
+	<fail unless="externalDirectory" message="Ant variable externalDirectory must be defined." />
+	<fail unless="distDirectory" message="Ant variable distDirectory must be defined." />
+
+	<!-- The package version if previously undefined -->
+	<property name="default.package.version" value="2.5" />
+	<property name="docDirectory" value="${basedir}/javadoc" />
+	<property name="report.dir" value="${basedir}/report" />
+	<property name="report.src" location="${srcDirectory}" />
+	<property name="checkstyle.dir" value="${basedir}/checkstyle" />
+	<property name="checkstyle.config" value="${base.build.dir}/toolbox/checkstyle/buglabs_checks.xml" />
+	<property name="checkstyle.src" value="${srcDirectory}" />
+	<property name="junit.jar.name" value="junit4.jar" />
+	<property name="testBundles" value="file:${externalDirectory}/com.buglabs.osgi.tester.jar file:${externalDirectory}/${junit.jar.name}" />
+	<property name="felix.jar.name" value="felix.jar" />
+
+	<property environment="env" />
+	<tstamp />
+
+	<!-- Import Checkstyle -->
+	<taskdef resource="checkstyletask.properties" classpath="${base.build.dir}/toolbox/checkstyle/checkstyle-5.3-all.jar" />
+
+	<!-- PROJECT CLASSPATH -->
+	<path id="bin.classpath">
+		<fileset dir="${externalDirectory}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${distDirectory}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- COMPILER SETTINGS -->
+	<property name="javacFailOnError" value="true" />
+	<property name="javacDebugInfo" value="on" />
+	<property name="logExtension" value=".log" />
+	<property name="javacSource" value="1.6" />
+	<property name="javacTarget" value="1.6" />
+	<path id="path_bootclasspath">
+		<fileset dir="${java.home}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<property name="bootclasspath" refid="path_bootclasspath" />
+	<property name="bundleJavacSource" value="${javacSource}" />
+	<property name="bundleJavacTarget" value="${javacTarget}" />
+	<property name="bundleBootClasspath" value="${bootclasspath}" />
+
+	<!-- target: build	  Compile the source code -->
+	<target name="build" description="BUILDING: ${ant.project.name}">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build" />
+
+		<available file="${buildDirectory}" type="dir" property="delete-main-failure" />
+		<fail if="delete-main-failure" message="${buildDirectory} already exists, failing task." />
+
+		<mkdir dir="${buildDirectory}" />
+
+		<!-- These will only be set if previously undefined -->
+		<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
+		<property name="package.version" value="${default.package.version}" />
+		<property name="env.BUILD_NUMBER" value="0" />
+		<property name="env.JOB_NAME" value="undefined" />
+		<property name="env.BUILD_URL" value="undefined" />
+
+		<property name="full.version" value="${package.version}.${env.BUILD_NUMBER}">
+		</property>
+
+		<javac destdir="${buildDirectory}" srcdir="${srcDirectory}" source="${javacSource}" target="${javacTarget}" encoding="utf-8" fork="true" includeantruntime="false" debug="${javacDebugInfo}">
+			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
+			<classpath refid="bin.classpath" />
+		</javac>
+		<manifest file="${manifest.location}" mode="update">
+			<attribute name="Bundle-Version" value="${full.version}" />
+			<attribute name="Build-Label" value="${env.JOB_NAME}" />
+			<attribute name="Build-Source" value="${env.BUILD_URL}" />
+			<attribute name="Build-Date" value="${TODAY}" />
+		</manifest>
+	</target>
+
+	<!-- target: build.jars   Build jars intended for production distribution -->
+	<target name="build.jars" depends="build, document" description="Package the java class files into a jar.">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.jars" />
+			
+		<property name="dist.jar.name" value="${ant.project.name}" />
+		<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
+			
+		<fail unless="distDirectory" message="distDirectory must be defined." />
+		<fail unless="buildDirectory" message="buildDirectory must be defined." />
+
+		<jar destfile="${distDirectory}/${dist.jar.name}.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="**/*.java,build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,**/.classpath,**/.project,src/**,test/**,junit-reports/**,.git/**,**.gitignore,**/.checkstyle,**/README.*,**/build*.sh,checkstyle-reports/**" />
+	</target>
+
+	<!-- target: build.src.jars   Build jars with source code -->
+	<target name="build.src.jars" depends="build, document" description="Package the java class files into a jar with source files.">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build.src.jars" />
+			
+		<property name="dist.jar.name" value="${ant.project.name}" />
+		<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
+
+		<jar destfile="${distDirectory}/${dist.jar.name}-src.jar" basedir="${buildDirectory}" manifest="${manifest.location}" excludes="build/**,**/.settings/**,**/build.xml/**,**/build.properties/**,test/**,junit-reports/**,.git/**,**.gitignore" />
+	</target>
+
+	<!-- target: doc.build.jars   Generate javadocs after building and jaring -->
+	<target name="doc.build.jars" description="Generate javadoc and make the jar.">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: doc.build.jars" />
+		
+
+		<property name="generate.docs" value="true" />
+		<antcall target="build.jars" />
+	</target>
+
+	<target name="document" if="generate.docs">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: document" />
+		<echo message="Generating documentation in directory: ${docDirectory}/${ant.project.name}" />
+		<javadoc destdir="${docDirectory}/${ant.project.name}" classpathref="bin.classpath">
+			<fileset dir="${srcDirectory}">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<!-- target: test   Run JUnit tests -->
+	<target name="test" depends="create_dirs, build.jars">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test" />
+		<fail unless="report.dir" message="Ant variable report.dir must be defined." />
+		<echo message="Generating test result output in ${report.dir}..." />
+		<junit printsummary="yes">
+			<classpath refid="bin.classpath" />
+			<sysproperty key="report.misc" value="${report.misc}" />
+			<formatter type="xml" />
+			<batchtest todir="${report.dir}">
+				<fileset dir="${report.src}">
+					<include name="**/*Test*.java" />
+					<exclude name="**/*OSGiTest*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<!-- target: test-osgi   Run tests within an OSGi framework -->
+	<target name="test-osgi" depends="clean, test">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: test-osgi" />
+
+		<echo message="Generating osgi-test result output in ${report.dir}..." />
+		<echo message="Creating OSGi instance with following bundles: ${testBundles}">
+		</echo>
+		<property name="osgi.framework.jar" location="${externalDirectory}/${felix.jar.name}" />
+		<java jar="${osgi.framework.jar}" fork="true">
+			<jvmarg value="-Dorg.osgi.framework.storage=/tmp/felix-cache" />
+			<jvmarg value="-Dorg.osgi.framework.storage.clean=onFirstInit" />
+			<jvmarg value="-Dfelix.auto.deploy.dir=${distDirectory}" />
+			<jvmarg value="-Dfelix.auto.start.1=${testBundles}" />
+			<jvmarg value="-Dcom.buglabs.osgi.tester.report.dir=${report.dir}" />
+		</java>
+	</target>
+
+	<!-- target: checkstyle   Run the checkstyle validator against sources -->
+	<target name="checkstyle" depends="create_dirs">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: checkstyle" />
+		<fail unless="checkstyle.dir" message="Ant variable checkstyle.dir must be defined." />
+		<echo message="Running checkstyle template: ${checkstyle.config} for sources in ${checkstyle.src} and outputing to ${checkstyle.dir}/checkstyle_errors.xml">
+		</echo>
+		<checkstyle config="${checkstyle.config}">
+			<fileset dir="${checkstyle.src}" includes="**/*.java" />
+			<formatter type="xml" toFile="${checkstyle.dir}/checkstyle-${ant.project.name}.xml" />
+		</checkstyle>
+	</target>
+
+	<!-- target: cpd   Run the cpd dup checker against sources -->
+	<target name="cpd">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: cpd" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpath="${base.build.dir}/toolbox/pmd/pmd-4.2.5.jar:${base.build.dir}/toolbox/pmd/jaxen-1.1.1.jar" />
+		<cpd minimumTokenCount="100" format="xml" outputFile="${checkstyle.dir}/cpd-${ant.project.name}.xml">
+			<fileset dir="${checkstyle.src}">
+				<include name="**/*.java" />
+			</fileset>
+		</cpd>
+	</target>
+
+	<!-- target: pmd   Run the pmd validator against sources -->
+	<target name="pmd">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: pmd" />
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpath="${base.build.dir}/toolbox/pmd/pmd-4.2.5.jar:${base.build.dir}/toolbox/pmd/jaxen-1.1.1.jar:${base.build.dir}/toolbox/pmd/asm-3.1.jar" />
+		<pmd>
+			<ruleset>rulesets/favorites.xml</ruleset>
+			<ruleset>basic</ruleset>
+			<ruleset>strings</ruleset>
+			<ruleset>braces</ruleset>
+			<ruleset>coupling</ruleset>
+			<ruleset>design</ruleset>
+			<ruleset>imports</ruleset>
+			<formatter type="xml" toFile="${checkstyle.dir}/pmd-${ant.project.name}.xml" />
+			<fileset dir="${srcDirectory}">
+				<include name="**/*.java" />
+			</fileset>
+		</pmd>
+	</target>
+
+
+	<target name="buildDirectory.check">
+		<condition property="buildDirectory.exists">
+			<available file="${buildDirectory}" type="dir" />
+		</condition>
+	</target>
+
+	<target name="create_dirs">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: create_dirs" />
+		<mkdir dir="${report.dir}" />
+		<mkdir dir="${checkstyle.dir}" />
+		<mkdir dir="${distDirectory}" />
+		<mkdir dir="${externalDirectory}" />
+	</target>
+
+	<target name="clean">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: clean" />
+		<delete dir="${buildDirectory}" />
+	</target>
+	
+	<target name="clean_all">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: clean_all" />
+		<delete dir="${report.dir}" />
+		<delete dir="${buildDirectory}" />
+		<delete dir="${checkstyle.dir}" />
+		<delete dir="${distDirectory}" />
+		<delete dir="${externalDirectory}" />
+		<delete dir="${docDirectory}" />
+	</target>
+</project>

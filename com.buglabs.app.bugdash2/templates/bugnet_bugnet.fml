@@ -1,0 +1,62 @@
+<include "header">
+<h1>BUGnet</h1>
+
+<if error != "">${error}</if>
+
+<script type="text/javascript">	
+	var submit_status;
+	<if js_submit_status != "" >  
+	submit_status = ${js_submit_status}; 
+	</if>	
+	
+	$(function() {
+		if (submit_status != undefined) 
+			parent.announcer.tell(submit_status, true); 
+	});	
+</script>
+
+<div class="main">
+<table class="form">
+	<form name="frm_bugnet_login" method="post" action="">
+		<if logged_in == "true">
+			<tr>
+				<td colspan="2">
+						Logged in as ${username} <br /><br />
+						<input type="submit" name="btn_submit" value="Logout" class="submit" />
+				</td>
+			</tr>
+		<else>
+			<tr>
+				<td>Username</td>
+				<td>
+					<input type="text" name="inp_username" id="inp_username" value="${username}" />
+				</td>
+			</tr>
+			<tr>
+			</tr>
+			<tr>
+				<td>Password</td>
+				<td>
+					<input type="password" name="inp_password" id="inp_password" value="" />
+				</td>
+			</tr>
+			<!--
+			AK: hold until we figure out how to create a cookie with an expiration date 
+			<tr>
+				<td></td>
+				<td>
+					<input type="checkbox" name="remember_me" id="remember_me" value="yes" />
+					&nbsp;
+					Remember my info
+				</td>
+			</tr>
+			-->
+			<tr>
+				<td></td>
+				<td><input type="submit" name="btn_submit" value="Login" class="submit" /></td>
+			</tr>
+		</if> 		
+	</form>
+</table>
+</div>
+<include "footer">

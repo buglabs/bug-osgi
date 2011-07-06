@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-Name: BUG Base 2.0 Services
+Bundle-Activator: com.buglabs.bug.base.Activator
+Bundle-SymbolicName: com.buglabs.bug.base.bug20
+Bundle-Version: 1.0.0
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.bug.base.pub
+Import-Package: com.buglabs.bug.input.pub,
+ com.buglabs.bug.sysfs,
+ com.buglabs.device,
+ com.buglabs.support,
+ com.buglabs.util.osgi,
+ com.buglabs.util.ui,
+ javax.servlet,
+ javax.servlet.http,
+ org.apache.commons.io,
+ org.osgi.framework,
+ org.osgi.service.http,
+ org.osgi.service.log,
+ org.osgi.util.tracker

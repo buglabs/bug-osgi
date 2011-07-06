@@ -1,0 +1,72 @@
+<include "header">
+<script type="text/javascript">
+
+	var submit_status;
+	<if js_submit_status != "" >  
+	submit_status = ${js_submit_status}; 
+	</if>
+	
+	$(function() {
+		if (submit_status != undefined) 
+			top.announcer.tell(submit_status, true); 
+	});
+	
+	function delete_file(file_path)
+	{
+		if (confirm('Are you sure you want to delete this file? You cannot undo this operation.')) {
+			// make this a post operation 
+			document.file_delete.submit();
+		}
+	}
+	
+	if('${file_title}' == "")
+	{
+		this.parent.nav.window.location = "/admin_system/navigator";
+	}
+	
+</script>
+<style>
+	h2 {border-bottom:1px dotted #ccc; padding-bottom:6px;}
+	body {background-color:#fefefe; margin:10px 20px;}
+	.reader .message {width: 600px; height: 300px;}
+	table.file_detail tbody tr td { font-size:12px; padding: 2px 30px 3px 0px; }
+	table.file_detail tbody tr td.label {color:#666; width: 60px; padding-right: 7px; white-space:nowrap;}
+	div.file_menu {margin-top: 10px;}
+	.image_viewer { width: 600px; height: 300px; overflow: auto;}
+</style>
+<if file_title != "">
+	<h2>${file_title}</h2>
+	<form id="delete" name="file_delete" action="" method="post">
+		<input type="text" name="filename" value='${file_title}' style="display:none" />
+		<input type="text" name="hiddenFilePath" value='${file_path}' style="display:none" />
+	</form>
+	
+	<table class="file_detail">
+	<tr>
+		<td class="label">File type</td>
+		<td>${file_type}</td>
+		<td class="label">Last modified</td>
+		<td>${file_last_modified}</td>
+		<td class="label">File size</td>
+		<td>${file_size} KB</td>		
+	</tr>
+	</table>
+	<if is_image == "true"> 
+		<div class="image_viewer">
+			<img src="/admin_imageviewer?${file_path}" alt="${file_path}" />
+		</div>
+	<else>
+		<if is_text == "true" > 
+			<div class="reader">
+				<div class="message"><pre>${file_content}</pre></div>
+			</div>
+		</if> 
+	</if>
+	<div class="file_menu">
+		<a href="/admin_imageviewer?-1${file_path}" class="submit-small">Download ${file_title}</a>&nbsp;&nbsp;
+		<a href="javascript:void(0);" onclick="delete_file('${file_path}')">Delete this file</a>
+	</div>
+<else> 
+	<h3>Select a file from the right panel</h3>
+</if> 
+<include "footer">

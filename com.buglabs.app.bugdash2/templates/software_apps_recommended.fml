@@ -1,0 +1,43 @@
+<include "header">
+<style>
+	body {background-color:#f9f9f9} /* displayed inside a module */
+</style>
+<script type="text/javascript">
+$(function() {
+	if (typeof(parent.update_count) == 'function') {
+		parent.update_count('recommended',${apps_size}); 
+	}
+});
+</script>
+<if connected == "true">
+	<table class="general">
+		<tbody>
+			<foreach app in apps_list>
+				<tr <if app.index%2==0 >class="alternate"</if> >
+					<td class="menu center">
+						<img src="/admin.images/download-icn.gif" alt="install" /><br />
+						<a href="javascript:void(0);" onclick="parent.manager.install('${app.title}');">Install</a>
+					</td>
+					<td>
+						<a href="javascript:void(0)" onclick="parent.preview_app('${app.title}')"><img src="${app.icon}" class="polaroid icon" /></a>
+					</td>
+					<td class="title">
+						<a href="javascript:void(0)" onclick="parent.preview_app('${app.title}')" style="display:block;">${app.title}</a>
+						${app.module_icons}
+					</td>
+					<td class="small">
+						<if app.category != "">
+							<span class="quiet">${app.category}</span><br />
+						</if>
+						${app.api_version}&nbsp;
+					</td>
+				</tr>
+			</foreach>	
+		</tbody>
+	</table>
+<else>
+	<div class="center"><br /><br />No network connection</div>
+</if>
+
+
+<include "footer">

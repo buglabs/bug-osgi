@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bug-Bundle-Type: Application
+Bundle-Vendor: Bug Labs, Inc.
+Bundle-Version: 2.2.0
+BUG-API-Version: 1.4.4
+Bundle-Name: BUGDash
+Bundle-Activator: com.buglabs.app.bugdash2.Activator
+Bundle-SymbolicName: com.buglabs.app.bugdash2
+Import-Package: 
+ com.buglabs.util,
+ com.buglabs.util.xml,
+ com.buglabs.bug.dragonfly.module,
+ com.buglabs.bug.program.pub,
+ com.buglabs.osgi.sewing.pub,
+ com.buglabs.osgi.sewing.pub.util,
+ com.buglabs.util.osgi,
+ com.buglabs.util.shell.pub,
+ com.buglabs.util.simplerestclient,
+ com.buglabs.util.ui,
+ org.sprinkles.functions,
+ freemarker.template,
+ javax.servlet,
+ javax.servlet.http,
+ org.osgi.framework,
+ org.osgi.service.cm,
+ org.osgi.service.log,
+ org.osgi.util.tracker

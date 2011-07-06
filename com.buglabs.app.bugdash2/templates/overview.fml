@@ -1,0 +1,147 @@
+<include "header">
+<h1>Overview</h1>
+
+<script>
+	function update_processes(id) {
+		if (id) $('#'+id).text('...');
+		BL.BUGdash.Utilities.displayProcesses(
+			function(text) { 
+				$('#div_overview_processes').text(text); 
+				if (id) $('#'+id).text('Refresh'); 
+			},
+			function() { }
+		);
+	}
+	function expand_processes() {
+		if ($('#div_overview_processes').css('height') == 'auto') {
+			$('#div_overview_processes').css('height','150px'); $('#ahref_expand').text('Expand');
+		} else {
+			$('#div_overview_processes').css('height','auto'); $('#ahref_expand').text('Collapse');
+		}
+	}
+	var device_name = '${device_name}';
+	function edit_device_name() {
+		$('#div_rename_device .view_name').hide();
+		$('#div_rename_device .edit_name').show();
+		$('#div_rename_device #inp_name').focus();
+	}
+	function save_device_name() {
+		var new_name = $('#div_rename_device #inp_name').val(); 
+
+		new_name = jQuery.trim(new_name);
+		new_name = new_name.replace(/^[0-9]/g,''); 			// hostname cannot start with a number 
+		new_name = new_name.replace(/\-$/g,''); 			// hostname cannot end with a hyphen
+		new_name = new_name.replace(/[^a-zA-Z 0-9]+/g,''); 	// cleanup 
+		new_name = new_name.replace(/\ /g,'-'); 			// hyphen is allowed 
+		
+		if (new_name.length == 0) {
+			$('#div_rename_device #inp_name').focus();
+			alert('Please enter a new device name'); 
+			return false; 
+		} 		
+		if (new_name != device_name) { 
+			jQuery.ajax({
+				url: '/admin_system/rename_device', 
+				data: 'inp_bugname='+new_name+'&format=json',
+				type: 'POST',
+				success: function(data) {
+					if (data.indexOf('error') > -1) {
+						parent.announcer.tell({category: 'error', message:'There was a problem updating device name'}, true);
+					} else { 
+					device_name = new_name; 
+						$('#div_rename_device #inp_name').val(new_name);
+						$('#div_rename_device #span_device_name').text(new_name);
+						view_device_name();				
+						parent.announcer.tell({category: 'info', message:'Your device name is updated to ' + device_name}, true);
+					} 
+				},
+				error: function() {
+					parent.announcer.tell({category: 'error', message: 'There was a problem updating device name'}, true); 
+					
+				}
+			});
+		} else {
+			view_device_name();
+			parent.announcer.tell({category: 'info', message:'Your device name is already ' + new_name}, true);
+		}
+	}
+	function view_device_name() {
+		$('#div_rename_device .view_name').show();
+		$('#div_rename_device .edit_name').hide();	
+	}
+	$(function() { 
+		$('.module').corner('7px tl'); update_processes(); 
+	});
+</script>
+
+<div class="module">
+	<h2>BUG Software</h2>
+	<div class="content">
+		<b>Root filesystem</b><br />
+		<p>${rootfs_info}</p><br />
+		<b>Kernel</b><br />
+		<p>${kernel_info}</p>
+	</div>
+	<div class="footer">
+		<a href="/admin_system/display_system_info">More info <img src="/admin.images/more-info.jpg" /></a>
+	</div>
+</div>
+
+<div class="module">
+	<h2>Device Info</h2>
+	<div class="content">
+		<div id="div_rename_device">
+		 <div class="view_name">
+		 	Device name: <span id="span_device_name">${device_name}</span>&nbsp;
+		 	<if device_name != "">
+		 	<a href="javascript:void(0);" onclick="edit_device_name();" style="font-size:11px">Edit</a>
+		 	</if>
+		 </div>
+		 <div class="edit_name" style="display:none">
+		 	Name: <input type="text" id="inp_name" value="${device_name}" style="width:120px" maxlength="30" /> 
+		 	<input type="button" value="Save" onclick="save_device_name();" class="submit-small" />
+		 	<a href="javascript:void(0);" onclick="view_device_name();" style="font-size:11px">Cancel</a>
+		 </div>
+		</div>
+		<p>${disk_info}</p>
+	</div>
+	<div class="footer">
+		<a href="/admin_system/display_system_info">More info <img src="/admin.images/more-info.jpg" /></a>
+	</div>	
+</div>
+
+<div class="clear"></div>
+
+<div class="module">
+	<h2>Apps on your BUG</h2>
+	<div class="content" style="padding:0px;">
+		<iframe src="/admin_software/apps_installed?disable=true" id="frm_installed" style="width: 380px; height: 140px; overflow-x:hidden; overflow-y:auto" frameborder="1" ></iframe>
+	</div>
+	<div class="footer">
+		<a href="/admin_software/apps">More info <img src="/admin.images/more-info.jpg" /></a>
+	</div>		
+</div>
+
+<div class="module">
+	<h2>Network</h2>
+	<div class="content">
+		<!--
+		<p><div id="network_status" style="font-weight:bold;">Testing connectivity..</div></p>
+		-->	
+		<p>${network_info}</p>
+	</div>	
+</div> 
+
+<div class="clear"></div>
+
+<div class="module">
+	<h2>Processes</h2>
+	<div class="content" style="padding:0 10px;">	
+		<a href="javascript:void(0);" id="ahref_refresh" class="btn-menu" onclick="update_processes('ahref_refresh');">Refresh</a>
+		<a href="javascript:void(0);" id="ahref_expand" class="btn-menu" onclick="expand_processes();">Expand</a>
+		<br />
+		<div id="div_overview_processes"></div>
+	</div>
+</div>
+
+<include "footer">

@@ -1,0 +1,95 @@
+<include "header">
+<h1>Install ipkg</h1>
+
+<script>
+	var submit_status;
+	<if js_submit_status != "" >  
+	submit_status = ${js_submit_status}; 
+	</if>
+	
+	$(function() {
+		if (submit_status != undefined) 
+			parent.announcer.tell(submit_status, true); 
+	});
+	
+	function delete_repo(path) {
+		if (confirm('Are you sure you want to delete the following config file?\n\n'+path)) {
+			$('#ipkg_delete_repo').attr('value',path);
+			$("form:first").submit();
+		}
+	}
+</script>
+
+<div class="main">
+	<div style="line-height:23px;">
+		<h2>Option 1: Install from a remote server</h2>
+		<form name="frm" action="/admin_software/install_package" method="post">
+		<input type="hidden" name="ipkg_delete_repo" id="ipkg_delete_repo" value="" />
+		
+		Type in one or more ipkgs: <br />
+		<input type="text" name="ipkg_name" class="text" style="width:400px; margin-top:4px;" />
+		<br />
+					<a href="javascript:void(0);" onclick="$('#div_ipk_customize').toggle();">Which server?</a><br />
+
+					<div id="div_ipk_customize" style="display:none;">
+						<table>
+							<if ipkg_sources_size gt 0 > 
+								<tr>
+									<td colspan="2">We'll use the following sources:</td>
+								</tr>
+								<assign header = "">
+								<foreach source in ipkg_sources>
+									<if header != source.file >
+										<tr>
+											<td colspan="2"><b>${source.file}</b></td>
+											<td>
+												<if source.readonly == "false">
+													<a href="javascript:void(0)" onclick="delete_repo('${source.file}')">Delete [x]</a>
+												</if>
+											</td>
+										</tr>	
+									</if>
+									<tr>
+										<td>${source.name}</td>
+										<td>${source.url}</td>
+										<td></td>
+									</tr>
+									<assign header = source.file>
+								</foreach>
+							<else>
+								<tr>
+									<td colspan="3">No source entries found</td>
+								</tr>
+							</if>
+							<tr>
+								<td colspan="3">Add a new entry:</td>
+							</tr>							
+							<tr>
+								<td>
+									<input type="text" name="ipkg_repo_name" style="width:100px;" /><br />
+									<span class="quiet">Name</span>
+								</td>
+								<td>
+									http:// <input type="text" name="ipkg_repo_url" style="width:200px;" /><br />
+									<span class="quiet" style="margin-left:40px;">URL</span>
+								</td>
+								<td></td>
+							</tr>
+						</table>
+					</div>
+					<br />
+					<input type="submit" value="Submit" class="submit" />
+
+		</form>
+		
+		<br />
+		<h2>Option 2: Provide an ipkg file</h2>
+		<form name="frm" action="/admin_software/install_package" method="post" enctype="multipart/form-data">
+		Browse your local machine for an ipkg file: <br />
+		<input type="file" name="ipkg_file" style="margin: 5px 0px;" /> &nbsp;<br />
+		<input type="submit" value="Upload and install" class="submit" style="margin-top:7px;" />
+		</form>
+	</div> 
+</form>
+</div>
+<include "footer">

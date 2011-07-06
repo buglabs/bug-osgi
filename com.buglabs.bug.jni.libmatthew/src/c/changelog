@@ -1,0 +1,49 @@
+Version 0.7.1:
+
+	* Fix compiler warning on 64bit systems (spotted by 
+	  serkankaba -at- gmail -dot- com)
+	* Fix compilation with glibc 2.8 (patch from Omair Majid
+	  <omajid -at- redhat -dot- com>)
+
+Version 0.7:
+
+	* use += not ?= when setting *FLAGS
+	* Possible SIGSEGV in native_close, possible fix
+	* Don't include debug-disable in any manifests
+	* Fix some compiler warnings. Setenv doesn't exist on all platforms.
+
+Version 0.6:
+
+	* Add toByteArray to Hexdump for creating byte-array-literals in
+	  generated code.
+	* UnixSocket output streams can now send multiple byte[] at once
+	  to use scatter-gather for efficiency
+	* Add fuctions to get peer credentials
+	* Work on BSD
+
+Version 0.5:
+
+	* Add licence headers to files which are missing
+	* fix javadoc calls so that -link is replacable with local docs
+	* add .NOPARALLEL: to disable parallel building. Fails to get debugging
+	right
+
+Version 0.4:
+	
+	* Add javadoc target
+	* Add Manifest with Class-Path to relevant jars
+
+Version 0.2:
+
+	* Fix Unix Sockets not to lose reference if IO streams are still
+	referenced.
+	* Add methods to Debug to set the config manually
+	* update Debug defaults
+	* add ALL as a class name to Debug
+	* write installation guide
+	* fix UnixSocket.setBlocking
+	* add UnixSocket.setSoTimeout
+
+Version 0.1:
+
+	* Initial code and packaging.

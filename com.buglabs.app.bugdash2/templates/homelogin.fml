@@ -1,0 +1,52 @@
+<include "header">
+<script type="text/javascript">
+	if("${login_correct}" == "true")
+	{
+		window.location = "../admin";
+	}
+</script>
+<style>
+table#tbl_form tbody tr td {padding: 5px;}
+table#tbl_form tbody tr td.label {color:#666}
+</style>
+<table id="container" class="structure">
+	<tbody>	
+		<tr style="height:99px">
+			<td><div id="header"></div></td>
+		</tr>
+		<tr>
+			<td>
+				<div id="loginform" class="main">
+				<h1>Welcome</h1>
+				<p>BUGdash is a web-based admin tool for your BUG. Please log in.<br /><br /></p>
+				<form name="frm_rename" method="post" action="">				
+					<table id="tbl_form">
+						<if error != "">
+						<tr>
+							<td></td>
+							<td class="highlight">&nbsp;${error}</td>
+						</tr>					
+						</if>
+						<tr>
+							<td class="label">Username</td>
+							<td><input type="text" name="inp_username" id="inp_buguser" value="" class="text" /></td>
+						</tr>
+						<tr>
+							<td class="label">Password</td>
+							<td>
+								<input type="password" name="inp_password" id="inp_bugpass" value="" class="text" />
+								&nbsp;<a href="/admin/forgotPassword">Forgot password?</a>
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td colspan="2"><input type="submit" name="btn_submit" value="Login" class="submit" /></td>
+						</tr>
+					</table>
+				</form>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<include "footer">
