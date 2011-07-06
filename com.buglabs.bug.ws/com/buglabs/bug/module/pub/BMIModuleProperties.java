@@ -5,11 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.buglabs.bug.sysfs.BMIDevice;
+
 /**
  * A bean-style class for properties associated with a BMI module attached to
  * BUG.
  * 
- * @deprecated Use com.buglabs.bug.sysfs.BMIDevice instead.
  * @author kgilmer
  * 
  */
@@ -24,6 +25,7 @@ public class BMIModuleProperties {
 	private int power_charging;
 	private String product_id;
 	private String serial_num;
+	private static BMIDevice device;
 
 	private BMIModuleProperties(int gpioUsage, int powerUse, String productId) {
 		this.gpio_usage = gpioUsage;
@@ -60,6 +62,10 @@ public class BMIModuleProperties {
 		//String serialNum = parseMultiInt(loadFile(new File(directory, "serial_num")));
 
 		return new BMIModuleProperties(revision, vendor, productId);
+	}
+	
+	public static BMIModuleProperties createFromBMIDevice(BMIDevice device) throws IOException {
+		return new BMIModuleProperties(device.getRevision(), device.getVendor(), device.getProductId());
 	}
 
 	public String getDescription() {
