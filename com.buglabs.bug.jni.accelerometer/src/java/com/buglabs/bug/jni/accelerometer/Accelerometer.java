@@ -30,17 +30,37 @@ package com.buglabs.bug.jni.accelerometer;
 import com.buglabs.bug.accelerometer.pub.AccelerometerConfiguration;
 import com.buglabs.bug.jni.common.CharDevice;
 
+/**
+ * Controls the Accelerometer device on the BUG MDACC module.
+ *
+ */
 public class Accelerometer extends CharDevice {
 
 	static {
 		System.loadLibrary("Accelerometer");
 	}
 
+	/**
+	 * Start the accelerometer device.
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_MDACC_ACCELEROMETER_RUN();
 
+	/**
+	 * Stop the accelerometer device.
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_MDACC_ACCELEROMETER_STOP();
 
+	/**
+	 * Configure the accelerometer device.
+	 * @param config
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_MDACC_ACCELEROMETER_SET_CONFIG(AccelerometerConfiguration config);
 
+	/**
+	 * @return active accelerometer configuration.
+	 */
 	public native AccelerometerConfiguration ioctl_BMI_MDACC_ACCELEROMETER_GET_CONFIG();
 }

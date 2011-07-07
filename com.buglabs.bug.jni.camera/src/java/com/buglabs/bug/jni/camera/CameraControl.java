@@ -27,18 +27,46 @@
  *******************************************************************************/
 package com.buglabs.bug.jni.camera;
 
+/**
+ * Controller for the BUG 2.0 Camera Module.
+ *
+ */
 public class CameraControl {
 
+	/**
+	 * Flash ligh beam
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_CAM_FLASH_HIGH_BEAM();
 
+	/**
+	 * Flash low beam
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_CAM_FLASH_LOW_BEAM();
 
+	/**
+	 * Turn flash off
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_CAM_FLASH_LED_OFF();
 
+	/**
+	 * Turn flash on
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_CAM_FLASH_LED_ON();
 
+	/**
+	 * Turn red LED off
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_CAM_RED_LED_OFF();
 
+	/**
+	 * Turn red LED on
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_CAM_RED_LED_ON();
 
 	public native int ioctl_BMI_CAM_GREEN_LED_OFF();
@@ -61,19 +89,81 @@ public class CameraControl {
 	 */
 	public native int ioctl_BMI_CAM_GET_SELECTED();
 	
+	/**
+	 * Suspend camera module
+	 * @return  0 on success
+	 */
 	public native int ioctl_BMI_CAM_SUSPEND();
 	
+	/**
+	 * Resume camera module
+	 * @return 0 on success
+	 */
 	public native int ioctl_BMI_CAM_RESUME();
 
 	// for ICamera2ModuleControl
+	/**
+	 * TODO: Document
+	 * @return 0 on success
+	 */
 	public native int getTestPattern();
+	
+	/**
+	 * TODO: Document
+	 * @param testPattern
+	 * @return  0 on success
+	 */
 	public native int setTestPattern(int testPattern);
+	
+	/**
+	 * TODO: Document
+	 * @return
+	 */
 	public native int getColorEffects();
+	
+	/**
+	 * TODO: Document
+	 * @param colorEffects
+	 * @return
+	 */
 	public native int setColorEffects(int colorEffects);
+	
+	/**
+	 * TODO: Document
+	 * @return
+	 */
 	public native int getVerticalFlip();
+	
+	/**
+	 * TODO: Document
+	 * @param verticalFlip
+	 * @return
+	 */
 	public native int setVerticalFlip(int verticalFlip);
+	
+	/**
+	 * TODO: Document
+	 * @return
+	 */
 	public native int getHorizontalMirror();
+	
+	/**
+	 * TODO: Document
+	 * @param horizontalMirror
+	 * @return
+	 */
 	public native int setHorizontalMirror(int horizontalMirror);
+	
+	/**
+	 * TODO: Document
+	 * @return
+	 */
 	public native int getExposureLevel();
+	
+	/**
+	 * TODO: Document
+	 * @param exposureLevel
+	 * @return
+	 */
 	public native int setExposureLevel(int exposureLevel);
 }

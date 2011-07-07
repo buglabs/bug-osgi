@@ -29,35 +29,74 @@ package com.buglabs.bug.jni.camera;
 
 import com.buglabs.bug.jni.common.CharDevice;
 
+/**
+ * Camera device.
+ *
+ */
 public class Camera extends CharDevice {
 	static {
 		System.loadLibrary("Camera");
 	}
 			
+	/**
+	 * @param media_node
+	 * @param slot_num
+	 * @param raw_height
+	 * @param raw_width
+	 * @param resize_height
+	 * @param resize_width
+	 * @return 0 on success
+	 */
 	public native int bug_camera_open(final String media_node,
 			int slot_num,
 			int raw_height,
 			int raw_width,
 			int resize_height,
 			int resize_width);
+	
+	/**
+	 * Close the camera device
+	 * @return 0 on success
+	 */
 	public native int bug_camera_close();
 
-	// start acquiring frames (typically for preview mode)
-	// camera must have been opened first
+	/**
+	 * start acquiring frames (typically for preview mode)
+	 *  camera must have been opened first
+	 *  
+	 * @return 0 on success
+	 */
 	public native int bug_camera_start();
 	
-	// stop acquiring frames (typically for preview mode)
-	// camera may be closed one it' stopped
+
+	/**
+	 * stop acquiring frames (typically for preview mode)
+	 * camera may be closed one it' stopped
+	 * @return 0 on success
+	 */
 	public native int bug_camera_stop();
 
-	// grab a preview-sized image as RGB. If pixelBuffer is null the frame
-	// will still be grabbed, but then thrown away - which is useful
-	// on startup to allow the sensor to settle
+	/**
+	 * grab a preview-sized image as RGB. If pixelBuffer is null the frame
+	 * will still be grabbed, but then thrown away - which is useful
+	 * on startup to allow the sensor to settle
+	 * 
+	 * @param pixelBuffer array to load with values
+	 * @return 0 on success
+	 */
 	public native boolean bug_camera_grab_preview(int [] pixelBuffer);
 	
-	// grab a raw-sized image as JPEG
+	
+	/**
+	 * Grab a raw-sized image as JPEG
+	 * @return byte array of image
+	 */
 	public native byte[] bug_camera_grab_raw();
 	
-	// flush the frame queue
+	
+	/**
+	 * flush the frame queue
+	 * @return 0 on success
+	 */
 	public native int bug_camera_flush_queue();
 }
