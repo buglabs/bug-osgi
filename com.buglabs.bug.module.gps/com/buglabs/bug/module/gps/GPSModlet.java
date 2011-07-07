@@ -81,16 +81,21 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 
 	private ServiceRegistration moduleReg;
 
-	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	protected static final String PROPERTY_IOX = "IOX";
 	protected static final String PROPERTY_GPS_FIX = "GPS Fix";
 	protected static final String PROPERTY_ANTENNA = "Antenna";
 	protected static final String PROPERTY_ANTENNA_PASSIVE = "Passive";
 	protected static final String PROPERTY_ANTENNA_ACTIVE = "Active";
 
-	public static final String MODULE_ID = "0001";
-
+	/**
+	 * Service property that defines active Antenna type.
+	 */
 	private static final String EXTERNAL_ANTENNA_PROPERTY = "gps.antenna.external";
+
+	/**
+	 * Number of millis to wait before checking the GPS sync status.
+	 */
+	private static final long GPS_STATUS_SCAN_INTERVAL = 5000;
 
 	private NMEASentenceProvider nmeaProvider;
 	private GPSControl gpsControl;
@@ -149,12 +154,13 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		registerService(PublicWSProvider.class.getName(), this, null);
 
 		timer = new Timer();
-		timer.schedule(new GPSFIXLEDStatusTask(this, getLog()), 500, 5000);
+		timer.schedule(new GPSFIXLEDStatusTask(this, getLog()), 500, GPS_STATUS_SCAN_INTERVAL);
 
 		registerService(IPositionProvider.class.getName(), this, createBasicServiceProperties());
-		context.addServiceListener(nmeaProvider, "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "="
-				+ IPositionSubscriber.class.getName() + "))");
-		context.addServiceListener(nmeaProvider, FilterUtil.generateServiceFilter(INMEASentenceSubscriber.class.getName(), IPositionSubscriber.class.getName()));
+		
+		context.addServiceListener(nmeaProvider, FilterUtil.generateServiceFilter(
+				INMEASentenceSubscriber.class.getName(), 
+				IPositionSubscriber.class.getName()));
 	}
 
 	private Dictionary createBasicServiceProperties() {

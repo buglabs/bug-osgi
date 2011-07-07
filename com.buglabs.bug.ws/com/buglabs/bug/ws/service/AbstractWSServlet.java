@@ -45,6 +45,7 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
+import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.osgi.OSGiServiceLoader;
 
@@ -78,8 +79,10 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 				if (!listenerRegistered) {
 					listenerRegistered = true;
 					addExistingServices(context, serviceMap);
-					context.addServiceListener(this, "(|(" + Constants.OBJECTCLASS + "=" + PublicWSProvider2.class.getName() + ") (" + Constants.OBJECTCLASS + "="
-							+ PublicWSProvider.class.getName() + "))");
+					context.addServiceListener(this, FilterUtil.generateServiceFilter(
+							PublicWSProvider2.class.getName(),
+							PublicWSProvider.class.getName()
+							));					
 				}
 			} catch (Exception e) {
 				//Since our filter does not change, this should never occur.
