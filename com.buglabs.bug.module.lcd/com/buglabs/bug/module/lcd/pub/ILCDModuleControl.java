@@ -32,7 +32,7 @@ import java.io.IOException;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 
 /**
- * The interface that controls functions of the LCD module.
+ * The interface that controls functions of the LCD module (BUG 2.0).
  */
 public interface ILCDModuleControl extends IModuleControl {
 	
@@ -41,24 +41,5 @@ public interface ILCDModuleControl extends IModuleControl {
 	 *            Set's the intensity of the backlight 0-7.
 	 * 
 	 */
-	public int setBackLight(int val) throws IOException; // Set IOX backlight
-															// bits [2:0]
-
-	/**
-	 * @param val
-	 *            Set's the intensity of the backlight 0-7.
-	 * @deprecated use setBackLight.
-	 */
-	public int setBlackLight(int val) throws IOException; // Set IOX backlight
-															// bits [2:0]
-
-	/**
-	 * 
-	 * @return The stat of IOX. The 3 LSBs reprersent the state of the
-	 *         backlight.
-	 */
-
-	public int disable() throws IOException; // Power down module
-
-	public int enable() throws IOException; // Power up module
+	public int setBackLight(int val) throws IOException; // Set IOX backlight	
 }
