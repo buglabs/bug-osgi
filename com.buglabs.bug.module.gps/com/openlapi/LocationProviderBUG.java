@@ -81,7 +81,7 @@ public class LocationProviderBUG extends LocationProviderSimplified {
 	 * @return INMEARawFeed or NULL if no service is available.
 	 */
 	private INMEARawFeed getRawFeed() {
-		BundleContext bc = Activator.getInstance().getBundleContext();
+		BundleContext bc = Activator.getContext();
 		
 		ServiceReference sr = bc.getServiceReference(INMEARawFeed.class.getName());
 		

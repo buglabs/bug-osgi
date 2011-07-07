@@ -27,63 +27,28 @@
  *******************************************************************************/
 package com.buglabs.bug.module.lcd;
 
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.BUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
-import com.buglabs.bug.bmi.pub.IModletFactory;
 import com.buglabs.bug.module.lcd.pub.LCDModlet;
 
-public class Activator implements BundleActivator, IModletFactory {
-	private BundleContext context;
-	private ServiceRegistration sr;
-	private static Activator instance;
+/**
+ *
+ */
+public class Activator extends BUGModuleActivator {
 
-	public Activator() {
-		instance = this;
-	}
-
-	public void start(BundleContext context) throws Exception {
-		this.context = context;
-		sr = context.registerService(IModletFactory.class.getName(), this, null);
-	}
-
-	public void stop(BundleContext context) throws Exception {
-		sr.unregister();
-	}
-
-	public static Activator getInstance() {
-		synchronized (instance) {
-			return instance;
-		}
-	}
-
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.pub.BUGModuleActivator#createModlet(org.osgi.framework.BundleContext, int)
+	 */
 	public IModlet createModlet(BundleContext context, int slotId) {
 		return new LCDModlet(context, slotId, getModuleId());
 	}
 
-	public String getModuleId() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Id");
-	}
-
-	public String getName() {
-		return (String) context.getBundle().getHeaders().get("Bundle-SymbolicName");
-	}
-
-	public String getVersion() {
-		return (String) context.getBundle().getHeaders().get("Bundle-Version");
-	}
-
-	public BundleContext getBundleContext() {
-		return context;
-	}
-
-	public String getModuleDriver() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
-	}
-
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.pub.BUGModuleActivator#createModlet(org.osgi.framework.BundleContext, int, com.buglabs.bug.bmi.pub.BMIModuleProperties)
+	 */
 	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
 		return new LCDModlet(context, slotId, getModuleId(), properties);
 	}

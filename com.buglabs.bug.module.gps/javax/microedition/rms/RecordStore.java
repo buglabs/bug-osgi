@@ -31,7 +31,7 @@ public class RecordStore {
 	}
 	
 	public static RecordStore openRecordStore(String recordStoreName, boolean createIfNecessary) throws RecordStoreException {
-		ConfigurationAdmin ca = getConfigurationAdmin(Activator.getInstance().getBundleContext());
+		ConfigurationAdmin ca = getConfigurationAdmin(Activator.getContext());
 		
 		if (ca == null) {
 			throw new RecordStoreException("Unable to access internal persistent store: ConfigurationAdmin.");
@@ -65,7 +65,7 @@ public class RecordStore {
 	}
 
 	public static void deleteRecordStore(String recordStoreName) throws RecordStoreNotFoundException {
-		ConfigurationAdmin ca = getConfigurationAdmin(Activator.getInstance().getBundleContext());
+		ConfigurationAdmin ca = getConfigurationAdmin(Activator.getContext());
 
 		if (ca == null) {
 			throw new RecordStoreNotFoundException("Unable to access internal persistent store: ConfigurationAdmin.");
@@ -83,7 +83,7 @@ public class RecordStore {
 	}
 
 	public static String[] listRecordStores() throws IOException {
-		ConfigurationAdmin ca = getConfigurationAdmin(Activator.getInstance().getBundleContext());
+		ConfigurationAdmin ca = getConfigurationAdmin(Activator.getContext());
 
 		if (ca == null) {
 			throw new IOException("Unable to access internal persistent store: ConfigurationAdmin.");

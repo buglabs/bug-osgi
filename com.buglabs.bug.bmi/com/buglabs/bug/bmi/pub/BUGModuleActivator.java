@@ -28,6 +28,7 @@
 package com.buglabs.bug.bmi.pub;
 
 import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -86,7 +87,15 @@ public abstract class BUGModuleActivator implements BundleActivator, IModletFact
 		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
 	}
 	
-	public abstract Dictionary getModletProperties();
+	public Dictionary getModletProperties() {
+		Dictionary d = new Hashtable();
+		
+		d.put("Provider", getName());
+		d.put("Source", this.getClass().getName());
+		d.put("Bug-Module-Id", getModuleId());
+		
+		return d;
+	}
 
 	public abstract IModlet createModlet(BundleContext context, int slotId);
 

@@ -30,70 +30,30 @@ package com.buglabs.bug.module.gps;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.BUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
-import com.buglabs.bug.bmi.pub.IModletFactory;
 
-public class Activator implements BundleActivator, IModletFactory {
-	private BundleContext context;
-	private ServiceRegistration sr;
+public class Activator extends BUGModuleActivator {
 
-	private static Activator instance;
-
-	public void start(BundleContext context) throws Exception {
-		this.context = context;
-		instance = this;
-		sr = context.registerService(IModletFactory.class.getName(), this, getModletSvcProperties());
-	}
-
-	public void stop(BundleContext context) throws Exception {
-		sr.unregister();
-	}
-
-	private Dictionary getModletSvcProperties() {
-		Hashtable ht = new Hashtable();
-		
-		ht.put("Source", this.getClass().getName());
-		ht.put("Bug-Module-Id", getModuleId());
-		
-		return ht;
-	}
-	
 	public IModlet createModlet(BundleContext context, int slotId) {
 		GPSModlet modlet = new GPSModlet(context, slotId, getModuleId(), "GPS");
 
 		return modlet;
 	}
 
-	public String getModuleId() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Id");
-	}
-
-	public String getName() {
-		return (String) context.getBundle().getHeaders().get("Bundle-SymbolicName");
-	}
-
-	public String getVersion() {
-		return (String) context.getBundle().getHeaders().get("Bundle-Version");
-	}
-
-	public BundleContext getBundleContext() {
-		return context;
-	}
-
-	public static Activator getInstance() {		
-		return instance;
-	}
-
-	public String getModuleDriver() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
-	}
-
 	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
 		return new GPSModlet(context, slotId, getModuleId(), "GPS", properties);
+	}
+
+	public Dictionary getModletProperties() {
+		Hashtable ht = new Hashtable();
+
+		ht.put("Source", this.getClass().getName());
+		ht.put("Bug-Module-Id", getModuleId());
+
+		return ht;
 	}
 }

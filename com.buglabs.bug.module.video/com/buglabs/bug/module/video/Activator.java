@@ -31,30 +31,24 @@ import java.io.File;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.BUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
-import com.buglabs.bug.bmi.pub.IModletFactory;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.bmi.sysfs.BMIDeviceNodeFactory;
 import com.buglabs.bug.module.video.pub.VideoOutBMIDevice;
-import com.buglabs.util.osgi.LogServiceUtil;
 
-public class Activator implements BundleActivator, IModletFactory {
-	private BundleContext context;
-	private ServiceRegistration sr;
+public class Activator extends BUGModuleActivator {
+
 	private ServiceRegistration sysfsSr;
-	private static LogService log;
+
 
 	public void start(BundleContext context) throws Exception {
-		this.context = context;
-		this.log = LogServiceUtil.getLogService(context);
-		sr = context.registerService(IModletFactory.class.getName(), this, null);
-		
+		super.start(context);
+	
 		Dictionary d = new Hashtable();
 		d.put(BMIDeviceNodeFactory.MODULE_ID_SERVICE_PROPERTY, getModuleId());
 		sysfsSr = context.registerService(BMIDeviceNodeFactory.class.getName(), new VideoBMIDeviceNodeFactory(), d);
@@ -62,41 +56,17 @@ public class Activator implements BundleActivator, IModletFactory {
 
 	public void stop(BundleContext context) throws Exception {
 		sysfsSr.unregister();
-		sr.unregister();
+		super.stop(context);
 	}
 
 	public IModlet createModlet(BundleContext context, int slotId) {
 		return new VideoModlet(context, slotId, getModuleId());
 	}
 
-	public String getModuleId() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Id");
-	}
-
-	public String getName() {
-		return (String) context.getBundle().getHeaders().get("Bundle-SymbolicName");
-	}
-
-	public String getVersion() {
-		return (String) context.getBundle().getHeaders().get("Bundle-Version");
-	}
-
-	public BundleContext getBundleContext() {
-		return context;
-	}
-
-	public String getModuleDriver() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
-	}
-
 	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
 		return new VideoModlet(context, slotId, getModuleId(), properties);
 	}
 
-	public static LogService getLog() {		
-		return log;
-	}
-	
 	private class VideoBMIDeviceNodeFactory implements BMIDeviceNodeFactory {
 
 		@Override
