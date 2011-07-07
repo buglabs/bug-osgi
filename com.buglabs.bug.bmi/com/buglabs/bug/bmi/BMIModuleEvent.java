@@ -29,8 +29,8 @@ package com.buglabs.bug.bmi;
 
 import java.io.IOException;
 
-import com.buglabs.bug.sysfs.BMIDevice;
-import com.buglabs.bug.sysfs.BMIDeviceHelper;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
+import com.buglabs.bug.bmi.sysfs.BMIDeviceHelper;
 
 /**
  * An event from the BMI system. Format [moduleId] [version] [slot] [event]

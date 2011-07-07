@@ -14,6 +14,7 @@ Import-Package:
  com.buglabs.bug.jni.motion,
  com.buglabs.bug.bmi.pub,
  com.buglabs.bug.sysfs,
+ com.buglabs.bug.bmi.sysfs,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
  com.buglabs.util.xml,

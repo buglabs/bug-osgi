@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.buglabs.bug.sysfs.BMIDevice;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 
 /**
  * A bean-style class for properties associated with a BMI module attached to

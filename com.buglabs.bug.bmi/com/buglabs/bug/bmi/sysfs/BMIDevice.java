@@ -1,4 +1,4 @@
-package com.buglabs.bug.sysfs;
+package com.buglabs.bug.bmi.sysfs;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.sprinkles.Fn;
 
+import com.buglabs.bug.sysfs.SysfsNode;
 import com.buglabs.util.osgi.OSGiServiceLoader;
 
 /**

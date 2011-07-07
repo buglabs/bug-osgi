@@ -9,6 +9,8 @@ Import-Package:
  com.buglabs.util.osgi,
  com.buglabs.util.shell.pub,
  org.osgi.framework,
- org.osgi.service.log
+ org.osgi.service.log,
+ org.sprinkles
 Export-Package: 
- com.buglabs.bug.bmi.pub
+ com.buglabs.bug.bmi.pub,
+ com.buglabs.bug.bmi.sysfs

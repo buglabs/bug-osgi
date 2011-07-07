@@ -38,9 +38,9 @@ import org.osgi.framework.ServiceRegistration;
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.pub.IModletFactory;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
+import com.buglabs.bug.bmi.sysfs.BMIDeviceNodeFactory;
 import com.buglabs.bug.module.camera.pub.CameraSysfsNode;
-import com.buglabs.bug.sysfs.BMIDevice;
-import com.buglabs.bug.sysfs.BMIDeviceNodeFactory;
 
 /**
  * Java API bundle for Camera module.

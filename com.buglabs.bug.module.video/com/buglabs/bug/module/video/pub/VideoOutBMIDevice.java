@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.module.video.Activator;
-import com.buglabs.bug.sysfs.BMIDevice;
 
 /**
  * Access sysfs items for video module.

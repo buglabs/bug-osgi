@@ -1,4 +1,4 @@
-package com.buglabs.bug.sysfs;
+package com.buglabs.bug.bmi.sysfs;
 
 import java.io.File;
 
