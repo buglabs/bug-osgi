@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * Copyright (c) 2008, 2009, 2011 Bug Labs, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,10 +35,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
- * Java API bundle for Camera module.
+ * Common abstract BundleActivator for bundles that contribute IModletFactories, ie
+ * bundles that provide API and service code for BUG modules.
  * 
  * @author kgilmer
  * 
@@ -47,23 +49,34 @@ public abstract class BUGModuleActivator implements BundleActivator, IModletFact
 
 	private static BundleContext context;
 	private ServiceRegistration sr;
+	private Dictionary headers;
 	private static LogService log;
 	
+	/**
+	 * @return an instance of LogService or null if bundle has not been started or has been stopped.
+	 */
 	public static LogService getLog() {
 		return log;
 	}
 	
+	/**
+	 * @return an instance of local BundleContext or null if bundle has not been started or has been stopped.
+	 */
 	public static BundleContext getContext() {
 		return context;
 	}
 
 	public void start(BundleContext context) throws Exception {
-		this.context = context;
-		this.log = LogServiceUtil.getLogService(context);
+		BUGModuleActivator.context = context;
+		BUGModuleActivator.log = LogServiceUtil.getLogService(context);
+		this.headers = context.getBundle().getHeaders();
 		
 		sr = context.registerService(IModletFactory.class.getName(), this, getModletProperties());		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
 		sr.unregister();
 		sr = null;
@@ -71,28 +84,47 @@ public abstract class BUGModuleActivator implements BundleActivator, IModletFact
 		log = null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.pub.IModletFactory#getModuleId()
+	 */
 	public String getModuleId() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Id");
+		return headers.get("Bug-Module-Id").toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.pub.IModletFactory#getName()
+	 */
 	public String getName() {
-		return (String) context.getBundle().getHeaders().get("Bundle-SymbolicName");
+		return headers.get("Bundle-SymbolicName").toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.pub.IModletFactory#getVersion()
+	 */
 	public String getVersion() {
-		return (String) context.getBundle().getHeaders().get("Bundle-Version");
+		return headers.get("Bundle-Version").toString();
 	}
 
+	/**
+	 * @return driver id
+	 */
 	public String getModuleDriver() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
+		return headers.get("Bug-Module-Driver-Id").toString();
 	}
 	
+	/**
+	 * Get the service properties associated with the IModletFactory registration in the OSGi service registry.
+	 * 
+	 * Clients can override this to provide custom/additional properties.
+	 * 
+	 * @return A dictionary with some default values.  
+	 */
 	public Dictionary getModletProperties() {
 		Dictionary d = new Hashtable();
 		
-		d.put("Provider", getName());
-		d.put("Source", this.getClass().getName());
-		d.put("Bug-Module-Id", getModuleId());
+		d.put(BUGBundleConstants.MODLET_FACTORY_PROVIDER, getName());
+		d.put(BUGBundleConstants.MODLET_FACTORY_SOURCE, this.getClass().getName());
+		d.put(BUGBundleConstants.MODLET_FACTORY_ID, getModuleId());
 		
 		return d;
 	}

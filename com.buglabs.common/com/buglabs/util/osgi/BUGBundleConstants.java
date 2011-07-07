@@ -73,4 +73,19 @@ public interface BUGBundleConstants {
 	 * The Module ID header as presented by the BMI bus.
 	 */
 	public static final String BUG_BUNDLE_MODULE_ID = "Bug-Module-Id";
+
+	/**
+	 * A property entry in the IModletFactory service for the name of the factory.
+	 */
+	public static final String MODLET_FACTORY_PROVIDER = "Provider";
+
+	/**
+	 * A property entry in the IModletFactory service for the source of the factory.
+	 */
+	public static final String MODLET_FACTORY_SOURCE = "Source";
+
+	/**
+	 * A property entry in the IModletFactory service for the module id that the factory handles.
+	 */
+	public static final String MODLET_FACTORY_ID =  "Bug-Module-Id";
 }
