@@ -55,7 +55,7 @@ import com.buglabs.services.ws.WSResponse;
  * @author kgilmer
  * 
  */
-public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, PublicWSProvider2, IModuleControl {
+public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, PublicWSProvider2 {
 	private static final String JPEG_MIME_TYPE = "image/jpg";
 	private static boolean suspended = false;
 

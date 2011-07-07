@@ -31,6 +31,7 @@ public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 	protected final LogService logService;
 	private List<ServiceRegistration> registrationList;
 	private final String name;
+	private Hashtable commonProperties;
 	
 	/**
 	 * @param context
@@ -54,6 +55,20 @@ public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 	@Override
 	public final int getSlotId() {
 		return bmiDevice.getSlot();
+	}
+	
+	/**
+	 * @return instance of LogService
+	 */
+	public final LogService getLog() {
+		return logService;
+	}
+	
+	/**
+	 * @return the BMI device associated with this modlet.
+	 */
+	public final BMIDevice getBMIDevice() {
+		return bmiDevice;
 	}
 
 	@Override
@@ -90,23 +105,25 @@ public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 	 * @return A dictionary with common BUG service properties.
 	 */
 	public final Dictionary getCommonProperties() {
-		Dictionary p = new Hashtable();
-		p.put(BUGBundleConstants.MODULE_PROVIDER_KEY, this.getClass().getName());
-		p.put("Slot", Integer.toString(bmiDevice.getSlot()));
-
-		if (bmiDevice != null) {
-			if (bmiDevice.getDescription() != null)
-				p.put(BUGBundleConstants.MODULE_DESC_KEY, bmiDevice.getDescription());
-
-			if (bmiDevice.getSerialNum() != null)
-				p.put(BUGBundleConstants.MODULE_SERIAL_KEY, bmiDevice.getSerialNum());
-
-			// these are ints so don't need a null check
-			p.put(BUGBundleConstants.MODULE_VENDOR_KEY, "" + bmiDevice.getVendor());
-			p.put(BUGBundleConstants.MODULE_VERSION_KEY, "" + bmiDevice.getRevision());
+		if (commonProperties == null) {
+			commonProperties = new Hashtable();
+			commonProperties.put(BUGBundleConstants.MODULE_PROVIDER_KEY, this.getClass().getName());
+			commonProperties.put("Slot", Integer.toString(bmiDevice.getSlot()));
+	
+			if (bmiDevice != null) {
+				if (bmiDevice.getDescription() != null)
+					commonProperties.put(BUGBundleConstants.MODULE_DESC_KEY, bmiDevice.getDescription());
+	
+				if (bmiDevice.getSerialNum() != null)
+					commonProperties.put(BUGBundleConstants.MODULE_SERIAL_KEY, bmiDevice.getSerialNum());
+	
+				// these are ints so don't need a null check
+				commonProperties.put(BUGBundleConstants.MODULE_VENDOR_KEY, "" + bmiDevice.getVendor());
+				commonProperties.put(BUGBundleConstants.MODULE_VERSION_KEY, "" + bmiDevice.getRevision());
+			}
 		}
 
-		return p;
+		return commonProperties;
 	}
 	
 	public abstract boolean isSuspended();

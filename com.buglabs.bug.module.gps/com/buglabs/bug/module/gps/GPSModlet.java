@@ -30,9 +30,8 @@ package com.buglabs.bug.module.gps;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
-import java.util.Properties;
 import java.util.Timer;
 
 import org.osgi.framework.BundleContext;
@@ -43,8 +42,7 @@ import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
 import org.osgi.util.position.Position;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
@@ -68,8 +66,6 @@ import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.osgi.BUGBundleConstants;
-import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.xml.XmlNode;
 
 /**
@@ -78,17 +74,11 @@ import com.buglabs.util.xml.XmlNode;
  * @author kgilmer
  * 
  */
-public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, PublicWSProvider2, IPositionProvider, IModuleLEDController {
+public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, PublicWSProvider2, IPositionProvider, IModuleLEDController {
 
 	private BundleContext context;
 
-	private int slotId;
-
-	private final String moduleId;
-
 	private ServiceRegistration moduleRef;
-
-	private ServiceRegistration positionRef;
 
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	protected static final String PROPERTY_IOX = "IOX";
@@ -99,30 +89,19 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	public static final String MODULE_ID = "0001";
 
-	private ServiceRegistration nmeaRef;
-	private ServiceRegistration nmeaProviderRef;
+	private static final String EXTERNAL_ANTENNA_PROPERTY = "gps.antenna.external";
 
-	private final String moduleName;
 	private NMEASentenceProvider nmeaProvider;
 	private GPSControl gpscontrol;
 
-	private ServiceRegistration gpsControlRef;
-
 	private Timer timer;
-
-	private LogService log;
-
-	private ServiceRegistration ledRef;
 
 	private String serviceName = "Location";
 
 	private boolean suspended;
 
-	private final BMIDevice properties;
-
 	private InputStream gpsIs;
 
-	private ServiceRegistration wsReg;
 
 	/**
 	 * @param context
@@ -132,12 +111,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 */
 
 	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIDevice properties2) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleName = moduleName;
-		this.moduleId = moduleId;
-		this.properties = properties2;
-		this.log = LogServiceUtil.getLogService(context);	
+		super(context, moduleId, properties2, moduleName);		
 	}
 
 	/*
@@ -149,12 +123,12 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		boolean retry = false;
 		int count = 0;
 		do {
-			log.log(LogService.LOG_INFO, "GPSModlet setting active (external) antenna");
+			getLog().log(LogService.LOG_INFO, "GPSModlet setting active (external) antenna");
 			try {
 				setActiveAntenna();
 				retry = false;
 			} catch (IOException e) {
-				log.log(LogService.LOG_ERROR, "Failed to set GPS antenna to active (external) antenna", e);
+				getLog().log(LogService.LOG_ERROR, "Failed to set GPS antenna to active (external) antenna", e);
 				retry = true;
 				Thread.sleep(200);
 				count++;
@@ -164,50 +138,39 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		//gpsd.start();
 		nmeaProvider.start();
 
-		Properties modProperties = createBasicServiceProperties();
+		Dictionary modProperties = createBasicServiceProperties();
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
-		ledRef = context.registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties());
-		gpsControlRef = context.registerService(IGPSModuleControl.class.getName(), this, createBasicServiceProperties());
-		nmeaRef = context.registerService(INMEARawFeed.class.getName(), new NMEARawFeed(gpsIs), createBasicServiceProperties());
-		nmeaProviderRef = context.registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createBasicServiceProperties());
-		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
+		registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties());
+		registerService(IGPSModuleControl.class.getName(), this, createBasicServiceProperties());
+		registerService(INMEARawFeed.class.getName(), new NMEARawFeed(gpsIs), createBasicServiceProperties());
+		registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createBasicServiceProperties());
+		registerService(PublicWSProvider.class.getName(), this, null);
 
 		timer = new Timer();
-		timer.schedule(new GPSFIXLEDStatusTask(this, log), 500, 5000);
+		timer.schedule(new GPSFIXLEDStatusTask(this, getLog()), 500, 5000);
 
-		positionRef = context.registerService(IPositionProvider.class.getName(), this, createBasicServiceProperties());
+		registerService(IPositionProvider.class.getName(), this, createBasicServiceProperties());
 		context.addServiceListener(nmeaProvider, "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "="
 				+ IPositionSubscriber.class.getName() + "))");
 	}
 
-	private Properties createBasicServiceProperties() {
-		Properties p = new Properties();
-		p.put(BUGBundleConstants.MODULE_PROVIDER_KEY, this.getClass().getName());
-		p.put("Slot", Integer.toString(slotId));
-
-		if (properties != null) {
-			if (properties.getDescription() != null) {
-				p.put("ModuleDescription", properties.getDescription());
-			}
-			if (properties.getSerialNum() != null) {
-				p.put("ModuleSN", properties.getSerialNum());
-			}
-			p.put("ModuleVendorID", "" + properties.getVendor());
-			p.put("ModuleRevision", "" + properties.getRevision());
-		}
+	private Dictionary createBasicServiceProperties() {
+		Dictionary d = getCommonProperties();		
 
 		try {
-			p.put("gps.antenna.external", "" + isAntennaExternal());
+			d.remove(EXTERNAL_ANTENNA_PROPERTY);
+			d.put(EXTERNAL_ANTENNA_PROPERTY, "" + isAntennaExternal());
 		} catch (IOException e) {
-			log.log(LogService.LOG_ERROR, "Unable to access GPS antenna state.", e);
+			getLog().log(LogService.LOG_ERROR, "Unable to access GPS antenna state.", e);
 		}
-		return p;
+		
+		return d;
 	}
 
 	private void updateIModuleControlProperties(){
 		if (moduleRef!=null){
-			Properties modProperties = createBasicServiceProperties();
+			Dictionary modProperties = createBasicServiceProperties();
 			modProperties.put("Power State", suspended ? "Suspended": "Active");
 			moduleRef.setProperties(modProperties);
 		}
@@ -224,18 +187,12 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 */
 	public void stop() throws Exception {
 		timer.cancel();
-		wsReg.unregister();
-
 		context.removeServiceListener(nmeaProvider);
 		moduleRef.unregister();
-		gpsControlRef.unregister();
-		nmeaRef.unregister();
-		ledRef.unregister();
-		positionRef.unregister();
-		nmeaProviderRef.unregister();
 		nmeaProvider.interrupt();
 		gpsIs.close();
 		gpscontrol.close();
+		super.stop();
 	}
 
 	/*
@@ -253,7 +210,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 						* Math.PI / 180.0, Unit.rad), new Measurement(0.0d, Unit.m), null, null);
 				return pos;
 			} catch (NumberFormatException e) {
-				log.log(LogService.LOG_ERROR, "Unable to parse position.", e);
+				getLog().log(LogService.LOG_ERROR, "Unable to parse position.", e);
 				return null;
 			}
 		} else {
@@ -267,10 +224,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 * 
 	 * @see com.buglabs.module.IModuleControl#getModuleProperties()
 	 */
-	public List getModuleProperties() {
-		List mprops = new ArrayList();
-
-		mprops.add(new ModuleProperty("Slot", "" + slotId));
+	public List<IModuleProperty> getModuleProperties() {
+		List<IModuleProperty> mprops = super.getModuleProperties();
 
 		try {
 			int status = getStatus();
@@ -287,17 +242,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 				antenna = PROPERTY_ANTENNA_PASSIVE;
 			}
 			mprops.add(new ModuleProperty(PROPERTY_ANTENNA, antenna, "String", false));
-			mprops.add(new ModuleProperty("Power State", suspended ? "Suspended" : "Active", "String", true));
 		} catch (IOException e) {
-			log.log(LogService.LOG_ERROR, "Exception occured while getting module properties.", e);
-		}
-		
-		if (properties != null) {
-			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
-			mprops.add(new ModuleProperty("Module SN", properties.getSerialNum()));
-			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
-			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
-		}
+			getLog().log(LogService.LOG_ERROR, "Exception occured while getting module properties.", e);
+		}		
 
 		return mprops;
 	}
@@ -318,38 +265,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 				System.out.println("Active");
 			}
 			return true;
+		}  else {
+			return super.setModuleProperty(property);
 		}
-		if (property.getName().equals("Power State")) {
-			if (((String) property.getValue()).equals("Suspend")) {
-				try {
-					suspend();					
-				} catch (IOException e) {
-					LogServiceUtil.logBundleException(log, "Error while changing suspend state.", e);
-				}
-			} else if (((String) property.getValue()).equals("Resume")) {
-
-				try {
-					resume();
-				} catch (IOException e) {
-					LogServiceUtil.logBundleException(log, "Error while changing suspend state.", e);
-				}
-			}
-
-		}
-
-		return false;
-	}
-
-	public String getModuleName() {
-		return moduleName;
-	}
-
-	public String getModuleId() {
-		return moduleId;
-	}
-
-	public int getSlotId() {
-		return slotId;
 	}
 
 	public int resume() throws IOException {
@@ -381,7 +299,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		if (operation == PublicWSProvider2.GET) {
 			return new PublicWSDefinition() {
 
-				public List getParameters() {
+				public List<String> getParameters() {
 					return null;
 				}
 
@@ -445,8 +363,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	}
 
 	public void setup() throws Exception {
-		String devnode_gps = "/dev/ttyBMI" + Integer.toString(slotId);
-		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(slotId);
+		String devnode_gps = "/dev/ttyBMI" + Integer.toString(getSlotId());
+		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(getSlotId());
 
 		//Creation and initialization of this device is necessary to access the control device, below.
 		GPS gps = new GPS();
@@ -458,10 +376,10 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		}
 
 		gpscontrol = new GPSControl();
-		log.log(LogService.LOG_DEBUG, "Opening GPS control port: " + devnode_gpscontrol);
+		getLog().log(LogService.LOG_DEBUG, "Opening GPS control port: " + devnode_gpscontrol);
 		CharDeviceUtils.openDeviceWithRetry(gpscontrol, devnode_gpscontrol, 2);
 		gps.close();
-		log.log(LogService.LOG_DEBUG, "Opening GPS data port: " + devnode_gps);
+		getLog().log(LogService.LOG_DEBUG, "Opening GPS data port: " + devnode_gps);
 		gpsIs = new FileInputStream(devnode_gps);
 		nmeaProvider = new NMEASentenceProvider(gpsIs, context);
 	}
@@ -607,5 +525,9 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	public void setPublicName(String name) {
 		serviceName = name;
+	}
+
+	public boolean isSuspended() {	
+		return suspended;
 	}
 }
