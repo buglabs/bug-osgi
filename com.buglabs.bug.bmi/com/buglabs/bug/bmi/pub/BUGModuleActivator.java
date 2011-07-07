@@ -25,48 +25,70 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.module.pub;
+package com.buglabs.bug.bmi.pub;
+
+import java.util.Dictionary;
+
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.log.LogService;
+
+import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
- * modlet is a software component that handles all runtime service aspects of a
- * given hardware module.
+ * Java API bundle for Camera module.
  * 
  * @author kgilmer
  * 
  */
-public interface IModlet {
-	/**
-	 * Return the MODULE ID. This comes from the hardware.
-	 * 
-	 * @return
-	 */
-	public String getModuleId();
+public abstract class BUGModuleActivator implements BundleActivator, IModletFactory {
 
-	/**
-	 * @return Slot that the Module is currently connected to.
-	 */
-	public int getSlotId();
+	private static BundleContext context;
+	private ServiceRegistration sr;
+	private static LogService log;
+	
+	public static LogService getLog() {
+		return log;
+	}
+	
+	public static BundleContext getContext() {
+		return context;
+	}
 
-	/**
-	 * Connect to any devices or do any initialization. This is a good place to
-	 * throw an exception if the expected hardware environment is not valid.
-	 * 
-	 * @throws Exception
-	 */
-	public void setup() throws Exception;
+	public void start(BundleContext context) throws Exception {
+		this.context = context;
+		this.log = LogServiceUtil.getLogService(context);
+		
+		sr = context.registerService(IModletFactory.class.getName(), this, getModletProperties());		
+	}
 
-	/**
-	 * Begin modlet. Any services that the modlet supports should be registered
-	 * here.
-	 * 
-	 * @throws Exception
-	 */
-	public void start() throws Exception;
+	public void stop(BundleContext context) throws Exception {
+		sr.unregister();
+		sr = null;
+		context = null;
+		log = null;
+	}
 
-	/**
-	 * Unregister services and release any resources.
-	 * 
-	 * @throws Exception
-	 */
-	public void stop() throws Exception;
+	public String getModuleId() {
+		return (String) context.getBundle().getHeaders().get("Bug-Module-Id");
+	}
+
+	public String getName() {
+		return (String) context.getBundle().getHeaders().get("Bundle-SymbolicName");
+	}
+
+	public String getVersion() {
+		return (String) context.getBundle().getHeaders().get("Bundle-Version");
+	}
+
+	public String getModuleDriver() {
+		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
+	}
+	
+	public abstract Dictionary getModletProperties();
+
+	public abstract IModlet createModlet(BundleContext context, int slotId);
+
+	public abstract IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties);
 }

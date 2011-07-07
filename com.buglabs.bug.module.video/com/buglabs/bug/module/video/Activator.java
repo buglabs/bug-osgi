@@ -36,9 +36,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.bug.module.pub.IModlet;
-import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.pub.IModletFactory;
 import com.buglabs.bug.module.video.pub.VideoOutBMIDevice;
 import com.buglabs.bug.sysfs.BMIDevice;
 import com.buglabs.bug.sysfs.BMIDeviceNodeFactory;

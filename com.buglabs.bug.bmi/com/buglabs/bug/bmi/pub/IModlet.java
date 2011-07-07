@@ -25,66 +25,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.module.motion;
+package com.buglabs.bug.bmi.pub;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
+/**
+ * modlet is a software component that handles all runtime service aspects of a
+ * given hardware module.
+ * 
+ * @author kgilmer
+ * 
+ */
+public interface IModlet {
+	/**
+	 * Return the MODULE ID. This comes from the hardware.
+	 * 
+	 * @return
+	 */
+	public String getModuleId();
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.IModlet;
-import com.buglabs.bug.bmi.pub.IModletFactory;
+	/**
+	 * @return Slot that the Module is currently connected to.
+	 */
+	public int getSlotId();
 
-public class Activator implements BundleActivator, IModletFactory {
-	private BundleContext context;
-	private ServiceRegistration sr;
+	/**
+	 * Connect to any devices or do any initialization. This is a good place to
+	 * throw an exception if the expected hardware environment is not valid.
+	 * 
+	 * @throws Exception
+	 */
+	public void setup() throws Exception;
 
-	private static Activator instance;
+	/**
+	 * Begin modlet. Any services that the modlet supports should be registered
+	 * here.
+	 * 
+	 * @throws Exception
+	 */
+	public void start() throws Exception;
 
-	public Activator() {
-		instance = this;
-	}
-
-	public void start(BundleContext context) throws Exception {
-		this.context = context;
-		sr = context.registerService(IModletFactory.class.getName(), this, null);
-	}
-
-	public void stop(BundleContext context) throws Exception {
-		sr.unregister();
-	}
-
-	public IModlet createModlet(BundleContext context, int slotId) {
-		MotionModlet modlet = new MotionModlet(context, slotId, getModuleId(), "Motion");
-
-		return modlet;
-	}
-
-	public String getModuleId() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Id");
-	}
-
-	public String getName() {
-		return (String) context.getBundle().getHeaders().get("Bundle-SymbolicName");
-	}
-
-	public String getVersion() {
-		return (String) context.getBundle().getHeaders().get("Bundle-Version");
-	}
-
-	public static Activator getInstance() {
-		return instance;
-	}
-
-	public BundleContext getBundleContext() {
-		return context;
-	}
-
-	public String getModuleDriver() {
-		return (String) context.getBundle().getHeaders().get("Bug-Module-Driver-Id");
-	}
-
-	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
-		return new MotionModlet(context, slotId, getModuleId(), "Motion", properties);
-	}
+	/**
+	 * Unregister services and release any resources.
+	 * 
+	 * @throws Exception
+	 */
+	public void stop() throws Exception;
 }

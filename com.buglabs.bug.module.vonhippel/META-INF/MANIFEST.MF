@@ -10,7 +10,7 @@ Import-Package:
  com.buglabs.bug.dragonfly.module,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.vonhippel,
- com.buglabs.bug.module.pub,
+ com.buglabs.bug.bmi.pub,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
  com.buglabs.util.xml,

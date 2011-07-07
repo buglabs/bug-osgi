@@ -43,6 +43,8 @@ import com.buglabs.bug.accelerometer.pub.IAccelerometerControl;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerRawFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
+import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
@@ -57,8 +59,6 @@ import com.buglabs.bug.module.motion.pub.IMDACCModuleControl;
 import com.buglabs.bug.module.motion.pub.IMotionRawFeed;
 import com.buglabs.bug.module.motion.pub.IMotionSubject;
 import com.buglabs.bug.module.motion.pub.MotionWS;
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.util.osgi.LogServiceUtil;
 

@@ -37,9 +37,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.bug.module.pub.IModlet;
-import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.pub.IModletFactory;
 
 /**
  * Manages logic of receiving messages from BMI and making changes to runtime.

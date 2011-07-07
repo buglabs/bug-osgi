@@ -43,6 +43,8 @@ import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
 import org.osgi.util.position.Position;
 
+import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
@@ -58,8 +60,6 @@ import com.buglabs.bug.module.gps.pub.INMEASentenceSubscriber;
 import com.buglabs.bug.module.gps.pub.IPositionProvider;
 import com.buglabs.bug.module.gps.pub.IPositionSubscriber;
 import com.buglabs.bug.module.gps.pub.LatLon;
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.nmea.DegreesMinutesSeconds;
 import com.buglabs.nmea2.RMC;
 import com.buglabs.services.ws.IWSResponse;

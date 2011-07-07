@@ -8,10 +8,8 @@ Bundle-Vendor: Bug Labs, Inc.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: 
  com.buglabs.bug.dragonfly.module,
- com.buglabs.bug.sysfs,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
- com.buglabs.util.ui,
  com.buglabs.util.xml,
  javax.servlet,
  javax.servlet.http,
@@ -22,5 +20,4 @@ Import-Package:
  org.osgi.service.log,
  org.osgi.util.tracker
 Export-Package: 
- com.buglabs.bug.module.pub,
  com.buglabs.bug.program.pub

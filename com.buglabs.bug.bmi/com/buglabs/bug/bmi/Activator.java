@@ -44,8 +44,8 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.module.pub.IModlet;
-import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.pub.IModletFactory;
 import com.buglabs.bug.sysfs.BMIDevice;
 import com.buglabs.bug.sysfs.BMIDeviceHelper;
 import com.buglabs.util.osgi.FilterUtil;

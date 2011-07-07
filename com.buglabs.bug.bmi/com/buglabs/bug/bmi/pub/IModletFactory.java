@@ -25,9 +25,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.module.pub;
+package com.buglabs.bug.bmi.pub;
 
 import org.osgi.framework.BundleContext;
+
 
 /**
  * A IModletFactory is able to create modlets. The factory descibes which type

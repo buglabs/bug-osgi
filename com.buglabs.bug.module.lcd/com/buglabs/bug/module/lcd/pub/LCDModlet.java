@@ -47,14 +47,14 @@ import org.osgi.service.log.LogService;
 
 
 
+import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
 import com.buglabs.bug.dragonfly.module.ModuleProperty;
 import com.buglabs.bug.module.lcd.AccelerationWS;
 import com.buglabs.bug.module.lcd.ML8953AccelerometerImplementation;
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.util.osgi.LogServiceUtil;
 

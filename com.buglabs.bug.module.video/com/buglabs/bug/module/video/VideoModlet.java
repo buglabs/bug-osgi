@@ -42,11 +42,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
 import com.buglabs.bug.dragonfly.module.ModuleProperty;
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.bug.module.pub.IModlet;
 import com.buglabs.bug.module.video.pub.IVideoModuleControl;
 import com.buglabs.bug.module.video.pub.VideoOutBMIDevice;
 import com.buglabs.services.ws.IWSResponse;

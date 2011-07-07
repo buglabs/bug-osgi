@@ -1,4 +1,4 @@
-package com.buglabs.bug.module.pub;
+package com.buglabs.bug.bmi.pub;
 
 import java.io.BufferedReader;
 import java.io.File;

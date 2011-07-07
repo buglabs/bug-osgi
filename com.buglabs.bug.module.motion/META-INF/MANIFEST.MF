@@ -12,7 +12,7 @@ Import-Package:
  com.buglabs.bug.jni.accelerometer,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.motion,
- com.buglabs.bug.module.pub,
+ com.buglabs.bug.bmi.pub,
  com.buglabs.bug.sysfs,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,

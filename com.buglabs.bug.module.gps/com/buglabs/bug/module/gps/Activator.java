@@ -34,9 +34,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import com.buglabs.bug.module.pub.BMIModuleProperties;
-import com.buglabs.bug.module.pub.IModlet;
-import com.buglabs.bug.module.pub.IModletFactory;
+import com.buglabs.bug.bmi.pub.BMIModuleProperties;
+import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.pub.IModletFactory;
 
 public class Activator implements BundleActivator, IModletFactory {
 	private BundleContext context;
