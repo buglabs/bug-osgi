@@ -109,7 +109,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 
 	public void setup() throws Exception {
-		this.videoOutDevice = (VideoOutBMIDevice) BMIDeviceHelper.getDevice(slotId);
+		this.videoOutDevice = (VideoOutBMIDevice) BMIDeviceHelper.getDevice(context, slotId);
 	}
 
 	public void start() throws Exception {
