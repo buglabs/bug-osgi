@@ -45,5 +45,5 @@ public interface PublicWSDefinition {
 	/**
 	 * @return A list of <code>String</code> that define parameter names.
 	 */
-	public List getParameters();
+	public List<String> getParameters();
 }
