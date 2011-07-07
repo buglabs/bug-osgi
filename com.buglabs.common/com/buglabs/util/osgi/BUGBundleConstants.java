@@ -88,4 +88,6 @@ public interface BUGBundleConstants {
 	 * A property entry in the IModletFactory service for the module id that the factory handles.
 	 */
 	public static final String MODLET_FACTORY_ID =  "Bug-Module-Id";
+	
+	public static final String PROPERTY_MODULE_NAME = "moduleName";
 }

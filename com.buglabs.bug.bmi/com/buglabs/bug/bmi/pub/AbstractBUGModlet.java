@@ -1,5 +1,6 @@
 package com.buglabs.bug.bmi.pub;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -10,9 +11,17 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
+import com.buglabs.bug.dragonfly.module.IModuleControl;
+import com.buglabs.bug.dragonfly.module.IModuleProperty;
+import com.buglabs.bug.dragonfly.module.ModuleProperty;
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.LogServiceUtil;
 
-public abstract class AbstractBUGModlet implements IModlet {
+/**
+ * @author kgilmer
+ *
+ */
+public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 
 	protected final BundleContext context;
 	protected final int slotId;
@@ -20,12 +29,14 @@ public abstract class AbstractBUGModlet implements IModlet {
 	private final BMIDevice properties;
 	protected final LogService logService;
 	private List<ServiceRegistration> registrationList;
-
-	public AbstractBUGModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties) {
+	private final String name;
+	
+	public AbstractBUGModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties, String name) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
 		this.properties = properties;
+		this.name = name;
 		this.logService = LogServiceUtil.getLogService(context);
 	}
 
@@ -85,7 +96,55 @@ public abstract class AbstractBUGModlet implements IModlet {
 		}
 
 		return p;
+	}
+	
+	public abstract boolean isSuspended();
+	
+	public List<IModuleProperty> getModuleProperties() {
+		List<IModuleProperty> modProps = new ArrayList<IModuleProperty>();
 
+		modProps.add(new ModuleProperty(BUGBundleConstants.PROPERTY_MODULE_NAME, getModuleName()));
+		modProps.add(new ModuleProperty("Slot", "" + slotId));
+		modProps.add(new ModuleProperty("Power State", isSuspended() ? "Suspended": "Active", "String", true));
+		
+		if (properties != null) {
+			modProps.add(new ModuleProperty("Module Description", properties.getDescription()));
+			modProps.add(new ModuleProperty("Module SN", properties.getSerialNum()));
+			modProps.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
+			modProps.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
+		}
+		
+		return modProps;
+	}
+
+	public String getModuleName() {
+		return name;
+	}
+
+	public boolean setModuleProperty(IModuleProperty property) {
+		if (!property.isMutable()) {
+			return false;
+		}
+		if (property.getName().equals("Power State")) {
+			if (((String) property.getValue()).equals("Suspend")){
+				try{
+				suspend();
+				}
+			 catch (IOException e) {
+				 LogServiceUtil.logBundleException(logService, e.getMessage(), e);
+			}
+			}
+			else if (((String) property.getValue()).equals("Resume")){
+				
+				try {
+					resume();
+				} catch (IOException e) {
+					LogServiceUtil.logBundleException(logService, e.getMessage(), e);
+				}
+			}
+		}
+		
+		return false;
 	}
 
 }

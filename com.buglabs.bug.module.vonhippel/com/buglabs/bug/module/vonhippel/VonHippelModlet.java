@@ -32,13 +32,11 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;

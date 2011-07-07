@@ -29,23 +29,16 @@ package com.buglabs.bug.module.camera;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
-import com.buglabs.bug.dragonfly.module.IModuleProperty;
-import com.buglabs.bug.dragonfly.module.ModuleProperty;
 import com.buglabs.bug.jni.camera.Camera;
 import com.buglabs.bug.jni.camera.CameraControl;
 import com.buglabs.bug.module.camera.pub.ICamera2Device;
@@ -56,7 +49,6 @@ import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
  * 
@@ -67,63 +59,48 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 	private static final String JPEG_MIME_TYPE = "image/jpg";
 	private static boolean suspended = false;
 
-	private List modProps;
-
-
-	private final String moduleName;
-
 	private ServiceRegistration moduleControlReg;
 
-	private LogService logService;
-
 	private Camera camera;
-	
-	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 
-	private String moduleId;
+	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 
 	private CameraModuleControl cameraControl;
 
 	private CameraControl cc;
 
 	private String pictureServiceName = "Picture";
-	private BMIDevice properties;
-	
-	
+
 	private boolean isCameraOpen = false;
 	private boolean isCameraStarted = false;
-	
+
 	private int previewsGrabbed = 0;
 	private int fullsGrabbed = 0;
-	
+
 	int getPreviewsGrabbed() {
 		return previewsGrabbed;
 	}
-	
+
 	int getFullsGrabbed() {
 		return fullsGrabbed;
 	}
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties) {
-		super(context, slotId, moduleId, properties);
-		this.moduleName = "Camera";
+		super(context, slotId, moduleId, properties, "Camera");
 	}
 
-
 	public void setup() throws Exception {
-		
+
 	}
 
 	public void start() throws Exception {
-		modProps = new ArrayList();
-
 		camera = new Camera();
 		cc = new CameraControl();
 		cameraControl = new CameraModuleControl(cc, this);
 		registerService(ICameraModuleControl.class.getName(), cameraControl, getCommonProperties());
 		moduleControlReg = context.registerService(ICamera2ModuleControl.class.getName(), cameraControl, getCommonProperties());
 		Dictionary modProperties = getCommonProperties();
-		modProperties.put("Power State", suspended ? "Suspended": "Active");
+		modProperties.put("Power State", suspended ? "Suspended" : "Active");
 		registerService(IModuleControl.class.getName(), this, modProperties);
 		registerService(ICamera2Device.class.getName(), this, getCommonProperties());
 		registerService(IModuleLEDController.class.getName(), cameraControl, getCommonProperties());
@@ -131,10 +108,10 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 		registerService(PublicWSProvider.class.getName(), cameraControl, null);
 	}
 
-	private void updateIModuleControlProperties(){
-		if (moduleControlReg!=null){
+	private void updateIModuleControlProperties() {
+		if (moduleControlReg != null) {
 			Dictionary modProperties = getCommonProperties();
-			modProperties.put("Power State", suspended ? "Suspended": "Active");
+			modProperties.put("Power State", suspended ? "Suspended" : "Active");
 			moduleControlReg.setProperties(modProperties);
 		}
 	}
@@ -143,7 +120,7 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 		cameraStop();
 		cameraClose();
 
-		moduleControlReg.unregister();	
+		moduleControlReg.unregister();
 		camera.close();
 		super.stop();
 	}
@@ -167,11 +144,11 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 
 	public IWSResponse execute(int operation, String input) {
 		if (operation == PublicWSProvider2.GET) {
-			
+
 			// open it if we need to
 			cameraOpenDefault();
 			cameraStart();
-			
+
 			// we'll leave the camera running
 			return new WSResponse(new ByteArrayInputStream(grabFull()), JPEG_MIME_TYPE);
 		}
@@ -182,53 +159,6 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 		return pictureServiceName;
 	}
 
-	public List getModuleProperties() {
-		modProps.clear();
-
-		modProps.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
-		modProps.add(new ModuleProperty("Slot", "" + slotId));
-		modProps.add(new ModuleProperty("Power State", suspended ? "Suspended": "Active", "String", true));
-		
-		if (properties != null) {
-			modProps.add(new ModuleProperty("Module Description", properties.getDescription()));
-			modProps.add(new ModuleProperty("Module SN", properties.getSerialNum()));
-			modProps.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
-			modProps.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
-		}
-		
-		return modProps;
-	}
-
-	public String getModuleName() {
-		return moduleName;
-	}
-
-	public boolean setModuleProperty(IModuleProperty property) {
-		if (!property.isMutable()) {
-			return false;
-		}
-		if (property.getName().equals("Power State")) {
-			if (((String) property.getValue()).equals("Suspend")){
-				try{
-				suspend();
-				}
-			 catch (IOException e) {
-				 LogServiceUtil.logBundleException(logService, e.getMessage(), e);
-			}
-			}
-			else if (((String) property.getValue()).equals("Resume")){
-				
-				try {
-					resume();
-				} catch (IOException e) {
-					LogServiceUtil.logBundleException(logService, e.getMessage(), e);
-				}
-			}
-		}
-		
-		return false;
-	}
-	
 	public int resume() throws IOException {
 		int result = -1;
 
@@ -241,7 +171,6 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 		updateIModuleControlProperties();
 		return result;
 	}
-	
 
 	public int suspend() throws IOException {
 		int result = -1;
@@ -267,66 +196,55 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 	public void setPublicName(String name) {
 		pictureServiceName = name;
 	}
-	
+
 	public boolean isCameraOpen() {
 		return isCameraOpen;
 	}
-	
+
 	public boolean isCameraStarted() {
 		return isCameraStarted;
 	}
-	
-	public synchronized int cameraOpenDefault()
-	{
+
+	public synchronized int cameraOpenDefault() {
 		return cameraOpen(ICamera2Device.DEFAULT_MEDIA_NODE, -1, 2048, 1536, 320, 240);
 	}
-	
-	public synchronized int cameraOpen(
-			final String media_node,
-			int slot_num,
-			int full_height,
-			int full_width,
-			int preview_height,
-			int preview_width)
-	{
+
+	public synchronized int cameraOpen(final String media_node, int slot_num, int full_height, int full_width, int preview_height, int preview_width) {
 		if (isCameraOpen) {
 			return 0;
 		}
 		final long before = System.currentTimeMillis();
 		final int ret = camera.bug_camera_open(media_node, slot_num, full_height, full_width, preview_height, preview_width);
 		final long after = System.currentTimeMillis();
-		System.out.println("TIMING: bug_camera_open took " + (after-before) + "ms");
+		System.out.println("TIMING: bug_camera_open took " + (after - before) + "ms");
 		isCameraOpen = (ret == 0);
 		return ret;
 	}
 
-	public synchronized int cameraClose()
-	{
+	public synchronized int cameraClose() {
 		if (!isCameraOpen) {
 			return 0;
 		}
-		
+
 		final int ret = camera.bug_camera_close();
 		isCameraOpen = !(ret == 0);
 		return ret;
 	}
 
-	public synchronized int cameraStart()
-	{
+	public synchronized int cameraStart() {
 		if (isCameraStarted) {
 			return 0;
 		}
-		
+
 		final long before = System.currentTimeMillis();
 		final int ret = camera.bug_camera_start();
 		final long after = System.currentTimeMillis();
-		System.out.println("TIMING: bug_camera_start took " + (after-before) + "ms");
+		System.out.println("TIMING: bug_camera_start took " + (after - before) + "ms");
 		isCameraStarted = (ret == 0);
 		return ret;
 	}
-	
-	public synchronized int cameraStop()
-	{
+
+	public synchronized int cameraStop() {
 		if (!isCameraStarted) {
 			return 0;
 		}
@@ -335,27 +253,30 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 		return ret;
 	}
 
-	public synchronized boolean grabPreview(int [] pixelBuffer)
-	{
+	public synchronized boolean grabPreview(int[] pixelBuffer) {
 		previewsGrabbed++;
 		return camera.bug_camera_grab_preview(pixelBuffer);
 	}
 
-	public synchronized byte[] grabFull()
-	{
+	public synchronized byte[] grabFull() {
 		final long before = System.currentTimeMillis();
 		final int flushed = camera.bug_camera_flush_queue();
 		final long after = System.currentTimeMillis();
-		System.out.println("TIMING: bug_camera_flush_queue took " + (after-before) + "ms");
+		System.out.println("TIMING: bug_camera_flush_queue took " + (after - before) + "ms");
 		if (flushed != 0) {
 			return null;
 		}
-		
+
 		fullsGrabbed++;
 		final long before2 = System.currentTimeMillis();
-		final byte [] jpeg = camera.bug_camera_grab_raw();
+		final byte[] jpeg = camera.bug_camera_grab_raw();
 		final long after2 = System.currentTimeMillis();
-		System.out.println("TIMING: bug_camera_grab_full took " + (after2-before2) + "ms");
+		System.out.println("TIMING: bug_camera_grab_full took " + (after2 - before2) + "ms");
 		return jpeg;
+	}
+
+	@Override
+	public boolean isSuspended() {
+		return suspended;
 	}
 }
