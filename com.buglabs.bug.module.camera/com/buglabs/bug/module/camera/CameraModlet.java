@@ -38,6 +38,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
@@ -62,21 +63,16 @@ import com.buglabs.util.osgi.LogServiceUtil;
  * @author kgilmer
  * 
  */
-public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2, IModuleControl {
+public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, PublicWSProvider2, IModuleControl {
 	private static final String JPEG_MIME_TYPE = "image/jpg";
 	private static boolean suspended = false;
 
 	private List modProps;
 
-	private final BundleContext context;
-
-	private final int slotId;
 
 	private final String moduleName;
 
 	private ServiceRegistration moduleControlReg;
-
-	private ServiceRegistration camera2DeviceReg;
 
 	private LogService logService;
 
@@ -88,16 +84,11 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	private CameraModuleControl cameraControl;
 
-	private ServiceRegistration cameraModuleControlReg;
-	private ServiceRegistration camera2ModuleControlReg;
-
 	private CameraControl cc;
 
-	private ServiceRegistration moduleLedControllerReg;
 	private String pictureServiceName = "Picture";
 	private BMIDevice properties;
-	private ServiceRegistration pictureWSReg;
-	private ServiceRegistration cameraControlWSReg;
+	
 	
 	private boolean isCameraOpen = false;
 	private boolean isCameraStarted = false;
@@ -114,23 +105,13 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 	}
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleId = moduleId;
+		super(context, slotId, moduleId, properties);
 		this.moduleName = "Camera";
-		this.properties = properties;
 	}
 
-	public String getModuleId() {
-		return moduleId;
-	}
-
-	public int getSlotId() {
-		return slotId;
-	}
 
 	public void setup() throws Exception {
-		logService = LogServiceUtil.getLogService(context);
+		
 	}
 
 	public void start() throws Exception {
@@ -139,40 +120,20 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		camera = new Camera();
 		cc = new CameraControl();
 		cameraControl = new CameraModuleControl(cc, this);
-		cameraModuleControlReg = context.registerService(ICameraModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
-		camera2ModuleControlReg = context.registerService(ICamera2ModuleControl.class.getName(), cameraControl, createBasicServiceProperties());
-		Dictionary modProperties = createBasicServiceProperties();
+		registerService(ICameraModuleControl.class.getName(), cameraControl, getCommonProperties());
+		moduleControlReg = context.registerService(ICamera2ModuleControl.class.getName(), cameraControl, getCommonProperties());
+		Dictionary modProperties = getCommonProperties();
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
-		moduleControlReg = context.registerService(IModuleControl.class.getName(), this, modProperties);
-		camera2DeviceReg = context.registerService(ICamera2Device.class.getName(), this, createBasicServiceProperties());
-		moduleLedControllerReg = context.registerService(IModuleLEDController.class.getName(), cameraControl, createBasicServiceProperties());
-		pictureWSReg = context.registerService(PublicWSProvider.class.getName(), this, null);
-		cameraControlWSReg = context.registerService(PublicWSProvider.class.getName(), cameraControl, null);
-	}
-
-	private Dictionary createBasicServiceProperties() {
-		Dictionary p = new Hashtable();
-		p.put("Provider", this.getClass().getName());
-		p.put("Slot", Integer.toString(slotId));
-
-		if (properties != null) {
-			if (properties.getDescription() != null)
-				p.put("ModuleDescription", properties.getDescription());
-			
-			if (properties.getSerialNum() != null)
-				p.put("ModuleSN", properties.getSerialNum());
-			
-			// these are ints so don't need a null check
-			p.put("ModuleVendorID", "" + properties.getVendor());			
-			p.put("ModuleRevision", "" + properties.getRevision());
-		}
-		
-		return p;
+		registerService(IModuleControl.class.getName(), this, modProperties);
+		registerService(ICamera2Device.class.getName(), this, getCommonProperties());
+		registerService(IModuleLEDController.class.getName(), cameraControl, getCommonProperties());
+		registerService(PublicWSProvider.class.getName(), this, null);
+		registerService(PublicWSProvider.class.getName(), cameraControl, null);
 	}
 
 	private void updateIModuleControlProperties(){
 		if (moduleControlReg!=null){
-			Dictionary modProperties = createBasicServiceProperties();
+			Dictionary modProperties = getCommonProperties();
 			modProperties.put("Power State", suspended ? "Suspended": "Active");
 			moduleControlReg.setProperties(modProperties);
 		}
@@ -182,14 +143,9 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		cameraStop();
 		cameraClose();
 
-		cameraModuleControlReg.unregister();
-		camera2ModuleControlReg.unregister();
-		camera2DeviceReg.unregister();
-		moduleControlReg.unregister();
-		moduleLedControllerReg.unregister();
-		pictureWSReg.unregister();
-		cameraControlWSReg.unregister();
+		moduleControlReg.unregister();	
 		camera.close();
+		super.stop();
 	}
 
 	public PublicWSDefinition discover(int operation) {

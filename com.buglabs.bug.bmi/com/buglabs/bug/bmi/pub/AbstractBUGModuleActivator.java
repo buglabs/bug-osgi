@@ -46,7 +46,7 @@ import com.buglabs.util.osgi.LogServiceUtil;
  * @author kgilmer
  * 
  */
-public abstract class BUGModuleActivator implements BundleActivator, IModletFactory {
+public abstract class AbstractBUGModuleActivator implements BundleActivator, IModletFactory {
 
 	private static BundleContext context;
 	private ServiceRegistration sr;
@@ -68,8 +68,8 @@ public abstract class BUGModuleActivator implements BundleActivator, IModletFact
 	}
 
 	public void start(BundleContext context) throws Exception {
-		BUGModuleActivator.context = context;
-		BUGModuleActivator.log = LogServiceUtil.getLogService(context);
+		AbstractBUGModuleActivator.context = context;
+		AbstractBUGModuleActivator.log = LogServiceUtil.getLogService(context);
 		this.headers = context.getBundle().getHeaders();
 		
 		sr = context.registerService(IModletFactory.class.getName(), this, getModletProperties());		

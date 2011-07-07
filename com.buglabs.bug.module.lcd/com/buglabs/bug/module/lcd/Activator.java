@@ -30,7 +30,7 @@ package com.buglabs.bug.module.lcd;
 import org.osgi.framework.BundleContext;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.BUGModuleActivator;
+import com.buglabs.bug.bmi.pub.AbstractBUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.module.lcd.pub.LCDModlet;
@@ -38,7 +38,7 @@ import com.buglabs.bug.module.lcd.pub.LCDModlet;
 /**
  *
  */
-public class Activator extends BUGModuleActivator {
+public class Activator extends AbstractBUGModuleActivator {
 
 	/* (non-Javadoc)
 	 * @see com.buglabs.bug.bmi.pub.BUGModuleActivator#createModlet(org.osgi.framework.BundleContext, int, com.buglabs.bug.bmi.pub.BMIModuleProperties)

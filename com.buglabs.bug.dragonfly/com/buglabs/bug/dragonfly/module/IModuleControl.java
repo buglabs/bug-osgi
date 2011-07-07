@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Bug Labs, Inc.
+ * Copyright (c) 2008, 2009, 2011 Bug Labs, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -42,38 +42,45 @@ public interface IModuleControl {
 	/**
 	 * Return a list of <code>IModuleProperty</code> elements.
 	 * 
-	 * @return
+	 * @return list of module properties
 	 */
-	public List getModuleProperties();
+	List<IModuleProperty> getModuleProperties();
 
 	/**
 	 * Get the human-readable name of this module.
 	 * 
-	 * @return
+	 * @return name of module
 	 */
-	public String getModuleName();
+	String getModuleName();
 
-	public int getSlotId();
+	/**
+	 * @return slot (0 - 3) that device is attached to.
+	 */
+	int getSlotId();
 
 	/**
 	 * Set a property. This is from a client request.
 	 * 
-	 * @param property
-	 * @return
+	 * @param property property to set
+	 * @return true if successful, false otherwise
 	 */
-	public boolean setModuleProperty(IModuleProperty property);
+	boolean setModuleProperty(IModuleProperty property);
 
 	/**
 	 * Suspend the module.
 	 * 
+	 * @return 1 if successful
 	 * @throws IOException
+	 *             on failure
 	 */
-	public int suspend() throws IOException;
+	int suspend() throws IOException;
 
 	/**
 	 * Resume the module.
 	 * 
+	 * @return 1 if successful
 	 * @throws IOException
+	 *             on failure
 	 */
-	public int resume() throws IOException;
+	int resume() throws IOException;
 }

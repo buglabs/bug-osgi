@@ -166,8 +166,8 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		}
 	}
 
-	public List<ModuleProperty> getModuleProperties() {
-		List<ModuleProperty> mprops = new ArrayList<ModuleProperty>();
+	public List<IModuleProperty> getModuleProperties() {
+		List<IModuleProperty> mprops = new ArrayList<IModuleProperty>();
 
 		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
 		mprops.add(new ModuleProperty("Slot", "" + slotId));

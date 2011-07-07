@@ -29,11 +29,11 @@ package com.buglabs.bug.module.gps;
 
 import org.osgi.framework.BundleContext;
 
-import com.buglabs.bug.bmi.pub.BUGModuleActivator;
+import com.buglabs.bug.bmi.pub.AbstractBUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 
-public class Activator extends BUGModuleActivator {
+public class Activator extends AbstractBUGModuleActivator {
 	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties) {
 		return new GPSModlet(context, slotId, getModuleId(), "GPS", properties);
 	}

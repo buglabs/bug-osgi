@@ -35,13 +35,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.BUGModuleActivator;
+import com.buglabs.bug.bmi.pub.AbstractBUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.bmi.sysfs.BMIDeviceNodeFactory;
 import com.buglabs.bug.module.video.pub.VideoOutBMIDevice;
 
-public class Activator extends BUGModuleActivator {
+public class Activator extends AbstractBUGModuleActivator {
 
 	private ServiceRegistration sysfsSr;
 
