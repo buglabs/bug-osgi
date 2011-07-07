@@ -40,6 +40,7 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
@@ -94,7 +95,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 
 	private ServiceRegistration moduleLedControllerReg;
 	private String pictureServiceName = "Picture";
-	private BMIModuleProperties properties;
+	private BMIDevice properties;
 	private ServiceRegistration pictureWSReg;
 	private ServiceRegistration cameraControlWSReg;
 	
@@ -112,16 +113,11 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		return fullsGrabbed;
 	}
 
-	public CameraModlet(BundleContext context, int slotId, String moduleId) {
+	public CameraModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
 		this.moduleName = "Camera";
-		this.properties = null;
-	}
-
-	public CameraModlet(BundleContext context, int slotId, String moduleId, BMIModuleProperties properties) {
-		this(context, slotId, moduleId);
 		this.properties = properties;
 	}
 
@@ -163,8 +159,8 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 			if (properties.getDescription() != null)
 				p.put("ModuleDescription", properties.getDescription());
 			
-			if (properties.getSerial_num() != null)
-				p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getSerialNum() != null)
+				p.put("ModuleSN", properties.getSerialNum());
 			
 			// these are ints so don't need a null check
 			p.put("ModuleVendorID", "" + properties.getVendor());			
@@ -239,7 +235,7 @@ public class CameraModlet implements IModlet, ICamera2Device, PublicWSProvider2,
 		
 		if (properties != null) {
 			modProps.add(new ModuleProperty("Module Description", properties.getDescription()));
-			modProps.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			modProps.add(new ModuleProperty("Module SN", properties.getSerialNum()));
 			modProps.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
 			modProps.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
 		}

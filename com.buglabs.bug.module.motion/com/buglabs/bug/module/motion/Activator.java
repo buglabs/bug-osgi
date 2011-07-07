@@ -29,19 +29,13 @@ package com.buglabs.bug.module.motion;
 
 import org.osgi.framework.BundleContext;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.BUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 
 public class Activator extends BUGModuleActivator {
 
-	public IModlet createModlet(BundleContext context, int slotId) {
-		MotionModlet modlet = new MotionModlet(context, slotId, getModuleId(), "Motion");
-
-		return modlet;
-	}
-
-	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
+	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties) {
 		return new MotionModlet(context, slotId, getModuleId(), "Motion", properties);
 	}
 }

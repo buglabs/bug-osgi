@@ -59,11 +59,7 @@ public class Activator extends BUGModuleActivator {
 		super.stop(context);
 	}
 
-	public IModlet createModlet(BundleContext context, int slotId) {
-		return new VideoModlet(context, slotId, getModuleId());
-	}
-
-	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
+	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties) {
 		return new VideoModlet(context, slotId, getModuleId(), properties);
 	}
 

@@ -32,6 +32,7 @@ import org.osgi.framework.BundleContext;
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.BUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.module.lcd.pub.LCDModlet;
 
 /**
@@ -40,16 +41,9 @@ import com.buglabs.bug.module.lcd.pub.LCDModlet;
 public class Activator extends BUGModuleActivator {
 
 	/* (non-Javadoc)
-	 * @see com.buglabs.bug.bmi.pub.BUGModuleActivator#createModlet(org.osgi.framework.BundleContext, int)
-	 */
-	public IModlet createModlet(BundleContext context, int slotId) {
-		return new LCDModlet(context, slotId, getModuleId());
-	}
-
-	/* (non-Javadoc)
 	 * @see com.buglabs.bug.bmi.pub.BUGModuleActivator#createModlet(org.osgi.framework.BundleContext, int, com.buglabs.bug.bmi.pub.BMIModuleProperties)
 	 */
-	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
+	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties) {
 		return new LCDModlet(context, slotId, getModuleId(), properties);
 	}
 }

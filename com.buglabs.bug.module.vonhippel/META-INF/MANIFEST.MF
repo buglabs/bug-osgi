@@ -11,6 +11,7 @@ Import-Package:
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.vonhippel,
  com.buglabs.bug.bmi.pub,
+ com.buglabs.bug.bmi.sysfs,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
  com.buglabs.util.xml,

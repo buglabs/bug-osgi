@@ -35,6 +35,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.LogServiceUtil;
 
@@ -129,7 +130,5 @@ public abstract class BUGModuleActivator implements BundleActivator, IModletFact
 		return d;
 	}
 
-	public abstract IModlet createModlet(BundleContext context, int slotId);
-
-	public abstract IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties);
+	public abstract IModlet createModlet(BundleContext context, int slotId, BMIDevice device);
 }

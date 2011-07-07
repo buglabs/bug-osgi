@@ -27,33 +27,14 @@
  *******************************************************************************/
 package com.buglabs.bug.module.gps;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 import org.osgi.framework.BundleContext;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.BUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 
 public class Activator extends BUGModuleActivator {
-
-	public IModlet createModlet(BundleContext context, int slotId) {
-		GPSModlet modlet = new GPSModlet(context, slotId, getModuleId(), "GPS");
-
-		return modlet;
-	}
-
-	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
+	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties) {
 		return new GPSModlet(context, slotId, getModuleId(), "GPS", properties);
-	}
-
-	public Dictionary getModletProperties() {
-		Hashtable ht = new Hashtable();
-
-		ht.put("Source", this.getClass().getName());
-		ht.put("Bug-Module-Id", getModuleId());
-
-		return ht;
 	}
 }

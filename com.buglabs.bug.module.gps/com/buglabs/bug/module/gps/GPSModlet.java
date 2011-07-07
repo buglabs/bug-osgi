@@ -45,6 +45,7 @@ import org.osgi.util.position.Position;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
@@ -116,7 +117,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private boolean suspended;
 
-	private final BMIModuleProperties properties;
+	private final BMIDevice properties;
 
 	private InputStream gpsIs;
 
@@ -128,21 +129,13 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 	 * @param moduleId
 	 * @param moduleName
 	 */
-	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleName = moduleName;
-		this.moduleId = moduleId;
-		this.properties = null;
-		this.log = LogServiceUtil.getLogService(context);
-	}
 
-	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIModuleProperties properties) {
+	public GPSModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIDevice properties2) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleName = moduleName;
 		this.moduleId = moduleId;
-		this.properties = properties;
+		this.properties = properties2;
 		this.log = LogServiceUtil.getLogService(context);	
 	}
 
@@ -196,8 +189,8 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 			if (properties.getDescription() != null) {
 				p.put("ModuleDescription", properties.getDescription());
 			}
-			if (properties.getSerial_num() != null) {
-				p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getSerialNum() != null) {
+				p.put("ModuleSN", properties.getSerialNum());
 			}
 			p.put("ModuleVendorID", "" + properties.getVendor());
 			p.put("ModuleRevision", "" + properties.getRevision());
@@ -300,7 +293,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 		
 		if (properties != null) {
 			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
-			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			mprops.add(new ModuleProperty("Module SN", properties.getSerialNum()));
 			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
 			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
 		}

@@ -44,6 +44,7 @@ import org.osgi.service.log.LogService;
 
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.bmi.sysfs.BMIDeviceHelper;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
@@ -82,27 +83,16 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	private Hashtable props;
 	private boolean suspended;
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
-	private final BMIModuleProperties properties;
+	private final BMIDevice properties;
 	private ServiceRegistration wsReg;
 	
 	private VideoOutBMIDevice videoOutDevice;
-	
-	public VideoModlet(BundleContext context, int slotId, String moduleId) {
+
+	public VideoModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties2) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
-
-		this.properties = null;
-		this.moduleName = "VIDEO";
-		this.log = LogServiceUtil.getLogService(context);
-		System.out.println("Asking for video out device");
-	}
-
-	public VideoModlet(BundleContext context, int slotId, String moduleId, BMIModuleProperties properties) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleId = moduleId;
-		this.properties = properties;
+		this.properties = properties2;
 		this.moduleName = "VIDEO";
 		this.log = LogServiceUtil.getLogService(context);
 		System.out.println("Asking for video out device");
@@ -143,8 +133,8 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 			if (properties.getDescription() != null) {
 				p.put("ModuleDescription", properties.getDescription());
 			}
-			if (properties.getSerial_num() != null) {
-				p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getSerialNum() != null) {
+				p.put("ModuleSN", properties.getSerialNum());
 			}
 			p.put("ModuleVendorID", "" + properties.getVendor());
 			p.put("ModuleRevision", "" + properties.getRevision());
@@ -176,8 +166,8 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 			if (properties.getDescription() != null) {
 				mprops.add(new ModuleProperty("ModuleDescription", properties.getDescription()));
 			}
-			if (properties.getSerial_num() != null) {
-				mprops.add(new ModuleProperty("ModuleSN", properties.getSerial_num()));
+			if (properties.getSerialNum() != null) {
+				mprops.add(new ModuleProperty("ModuleSN", properties.getSerialNum()));
 			}
 			
 			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));

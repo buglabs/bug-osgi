@@ -171,7 +171,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	 *             on bundle or system error
 	 */
 	private void createModlets(IModletFactory factory) throws Exception {
-		IModlet modlet = factory.createModlet(context, 0);
+		IModlet modlet = factory.createModlet(context, 0, null);
 		modlet.setup();
 		modlet.start();
 	}

@@ -45,6 +45,7 @@ import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
@@ -113,24 +114,16 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 	private LogService log;
 	private AccelerometerSampleProvider asp;
 	private boolean suspended;
-	private final BMIModuleProperties properties;
+	private final BMIDevice properties;
 	private ServiceRegistration motionWSReg;
 	private ServiceRegistration accelWSReg;
 
-	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName) {
+	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIDevice properties2) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleName = moduleName;
 		this.moduleId = moduleId;
-		this.properties = null;
-	}
-
-	public MotionModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIModuleProperties properties) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleName = moduleName;
-		this.moduleId = moduleId;
-		this.properties = properties;
+		this.properties = properties2;
 	}
 
 	public void start() throws Exception {
@@ -204,8 +197,8 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 			if (properties.getDescription() != null) {
 				p.put("ModuleDescription", properties.getDescription());
 			}
-			if (properties.getSerial_num() != null) {
-				p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getSerialNum() != null) {
+				p.put("ModuleSN", properties.getSerialNum());
 			}
 
 			p.put("ModuleVendorID", "" + properties.getVendor());
@@ -240,7 +233,7 @@ public class MotionModlet implements IModlet, IMDACCModuleControl, IModuleContro
 		
 		if (properties != null) {
 			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
-			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			mprops.add(new ModuleProperty("Module SN", properties.getSerialNum()));
 			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
 			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
 		}

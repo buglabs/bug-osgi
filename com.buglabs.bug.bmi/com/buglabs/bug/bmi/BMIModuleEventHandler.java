@@ -99,7 +99,7 @@ public class BMIModuleEventHandler {
 			case INSERT:
 
 				for (IModletFactory mf : modletFactories.get(event.getModuleId())) {
-					IModlet m = mf.createModlet(context, event.getSlot(), BMIModuleProperties.createFromBMIDevice(event.getBMIDevice()));
+					IModlet m = mf.createModlet(context, event.getSlot(), event.getBMIDevice());
 					try {
 						m.setup();
 					} catch (Exception e) {

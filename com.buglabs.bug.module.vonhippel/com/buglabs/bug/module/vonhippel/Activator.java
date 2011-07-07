@@ -27,27 +27,15 @@
  *******************************************************************************/
 package com.buglabs.bug.module.vonhippel;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.BUGModuleActivator;
 import com.buglabs.bug.bmi.pub.IModlet;
-import com.buglabs.bug.bmi.pub.IModletFactory;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 
 public class Activator extends BUGModuleActivator {	
-
-	public IModlet createModlet(BundleContext context, int slotId) {
-		VonHippelModlet modlet = new VonHippelModlet(context, slotId, getModuleId(), "VonHippel");
-
-		return modlet;
-	}
 	
-	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties) {
+	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties) {
 		return new VonHippelModlet(context, slotId, getModuleId(), "VonHippel", properties);
 	}
 }

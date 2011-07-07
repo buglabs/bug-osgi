@@ -36,19 +36,14 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
-
-
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
@@ -86,7 +81,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private Hashtable props;
 	private boolean suspended;
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
-	private final BMIModuleProperties properties;
+	private final BMIDevice properties;
 	private ServiceRegistration wsReg;
 	
 	private final String BRIGHTNESS_SYSFS = "/sys/class/backlight/omap-backlight/brightness";
@@ -95,20 +90,11 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 	private ML8953AccelerometerImplementation ml8953Control;
 	private ServiceRegistration ml8953AccelerometerRef;
 
-	public LCDModlet(BundleContext context, int slotId, String moduleId) {
+	public LCDModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties2) {
 		this.context = context;
 		this.slotId = slotId;
 		this.moduleId = moduleId;
-		this.properties = null;
-		this.moduleName = "LCD";
-		this.log = LogServiceUtil.getLogService(context);
-	}
-
-	public LCDModlet(BundleContext context, int slotId, String moduleId, BMIModuleProperties properties) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleId = moduleId;
-		this.properties = properties;
+		this.properties = properties2;
 		this.moduleName = "LCD";
 		this.log = LogServiceUtil.getLogService(context);
 	}
@@ -179,8 +165,8 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 			if (properties.getDescription() != null) {
 				p.put("ModuleDescription", properties.getDescription());
 			}
-			if (properties.getSerial_num() != null) {
-				p.put("ModuleSN", properties.getSerial_num());
+			if (properties.getSerialNum() != null) {
+				p.put("ModuleSN", properties.getSerialNum());
 			}
 
 			p.put("ModuleVendorID", "" + properties.getVendor());
@@ -211,7 +197,7 @@ public class LCDModlet implements IModlet, ILCDModuleControl, IModuleControl, IM
 
 		if (properties != null) {
 			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
-			mprops.add(new ModuleProperty("Module SN", properties.getSerial_num()));
+			mprops.add(new ModuleProperty("Module SN", properties.getSerialNum()));
 			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
 			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
 		}

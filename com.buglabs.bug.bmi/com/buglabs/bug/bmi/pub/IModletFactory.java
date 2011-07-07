@@ -29,6 +29,8 @@ package com.buglabs.bug.bmi.pub;
 
 import org.osgi.framework.BundleContext;
 
+import com.buglabs.bug.bmi.sysfs.BMIDevice;
+
 
 /**
  * A IModletFactory is able to create modlets. The factory descibes which type
@@ -68,15 +70,5 @@ public interface IModletFactory {
 	 *            0 - 3
 	 * @return
 	 */
-	public IModlet createModlet(BundleContext context, int slotId);
-
-	/**
-	 * Create an instance of the IModlet.
-	 * 
-	 * @param context
-	 * @param slotId
-	 *            0 - 3
-	 * @return
-	 */
-	public IModlet createModlet(BundleContext context, int slotId, BMIModuleProperties properties);
+	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties);
 }
