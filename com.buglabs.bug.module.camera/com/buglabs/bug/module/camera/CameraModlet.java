@@ -63,8 +63,6 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 
 	private Camera camera;
 
-	protected static final String PROPERTY_MODULE_NAME = "moduleName";
-
 	private CameraModuleControl cameraControl;
 
 	private CameraControl cc;
@@ -86,7 +84,7 @@ public class CameraModlet extends AbstractBUGModlet implements ICamera2Device, P
 	}
 
 	public CameraModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties) {
-		super(context, slotId, moduleId, properties, "Camera");
+		super(context, moduleId, properties, "Camera");
 	}
 
 	public void setup() throws Exception {

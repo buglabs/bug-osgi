@@ -68,6 +68,7 @@ import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.xml.XmlNode;
 
@@ -182,7 +183,7 @@ public class GPSModlet implements IModlet, IGPSModuleControl, IModuleControl, Pu
 
 	private Properties createBasicServiceProperties() {
 		Properties p = new Properties();
-		p.put("Provider", this.getClass().getName());
+		p.put(BUGBundleConstants.MODULE_PROVIDER_KEY, this.getClass().getName());
 		p.put("Slot", Integer.toString(slotId));
 
 		if (properties != null) {

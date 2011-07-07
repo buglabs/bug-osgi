@@ -90,4 +90,34 @@ public interface BUGBundleConstants {
 	public static final String MODLET_FACTORY_ID =  "Bug-Module-Id";
 	
 	public static final String PROPERTY_MODULE_NAME = "moduleName";
+	
+	/**
+	 * Service key for module description.
+	 */
+	static final String MODULE_DESC_KEY = "ModuleDescription";
+
+	/**
+	 * Service key for module serial number.
+	 */
+	public static final String MODULE_SERIAL_KEY = "ModuleSN";
+
+	/**
+	 * Service key for module product id.
+	 */
+	public static final String MODULE_VENDOR_KEY = "ModuleVendorID";
+
+	/**
+	 * Service key for module serial number.
+	 */
+	public static final String MODULE_VERSION_KEY = "ModuleRevision";
+	
+	/**
+	 * Service key for module provider.
+	 */
+	public static final String MODULE_PROVIDER_KEY = "Provider";
+	
+	/**
+	 * Service key for module slot index.
+	 */
+	public static final String MODULE_SLOT_KEY = "Slot";
 }

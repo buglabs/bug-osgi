@@ -49,6 +49,7 @@ import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.ServiceTrackerUtil;
 import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable;
 import com.buglabs.bug.base.pub.IBUG20BaseControl;
@@ -144,7 +145,7 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	 */
 	private Dictionary<String, String> getPowerButtonProperties() {
 		Dictionary<String, String> d = new Hashtable<String, String>();
-		d.put("Provider", this.getClass().getName());
+		d.put(BUGBundleConstants.MODULE_PROVIDER_KEY, this.getClass().getName());
 		d.put("Button", "Power");
 		return d;
 	}
@@ -154,7 +155,7 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	 */
 	private Dictionary<String, String> getUserButtonProperties() {
 		Dictionary<String, String> d = new Hashtable<String, String>();
-		d.put("Provider", this.getClass().getName());
+		d.put(BUGBundleConstants.MODULE_PROVIDER_KEY, this.getClass().getName());
 		d.put("Button", "User");
 		return d;
 	}

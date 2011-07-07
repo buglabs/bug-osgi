@@ -18,24 +18,30 @@ import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
+ * Abstract base class that handles standard IModlet and IModuleControl behavior.
+ * 
  * @author kgilmer
  *
  */
 public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 
 	protected final BundleContext context;
-	protected final int slotId;
 	protected final String moduleId;
-	private final BMIDevice properties;
+	private final BMIDevice bmiDevice;
 	protected final LogService logService;
 	private List<ServiceRegistration> registrationList;
 	private final String name;
 	
-	public AbstractBUGModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties, String name) {
+	/**
+	 * @param context
+	 * @param moduleId
+	 * @param bmiDevice
+	 * @param name
+	 */
+	public AbstractBUGModlet(BundleContext context, String moduleId, BMIDevice bmiDevice, String name) {
 		this.context = context;
-		this.slotId = slotId;
 		this.moduleId = moduleId;
-		this.properties = properties;
+		this.bmiDevice = bmiDevice;
 		this.name = name;
 		this.logService = LogServiceUtil.getLogService(context);
 	}
@@ -47,7 +53,7 @@ public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 
 	@Override
 	public final int getSlotId() {
-		return slotId;
+		return bmiDevice.getSlot();
 	}
 
 	@Override
@@ -65,9 +71,11 @@ public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 	
 	/**
 	 * This will manage the service references and unregister them upon shutdown.
-	 * @param clazz
-	 * @param service
-	 * @param properties
+	 * It is equivalent to <code>BundleContext.registerService()</code>
+	 * 
+	 * @param clazz name of service
+	 * @param service instance of service
+	 * @param properties properties of service
 	 */
 	protected final void registerService(String clazz, Object service, Dictionary properties) {
 		
@@ -78,21 +86,24 @@ public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 				context.registerService(clazz, service, properties));
 	}
 
+	/**
+	 * @return A dictionary with common BUG service properties.
+	 */
 	public final Dictionary getCommonProperties() {
 		Dictionary p = new Hashtable();
-		p.put("Provider", this.getClass().getName());
-		p.put("Slot", Integer.toString(slotId));
+		p.put(BUGBundleConstants.MODULE_PROVIDER_KEY, this.getClass().getName());
+		p.put("Slot", Integer.toString(bmiDevice.getSlot()));
 
-		if (properties != null) {
-			if (properties.getDescription() != null)
-				p.put("ModuleDescription", properties.getDescription());
+		if (bmiDevice != null) {
+			if (bmiDevice.getDescription() != null)
+				p.put(BUGBundleConstants.MODULE_DESC_KEY, bmiDevice.getDescription());
 
-			if (properties.getSerialNum() != null)
-				p.put("ModuleSN", properties.getSerialNum());
+			if (bmiDevice.getSerialNum() != null)
+				p.put(BUGBundleConstants.MODULE_SERIAL_KEY, bmiDevice.getSerialNum());
 
 			// these are ints so don't need a null check
-			p.put("ModuleVendorID", "" + properties.getVendor());
-			p.put("ModuleRevision", "" + properties.getRevision());
+			p.put(BUGBundleConstants.MODULE_VENDOR_KEY, "" + bmiDevice.getVendor());
+			p.put(BUGBundleConstants.MODULE_VERSION_KEY, "" + bmiDevice.getRevision());
 		}
 
 		return p;
@@ -104,14 +115,14 @@ public abstract class AbstractBUGModlet implements IModlet, IModuleControl {
 		List<IModuleProperty> modProps = new ArrayList<IModuleProperty>();
 
 		modProps.add(new ModuleProperty(BUGBundleConstants.PROPERTY_MODULE_NAME, getModuleName()));
-		modProps.add(new ModuleProperty("Slot", "" + slotId));
+		modProps.add(new ModuleProperty("Slot", "" + bmiDevice.getSlot()));
 		modProps.add(new ModuleProperty("Power State", isSuspended() ? "Suspended": "Active", "String", true));
 		
-		if (properties != null) {
-			modProps.add(new ModuleProperty("Module Description", properties.getDescription()));
-			modProps.add(new ModuleProperty("Module SN", properties.getSerialNum()));
-			modProps.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
-			modProps.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
+		if (bmiDevice != null) {
+			modProps.add(new ModuleProperty("Module Description", bmiDevice.getDescription()));
+			modProps.add(new ModuleProperty("Module SN", bmiDevice.getSerialNum()));
+			modProps.add(new ModuleProperty("Module Vendor ID", "" + bmiDevice.getVendor()));
+			modProps.add(new ModuleProperty("Module Revision", "" + bmiDevice.getRevision()));
 		}
 		
 		return modProps;
