@@ -54,6 +54,14 @@ public final class FilterUtil {
 	}
 	
 	/**
+	 * @param services A variable number of services.
+	 * @return A LDAP filter string that can be used to construct a Filter.  If null passed in, null is returned to caller.
+	 */
+	public static String generateServiceFilter(String ... services) {
+		return generateServiceFilter(Arrays.asList(services));
+	}
+	
+	/**
 	 * Generate a Filter as a String for a List of services.
 	 * 
 	 * @param services A String List of class names.

@@ -192,30 +192,16 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * ServiceTrackerRunnable-based ServiceTracker.
 	 * 
 	 * @param context
-	 * @param services
 	 * @param runnable
+	 * @param services
 	 * @return
 	 * @throws InvalidSyntaxException
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, ManagedRunnable runnable) throws InvalidSyntaxException {
+	public static ServiceTracker openServiceTracker(BundleContext context, ManagedRunnable runnable, String ... services) throws InvalidSyntaxException {
 		ServiceTracker st = new ClosingServiceTracker(context, FilterUtil.generateServiceFilter(context, services), new ServiceTrackerUtil(context, runnable, services.length), services);
 		st.open();
 		
 		return st;
-	}
-	
-	/**
-	 * Convenience method for creating and opening a
-	 * ServiceTrackerRunnable-based ServiceTracker.
-	 * 
-	 * @param context
-	 * @param service
-	 * @param runnable
-	 * @return
-	 * @throws InvalidSyntaxException
-	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, String service, ManagedRunnable runnable) throws InvalidSyntaxException {
-		return openServiceTracker(context, new String[] { service }, runnable);
 	}
 
 	/**
@@ -223,13 +209,13 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * ServiceTrackerRunnable-based ServiceTracker.
 	 * 
 	 * @param context
-	 * @param services
 	 * @param filter
 	 * @param runnable
+	 * @param services
 	 * @return
 	 * @throws InvalidSyntaxException
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, Filter filter, ManagedRunnable runnable) throws InvalidSyntaxException {
+	public static ServiceTracker openServiceTracker(BundleContext context, Filter filter, ManagedRunnable runnable, String ... services) throws InvalidSyntaxException {
 		ServiceTracker st = new ClosingServiceTracker(context, filter, new ServiceTrackerUtil(context, runnable, services.length), services);
 		st.open();
 
@@ -241,13 +227,13 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * ServiceTracker.
 	 * 
 	 * @param context
-	 * @param services
 	 * @param filter
 	 * @param customizer
+	 * @param services
 	 * @return
 	 * @throws InvalidSyntaxException
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, Filter filter, ServiceTrackerCustomizer customizer) throws InvalidSyntaxException {
+	public static ServiceTracker openServiceTracker(BundleContext context, Filter filter, ServiceTrackerCustomizer customizer, String ... services) throws InvalidSyntaxException {
 		ServiceTracker st = new ClosingServiceTracker(context, filter, customizer, services);
 		st.open();
 
@@ -259,12 +245,12 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * ServiceTracker.
 	 * 
 	 * @param context
-	 * @param services
 	 * @param customizer
+	 * @param services
 	 * @return
 	 * @throws InvalidSyntaxException
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, String[] services, ServiceTrackerCustomizer customizer) throws InvalidSyntaxException {
+	public static ServiceTracker openServiceTracker(BundleContext context, ServiceTrackerCustomizer customizer, String ... services) throws InvalidSyntaxException {
 		ServiceTracker st = new ClosingServiceTracker(context, FilterUtil.generateServiceFilter(context, services), customizer, services);
 		st.open();
 

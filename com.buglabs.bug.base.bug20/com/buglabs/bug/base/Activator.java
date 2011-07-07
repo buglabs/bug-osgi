@@ -214,7 +214,7 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 
 		registerServices(context);
 
-		httpTracker = ServiceTrackerUtil.openServiceTracker(context, new String[] { HttpService.class.getName() }, this);
+		httpTracker = ServiceTrackerUtil.openServiceTracker(context, this, new String[] { HttpService.class.getName() });
 
 		signalStartup();
 	}

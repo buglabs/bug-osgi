@@ -66,6 +66,7 @@ import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.services.ws.PublicWSProvider2;
 import com.buglabs.services.ws.WSResponse;
+import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.xml.XmlNode;
 
 /**
@@ -78,7 +79,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 
 	private BundleContext context;
 
-	private ServiceRegistration moduleRef;
+	private ServiceRegistration moduleReg;
 
 	protected static final String PROPERTY_MODULE_NAME = "moduleName";
 	protected static final String PROPERTY_IOX = "IOX";
@@ -92,7 +93,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	private static final String EXTERNAL_ANTENNA_PROPERTY = "gps.antenna.external";
 
 	private NMEASentenceProvider nmeaProvider;
-	private GPSControl gpscontrol;
+	private GPSControl gpsControl;
 
 	private Timer timer;
 
@@ -100,7 +101,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 
 	private boolean suspended;
 
-	private InputStream gpsIs;
+	private InputStream gpsInputStream;
 
 
 	/**
@@ -138,12 +139,12 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		//gpsd.start();
 		nmeaProvider.start();
 
-		Dictionary modProperties = createBasicServiceProperties();
-		modProperties.put("Power State", suspended ? "Suspended": "Active");
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
+		Dictionary properties = createBasicServiceProperties();
+		properties.put("Power State", suspended ? "Suspended": "Active");
+		moduleReg = context.registerService(IModuleControl.class.getName(), this, properties);
 		registerService(IModuleLEDController.class.getName(), this, createBasicServiceProperties());
 		registerService(IGPSModuleControl.class.getName(), this, createBasicServiceProperties());
-		registerService(INMEARawFeed.class.getName(), new NMEARawFeed(gpsIs), createBasicServiceProperties());
+		registerService(INMEARawFeed.class.getName(), new NMEARawFeed(gpsInputStream), createBasicServiceProperties());
 		registerService(INMEASentenceProvider.class.getName(), nmeaProvider, createBasicServiceProperties());
 		registerService(PublicWSProvider.class.getName(), this, null);
 
@@ -153,6 +154,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		registerService(IPositionProvider.class.getName(), this, createBasicServiceProperties());
 		context.addServiceListener(nmeaProvider, "(|(" + Constants.OBJECTCLASS + "=" + INMEASentenceSubscriber.class.getName() + ") (" + Constants.OBJECTCLASS + "="
 				+ IPositionSubscriber.class.getName() + "))");
+		context.addServiceListener(nmeaProvider, FilterUtil.generateServiceFilter(INMEASentenceSubscriber.class.getName(), IPositionSubscriber.class.getName()));
 	}
 
 	private Dictionary createBasicServiceProperties() {
@@ -169,10 +171,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	}
 
 	private void updateIModuleControlProperties(){
-		if (moduleRef!=null){
+		if (moduleReg!=null){
 			Dictionary modProperties = createBasicServiceProperties();
 			modProperties.put("Power State", suspended ? "Suspended": "Active");
-			moduleRef.setProperties(modProperties);
+			moduleReg.setProperties(modProperties);
 		}
 	}
 
@@ -188,10 +190,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public void stop() throws Exception {
 		timer.cancel();
 		context.removeServiceListener(nmeaProvider);
-		moduleRef.unregister();
+		moduleReg.unregister();
 		nmeaProvider.interrupt();
-		gpsIs.close();
-		gpscontrol.close();
+		gpsInputStream.close();
+		gpsControl.close();
 		super.stop();
 	}
 
@@ -258,10 +260,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 			return true;
 		} else if (property.getName().equals(PROPERTY_ANTENNA)) {
 			if (property.getValue().toString().equals(PROPERTY_ANTENNA_PASSIVE)) {
-				gpscontrol.ioctl_BMI_GPS_PASSIVE_ANT();
+				gpsControl.ioctl_BMI_GPS_PASSIVE_ANT();
 				System.out.println("Passive");
 			} else {
-				gpscontrol.ioctl_BMI_GPS_ACTIVE_ANT();
+				gpsControl.ioctl_BMI_GPS_ACTIVE_ANT();
 				System.out.println("Active");
 			}
 			return true;
@@ -273,7 +275,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int resume() throws IOException {
 		int result = -1;
 
-		result = gpscontrol.ioctl_BMI_GPS_RESUME();
+		result = gpsControl.ioctl_BMI_GPS_RESUME();
 		suspended = false;
 		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_RESUME failed");
@@ -286,7 +288,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int suspend() throws IOException {
 		int result = -1;
 
-		result = gpscontrol.ioctl_BMI_GPS_SUSPEND();
+		result = gpsControl.ioctl_BMI_GPS_SUSPEND();
 		if (result < 0) {
 			throw new IOException("ioctl BMI_GPS_SUSPEND failed");
 		}
@@ -375,13 +377,13 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 			throw new RuntimeException("Unable to initialize gps device: " + devnode_gpscontrol);
 		}
 
-		gpscontrol = new GPSControl();
+		gpsControl = new GPSControl();
 		getLog().log(LogService.LOG_DEBUG, "Opening GPS control port: " + devnode_gpscontrol);
-		CharDeviceUtils.openDeviceWithRetry(gpscontrol, devnode_gpscontrol, 2);
+		CharDeviceUtils.openDeviceWithRetry(gpsControl, devnode_gpscontrol, 2);
 		gps.close();
 		getLog().log(LogService.LOG_DEBUG, "Opening GPS data port: " + devnode_gps);
-		gpsIs = new FileInputStream(devnode_gps);
-		nmeaProvider = new NMEASentenceProvider(gpsIs, context);
+		gpsInputStream = new FileInputStream(devnode_gps);
+		nmeaProvider = new NMEASentenceProvider(gpsInputStream, context);
 	}
 
 	public LatLon getLatitudeLongitude() {
@@ -397,8 +399,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int LEDGreenOff() throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			result = gpscontrol.ioctl_BMI_GPS_GLEDOFF();
+		if (gpsControl != null) {
+			result = gpsControl.ioctl_BMI_GPS_GLEDOFF();
 		}
 
 		if (result < 0) {
@@ -411,8 +413,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int LEDGreenOn() throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			result = gpscontrol.ioctl_BMI_GPS_GLEDON();
+		if (gpsControl != null) {
+			result = gpsControl.ioctl_BMI_GPS_GLEDON();
 		}
 
 		if (result < 0) {
@@ -425,8 +427,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int LEDRedOff() throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			result = gpscontrol.ioctl_BMI_GPS_RLEDOFF();
+		if (gpsControl != null) {
+			result = gpsControl.ioctl_BMI_GPS_RLEDOFF();
 		}
 
 		if (result < 0) {
@@ -439,8 +441,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int LEDRedOn() throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			result = gpscontrol.ioctl_BMI_GPS_RLEDON();
+		if (gpsControl != null) {
+			result = gpsControl.ioctl_BMI_GPS_RLEDON();
 		}
 
 		if (result < 0) {
@@ -453,8 +455,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int getStatus() throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			result = gpscontrol.ioctl_BMI_GPS_GETSTAT();
+		if (gpsControl != null) {
+			result = gpsControl.ioctl_BMI_GPS_GETSTAT();
 		}
 
 		if (result < 0) {
@@ -467,8 +469,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int setActiveAntenna() throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			result = gpscontrol.ioctl_BMI_GPS_ACTIVE_ANT();
+		if (gpsControl != null) {
+			result = gpsControl.ioctl_BMI_GPS_ACTIVE_ANT();
 			System.out.println("Result: "+result);
 		}
 
@@ -482,8 +484,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int setPassiveAntenna() throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			result = gpscontrol.ioctl_BMI_GPS_PASSIVE_ANT();
+		if (gpsControl != null) {
+			result = gpsControl.ioctl_BMI_GPS_PASSIVE_ANT();
 			System.out.println("Result: "+result);
 		}
 
@@ -497,7 +499,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int setLEDGreen(boolean state) throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
+		if (gpsControl != null) {
 			if (state) {
 				return LEDGreenOn();
 			} else {
@@ -511,8 +513,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	public int setLEDRed(boolean state) throws IOException {
 		int result = -1;
 
-		if (gpscontrol != null) {
-			if (gpscontrol != null) {
+		if (gpsControl != null) {
+			if (gpsControl != null) {
 				if (state) {
 					return LEDRedOn();
 				} else {

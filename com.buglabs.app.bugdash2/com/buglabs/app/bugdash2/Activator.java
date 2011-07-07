@@ -47,7 +47,7 @@ public class Activator implements BundleActivator, IDesktopApp {
 		
 		batteryProvider = new BatteryInfoProvider();
 		batteryReg = context.registerService(IBatteryInfoProvider.class.getName(), batteryProvider, null);
-		stc = ServiceTrackerUtil.openServiceTracker(context, services, new DashApplication(context));
+		stc = ServiceTrackerUtil.openServiceTracker(context, new DashApplication(context), services);
 		
 		new BUGwebAdminServiceTracker(context);
 		

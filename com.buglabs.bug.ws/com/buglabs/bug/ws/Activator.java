@@ -90,7 +90,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 		log = LogServiceUtil.getLogService(bundleContext);
-		st = ServiceTrackerUtil.openServiceTracker(bundleContext, services , this);
+		st = ServiceTrackerUtil.openServiceTracker(bundleContext, this , services);
 		serviceMap = new Hashtable();
 	}
 

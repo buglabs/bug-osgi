@@ -64,7 +64,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 		LogManager.setContext(context);
 		log = LogServiceUtil.getLogService(context);
 		// Create the service tracker and run it.
-		stc = ServiceTrackerUtil.openServiceTracker(context, HttpService.class.getName(), this);		
+		stc = ServiceTrackerUtil.openServiceTracker(context, this, HttpService.class.getName());		
 	}
 
 	/*
