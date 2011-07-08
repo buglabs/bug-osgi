@@ -30,7 +30,6 @@ package com.buglabs.bug.dragonfly;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,15 +41,27 @@ import javax.servlet.http.HttpServletResponse;
 import com.buglabs.util.xml.XmlNode;
 import com.buglabs.util.xml.XmlParser;
 
+/**
+ * Servlet to receive subscriptions from SDK clients for module update events.
+ * 
+ * @author kgilmer
+ *
+ */
 public class DragonflyEventServlet extends HttpServlet {
 	private static final long serialVersionUID = -6041541048676568932L;
 
-	private final Map eventMap;
+	private final Map<String, List<DragonflyEventSubscriber>> eventMap;
 
-	public DragonflyEventServlet(Map eventMap) {
+	/**
+	 * @param eventMap map of event subscribers
+	 */
+	public DragonflyEventServlet(Map<String, List<DragonflyEventSubscriber>> eventMap) {
 		this.eventMap = eventMap;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doPut(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		BufferedReader br = new BufferedReader(req.getReader());
 		StringBuffer reqStr = new StringBuffer();
@@ -61,15 +72,14 @@ public class DragonflyEventServlet extends HttpServlet {
 
 		XmlNode reqXml = XmlParser.parse(reqStr.toString());
 
-		for (Iterator i = reqXml.getChildren().iterator(); i.hasNext();) {
-			XmlNode eventXml = (XmlNode) i.next();
+		for (XmlNode eventXml : reqXml.getChildren()) {
 			DragonflyEventSubscriber subscriber = new DragonflyEventSubscriber(eventXml);
 
 			if (subscriber.isValid()) {
-				List subList = (List) eventMap.get(subscriber.getTopic());
+				List<DragonflyEventSubscriber> subList = eventMap.get(subscriber.getTopic());
 
 				if (subList == null) {
-					subList = new ArrayList();
+					subList = new ArrayList<DragonflyEventSubscriber>();
 					eventMap.put(subscriber.getTopic(), subList);
 				}
 

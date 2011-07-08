@@ -29,17 +29,29 @@ package com.buglabs.bug.dragonfly;
 
 import com.buglabs.util.xml.XmlNode;
 
+/**
+ * Class to model a web-based subscriber for BUG module change events.
+ * 
+ * @author kgilmer
+ *
+ */
 public class DragonflyEventSubscriber {
 
 	private String url;
 
 	private String topic;
 
+	/**
+	 * @param node xml input
+	 */
 	public DragonflyEventSubscriber(XmlNode node) {
 		url = node.getAttribute("url");
 		topic = node.getAttribute("topic");
 	}
 
+	/**
+	 * @return true if instance has required data.
+	 */
 	public boolean isValid() {
 		if (url == null || topic == null) {
 			return false;
@@ -48,14 +60,23 @@ public class DragonflyEventSubscriber {
 		return true;
 	}
 
+	/**
+	 * @return topic
+	 */
 	public String getTopic() {
 		return topic;
 	}
 
+	/**
+	 * @return url of subscriber
+	 */
 	public String getUrl() {
 		return url;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object arg0) {
 		if (arg0 instanceof DragonflyEventSubscriber) {
 			DragonflyEventSubscriber othersub = (DragonflyEventSubscriber) arg0;
@@ -67,5 +88,4 @@ public class DragonflyEventSubscriber {
 		}
 		return super.equals(arg0);
 	}
-
 }
