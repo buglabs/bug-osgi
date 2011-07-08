@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -111,9 +112,8 @@ public class WSServlet extends AbstractWSServlet {
 			Object data = response.getContent();
 
 			if (data instanceof InputStream) {
-				pipe((InputStream) data, resp.getOutputStream());
-				((InputStream) data).close();
-				System.gc();
+				IOUtils.copy((InputStream) data, resp.getOutputStream());
+				IOUtils.closeQuietly(((InputStream) data));			
 			} else {
 				resp.getWriter().print(response.getContent());
 			}
@@ -200,20 +200,4 @@ public class WSServlet extends AbstractWSServlet {
 
 		return root;
 	}
-
-	private static void pipe(InputStream in, OutputStream out) throws IOException {
-		byte[] buf = new byte[500000];
-		int nread;
-		int total = 0;
-
-		synchronized (in) {
-			while ((nread = in.read(buf, 0, buf.length)) >= 0) {
-				out.write(buf, 0, nread);
-				total += nread;
-			}
-		}
-		out.flush();
-		buf = null;
-	}
-
 }
