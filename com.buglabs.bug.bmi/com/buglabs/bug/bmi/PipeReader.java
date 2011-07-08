@@ -27,11 +27,14 @@
  *******************************************************************************/
 package com.buglabs.bug.bmi;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
 import org.osgi.service.log.LogService;
 
 /**
@@ -76,11 +79,10 @@ public class PipeReader extends Thread {
 
 		try {
 			FileOutputStream fos = new FileOutputStream(pipeFilename);
-			fos.write(POISON_PILL.getBytes());
-			fos.close();
+			IOUtils.write(POISON_PILL, fos);
+			IOUtils.closeQuietly(fos);			
 		} catch (IOException e) {
 		}
-
 	}
 
 	/*
@@ -93,32 +95,25 @@ public class PipeReader extends Thread {
 		while (!Thread.currentThread().isInterrupted()) {
 			try {
 
-				stream = new FileInputStream(pipeFilename);
+				BufferedReader reader = new BufferedReader(new FileReader(pipeFilename));
+				String line = null;
+				
+				while ((line = reader.readLine()) != null) {
+					if (line.equals(POISON_PILL)) {
+						return;
+					}
+					
+					if (logService != null) {
+						logService.log(LogService.LOG_DEBUG
+								, "Received message from event pipe: " + line);
+					}
+					BMIModuleEvent m = new BMIModuleEvent(line);
 
-				int c = 0;
-
-				StringBuilder sb = new StringBuilder();
-
-				while ((c = stream.read()) != -1) {
-					sb.append((char) c);
-					if (c == '\n' || c == '\r') {
-						if (sb.toString().equals(POISON_PILL)) {
-							return;
-						}
-						if (logService != null) {
-							logService.log(LogService.LOG_DEBUG
-									, "Received message from event pipe: " + sb.toString());
-						}
-						BMIModuleEvent m = new BMIModuleEvent(sb.toString());
-
-						if (m.parse()) {
-							eventHandler.handleEvent(m);
-						} else {
-							logService.log(LogService.LOG_ERROR
-									, "Unable to parse message from event pipe: " + sb.toString());
-						}
-
-						break;
+					if (m.parse()) {
+						eventHandler.handleEvent(m);
+					} else {
+						logService.log(LogService.LOG_ERROR
+								, "Unable to parse message from event pipe: " + line);
 					}
 				}
 			} catch (FileNotFoundException e) {
@@ -126,12 +121,7 @@ public class PipeReader extends Thread {
 			} catch (IOException e) {
 				logService.log(LogService.LOG_ERROR, e.getMessage());
 			} finally {
-				try {
-					if (stream != null) {
-						stream.close();
-					}
-				} catch (IOException e) {
-				}
+				IOUtils.closeQuietly(stream);				
 			}
 		}
 	}

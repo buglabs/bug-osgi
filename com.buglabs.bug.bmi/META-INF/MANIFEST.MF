@@ -11,7 +11,8 @@ Import-Package:
  org.osgi.framework,
  org.osgi.service.log,
  org.sprinkles,
- com.buglabs.bug.dragonfly.module
+ com.buglabs.bug.dragonfly.module,
+ org.apache.commons.io;version="2.0.1"
 Export-Package: 
  com.buglabs.bug.bmi.pub,
  com.buglabs.bug.bmi.sysfs
