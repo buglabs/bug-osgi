@@ -35,7 +35,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,10 +46,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
 import com.buglabs.util.xml.XmlNode;
 
 /**
@@ -65,7 +64,7 @@ public class Activator implements BundleActivator, ServiceListener, ManagedInlin
 
 	private static final String DRAGONFLY_WS_PATH = "/event";
 
-	private Map eventMap;
+	private Map<String, List<DragonflyEventSubscriber>> eventMap;
 
 	private BundleContext context;
 
@@ -79,7 +78,7 @@ public class Activator implements BundleActivator, ServiceListener, ManagedInlin
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 		logService = LogServiceUtil.getLogService(context);
-		eventMap = new Hashtable();
+		eventMap = new Hashtable<String, List<DragonflyEventSubscriber>>();
 
 		context.addServiceListener(this, FilterUtil.generateServiceFilter(IModuleControl.class.getName()));
 	}
@@ -110,9 +109,9 @@ public class Activator implements BundleActivator, ServiceListener, ManagedInlin
 	/**
 	 * Send message to subscriber.
 	 * 
-	 * @param s
-	 * @param message
-	 * @throws IOException
+	 * @param s subscriber
+	 * @param message message to send
+	 * @throws IOException on IO failure
 	 */
 	private void notifySubscriber(DragonflyEventSubscriber s, String message) throws IOException {
 		logService.log(LogService.LOG_DEBUG, "Notifying " + s.getUrl() + " of model update.");
@@ -126,14 +125,16 @@ public class Activator implements BundleActivator, ServiceListener, ManagedInlin
 		osr.flush();
 
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		String line, resp = new String("");
-		while ((line = rd.readLine()) != null) {
-			resp = resp + line + "\n";
-		}
+		//Read but discard response from subscriber.
+		while ((rd.readLine() != null))
+		
 		osr.close();
 		rd.close();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.ServiceListener#serviceChanged(org.osgi.framework.ServiceEvent)
+	 */
 	public void serviceChanged(ServiceEvent event) {
 		ServiceReference sr = event.getServiceReference();
 
@@ -155,35 +156,39 @@ public class Activator implements BundleActivator, ServiceListener, ManagedInlin
 
 		logService.log(LogService.LOG_INFO, "Received new " + type + " model change event for module " + module);
 
-		List subList = (List) eventMap.get(topic);
-		List removeList = null;
+		List<DragonflyEventSubscriber> subList = eventMap.get(topic);
+		List<DragonflyEventSubscriber> removeList = null;
 
 		if (subList != null) {
-			for (Iterator i = subList.iterator(); i.hasNext();) {
-				DragonflyEventSubscriber s = (DragonflyEventSubscriber) i.next();
-
+			for (DragonflyEventSubscriber s : subList) {
+		
 				try {
 					notifySubscriber(s, createMessage(topic, type, module));
 				} catch (IOException e) {
-					if (!e.getMessage().equals("Unexpected end of file from server") && !e.getMessage().equals("Connection reset")) {
+					if (!e.getMessage().equals("Unexpected end of file from server") 
+							&& !e.getMessage().equals("Connection reset")) {
 						if (removeList == null) {
-							removeList = new ArrayList();
+							removeList = new ArrayList<DragonflyEventSubscriber>();
 						}
-						logService.log(LogService.LOG_WARNING, "Removing subscriber " + s.getUrl() + " due to I/O Exception: " + e.getMessage());
+						logService.log(LogService.LOG_WARNING, "Removing subscriber " + s.getUrl() 
+								+ " due to I/O Exception: " + e.getMessage());
 						removeList.add(s);
 					}
 				}
 			}
 
 			if (removeList != null) {
-				for (Iterator i = removeList.iterator(); i.hasNext();) {
-					subList.remove(i.next());
+				for (Object o : removeList) {
+					subList.remove(o);
 				}
 			}
 		}
 	}
 
-	public void run(Map services) {
+	/* (non-Javadoc)
+	 * @see com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable#run(java.util.Map)
+	 */
+	public void run(Map<Object, Object> services) {
 		httpService = (HttpService) services.get(HttpService.class.getName());
 
 		try {
@@ -194,6 +199,9 @@ public class Activator implements BundleActivator, ServiceListener, ManagedInlin
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable#shutdown()
+	 */
 	public void shutdown() {
 		if (httpService != null)
 			httpService.unregister(DRAGONFLY_WS_PATH);
