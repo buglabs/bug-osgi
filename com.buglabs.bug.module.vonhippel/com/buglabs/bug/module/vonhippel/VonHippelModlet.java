@@ -28,205 +28,75 @@
 package com.buglabs.bug.module.vonhippel;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
-import com.buglabs.bug.dragonfly.module.IModuleProperty;
-import com.buglabs.bug.dragonfly.module.ModuleProperty;
 import com.buglabs.bug.jni.common.CharDeviceUtils;
 import com.buglabs.bug.jni.vonhippel.VonHippel;
 import com.buglabs.bug.module.vonhippel.pub.IVonHippelModuleControl;
 import com.buglabs.bug.module.vonhippel.pub.VonHippelWS;
 import com.buglabs.services.ws.PublicWSProvider;
-import com.buglabs.util.osgi.LogServiceUtil;
 
-public class VonHippelModlet implements IModlet, IModuleControl {
-
-	private BundleContext context;
-
-	private boolean deviceOn = true;
-
-	private int slotId;
-
-	private final String moduleId;
-
+/**
+ * Modlet for von Hippel Module
+ */
+public class VonHippelModlet extends AbstractBUGModlet {
 	private ServiceRegistration moduleRef;
-
-	protected static final String PROPERTY_MODULE_NAME = "moduleName";
-
-	public static final String MODULE_ID = "0007";
-
-	private static final int SERIAL_WAIT_TO_OPEN_TIME = 4000;  //ms to wait before trying to open the serial port.
-	private final String moduleName;
 
 	private VonHippel vhDevice;
 
-	private ServiceRegistration vhModuleRef;
-
 	private VonHippelModuleControl vhc;
-
-	private ServiceRegistration vhSerialRef;
-
-	private ServiceRegistration vhLedRef;
 
 	private boolean suspended;
 
-	private LogService logService;
-
-	private final BMIDevice properties;
-
-
-	private String devNode;
-
-	private ServiceRegistration wsRef;
-
 	public VonHippelModlet(BundleContext context, int slotId, String moduleId, String moduleName, BMIDevice properties) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleName = moduleName;
-		this.moduleId = moduleId;
-		this.properties = properties;
-		this.logService = LogServiceUtil.getLogService(context);
+		super(context, moduleId, properties, moduleName);		
 	}
 
 	public void start() throws Exception {
-		Dictionary modProperties = createBasicServiceProperties();
+		Dictionary modProperties = getCommonProperties();
 		modProperties.put("Power State", suspended ? "Suspended": "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
-		vhModuleRef = context.registerService(IVonHippelModuleControl.class.getName(), vhc, createBasicServiceProperties());
-		vhLedRef =context.registerService(IModuleLEDController.class.getName(), vhc, createBasicServiceProperties());
-		VonHippelWS vhWS = new VonHippelWS(vhc);
-		wsRef = context.registerService(PublicWSProvider.class.getName(), vhWS, null);
+		registerService(IVonHippelModuleControl.class.getName(), vhc, getCommonProperties());
+		registerService(IModuleLEDController.class.getName(), vhc, getCommonProperties());
+		registerService(PublicWSProvider.class.getName(), new VonHippelWS(vhc), null);
 	}
 
 	public void stop() throws Exception {
 		//close any open resources
 
-		wsRef.unregister();
-		
-		if (vhLedRef != null) {
-			vhLedRef.unregister();
-		}
-		
 		if (moduleRef != null) {
 			moduleRef.unregister();
 		}
-
-		if (vhModuleRef != null) {
-			vhModuleRef.unregister();
-		}
-		
 	
 		//close /dev/bmi_vh_ctl_m#
 		if (vhDevice != null ){
 			vhDevice.close();
 		}
-		
+		super.stop();
 	}
 
-	private Dictionary createBasicServiceProperties() {
-		Dictionary p = new Hashtable();
-		p.put("Provider", this.getClass().getName());
-		p.put("Slot", Integer.toString(slotId));
-
-		if (properties != null) {
-			if (properties.getDescription() != null) {
-				p.put("ModuleDescription", properties.getDescription());
-			}
-			if (properties.getSerialNum() != null) {
-				p.put("ModuleSN", properties.getSerialNum());
-			}
-
-			p.put("ModuleVendorID", "" + properties.getVendor());
-
-			p.put("ModuleRevision", "" + properties.getRevision());
-
-		}
-		
-		return p;
-	}
-
+	/**
+	 * 
+	 */
 	private void updateIModuleControlProperties(){
 		if (moduleRef!=null){
-			Dictionary modProperties = createBasicServiceProperties();
+			Dictionary modProperties = getCommonProperties();
 			modProperties.put("Power State", suspended ? "Suspended": "Active");
 			moduleRef.setProperties(modProperties);
 		}
 	}
 
-	public List<IModuleProperty> getModuleProperties() {
-		List<IModuleProperty> mprops = new ArrayList<IModuleProperty>();
 
-		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
-		mprops.add(new ModuleProperty("Slot", "" + slotId));
-		mprops.add(new ModuleProperty("State", Boolean.toString(deviceOn), "Boolean", true));
-		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended": "Active", "String", true));
-		
-		if (properties != null) {
-			mprops.add(new ModuleProperty("Module Description", properties.getDescription()));
-			mprops.add(new ModuleProperty("Module SN", properties.getSerialNum()));
-			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
-			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
-		}
-		
-		return mprops;
-	}
-
-	public boolean setModuleProperty(IModuleProperty property) {
-		if (!property.isMutable()) {
-			return false;
-		}
-		if (property.getName().equals("State")) {
-			deviceOn = Boolean.valueOf((String) property.getValue()).booleanValue();
-			return true;
-		}
-		if (property.getName().equals("Power State")) {
-			if (((String) property.getValue()).equals("Suspend")){
-				try{
-				suspend();
-				}
-			 catch (IOException e) {
-				 LogServiceUtil.logBundleException(logService, e.getMessage(), e);
-			}
-			}
-			else if (((String) property.getValue()).equals("Resume")){
-				
-				try {
-					resume();
-				} catch (IOException e) {
-					this.logService = LogServiceUtil.getLogService(context);
-				}
-			}
-			
-				
-			
-		}
-		
-		return false;
-	}
-
-	public String getModuleName() {
-		return moduleName;
-	}
-
-	public String getModuleId() {
-		return moduleId;
-	}
-
-	public int getSlotId() {
-		return slotId;
-	}
-
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.dragonfly.module.IModuleControl#resume()
+	 */
 	public int resume() throws IOException {
 		int result = -1;
 
@@ -241,6 +111,9 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 	}
 	
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.dragonfly.module.IModuleControl#suspend()
+	 */
 	public int suspend() throws IOException {
 		int result = -1;
 
@@ -254,16 +127,20 @@ public class VonHippelModlet implements IModlet, IModuleControl {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.pub.AbstractBUGModlet#setup()
+	 */
 	public void setup() throws Exception {
-		int slot = slotId;
+		int slot = getSlotId();
 		String devnode_vh = "/dev/bmi_vh_control_m" + slot;
 		vhDevice = new VonHippel();
 		CharDeviceUtils.openDeviceWithRetry(vhDevice, devnode_vh, 2);
-		vhc = new VonHippelModuleControl(vhDevice, slotId);
-		
-        
-        
-	
+		vhc = new VonHippelModuleControl(vhDevice, getSlotId());	
+	}
+
+	@Override
+	public boolean isSuspended() {
+		return suspended;
 	}
 
 }
