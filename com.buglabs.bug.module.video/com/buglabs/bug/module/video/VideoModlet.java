@@ -28,36 +28,27 @@
 package com.buglabs.bug.module.video;
 
 import java.awt.Frame;
-import java.awt.Point;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.bmi.sysfs.BMIDeviceHelper;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
-import com.buglabs.bug.dragonfly.module.ModuleProperty;
 import com.buglabs.bug.module.video.pub.IVideoModuleControl;
 import com.buglabs.bug.module.video.pub.VideoOutBMIDevice;
 import com.buglabs.services.ws.IWSResponse;
 import com.buglabs.services.ws.PublicWSDefinition;
 import com.buglabs.services.ws.PublicWSProvider;
-import com.buglabs.services.ws.PublicWSProviderWithParams;
 import com.buglabs.services.ws.PublicWSProvider2;
+import com.buglabs.services.ws.PublicWSProviderWithParams;
 import com.buglabs.services.ws.WSResponse;
-import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.xml.XmlNode;
 
 /**
@@ -66,117 +57,35 @@ import com.buglabs.util.xml.XmlNode;
  * @author dfindlay
  * 
  */
-public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl, com.buglabs.bug.module.lcd.pub.IModuleDisplay, PublicWSProviderWithParams {
-	private final BundleContext context;
-	private final int slotId;
-	private final String moduleId;
-	private final String moduleName;
+public class VideoModlet extends AbstractBUGModlet implements IVideoModuleControl, com.buglabs.bug.module.lcd.pub.IModuleDisplay, PublicWSProviderWithParams {
 	private String serviceName = "Video";
-	// TODO requires driver (or something else?)to expose size before we can ditch the hardcoded frame size
-	private final int LCD_WIDTH = 320;
-	private final int LCD_HEIGHT = 240;
 	
-	private ServiceRegistration moduleRef;
-	private ServiceRegistration moduleDisplayServReg;
-	private ServiceRegistration videoControlServReg;
-	private LogService log;
-	private Hashtable props;
 	private boolean suspended;
-	protected static final String PROPERTY_MODULE_NAME = "moduleName";
-	private final BMIDevice properties;
-	private ServiceRegistration wsReg;
-	
+
 	private VideoOutBMIDevice videoOutDevice;
 
 	public VideoModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties2) {
-		this.context = context;
-		this.slotId = slotId;
-		this.moduleId = moduleId;
-		this.properties = properties2;
-		this.moduleName = "VIDEO";
-		this.log = LogServiceUtil.getLogService(context);
-		System.out.println("Asking for video out device");
+		super(context, moduleId, properties2, "VIDEO");
 	}
 
 	public void setup() throws Exception {
-		this.videoOutDevice = (VideoOutBMIDevice) BMIDeviceHelper.getDevice(context, slotId);
+		this.videoOutDevice = (VideoOutBMIDevice) BMIDeviceHelper.getDevice(context, getSlotId());
 	}
 
 	public void start() throws Exception {
-		Dictionary modProperties = createBasicServiceProperties();
+		Dictionary modProperties = getCommonProperties();
 		modProperties.put("Power State", suspended ? "Suspended" : "Active");
-		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
-
-		props = new Hashtable();
-		props.put("width", new Integer(LCD_WIDTH));
-		props.put("height", new Integer(LCD_HEIGHT));
-		props.put("Slot", "" + slotId);
-
-		videoControlServReg = context.registerService(IVideoModuleControl.class.getName(), this, createBasicServiceProperties());
-		moduleDisplayServReg = context.registerService(com.buglabs.bug.module.lcd.pub.IModuleDisplay.class.getName(), this, createBasicServiceProperties());
-		wsReg = context.registerService(PublicWSProvider.class.getName(), this, null);
+		
+		registerService(IModuleControl.class.getName(), this, modProperties);
+		registerService(IVideoModuleControl.class.getName(), this, modProperties);
+		registerService(com.buglabs.bug.module.lcd.pub.IModuleDisplay.class.getName(), this, modProperties);
+		registerService(PublicWSProvider.class.getName(), this, null);
 	}
 
 	public void stop() throws Exception {
-		moduleRef.unregister();
-		videoControlServReg.unregister();
-		moduleDisplayServReg.unregister();
-		wsReg.unregister();
+		super.stop();
 	}
 	
-	private Dictionary createBasicServiceProperties() {
-		Properties p = new Properties();
-		p.put("Provider", this.getClass().getName());
-		p.put("Slot", Integer.toString(slotId));
-
-		if (properties != null) {
-			if (properties.getDescription() != null) {
-				p.put("ModuleDescription", properties.getDescription());
-			}
-			if (properties.getSerialNum() != null) {
-				p.put("ModuleSN", properties.getSerialNum());
-			}
-			p.put("ModuleVendorID", "" + properties.getVendor());
-			p.put("ModuleRevision", "" + properties.getRevision());
-		}
-
-		return p;
-	}
-
-	/*
-	private void updateIModuleControlProperties() {
-		if (moduleRef != null) {
-			Properties modProperties = createBasicServiceProperties();
-			modProperties.put("Power State", suspended ? "Suspended" : "Active");
-			moduleRef.setProperties(modProperties);	public Point getResolution() {
-
-		}
-	}
-	*/
-
-	public List getModuleProperties() {
-		List mprops = new ArrayList();
-		mprops.add(new ModuleProperty("Slot", "" + slotId));
-		mprops.add(new ModuleProperty("Width", "" + LCD_WIDTH));
-		mprops.add(new ModuleProperty("Height", "" + LCD_HEIGHT));
-		mprops.add(new ModuleProperty(PROPERTY_MODULE_NAME, getModuleName()));
-		mprops.add(new ModuleProperty("Power State", suspended ? "Suspended" : "Active", "String", true));
-
-		if (properties != null) {
-			if (properties.getDescription() != null) {
-				mprops.add(new ModuleProperty("ModuleDescription", properties.getDescription()));
-			}
-			if (properties.getSerialNum() != null) {
-				mprops.add(new ModuleProperty("ModuleSN", properties.getSerialNum()));
-			}
-			
-			mprops.add(new ModuleProperty("Module Vendor ID", "" + properties.getVendor()));
-			mprops.add(new ModuleProperty("Module Revision", "" + properties.getRevision()));
-		}
-
-		return mprops;
-	}
-
 	public boolean setModuleProperty(IModuleProperty property) {
 		if (!property.isMutable()) {
 			return false;
@@ -188,20 +97,16 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 			if (((String) property.getValue()).equals("Suspend")) {
 
 				if (! (suspend() == 1)) {
-					log.log(LogService.LOG_ERROR, "An error occured while changing suspend state.");
+					getLog().log(LogService.LOG_ERROR, "An error occured while changing suspend state.");
 				}
 			} else if (((String) property.getValue()).equals("Resume")) {
 				if (! (resume() == 1)) {
-					log.log(LogService.LOG_ERROR, "An error occured while changing suspend state.");
+					getLog().log(LogService.LOG_ERROR, "An error occured while changing suspend state.");
 				} 
 			}
 		}
 
 		return false;
-	}
-
-	public int getSlotId() {
-		return slotId;
 	}
 
 	public int resume() {
@@ -223,19 +128,12 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 	
 	public Frame getFrame() {
+		int[] ds = getDisplaySize();
 		Frame frame = new Frame();
-		frame.setSize(LCD_WIDTH, LCD_HEIGHT);
+		frame.setSize(ds[0], ds[1]);
 		frame.setResizable(false);
 		frame.setVisible(true);
 		return frame;
-	}
-
-	public String getModuleId() {
-		return moduleId;
-	}
-
-	public String getModuleName() {
-		return moduleName;
 	}
 
 	public boolean isVGA() {
@@ -259,7 +157,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		if (operation == PublicWSProvider2.GET) {
 			return new PublicWSDefinition() {
 
-				public List getParameters() {
+				public List<String> getParameters() {
 					return null;
 				}
 
@@ -279,7 +177,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 	}
 
 	@Override
-	public IWSResponse execute(int operation, String input, Map get, Map post) {
+	public IWSResponse execute(int operation, String input, Map<String, String> get, Map<String, String> post) {
 		try {
 			if (get.containsKey("suspend")) {
 				videoOutDevice.suspend();
@@ -307,7 +205,7 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 			}
 			return null;
 		} catch (IOException e) {
-			log.log(LogService.LOG_ERROR, "Failed to execute web service.", e);
+			getLog().log(LogService.LOG_ERROR, "Failed to execute web service.", e);
 			return new WSResponse(0, "Failed to execute web service: " + e.getMessage());
 		}
 	}
@@ -342,4 +240,18 @@ public class VideoModlet implements IModlet, IVideoModuleControl, IModuleControl
 		return videoOutDevice.getResolution();
 	}
 
+	@Override
+	public boolean isSuspended() {
+		return suspended;
+	}
+
+	@Override
+	public int[] getDisplaySize() {	
+		int[] s = new int[2];
+		String [] elems = videoOutDevice.getResolution().split("x");
+		s[0] = Integer.parseInt(elems[0]);
+		s[1] = Integer.parseInt(elems[1]);
+		
+		return s;
+	}
 }

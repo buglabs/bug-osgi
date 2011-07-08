@@ -38,8 +38,15 @@ public interface IVideoModuleControl extends IModuleControl {
 	/**
 	 * Get the currently selected video resolution.
 	 * @return resolution, e.g. "1280x1024"
+	 * @deprecated use getDisplaySize();
 	 */
 	public String getResolution();
+	
+	/**
+	 * @return 2-dimentional array of display resolution, 0 - x, 1 - y.  Example [640, 480]
+	 *
+	 */
+	public int[] getDisplaySize();
 	
 	/**
 	 * @return true if video module is currently in VGA mode

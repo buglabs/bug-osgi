@@ -53,5 +53,5 @@ public interface PublicWSProviderWithParams extends PublicWSProvider2 {
 	 *            Key value pairs passed in via POST data.
 	 * @return
 	 */
-	public IWSResponse execute(int operation, String input, Map get, Map post);
+	public IWSResponse execute(int operation, String input, Map<String, String> get, Map<String, String> post);
 }
