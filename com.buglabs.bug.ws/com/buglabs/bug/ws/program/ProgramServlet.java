@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.knapsack.init.pub.KnapsackInitService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -139,9 +140,8 @@ public class ProgramServlet extends HttpServlet {
 		}
 
 		File jarFile = new File(bundleDir.getAbsolutePath() + File.separator + jarName + ".jar");
-
 		FileOutputStream fos = new FileOutputStream(jarFile);
-		pipe(req.getInputStream(), fos, req.getContentLength());
+		IOUtils.copy(req.getInputStream(), fos);
 		fos.flush();
 		fos.close();
 		//Tell knapsack to start the bundle.
@@ -151,41 +151,6 @@ public class ProgramServlet extends HttpServlet {
 
 		resp.getWriter().println(HTTP_OK_RESPONSE);
 		req.getInputStream().close();
-	}
-
-	/**
-	 * Send data from inputstream to outputstream one byte at a time.
-	 * 
-	 * @param in
-	 * @param out
-	 * @param length
-	 * @throws IOException
-	 */
-	private static void pipe(InputStream in, OutputStream out, int length) throws IOException {
-		for (int i = 0; i < length; ++i) {
-			out.write(in.read());
-		}
-
-		out.flush();
-	}
-
-	/**
-	 * Send data from inputstream to outputstream one byte at a time.
-	 * 
-	 * @param in
-	 * @param out
-	 * @param length
-	 * @throws IOException
-	 */
-	private static void pipe(InputStream in, OutputStream out) throws IOException {
-		byte buf[] = new byte[1024 * 8];
-		int read;
-
-		while ((read = in.read(buf)) > 0) {
-			out.write(buf, 0, read);
-		}
-
-		out.flush();
 	}
 
 	private void uninstallBundle(Bundle bundle) throws BundleException {
@@ -241,14 +206,14 @@ public class ProgramServlet extends HttpServlet {
 			if (jarfile != null && jarfile.exists() && jarfile.isFile()) {
 				resp.setContentType(APPLICATION_JAVA_ARCHIVE_MIME_TYPE);
 				FileInputStream fis = new FileInputStream(jarfile);
-				pipe(fis, resp.getOutputStream());
+				IOUtils.copy(fis, resp.getOutputStream());
 			} else if (jarfile != null && jarfile.exists() && jarfile.isDirectory()) {
 				resp.setContentType(APPLICATION_JAVA_ARCHIVE_MIME_TYPE);
 				File bundleFile = new File(incomingBundleDir + File.separator + BUNDLE_TEMP_FILENAME);
 				jarfile = createJar(jarfile, bundleFile);
 
 				FileInputStream fis = new FileInputStream(jarfile);
-				pipe(fis, resp.getOutputStream());
+				IOUtils.copy(fis, resp.getOutputStream());
 			} else {
 				resp.setContentType(TEXT_PLAIN_MIME_TYPE);
 				resp.sendError(0, "No program with id: " + id);
