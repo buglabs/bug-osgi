@@ -48,6 +48,10 @@ import com.buglabs.bug.dragonfly.module.MutableModuleProperty;
 import com.buglabs.bug.ws.Activator;
 import com.buglabs.util.xml.XmlNode;
 
+/**
+ * A servlet to expose BUG module data to web clients.
+ *
+ */
 public class ModuleServlet extends HttpServlet implements ServiceListener {
 
 	private static final long serialVersionUID = -6977609397049223637L;
@@ -56,6 +60,9 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 
 	private BundleContext context;
 
+	/**
+	 * 
+	 */
 	public ModuleServlet() {
 		context = Activator.getContext();
 		//Initialize the array that tracks modules.
@@ -64,6 +71,9 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 			modules[i] = null;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
 		// Must have a module in the path.
@@ -97,6 +107,9 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getPathInfo();
 		String response = null;
@@ -131,6 +144,10 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 		resp.getWriter().print(response);
 	}
 
+	/**
+	 * @param mc IModuleControl
+	 * @return module XML
+	 */
 	private String getModuleXML(IModuleControl mc) {
 		XmlNode root = new XmlNode("module");
 		root.setAttribute("name", mc.getModuleName());
@@ -155,7 +172,7 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 	}
 
 	/**
-	 * @return
+	 * @return XML as string of modules
 	 */
 	private String getModules() {
 		XmlNode root = new XmlNode("modules");

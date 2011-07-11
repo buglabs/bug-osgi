@@ -49,7 +49,7 @@ import com.buglabs.util.xml.XmlNode;
 import com.buglabs.util.xml.XmlParser;
 
 /**
- * A servlet that interacts with bug's configuration
+ * A servlet that interacts with bug's configuration.
  * 
  * @author akravets
  * 
@@ -59,10 +59,17 @@ public class ConfigAdminServlet extends HttpServlet {
 	private ConfigurationAdmin configAdmin;
 	private boolean isStateSet = false;
 
+	/**
+	 * @param context BundleContext
+	 * @param configAdmin ConfigurationAdmin
+	 */
 	public ConfigAdminServlet(BundleContext context, ConfigurationAdmin configAdmin) {
 		this.configAdmin = configAdmin;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String response = null;
 		isStateSet = false;
@@ -77,6 +84,9 @@ public class ConfigAdminServlet extends HttpServlet {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doPut(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		BufferedReader br;
 		StringBuffer reqStr = null;
@@ -100,11 +110,11 @@ public class ConfigAdminServlet extends HttpServlet {
 	}
 
 	/**
-	 * Updates configuration
+	 * Updates configuration.
 	 * 
 	 * @param reqStr
 	 *            payload in xml format
-	 * @throws IOException
+	 * @throws IOException on configadmin error
 	 */
 	private void updateConfiguration(StringBuffer reqStr) throws IOException {
 		XmlNode node = XmlParser.parse(reqStr.toString());
@@ -157,7 +167,6 @@ public class ConfigAdminServlet extends HttpServlet {
 	 * @return Returns XML representing current state of all
 	 *         {@link Configuration}s for the bug
 	 * @throws IOException
-	 * @throws SelfReferenceException
 	 * @throws InvalidSyntaxException
 	 */
 	private String getConfigurationXml(String response) throws IOException, InvalidSyntaxException {
@@ -200,6 +209,10 @@ public class ConfigAdminServlet extends HttpServlet {
 		return configurationsNode.toString();
 	}
 
+	/**
+	 * @param configurationNode config xml
+	 * @param map 
+	 */
 	private void createAppStateProperties(XmlNode configurationNode, Object map) {
 		XmlNode property = new XmlNode("property");
 		property.addAttribute("name", "app.state");
@@ -216,6 +229,10 @@ public class ConfigAdminServlet extends HttpServlet {
 		configurationNode.addChild(property);
 	}
 
+	/**
+	 * @param e exception
+	 * @return Error message
+	 */
 	private String getErrorDetails(Exception e) {
 		StringWriter wr = new StringWriter();
 		e.printStackTrace(new PrintWriter(wr));

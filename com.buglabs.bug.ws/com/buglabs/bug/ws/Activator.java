@@ -1,27 +1,19 @@
 package com.buglabs.bug.ws;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Hashtable;
 import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.knapsack.init.pub.KnapsackInitService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.util.osgi.ServiceTrackerUtil;
-import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.ws.module.ModuleServlet;
 import com.buglabs.bug.ws.module.PackageServlet;
@@ -29,8 +21,10 @@ import com.buglabs.bug.ws.program.ConfigAdminServlet;
 import com.buglabs.bug.ws.program.ProgramServlet;
 import com.buglabs.bug.ws.service.WSHtmlServlet;
 import com.buglabs.bug.ws.service.WSServlet;
-import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.osgi.FilterUtil;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
 
 /**
  * Bundle activator for BUG web services functionality.

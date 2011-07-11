@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.service.cm.Configuration;
@@ -52,7 +51,7 @@ import com.buglabs.util.osgi.OSGiServiceLoader;
 /**
  * Abstract class to hold common functionality for different Service views
  * currently extended by WSServlet (default, xml view) and WSHtmlServlet (html
- * view)
+ * view).
  * 
  * 
  */
@@ -69,6 +68,12 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 
 	private LogService log;
 
+	/**
+	 * @param context
+	 *            BundleContext
+	 * @param serviceMap
+	 *            services
+	 */
 	public AbstractWSServlet(BundleContext context, Map<String, PublicWSProvider> serviceMap) {
 		this.context = context;
 		this.log = LogServiceUtil.getLogService(context);
@@ -79,24 +84,40 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 				if (!listenerRegistered) {
 					listenerRegistered = true;
 					addExistingServices(context, serviceMap);
-					context.addServiceListener(this, FilterUtil.generateServiceFilter(
-							PublicWSProvider2.class.getName(),
-							PublicWSProvider.class.getName()
-							));					
+					context.addServiceListener(this,
+							FilterUtil.generateServiceFilter(
+									PublicWSProvider2.class.getName(), 
+									PublicWSProvider.class.getName()));
 				}
 			} catch (Exception e) {
-				//Since our filter does not change, this should never occur.
+				// Since our filter does not change, this should never occur.
 				e.printStackTrace();
 			}
 		}
 	}
 
 	/**
+	 * @param context
+	 *            BundleContext
+	 * @param serviceMap
+	 *            services
+	 * @param configAdmin
+	 *            ConfigAdmin instance
+	 */
+	public AbstractWSServlet(BundleContext context, Map<String, PublicWSProvider> serviceMap, ConfigurationAdmin configAdmin) {
+		this(context, serviceMap);
+		this.configAdmin = configAdmin;
+	}
+
+	/**
 	 * Add services that are already registered into the service map.
 	 * 
 	 * @param context2
+	 *            BundleContext
 	 * @param serviceMap2
+	 *            services
 	 * @throws Exception
+	 *             on OSGi Filter error
 	 */
 	private void addExistingServices(BundleContext context2, Map<String, PublicWSProvider> serviceMap2) throws Exception {
 
@@ -113,43 +134,76 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 		});
 	}
 
-	public AbstractWSServlet(BundleContext context, Map<String, PublicWSProvider> serviceMap, ConfigurationAdmin configAdmin) {
-		this(context, serviceMap);
-		this.configAdmin = configAdmin;
-	}
-
 	/**
-	 * override this method to handle all default requests
+	 * Override this method to handle all default requests.
 	 * 
 	 * @param req
+	 *            HttpServletRequest
 	 * @param resp
+	 *            HttpServletResponse
 	 * @param reqMethod
+	 *            reqMethod
 	 * @throws IOException
+	 *             on IO exception
 	 * @throws ServletException
+	 *             on internal servlet exception
 	 */
-	protected abstract void executeHttpMethod(HttpServletRequest req, HttpServletResponse resp, int reqMethod) throws IOException, ServletException;
+	protected abstract void executeHttpMethod(HttpServletRequest req, HttpServletResponse resp, int reqMethod) throws IOException,
+			ServletException;
 
 	/**
-	 * all the main entry points by default call executeHttpMethod, but these
+	 * All the main entry points by default call executeHttpMethod, but these
 	 * methods can be overridden in the implementor if a different behavior is
-	 * desired
+	 * desired.
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		executeHttpMethod(req, resp, PublicWSProvider.GET);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doDelete(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		executeHttpMethod(req, resp, PublicWSProvider.DELETE);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		executeHttpMethod(req, resp, PublicWSProvider.POST);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doPut(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
+	 */
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		executeHttpMethod(req, resp, PublicWSProvider.PUT);
 	}
 
+	/**
+	 * @param provider
+	 *            PublicWSProvider
+	 */
 	public void addPublicService(PublicWSProvider provider) {
 		if (!serviceMap.containsKey(provider.getPublicName().toUpperCase())) {
 			serviceMap.put(provider.getPublicName().toUpperCase(), provider);
@@ -163,6 +217,10 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 		}
 	}
 
+	/**
+	 * @param provider
+	 *            PublicWSProvider
+	 */
 	public void removePublicService(PublicWSProvider provider) {
 		if (serviceMap.containsKey(provider.getPublicName().toUpperCase())) {
 			serviceMap.remove(provider.getPublicName().toUpperCase());
@@ -172,23 +230,30 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 	}
 
 	/**
-	 * Use in child class to get list of services available
+	 * Use in child class to get list of services available.
 	 * 
-	 * @return
+	 * @return service map
 	 */
 	protected Map<String, PublicWSProvider> getServiceMap() {
 		return serviceMap;
 	}
 
 	/**
-	 * Use in child class to get a reference to the current ConfigurationAdmin
+	 * Use in child class to get a reference to the current ConfigurationAdmin.
 	 * 
-	 * @return
+	 * @return ConfigAdmin instance.
 	 */
 	protected ConfigurationAdmin getConfigurationAdmin() {
 		return configAdmin;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.osgi.framework.ServiceListener#serviceChanged(org.osgi.framework.
+	 * ServiceEvent)
+	 */
 	public void serviceChanged(ServiceEvent event) {
 		Object svc = context.getService(event.getServiceReference());
 		PublicWSProvider p = null;
@@ -204,11 +269,13 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 		case ServiceEvent.UNREGISTERING:
 			removePublicService(p);
 			break;
+		default:
+			throw new RuntimeException("Unknown event type");
 		}
 	}
-	
+
 	/**
-	 * Checks whether service is enabled
+	 * Checks whether service is enabled.
 	 * 
 	 * @param admin
 	 *            {@link ConfigurationAdmin}
@@ -217,15 +284,15 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 	 * @return Returns <code>true</code> if service is enabled,
 	 *         <code>false</code> otherwise. Note that true will be returned if
 	 *         configuration does not have enabled property.
-	 * @throws IOException
+	 * @throws IOException on configadmin error
 	 */
 	protected static boolean isServiceEnabled(ConfigurationAdmin admin, String serviceName) throws IOException {
 		Configuration configuration = admin.getConfiguration(PublicWSProvider.PACKAGE_ID + "." + serviceName);
-		
+
 		if (configuration == null) {
 			return true;
 		}
-		
+
 		if (configuration.getProperties() == null) {
 			return true;
 		} else {
@@ -233,7 +300,7 @@ public abstract class AbstractWSServlet extends HttpServlet implements ServiceLi
 			if (enabledProperty == null) {
 				return true;
 			}
-			
+
 			return ((Boolean) enabledProperty).booleanValue();
 		}
 	}
