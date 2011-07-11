@@ -4,15 +4,14 @@ Bundle-Name: com.buglabs.bug.networking
 Bundle-SymbolicName: com.buglabs.bug.networking
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.buglabs.bug.networking.Activator
-Import-Package: org.osgi.framework,
+Import-Package: 
+ org.osgi.framework,
  org.osgi.util.tracker,
- com.buglabs.application,
  org.freedesktop.dbus,
  javax.servlet,
  org.osgi.service.http,
  javax.servlet.http,
  org.osgi.service.log,
- com.buglabs.util
  com.buglabs.util.osgi
 Export-Package: com.buglabs.bug.networking,
  com.buglabs.bug.networking.pub
