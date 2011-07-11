@@ -46,8 +46,8 @@ public class OSGiServiceLoader {
 	 * @return A list of service instances that match the input parameters.
 	 * @throws Exception
 	 */
-	public static List getServices(BundleContext context, String clazz, String filter) throws Exception {
-		final List svcList = new ArrayList();
+	public static List<Object> getServices(BundleContext context, String clazz, String filter) throws Exception {
+		final List<Object> svcList = new ArrayList<Object>();
 		
 		loadServices(context, clazz, filter, new IServiceLoader() {
 			

@@ -14,7 +14,6 @@ Import-Package:
 Export-Package: 
  com.buglabs.bug.sysfs,
  com.buglabs.device,
- com.buglabs.osgi.shell,
  com.buglabs.services.ws,
  com.buglabs.support,
  com.buglabs.util,

@@ -68,11 +68,6 @@ public class ClassAvailableTests extends TestCase {
 		testClass(MutableModuleProperty.class);
 	}
 
-	public void testPackageOsgiShell() {
-		testClass(ICommand.class);
-		testClass(IShellCommandProvider.class);		
-	}
-
 	public void testPackageServicesWs() {
 		testClass(DefaultWSImplementation.class);
 		testClass(DefaultWSImplementationWithParams.class);
