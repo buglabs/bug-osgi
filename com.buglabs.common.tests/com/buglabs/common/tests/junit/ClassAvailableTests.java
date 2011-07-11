@@ -10,8 +10,6 @@ import com.buglabs.bug.dragonfly.module.MutableModuleProperty;
 import com.buglabs.device.ButtonEvent;
 import com.buglabs.device.IButtonEventListener;
 import com.buglabs.device.IButtonEventProvider;
-import com.buglabs.osgi.shell.ICommand;
-import com.buglabs.osgi.shell.IShellCommandProvider;
 import com.buglabs.services.ws.DefaultWSImplementation;
 import com.buglabs.services.ws.DefaultWSImplementationWithParams;
 import com.buglabs.services.ws.HttpFormParser;
@@ -25,13 +23,10 @@ import com.buglabs.services.ws.WSResponse;
 import com.buglabs.util.Base64;
 import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.ConfigAdminUtil;
+import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.osgi.OSGiServiceLoader;
-import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.ServiceTrackerUtil;
-import com.buglabs.util.xml.XmlNode;
-import com.buglabs.util.xml.XmlParser;
-import com.buglabs.util.xml.XpathQuery;
 import com.buglabs.util.simplerestclient.BasicAuthenticationConnectionProvider;
 import com.buglabs.util.simplerestclient.DefaultConnectionProvider;
 import com.buglabs.util.simplerestclient.FormFile;
@@ -41,6 +36,9 @@ import com.buglabs.util.simplerestclient.HTTPResponse;
 import com.buglabs.util.simplerestclient.IConnectionProvider;
 import com.buglabs.util.simplerestclient.IFormFile;
 import com.buglabs.util.ui.IDesktopApp;
+import com.buglabs.util.xml.XmlNode;
+import com.buglabs.util.xml.XmlParser;
+import com.buglabs.util.xml.XpathQuery;
 
 /**
  * This test case simply loads BUG contributed classes to verify they are on the
