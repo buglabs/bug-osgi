@@ -17,11 +17,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.Font;
 
-import com.buglabs.application.IDesktopApp;
+import com.buglabs.util.ui.IDesktopApp;
 import com.buglabs.bug.module.lcd.pub.IModuleDisplay;
 import com.buglabs.bug.networking.pub.INetworking;
-import com.buglabs.util.LogServiceUtil;
-import com.buglabs.application.ServiceTrackerHelper;
+import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -85,7 +85,7 @@ public class Activator implements BundleActivator, IDesktopApp, WindowListener, 
 		
 		Activator.logDebug("starting tracker");
 		
-		serviceTracker = ServiceTrackerHelper.openServiceTracker(context, services, new ServiceTrackerHelper.ManagedInlineRunnable() {
+		serviceTracker = ServiceTrackerUtil.openServiceTracker(context, new ServiceTrackerUtil.ManagedInlineRunnable() {
 			
 			@Override
 			public void run(Map<Object, Object> services) {	
@@ -105,7 +105,7 @@ public class Activator implements BundleActivator, IDesktopApp, WindowListener, 
 			public void shutdown() {
 				unregisterDesktopApp();
 			}
-		});
+		}, services);
 		
 
 	}

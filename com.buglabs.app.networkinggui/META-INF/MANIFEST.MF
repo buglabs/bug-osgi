@@ -5,9 +5,16 @@ Bundle-Version: 1.0.0
 BUG-API-Version: 2.0.2
 Bundle-Name: NetworkingGUI
 Bundle-Activator: networkinggui.Activator
-Import-Package: com.buglabs.application,com.buglabs.bug.module.lcd.pub
- ,javax.swing,org.osgi.framework,org.osgi.util.tracker,com.buglabs.bug
- .networking.pub,org.osgi.service.log,com.buglabs.util,javax.swing.tex
- t,javax.swing.plaf
+Import-Package: 
+ com.buglabs.bug.module.lcd.pub,
+ com.buglabs.bug.networking.pub,
+ com.buglabs.util.osgi,
+ com.buglabs.util.ui,
+ javax.swing,
+ javax.swing.plaf,
+ javax.swing.text,
+ org.osgi.framework,
+ org.osgi.service.log,
+ org.osgi.util.tracker
 Bundle-SymbolicName: NetworkingGUI
 
