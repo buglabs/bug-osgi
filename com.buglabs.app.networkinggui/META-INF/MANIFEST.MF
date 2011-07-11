@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bug-Bundle-Type: Application
+Bundle-Vendor: aturley
+Bundle-Version: 1.0.0
+BUG-API-Version: 2.0.2
+Bundle-Name: NetworkingGUI
+Bundle-Activator: networkinggui.Activator
+Import-Package: com.buglabs.application,com.buglabs.bug.module.lcd.pub
+ ,javax.swing,org.osgi.framework,org.osgi.util.tracker,com.buglabs.bug
+ .networking.pub,org.osgi.service.log,com.buglabs.util,javax.swing.tex
+ t,javax.swing.plaf
+Bundle-SymbolicName: NetworkingGUI
+
