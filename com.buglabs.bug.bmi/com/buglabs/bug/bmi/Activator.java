@@ -156,8 +156,10 @@ public class Activator implements BundleActivator, ServiceListener {
 		if (devices != null) {
 			logService.log(LogService.LOG_DEBUG, "(coldplug) Initializing existing modules.");
 			for (BMIDevice bmiMessage : devices) {
-				logService.log(LogService.LOG_DEBUG, "Registering existing module with message: " + bmiMessage.toString());
-				eventHandler.handleEvent(new BMIModuleEvent(bmiMessage));
+				if (bmiMessage != null) {
+					logService.log(LogService.LOG_DEBUG, "Registering existing module with message: " + bmiMessage.toString());
+					eventHandler.handleEvent(new BMIModuleEvent(bmiMessage));
+				}
 			}
 		} else {
 			logService.log(LogService.LOG_DEBUG, "(coldplug) Not registering existing modules, none found.");
