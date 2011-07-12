@@ -9,7 +9,6 @@ import org.osgi.framework.ServiceReference;
 import org.sprinkles.Fn;
 
 import com.buglabs.bug.sysfs.SysfsNode;
-import com.buglabs.util.osgi.OSGiServiceLoader;
 
 /**
  * A for properties associated with a BMI module attached to

@@ -28,17 +28,16 @@ public final class BMIDeviceHelper {
 	 * @throws IOException IOException on File I/O error
 	 */
 	public static BMIDevice[] getDevices(BundleContext context) throws IOException {
-
 		BMIDevice[] devs = new BMIDevice[BMIDevice.MAX_BMI_SLOTS];
 
 		for (int i = 0; i < BMIDevice.MAX_BMI_SLOTS; ++i) {
 			File prodFile = getBMIDeviceRoot(i);
-			if (!validBMIDeviceRoot(prodFile)) {
+			if (prodFile == null) {
 				devs[i] = null;
 				continue;
 			}
 
-			devs[i] = BMIDevice.createFromSYSDirectory(context, prodFile, i);
+			devs[i] = BMIDevice.createFromSYSDirectory(context, prodFile, i);			
 		}
 		
 		return devs;
@@ -98,32 +97,17 @@ public final class BMIDeviceHelper {
 		return getDevices(context)[slot];
 	}
 
-
-	/**
-	 * @param directory directory of sysfs root
-	 * @return true if a module is inserted and recognized by BMI, false otherwise.
-	 */
-	private static boolean validBMIDeviceRoot(File directory) {
-		if (!directory.exists() || !directory.isDirectory()) {
-			return false;
-		}
-		
-		return directory.listFiles().length > 0;
-	}
-
 	/**
 	 * @param i slot index
 	 * @return valid directory of BMI device root
 	 * @throws IOException 
 	 */
 	private static File getBMIDeviceRoot(int i) throws IOException {
-		File root = new File("/sys/class/bmi/bmi-" + i + "/bmi-dev-" + i);
+		File root = new File("/sys/devices/platform/omap_bmi_slot.$i/bmi/bmi-$i/bmi-dev-$i/".replace("$i", "" + i));
 		
-		if (!root.exists() || root.isFile())
-			throw new IOException("Invalid BMI device root directory: " + root);
+		if (!root.exists() || root.isFile() || root.listFiles().length == 0)
+			return null;
 		
 		return root;
 	}
-
-
 }
