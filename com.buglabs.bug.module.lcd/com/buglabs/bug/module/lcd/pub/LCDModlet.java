@@ -78,14 +78,12 @@ public class LCDModlet extends AbstractBUGModlet implements ILCDModuleControl, I
 		modProperties.put("Power State", suspended ? "Suspended" : "Active");
 		moduleRef = context.registerService(IModuleControl.class.getName(), this, modProperties);
 
-		registerService(IModuleLEDController.class.getName(), this, createExgtendedServiceProperties());
-
 		ML8953AccelerometerImplementation ml8953Control = new ML8953AccelerometerImplementation();
 
 		registerService(IML8953Accelerometer.class.getName(), ml8953Control, modProperties);
 		registerService(PublicWSProvider.class.getName(), new AccelerationWS(ml8953Control, getLog()), modProperties);
-		registerService(ILCDModuleControl.class.getName(), this, createExgtendedServiceProperties());
-		registerService(IModuleDisplay.class.getName(), LCDModlet.this, createExgtendedServiceProperties());
+		registerService(ILCDModuleControl.class.getName(), this, createExtendedServiceProperties());
+		registerService(IModuleDisplay.class.getName(), LCDModlet.this, createExtendedServiceProperties());
 	}
 
 	public void stop() throws Exception {
@@ -93,7 +91,10 @@ public class LCDModlet extends AbstractBUGModlet implements ILCDModuleControl, I
 		super.stop();
 	}
 
-	private Dictionary createExgtendedServiceProperties() {
+	/**
+	 * @return
+	 */
+	private Dictionary createExtendedServiceProperties() {
 		Dictionary p = getCommonProperties();
 
 		p.put("width", new Integer(LCD_WIDTH));
