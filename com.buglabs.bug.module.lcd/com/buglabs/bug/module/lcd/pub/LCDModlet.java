@@ -65,7 +65,7 @@ public class LCDModlet extends AbstractBUGModlet implements ILCDModuleControl, I
 	private ServiceRegistration moduleRef;
 
 	public LCDModlet(BundleContext context, int slotId, String moduleId, BMIDevice properties2) {
-		super(context, moduleId, properties2, "GPS");
+		super(context, moduleId, properties2, "LCD");
 	}
 
 	public void setup() throws Exception {

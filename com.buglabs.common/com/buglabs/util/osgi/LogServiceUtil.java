@@ -111,7 +111,7 @@ public class LogServiceUtil {
 			created = true;
 		}
 		
-		if (created) {
+		if (created && context != null) {
 			// Register the service with the framework so that future calls to
 			// this static method need not create new objects.
 			context.registerService(LogService.class.getName(), logService, null);

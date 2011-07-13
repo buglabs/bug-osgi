@@ -77,16 +77,16 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 
 	private LogService log = null;
 	private volatile int index = 0;
-	private List subscribers;
+	private List<Object> subscribers;
 
 	private final BundleContext context;
 
 	private final long readSleepInterval;
 
-	public NMEASentenceProvider(InputStream nmeaStream, BundleContext context) {
+	public NMEASentenceProvider(InputStream nmeaStream, BundleContext context, LogService log) {
 		this.nmeaStream = nmeaStream;
 		this.context = context;
-		this.log = LogServiceUtil.getLogService(context);
+		this.log = log;
 
 		if (context.getProperty(SLEEP_INTERVAL_PROPERTY_KEY) == null) {
 			readSleepInterval = DEFAULT_SLEEP_INTERVAL;
@@ -176,7 +176,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		}
 
 		synchronized (subscribers) {
-			for (Iterator i = subscribers.iterator(); i.hasNext();) {
+			for (Iterator<Object> i = subscribers.iterator(); i.hasNext();) {
 				Object subscriber = i.next();
 
 				try {
@@ -208,7 +208,7 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		switch (event.getType()) {
 		case ServiceEvent.REGISTERED:
 			if (subscribers == null) {
-				subscribers = new ArrayList();
+				subscribers = new ArrayList<Object>();
 			}
 			subscribers.add(context.getService(event.getServiceReference()));
 			break;

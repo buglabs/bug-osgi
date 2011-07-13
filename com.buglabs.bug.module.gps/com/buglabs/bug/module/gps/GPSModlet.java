@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Timer;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 import org.osgi.util.measurement.Measurement;
@@ -76,9 +75,6 @@ import com.buglabs.util.xml.XmlNode;
  * 
  */
 public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, PublicWSProvider2, IPositionProvider, IModuleLEDController {
-
-	private BundleContext context;
-
 	private ServiceRegistration moduleReg;
 
 	protected static final String PROPERTY_IOX = "IOX";
@@ -389,7 +385,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		gps.close();
 		getLog().log(LogService.LOG_DEBUG, "Opening GPS data port: " + devnode_gps);
 		gpsInputStream = new FileInputStream(devnode_gps);
-		nmeaProvider = new NMEASentenceProvider(gpsInputStream, context);
+		nmeaProvider = new NMEASentenceProvider(gpsInputStream, context, getLog());
 	}
 
 	public LatLon getLatitudeLongitude() {
