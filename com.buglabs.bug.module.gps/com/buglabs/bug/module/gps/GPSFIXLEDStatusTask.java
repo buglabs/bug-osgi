@@ -35,22 +35,33 @@ import org.osgi.service.log.LogService;
 import com.buglabs.bug.module.gps.pub.IGPSModuleControl;
 
 /**
- * A class to express GPS state with GPS module LED
+ * A class to express GPS state with GPS module LED.
  * @author aroman
  *
  */
 public class GPSFIXLEDStatusTask extends TimerTask {
+	/**
+	 * Amount of time the GPS LED should blink.
+	 */
+	private static final int LED_BLINK_INTERVAL_MILLIS = 10;
 	private IGPSModuleControl control;
 	private final LogService log;
 
+	/**
+	 * @param control control
+	 * @param log LogService
+	 */
 	public GPSFIXLEDStatusTask(IGPSModuleControl control, LogService log) {
 		this.control = control;
 		this.log = log;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.util.TimerTask#run()
+	 */
 	public void run() {
 		int status = 0;
-		int delay = 10;
+		int delay = LED_BLINK_INTERVAL_MILLIS;
 		try {
 			status = control.getStatus();
 

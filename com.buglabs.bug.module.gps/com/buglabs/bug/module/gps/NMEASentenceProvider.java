@@ -82,11 +82,13 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	private final BundleContext context;
 
 	private final long readSleepInterval;
+	private final boolean gpsDebug;
 
 	public NMEASentenceProvider(InputStream nmeaStream, BundleContext context, LogService log) {
 		this.nmeaStream = nmeaStream;
 		this.context = context;
 		this.log = log;
+		this.gpsDebug = context.getProperty(Activator.GPS_DEBUG_LOGGING_KEY) != null;
 
 		if (context.getProperty(SLEEP_INTERVAL_PROPERTY_KEY) == null) {
 			readSleepInterval = DEFAULT_SLEEP_INTERVAL;
@@ -130,10 +132,14 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 				Thread.sleep(readSleepInterval);
 				try {
 					sentence = br.readLine();
-					log.log(LogService.LOG_DEBUG, "GPS NMEA DEBUG: " + sentence);
+					
+					if (gpsDebug)
+						log.log(LogService.LOG_DEBUG, "GPS NMEA DEBUG: " + sentence);
 				} catch (CharConversionException e) {
 					sentence = "";
-					log.log(LogService.LOG_DEBUG, "A conversion error occured while parsing sentence.", e);
+					
+					if (gpsDebug)
+						log.log(LogService.LOG_DEBUG, "A conversion error occured while parsing sentence.", e);
 					continue;
 				}
 
@@ -148,7 +154,8 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 						notifySubscribers(objSentence);
 					}
 				} catch (NMEAParserException e) {
-					log.log(LogService.LOG_DEBUG, "An error occured while parsing sentence: " + sentence, e);
+					if (gpsDebug)
+						log.log(LogService.LOG_DEBUG, "An error occured while parsing sentence: " + sentence, e);
 				}
 			} while (!Thread.currentThread().isInterrupted() && (sentence != null));
 		} catch (IOException e) {
