@@ -38,6 +38,8 @@ import java.util.Map;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -60,7 +62,7 @@ import com.buglabs.util.shell.pub.ShellSession;
  * @author kgilmer
  * 
  */
-public class Activator implements BundleActivator, ServiceListener {
+public class Activator implements BundleActivator, ServiceListener, FrameworkListener {
 	private static final String DEFAULT_PIPE_FILENAME = "/tmp/eventpipe";
 
 	/**
@@ -103,7 +105,7 @@ public class Activator implements BundleActivator, ServiceListener {
 	 * )
 	 */
 	public void start(BundleContext context) throws Exception {
-		this.context = context;
+		Activator.context = context;
 
 		modletFactories = new Hashtable<String, List<IModletFactory>>();
 		activeModlets = new Hashtable<String, List<IModlet>>();
@@ -120,10 +122,9 @@ public class Activator implements BundleActivator, ServiceListener {
 		createPipe(pipeFilename);
 		eventHandler = new BMIModuleEventHandler(context, logService, modletFactories, activeModlets);
 		pipeReader = new PipeReader(pipeFilename, eventHandler, logService);
-
-		coldPlug();
-
-		pipeReader.start();
+		
+		//Run coldplug and processing of BMI events after framework has fully loaded.
+		context.addFrameworkListener(this);
 	}
 
 	/*
@@ -157,7 +158,8 @@ public class Activator implements BundleActivator, ServiceListener {
 			logService.log(LogService.LOG_DEBUG, "(coldplug) Initializing existing modules.");
 			for (BMIDevice bmiMessage : devices) {
 				if (bmiMessage != null) {
-					logService.log(LogService.LOG_DEBUG, "Registering existing module with message: " + bmiMessage.toString());
+					logService.log(LogService.LOG_DEBUG
+							, "Registering existing module with message: " + bmiMessage.toString());
 					eventHandler.handleEvent(new BMIModuleEvent(bmiMessage));
 				}
 			}
@@ -247,7 +249,8 @@ public class Activator implements BundleActivator, ServiceListener {
 	 *             on Filter syntax error
 	 */
 	private void registerExistingServices() throws InvalidSyntaxException {
-		ServiceReference[] sr = context.getServiceReferences((String) null, FilterUtil.generateServiceFilter(IModletFactory.class.getName()));
+		ServiceReference[] sr = context.getServiceReferences((String) null
+				, FilterUtil.generateServiceFilter(IModletFactory.class.getName()));
 
 		if (sr != null) {
 			for (int i = 0; i < sr.length; ++i) {
@@ -256,6 +259,10 @@ public class Activator implements BundleActivator, ServiceListener {
 		}
 	}
 
+	/**
+	 * @param sr ServiceReference
+	 * @param eventType type of event
+	 */
 	private void registerService(ServiceReference sr, int eventType) {
 		IModletFactory factory = (IModletFactory) context.getService(sr);
 
@@ -266,7 +273,8 @@ public class Activator implements BundleActivator, ServiceListener {
 			if (!modletFactories.containsKey(factory.getModuleId())) {
 				modletFactories.put(factory.getModuleId(), new ArrayList<IModletFactory>());
 			} else {
-				logService.log(LogService.LOG_WARNING, "IModletFactory " + factory.getName() + " is already registered, ignoring registration.");
+				logService.log(LogService.LOG_WARNING, "IModletFactory " 
+						+ factory.getName() + " is already registered, ignoring registration.");
 				return;
 			}
 
@@ -275,11 +283,13 @@ public class Activator implements BundleActivator, ServiceListener {
 			if (!ml.contains(factory)) {
 				ml.add(factory);
 			}
-			logService.log(LogService.LOG_INFO, "Added modlet factory " + factory.getName() + " (" + factory.getModuleId() + ") to map.");
+			logService.log(LogService.LOG_INFO, "Added modlet factory " + factory.getName() 
+					+ " (" + factory.getModuleId() + ") to map.");
 
 			// Discovery Mode needs to know of all services a BUG contains. This
 			// causes all available modlets to be created and started.
-			if (context.getProperty("com.buglabs.bug.discoveryMode") != null && context.getProperty("com.buglabs.bug.discoveryMode").equals("true")) {
+			if (context.getProperty("com.buglabs.bug.discoveryMode") != null 
+					&& context.getProperty("com.buglabs.bug.discoveryMode").equals("true")) {
 				try {
 					createModlets(factory);
 				} catch (Exception e) {
@@ -325,7 +335,8 @@ public class Activator implements BundleActivator, ServiceListener {
 				try {
 					modlet.stop();
 				} catch (Exception e) {
-					logService.log(LogService.LOG_ERROR, "Error occured while stopping " + modlet.getModuleId() + ": " + e.getMessage());
+					logService.log(LogService.LOG_ERROR
+							, "Error occured while stopping " + modlet.getModuleId() + ": " + e.getMessage());
 				}
 	}
 
@@ -343,7 +354,25 @@ public class Activator implements BundleActivator, ServiceListener {
 		}
 	}
 
+	/**
+	 * @return BundleContext
+	 */
 	public static BundleContext getContext() {	
 		return context;
+	}
+
+	@Override
+	public void frameworkEvent(FrameworkEvent event) {
+		if (event.getType() == FrameworkEvent.STARTED) {
+			logService.log(LogService.LOG_DEBUG, "Framework has started, now handling coldplug and listening for udev events.");
+			try {
+				coldPlug();
+			} catch (IOException e) {
+				logService.log(LogService.LOG_ERROR
+						, "An error occured in coldplug, some devices may not be initialized.", e);
+			}
+
+			pipeReader.start();
+		}
 	}
 }

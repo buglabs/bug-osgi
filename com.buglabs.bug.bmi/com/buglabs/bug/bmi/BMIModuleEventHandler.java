@@ -40,6 +40,7 @@ import org.osgi.service.log.LogService;
 import com.buglabs.bug.bmi.pub.BMIModuleProperties;
 import com.buglabs.bug.bmi.pub.IModlet;
 import com.buglabs.bug.bmi.pub.IModletFactory;
+import com.buglabs.util.osgi.LogServiceUtil;
 
 /**
  * Manages logic of receiving messages from BMI and making changes to runtime.
@@ -103,7 +104,7 @@ public class BMIModuleEventHandler {
 					try {
 						m.setup();
 					} catch (Exception e) {
-						logService.log(LogService.LOG_ERROR, "Unable to setup Modlet " + mf.getName() + ": " + e.getMessage());
+						logService.log(LogService.LOG_ERROR, "Unable to setup Modlet " + mf.getName() + ": " + e.getMessage(), e);
 						continue;
 					}
 

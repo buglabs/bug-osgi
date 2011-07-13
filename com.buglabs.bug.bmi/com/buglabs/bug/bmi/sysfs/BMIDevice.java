@@ -77,7 +77,8 @@ public class BMIDevice extends SysfsNode {
 
 				@Override
 				public BMIDeviceNodeFactory apply(ServiceReference element) {
-					if (element.getProperty("PRODUCT.ID") != null && element.getProperty("PRODUCT.ID").equals(productId))
+					if (element.getProperty("PRODUCT.ID") != null 
+							&& element.getProperty("PRODUCT.ID").equals(productId))
 						return (BMIDeviceNodeFactory) context.getService(element);
 					
 					return null;
@@ -171,7 +172,6 @@ public class BMIDevice extends SysfsNode {
 	}
 	
 	/**
-	 * @return true if device was successfully suspended, false otherwise.
 	 * @throws IOException 
 	 */
 	public void suspend() throws IOException {
@@ -179,10 +179,15 @@ public class BMIDevice extends SysfsNode {
 	}
 	
 	/**
-	 * @return true if device was successfully resumed, false otherwise.
 	 * @throws IOException 
 	 */
 	public void resume() throws IOException {		
 		println(new File(root, SUSPEND_FILENAME), "0");		
+	}
+	
+	@Override
+	public String toString() {
+		
+		return "(BMIDevice " + productId + " in slot " + slot + ")";
 	}
 }
