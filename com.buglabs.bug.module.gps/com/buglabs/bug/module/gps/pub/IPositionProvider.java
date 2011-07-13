@@ -43,11 +43,11 @@ public interface IPositionProvider {
 	 * @return current position as Position object or null if unable to
 	 *         determine position.
 	 */
-	public Position getPosition();
+	Position getPosition();
 
 	/**
 	 * @return current position as LatLon object or null if unable to determine
 	 *         Lat/Long.
 	 */
-	public LatLon getLatitudeLongitude();
+	LatLon getLatitudeLongitude();
 }

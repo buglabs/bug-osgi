@@ -84,6 +84,11 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 	private final long readSleepInterval;
 	private final boolean gpsDebug;
 
+	/**
+	 * @param nmeaStream input stream
+	 * @param context BundleContext
+	 * @param log LogService
+	 */
 	public NMEASentenceProvider(InputStream nmeaStream, BundleContext context, LogService log) {
 		this.nmeaStream = nmeaStream;
 		this.context = context;
@@ -113,6 +118,9 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		return new com.buglabs.nmea.sentences.RMC(cachedRMC);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.INMEASentenceProvider#getLastRMC()
+	 */
 	public RMC getLastRMC() {
 		if (cachedRMC == null || cachedRMC.getLatitude() == null || cachedRMC.getLongitude() == null) {
 			return null;
@@ -121,6 +129,9 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		return cachedRMC;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Thread#run()
+	 */
 	public void run() {
 		BufferedReader br = null;
 
@@ -163,20 +174,15 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 		} catch (InterruptedException e) {
 			// Ignore this exception.
 		} finally {
-			try {
-				if (br != null) {
-					br.close();
-				} else {
-					if (nmeaStream != null) {
-						nmeaStream.close();
-					}
-				}
-			} catch (IOException e) {
-				LogServiceUtil.logBundleException(log, "Error while changing suspend state.", e);
-			}
+			org.apache.commons.io.IOUtils.closeQuietly(br);
+			org.apache.commons.io.IOUtils.closeQuietly(nmeaStream);			
 		}
 	}
 
+	/**
+	 * Notify subscribers of location event.
+	 * @param objSentence NMEASentence
+	 */
 	private void notifySubscribers(AbstractNMEASentence objSentence) {
 		if (subscribers == null || subscribers.size() == 0) {
 			return;
@@ -195,21 +201,32 @@ public class NMEASentenceProvider extends Thread implements INMEASentenceProvide
 						sub.positionUpdate(calculatePosition((RMC) objSentence));
 					}
 				} catch (RuntimeException e) {
-					LogServiceUtil.logBundleException(log, "GPS Position subscriber threw an unchecked exception in sentenceRecieved()", e);
+					LogServiceUtil.logBundleException(log
+							, "GPS Position subscriber threw an unchecked exception in sentenceRecieved()", e);
 				}
 			}
 		}
 	}
 
+	/**
+	 * @param rmc
+	 * @return current Position as converted
+	 */
 	private Position calculatePosition(RMC rmc) {
 		return new Position(new Measurement(rmc.getLatitudeAsDMS().toDecimalDegrees() * Math.PI / 180.0, Unit.rad), new Measurement(rmc.getLongitudeAsDMS().toDecimalDegrees()
 				* Math.PI / 180.0, Unit.rad), new Measurement(0.0d, Unit.m), null, null);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.INMEASentenceProvider#getIndex()
+	 */
 	public int getIndex() {
 		return index;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.ServiceListener#serviceChanged(org.osgi.framework.ServiceEvent)
+	 */
 	public void serviceChanged(ServiceEvent event) {
 
 		switch (event.getType()) {

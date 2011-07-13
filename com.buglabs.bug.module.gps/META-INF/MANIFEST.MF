@@ -21,7 +21,8 @@ Import-Package: com.buglabs.bug.dragonfly.module,
  org.osgi.framework;version="1.3.0",
  org.osgi.service.cm,
  org.osgi.service.log,
- org.osgi.util.tracker
+ org.osgi.util.tracker,
+ org.apache.commons.io;version="2.0.1"
 Bug-Bundle-Type: Module
 Bug-Module-Id: 0001
 Bug-Module-Driver-Id: bmi_gps

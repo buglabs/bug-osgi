@@ -40,9 +40,9 @@ import org.osgi.util.position.Position;
  *
  */
 public interface IPositionSubscriber {
-	
+		
 	/**
-	 * @param Position
+	 * @param position to be updated
 	 */
-	public void positionUpdate(Position position);
+	void positionUpdate(Position position);
 }

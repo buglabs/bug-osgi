@@ -42,7 +42,7 @@ import java.io.InputStream;
 public interface INMEARawFeed {
 	/**
 	 * @return NMEA data as a stream
-	 * @throws IOException
+	 * @throws IOException on IO error with device file
 	 */
-	public InputStream getInputStream() throws IOException;
+	InputStream getInputStream() throws IOException;
 }

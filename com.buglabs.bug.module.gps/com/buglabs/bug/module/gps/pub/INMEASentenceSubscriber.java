@@ -41,7 +41,7 @@ import com.buglabs.nmea2.AbstractNMEASentence;
  */
 public interface INMEASentenceSubscriber {
 	/**
-	 * @param sentence
+	 * @param sentence NMEA Sentence
 	 */
-	public void sentenceReceived(AbstractNMEASentence sentence);
+	void sentenceReceived(AbstractNMEASentence sentence);
 }

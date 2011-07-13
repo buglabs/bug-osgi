@@ -44,16 +44,16 @@ public interface INMEASentenceProvider {
 	 * @deprecated
 	 * @return RMC sentence object
 	 */
-	public RMC getRMC();
+	RMC getRMC();
 	
 	/**
 	 * @return Last parsed RMC NMEA sentence, or null if no sentence with location information has been received.
 	 */
-	public com.buglabs.nmea2.RMC getLastRMC();
+	com.buglabs.nmea2.RMC getLastRMC();
 	
 	/**
 	 * @return the index of the RMC value currently available.
 	 * Useful for determining if new RMC is available.
 	 */
-	public int getIndex();
+	int getIndex();
 }

@@ -40,10 +40,16 @@ public class NMEARawFeed implements INMEARawFeed {
 
 	private final InputStream is;
 
+	/**
+	 * @param is input stream
+	 */
 	public NMEARawFeed(InputStream is) {
 		this.is = is;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.INMEARawFeed#getInputStream()
+	 */
 	public InputStream getInputStream() throws IOException {
 		return is;
 	}
