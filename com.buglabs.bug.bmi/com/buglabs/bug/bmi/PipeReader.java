@@ -107,11 +107,11 @@ public class PipeReader extends Thread {
 						logService.log(LogService.LOG_DEBUG
 								, "Received message from event pipe: " + line);
 					}
-					BMIModuleEvent m = new BMIModuleEvent(line);
-
-					if (m.parse()) {
+					
+					try {
+						BMIModuleEvent m = new BMIModuleEvent(line);
 						eventHandler.handleEvent(m);
-					} else {
+					} catch (IOException e) {
 						logService.log(LogService.LOG_ERROR
 								, "Unable to parse message from event pipe: " + line);
 					}

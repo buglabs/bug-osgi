@@ -59,22 +59,12 @@ public class BMIModuleEvent {
 
 	/**
 	 * @param raw raw event string
+	 * @throws IOException on parse error
 	 */
-	public BMIModuleEvent(String raw) {
+	public BMIModuleEvent(String raw) throws IOException {
 		this.raw = raw;
-	}
-
-	/**
-	 * @param moduleId id of module (product id)
-	 * @param version module revision
-	 * @param slot slot index
-	 * @param event type of event
-	 */
-	public BMIModuleEvent(String moduleId, String version, int slot, EVENT_TYPE event) {
-		this.moduleId = moduleId;
-		this.version = version;
-		this.slot = slot;
-		this.event = event;
+		if (!parse()) 
+			throw new IOException("Failed to parse: " + raw);
 	}
 	
 	/**
@@ -82,6 +72,7 @@ public class BMIModuleEvent {
 	 * @param slot slot number, overrides value in device.
 	 */
 	public BMIModuleEvent(BMIDevice device, int slot) {
+		this.bmiDevice = device;
 		this.moduleId = device.getProductId();
 		this.version = "" + device.getRevision();
 		this.slot = slot;
@@ -92,6 +83,7 @@ public class BMIModuleEvent {
 	 * @param device sysfs device
 	 */
 	public BMIModuleEvent(BMIDevice device) {
+		this.bmiDevice = device;
 		this.moduleId = device.getProductId();
 		this.version = "" + device.getRevision();
 		this.slot = device.getSlot();
@@ -132,7 +124,7 @@ public class BMIModuleEvent {
 	 * @return true if parse successful
 	 * @throws IOException on File I/O error
 	 */
-	public boolean parse() throws IOException {
+	private boolean parse() throws IOException {
 		String[] toks = raw.split(" ");
 
 		if (toks.length != 4) {
