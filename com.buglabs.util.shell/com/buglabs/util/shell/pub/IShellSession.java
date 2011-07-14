@@ -13,27 +13,27 @@ import java.io.IOException;
 public interface IShellSession {
 
 	/**
-	 * @param command
+	 * @param command executable
 	 * @return stdout of command
 	 * @throws IOException if any data on stderr is produced.
 	 */
-	public String execute(String command) throws IOException;
+	String execute(String command) throws IOException;
 
 	/**
 	 * Execute a command and pass in a ICommandResponseHandler to deal with the output.
-	 * @param command
-	 * @param handler
-	 * @throws IOException
+	 * @param command executable
+	 * @param handler handle the response 
+	 * @throws IOException on File I/O error
 	 */
-	public void execute(String command, ICommandResponseHandler handler) throws IOException;
+	void execute(String command, ICommandResponseHandler handler) throws IOException;
 	
 	/**
 	 * Terminate the session and free any resources.
 	 */
-	public void dispose();
+	void dispose();
 	
 	/**
 	 * Interrupt any running programs.
 	 */
-	public void interrupt();
+	void interrupt();
 }

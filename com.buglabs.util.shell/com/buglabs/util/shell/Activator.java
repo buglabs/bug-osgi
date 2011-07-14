@@ -6,10 +6,19 @@ import org.osgi.framework.ServiceRegistration;
 
 import com.buglabs.util.shell.pub.IShellService;
 
+/**
+ * This activator registers an instance of IShellService in the service registry.
+ * 
+ * @author kgilmer
+ *
+ */
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;
 
+	/**
+	 * @return BundleContext
+	 */
 	static BundleContext getContext() {
 		return context;
 	}

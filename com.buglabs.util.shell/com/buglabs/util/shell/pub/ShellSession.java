@@ -24,25 +24,6 @@ public class ShellSession implements IShellSession {
 	public static final String TERMINATOR = "234o987dsfkcqiuwey18837032843259d";
 	public static final String LT = System.getProperty("line.separator");
 
-	public static String getFilePath(String file) throws IOException {
-		File f = new File(file);
-
-		if (!f.exists() || f.isDirectory()) {
-			throw new IOException("Path passed is not a file: " + file);
-		}
-
-		StringBuffer sb = new StringBuffer();
-
-		String elems[] = file.split(File.separator);
-
-		for (int i = 0; i < elems.length - 1; ++i) {
-			sb.append(elems[i]);
-			sb.append(File.separator);
-		}
-
-		return sb.toString();
-	}
-
 	private Process process;
 
 	private OutputStream pos = null;
@@ -50,6 +31,11 @@ public class ShellSession implements IShellSession {
 	private final File root;
 	private final Writer out;
 
+	/**
+	 * @param root directory to run the shell session
+	 * @param out where to direct output
+	 * @throws IOException on File I/O error
+	 */
 	public ShellSession(File root, Writer out) throws IOException {
 		this.root = root;
 
@@ -62,6 +48,10 @@ public class ShellSession implements IShellSession {
 		initializeShell();
 	}
 	
+	/**
+	 * @param root base directory
+	 * @throws IOException  on File I/O error
+	 */
 	public ShellSession(File root) throws IOException {
 		this.root = root;
 		this.out = new NullWriter();
@@ -69,6 +59,9 @@ public class ShellSession implements IShellSession {
 		initializeShell();
 	}
 
+	/**
+	 * @throws IOException  on File I/O error
+	 */
 	private void initializeShell() throws IOException {
 		if (!disposed) {
 			process = Runtime.getRuntime().exec(SHELL_PATH);
@@ -135,7 +128,7 @@ public class ShellSession implements IShellSession {
 	 * @see shellservice.IShellService#execute(java.lang.String,
 	 * shell.pub.ICommandResponseHandler)
 	 */
-	synchronized public void execute(String command, ICommandResponseHandler handler) throws IOException {
+	public synchronized void execute(String command, ICommandResponseHandler handler) throws IOException {
 		execute(command, TERMINATOR, handler);
 	}
 
@@ -145,7 +138,7 @@ public class ShellSession implements IShellSession {
 	 * @see shellservice.IShellService#execute(java.lang.String,
 	 * java.lang.String, shell.pub.ICommandResponseHandler)
 	 */
-	synchronized public void execute(String command, String terminator, ICommandResponseHandler handler) throws IOException {
+	public synchronized void execute(String command, String terminator, ICommandResponseHandler handler) throws IOException {
 		if (disposed) {
 			throw new IOException("This shell session has been disposed.");
 		}
@@ -186,8 +179,8 @@ public class ShellSession implements IShellSession {
 	 * Send command string to shell process and add special terminator string so
 	 * reader knows when output is complete.
 	 * 
-	 * @param command
-	 * @throws IOException
+	 * @param command command to execute
+	 * @throws IOException  on File I/O error
 	 */
 	private void sendToProcessAndTerminate(String command) throws IOException {
 		pos.write(command.getBytes());
@@ -198,10 +191,16 @@ public class ShellSession implements IShellSession {
 		pos.flush();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.util.shell.pub.IShellSession#interrupt()
+	 */
 	public void interrupt() {
 		interrupt = true;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.util.shell.pub.IShellSession#dispose()
+	 */
 	public void dispose() {
 		this.disposed = true;
 		interrupt();
@@ -213,12 +212,21 @@ public class ShellSession implements IShellSession {
 	 * @author kgilmer
 	 */
 	private class NullWriter extends Writer {
+		/* (non-Javadoc)
+		 * @see java.io.Writer#close()
+		 */
 		public void close() throws IOException {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.io.Writer#flush()
+		 */
 		public void flush() throws IOException {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.io.Writer#write(char[], int, int)
+		 */
 		public void write(char[] cbuf, int off, int len) throws IOException {
 		}
 	}

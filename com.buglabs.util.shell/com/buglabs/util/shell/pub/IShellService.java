@@ -13,15 +13,15 @@ public interface IShellService {
 	
 	/**
 	 * @return A default instance.  Directory defaults to /tmp.
-	 * @throws IOException
+	 * @throws IOException on File I/O error
 	 */
-	public IShellSession createShellSession() throws IOException;
+	IShellSession createShellSession() throws IOException;
 	
 	/**
 	 * @param directory directory where shell should begin.
 	 * @param output A writer where all output should go, or null if not required.
-	 * @return
-	 * @throws IOException
+	 * @return instance of IShellSession
+	 * @throws IOException on File I/O error
 	 */
-	public IShellSession createShellSession(File directory, Writer output) throws IOException;
+	IShellSession createShellSession(File directory, Writer output) throws IOException;
 }

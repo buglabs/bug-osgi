@@ -13,5 +13,5 @@ public interface ICommandResponseHandler {
 	 * @param line Line of output
 	 * @param isError true if data was read from stderr, false if read from stdout.
 	 */
-	public void response(String line, boolean isError);
+	void response(String line, boolean isError);
 }
