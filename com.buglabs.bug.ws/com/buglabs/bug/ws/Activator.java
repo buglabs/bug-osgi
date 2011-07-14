@@ -21,6 +21,7 @@ import com.buglabs.bug.ws.program.ConfigAdminServlet;
 import com.buglabs.bug.ws.program.ProgramServlet;
 import com.buglabs.bug.ws.service.WSHtmlServlet;
 import com.buglabs.bug.ws.service.WSServlet;
+import com.buglabs.services.ws.PublicWSProvider;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
 import com.buglabs.util.osgi.ServiceTrackerUtil;
@@ -48,6 +49,9 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 
 	private static BundleContext context;
 
+	/**
+	 * @return BundleContext
+	 */
 	public static BundleContext getContext() {
 		return context;
 	}
@@ -56,6 +60,9 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	
 	private Map<String, HttpServlet> servlets;
 	
+	/** 
+	 * @return Log Service
+	 */
 	public static LogService getLog() {
 		return log;
 	}
@@ -75,7 +82,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 
 	private ModuleServlet moduleServlet;
 
-	private Hashtable serviceMap;
+	private Map<String, PublicWSProvider> serviceMap;
 
 	/*
 	 * (non-Javadoc)
@@ -84,8 +91,8 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 		log = LogServiceUtil.getLogService(bundleContext);
+		serviceMap = new Hashtable<String, PublicWSProvider>();
 		st = ServiceTrackerUtil.openServiceTracker(bundleContext, this , services);
-		serviceMap = new Hashtable();
 	}
 
 	/*
@@ -101,7 +108,8 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	public void run(Map<Object, Object> services) {
 		// Determine if object state is valid
 		if (servlets != null) {
-			log.log(LogService.LOG_ERROR, "Servlets have already been registered but the ServiceTracker was called to register again.");
+			log.log(LogService.LOG_ERROR
+					, "Servlets have already been registered but the ServiceTracker was called to register again.");
 			return;
 		}
 			

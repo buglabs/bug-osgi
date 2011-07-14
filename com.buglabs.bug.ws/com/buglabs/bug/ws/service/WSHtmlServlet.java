@@ -2,8 +2,6 @@ package com.buglabs.bug.ws.service;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -19,7 +17,7 @@ import com.buglabs.services.ws.PublicWSProvider2;
 
 /**
  * This is a very simple servlet that provides an HTML view of the services
- * availible on a BUG
+ * availible on a BUG.
  * 
  * This is registered in PublicWSAdminImpl along with WSServlet, which handles
  * the actual xml services
@@ -31,10 +29,18 @@ public class WSHtmlServlet extends AbstractWSServlet {
 
 	private static final long serialVersionUID = -6855836987056987821L;
 
-	public WSHtmlServlet(BundleContext context, Hashtable servicesMap, ConfigurationAdmin configAdmin) {
+	/**
+	 * @param context <String, PublicWSProvider>
+	 * @param servicesMap map of services
+	 * @param configAdmin instance of ConfigAdmin
+	 */
+	public WSHtmlServlet(BundleContext context, Map<String, PublicWSProvider> servicesMap, ConfigurationAdmin configAdmin) {
 		super(context, servicesMap, configAdmin);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.ws.service.AbstractWSServlet#executeHttpMethod(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, int)
+	 */
 	protected void executeHttpMethod(HttpServletRequest req, HttpServletResponse resp, int reqMethod) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter writer = resp.getWriter();
@@ -47,28 +53,29 @@ public class WSHtmlServlet extends AbstractWSServlet {
 
 	}
 
+	/**
+	 * @return services as html
+	 */
 	private String getServicesListAsHtml() {
-		Map servicesMap = getServiceMap();
+		Map<String, PublicWSProvider> servicesMap = getServiceMap();
 		String buffer = "<ul>";
 
-		for (Iterator i = servicesMap.keySet().iterator(); i.hasNext();) {
-			String key = (String) i.next();
-			Object serviceObj = servicesMap.get(key);
-
+		for (Map.Entry<String, PublicWSProvider> e :  servicesMap.entrySet()) {
 			buffer += "<li>";
-			if (serviceObj instanceof PublicWSProvider) {
-				PublicWSProvider pubService = (PublicWSProvider) serviceObj;
+			if (e.getValue() instanceof PublicWSProvider) {
+				PublicWSProvider pubService = (PublicWSProvider) e.getValue();
 
 				boolean isServiceEnabled = false;
 				try {
 					isServiceEnabled = isServiceEnabled(getConfigurationAdmin(), pubService.getPublicName());
-				} catch (IOException e) {
+				} catch (IOException exc) {
 				}
 				// service is disabled, don't a line item for it
 				if (!isServiceEnabled)
 					continue;
 
-				buffer += "<a href=\"service/" + pubService.getPublicName() + "\"" + ">" + pubService.getPublicName() + "</a><br/>";
+				buffer += "<a href=\"service/" + pubService.getPublicName() 
+					+ "\"" + ">" + pubService.getPublicName() + "</a><br/>";
 				buffer += pubService.getDescription() + "<br/>";
 				buffer += "Request Methods:" + "<br/>";
 
@@ -93,7 +100,7 @@ public class WSHtmlServlet extends AbstractWSServlet {
 				}
 
 			} else {
-				buffer += key;
+				buffer += e.getKey();
 			}
 			buffer += "</li>";
 		}
@@ -102,6 +109,12 @@ public class WSHtmlServlet extends AbstractWSServlet {
 		return buffer;
 	}
 
+	/**
+	 * @param pubService PublicWSProvider
+	 * @param def PublicWSDefinition
+	 * @param reqType request type
+	 * @return request info
+	 */
 	private String getRequestInfo(PublicWSProvider pubService, PublicWSDefinition def, String reqType) {
 		String out = "<ul><li>" + reqType + "<br/>" + "returns - " + def.getReturnType() + "<br/>";
 		if (def.getParameters() != null)
