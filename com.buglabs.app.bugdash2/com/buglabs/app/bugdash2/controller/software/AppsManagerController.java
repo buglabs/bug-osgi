@@ -1,10 +1,9 @@
 package com.buglabs.app.bugdash2.controller.software;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.knapsack.init.pub.KnapsackInitService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -15,7 +14,6 @@ import com.buglabs.app.bugdash2.App;
 import com.buglabs.app.bugdash2.LogManager;
 import com.buglabs.app.bugdash2.TemplateHelper;
 import com.buglabs.app.bugdash2.controller.ApplicationController;
-import com.buglabs.bug.program.pub.IUserAppManager;
 import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 import com.buglabs.util.osgi.BundleUtils;
 
@@ -92,18 +90,16 @@ public class AppsManagerController extends ApplicationController {
 		}
 		int bundle_status 		= bundle.getState();
 		String bundle_name 		= BundleUtils.getBestName(bundle); 		
-		if (task.equals("uninstall")) {
-			ServiceReference sr = context.getServiceReference(IUserAppManager.class.getName());
-			IUserAppManager userAppManager = (IUserAppManager) context.getService(sr);
+		if (task.equals("uninstall")) {			
 			try {
 				LogManager.logDebug("Remove app: " + bundle_name);
-				userAppManager.removeApplication(bundle.getLocation());
 				bundle.uninstall();
+				
+				ServiceReference sr = context.getServiceReference(KnapsackInitService.class.getName());
+				KnapsackInitService initService = (KnapsackInitService) context.getService(sr);
+				initService.updateBundles();	
 				msg = TemplateHelper.getStatusJSONString("OK", "App uninstalled successfully"); 
 				LogManager.logDebug("App removed ok");
-			} catch (IOException e) {
-				msg = TemplateHelper.getStatusJSONString("ERROR", e.getMessage());
-				LogManager.logWarning("App removed error: " + e.getMessage());
 			} catch (BundleException e) {
 				msg = TemplateHelper.getStatusJSONString("ERROR", e.getMessage());
 				LogManager.logWarning("App removed error: " + e.getMessage());

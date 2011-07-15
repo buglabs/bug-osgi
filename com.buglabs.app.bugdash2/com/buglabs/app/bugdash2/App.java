@@ -1,5 +1,6 @@
 package com.buglabs.app.bugdash2;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,18 +17,17 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-
+import org.knapsack.init.pub.KnapsackInitService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.buglabs.app.bugdash2.utils.Utils;
-import com.buglabs.bug.program.pub.IUserAppManager;
-import com.buglabs.util.xml.XmlNode;
-import com.buglabs.util.xml.XmlParser;
 import com.buglabs.util.simplerestclient.BasicAuthenticationConnectionProvider;
 import com.buglabs.util.simplerestclient.HTTPRequest;
 import com.buglabs.util.simplerestclient.HTTPResponse;
 import com.buglabs.util.simplerestclient.IConnectionProvider;
+import com.buglabs.util.xml.XmlNode;
+import com.buglabs.util.xml.XmlParser;
 
 /**
  * Represents BUG apps from BUGnet 
@@ -161,15 +161,17 @@ public class App {
 		}
 		response = request.get(this.getDownloadUrl());
 		InputStream is = response.getStream();
-		String filename = path + "/" + this.getURLEncodedTitle() + ".jar";
+		File filename = new File(path + "/" + this.getURLEncodedTitle() + ".jar");
 		LogManager.logDebug("Installing: " + filename);
 		FileOutputStream fos = new FileOutputStream(filename, false);
 		pipe(is, fos);
+		fos.close();
+		filename.setExecutable(true);
 		BundleContext context  = Activator.getContext();
-		ServiceReference sr = context.getServiceReference(IUserAppManager.class.getName());
-		IUserAppManager userAppManager = (IUserAppManager) context.getService(sr);
-		userAppManager.addApplication(filename);
-		userAppManager.run();		
+		
+		ServiceReference sr = context.getServiceReference(KnapsackInitService.class.getName());
+		KnapsackInitService initService = (KnapsackInitService) context.getService(sr);
+		initService.updateBundles();		
 	}
 	
 	public void lookupByTitle() 
