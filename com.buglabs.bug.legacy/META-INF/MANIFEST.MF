@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BUG Legacy APIs
+Bundle-SymbolicName: com.buglabs.bug.legacy
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Bug Labs, Inc.
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.osgi.framework,
+ org.osgi.service.cm;resolution:=optional,
+ org.osgi.service.log,
+ org.osgi.util.tracker,
+ javax.servlet,
+ org.osgi.service.http,
+ javax.servlet.http
+Export-Package: 
+ com.buglabs.application,
+ com.buglabs.bug.base.pub,
+ com.buglabs.bug.bmi.pub,
+ com.buglabs.bug.event,
+ com.buglabs.bug.module.pub,
+ com.buglabs.bug.program.pub,
+ com.buglabs.device,
+ com.buglabs.menu,
+ com.buglabs.osgi.log,
+ com.buglabs.osgi.shell,
+ com.buglabs.osgi.shell.pub,
+ com.buglabs.status,
+ com.buglabs.tableviewer,
+ com.buglabs.util,
+ com.buglabs.util.simplerestclient
