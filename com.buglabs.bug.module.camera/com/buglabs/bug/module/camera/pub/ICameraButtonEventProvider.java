@@ -27,7 +27,7 @@
  *******************************************************************************/
 package com.buglabs.bug.module.camera.pub;
 
-import com.buglabs.device.IButtonEventProvider;
+import com.buglabs.bug.buttons.IButtonEventProvider;
 
 /**
  * A button provider for the Camera module.

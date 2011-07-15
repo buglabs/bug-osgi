@@ -6,12 +6,12 @@ Bundle-Activator: com.buglabs.bug.module.lcd.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.module.lcd.pub
 Import-Package: com.buglabs.bug.accelerometer.pub,
+ com.buglabs.bug.bmi.pub,
+ com.buglabs.bug.bmi.sysfs,
+ com.buglabs.bug.buttons,
  com.buglabs.bug.dragonfly.module,
  com.buglabs.bug.jni.common,
- com.buglabs.bug.bmi.pub,
  com.buglabs.bug.sysfs,
- com.buglabs.bug.bmi.sysfs,
- com.buglabs.device,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
  com.buglabs.util.xml,

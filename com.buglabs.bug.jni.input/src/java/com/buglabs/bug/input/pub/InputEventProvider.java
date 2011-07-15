@@ -33,12 +33,12 @@ import java.util.Iterator;
 
 import org.osgi.service.log.LogService;
 
+import com.buglabs.bug.buttons.ButtonEvent;
+import com.buglabs.bug.buttons.IButtonEventListener;
+import com.buglabs.bug.buttons.IButtonEventProvider;
 import com.buglabs.bug.jni.common.FCNTL_H;
 import com.buglabs.bug.jni.input.InputDevice;
 import com.buglabs.bug.jni.input.InputEvent;
-import com.buglabs.device.ButtonEvent;
-import com.buglabs.device.IButtonEventListener;
-import com.buglabs.device.IButtonEventProvider;
 
 public class InputEventProvider extends Thread implements IButtonEventProvider {
 
