@@ -2,14 +2,14 @@ package com.buglabs.common.tests.junit;
 
 import junit.framework.TestCase;
 
+import com.buglabs.bug.buttons.ButtonEvent;
+import com.buglabs.bug.buttons.IButtonEventListener;
+import com.buglabs.bug.buttons.IButtonEventProvider;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
 import com.buglabs.bug.dragonfly.module.ModuleProperty;
 import com.buglabs.bug.dragonfly.module.MutableModuleProperty;
-import com.buglabs.device.ButtonEvent;
-import com.buglabs.device.IButtonEventListener;
-import com.buglabs.device.IButtonEventProvider;
 import com.buglabs.services.ws.DefaultWSImplementation;
 import com.buglabs.services.ws.DefaultWSImplementationWithParams;
 import com.buglabs.services.ws.HttpFormParser;

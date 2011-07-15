@@ -4,9 +4,8 @@ Bundle-Activator: com.buglabs.common.tests.Activator
 Bundle-SymbolicName: com.buglabs.common.tests
 Bundle-Version: 1.0.0
 Import-Package: 
+ com.buglabs.bug.buttons,
  com.buglabs.bug.dragonfly.module,
- com.buglabs.device,
- com.buglabs.osgi.shell,
  com.buglabs.services.ws,
  com.buglabs.util,
  com.buglabs.util.osgi,
