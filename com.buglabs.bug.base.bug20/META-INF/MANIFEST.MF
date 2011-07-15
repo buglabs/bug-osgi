@@ -5,15 +5,15 @@ Bundle-SymbolicName: com.buglabs.bug.base.bug20
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.base.pub
-Import-Package: com.buglabs.bug.input.pub,
+Import-Package: com.buglabs.bug.buttons,
+ com.buglabs.bug.input.pub,
  com.buglabs.bug.sysfs,
- com.buglabs.device,
  com.buglabs.support,
  com.buglabs.util.osgi,
  com.buglabs.util.ui,
  javax.servlet,
  javax.servlet.http,
- org.apache.commons.io; version="2.0.1",
+ org.apache.commons.io;version="2.0.1",
  org.osgi.framework,
  org.osgi.service.http,
  org.osgi.service.log,
