@@ -25,16 +25,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.device;
+package com.buglabs.bug.buttons;
 
 /**
- * Implementors provide button events from physical hardware.
+ * Listeners receive <code>ButtonEvent</code>s from a
+ * <code>IButtonEventProvider</code>.
  * 
  * @author ken
  * 
  */
-public interface IButtonEventProvider {
-	public void addListener(IButtonEventListener listener);
-
-	public void removeListener(IButtonEventListener listener);
+public interface IButtonEventListener {
+	public void buttonEvent(ButtonEvent event);
 }
