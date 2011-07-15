@@ -46,7 +46,6 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.program.pub.IProgramXml;
 import com.buglabs.bug.ws.Activator;
 import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.xml.XmlNode;

@@ -20,5 +20,3 @@ Import-Package:
  org.osgi.service.log,
  org.osgi.util.tracker,
  org.apache.commons.io;version="2.0.1"
-Export-Package: 
- com.buglabs.bug.program.pub

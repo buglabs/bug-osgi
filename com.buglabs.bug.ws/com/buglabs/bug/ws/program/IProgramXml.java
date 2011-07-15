@@ -1,4 +1,4 @@
-package com.buglabs.bug.program.pub;
+package com.buglabs.bug.ws.program;
 
 /**
  * This interface defines the xml node and attribute names for the xml
