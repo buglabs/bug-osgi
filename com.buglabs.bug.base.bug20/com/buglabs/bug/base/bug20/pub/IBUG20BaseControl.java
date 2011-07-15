@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.base.pub;
+package com.buglabs.bug.base.bug20.pub;
 
 import java.io.IOException;
 import java.util.List;

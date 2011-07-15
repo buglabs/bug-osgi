@@ -41,7 +41,7 @@ import org.osgi.util.measurement.Measurement;
 import org.osgi.util.measurement.Unit;
 import org.osgi.util.position.Position;
 
-import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
+import com.buglabs.bug.bmi.api.AbstractBUGModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;

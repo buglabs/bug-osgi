@@ -25,48 +25,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.bmi.pub;
+package com.buglabs.bug.base.bug20.pub;
+
+import java.util.Date;
 
 /**
- * modlet is a software component that handles all runtime service aspects of a
- * given hardware module.
- * 
- * @author kgilmer
- * 
+ * A service definition for something that can provide time.  Intended for use by GPS devices.
+ *
  */
-public interface IModlet {
+public interface ITimeProvider {
 	/**
-	 * Return the MODULE ID. This comes from the hardware.
-	 * 
-	 * @return
+	 * @return current time 
 	 */
-	public String getModuleId();
-
-	/**
-	 * @return Slot that the Module is currently connected to.
-	 */
-	public int getSlotId();
-
-	/**
-	 * Connect to any devices or do any initialization. This is a good place to
-	 * throw an exception if the expected hardware environment is not valid.
-	 * 
-	 * @throws Exception
-	 */
-	public void setup() throws Exception;
-
-	/**
-	 * Begin modlet. Any services that the modlet supports should be registered
-	 * here.
-	 * 
-	 * @throws Exception
-	 */
-	public void start() throws Exception;
-
-	/**
-	 * Unregister services and release any resources.
-	 * 
-	 * @throws Exception
-	 */
-	public void stop() throws Exception;
+	Date getTime();
 }

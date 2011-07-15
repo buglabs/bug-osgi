@@ -37,9 +37,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.service.log.LogService;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.IModlet;
-import com.buglabs.bug.bmi.pub.IModletFactory;
+import com.buglabs.bug.bmi.api.BMIModuleProperties;
+import com.buglabs.bug.bmi.api.IModlet;
+import com.buglabs.bug.bmi.api.IModletFactory;
 import com.buglabs.util.osgi.LogServiceUtil;
 
 /**

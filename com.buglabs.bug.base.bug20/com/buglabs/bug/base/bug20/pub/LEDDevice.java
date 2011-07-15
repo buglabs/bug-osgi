@@ -1,4 +1,4 @@
-package com.buglabs.bug.base.pub;
+package com.buglabs.bug.base.bug20.pub;
 
 import java.io.File;
 import java.io.IOException;

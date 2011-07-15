@@ -34,9 +34,9 @@ import java.util.Hashtable;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import com.buglabs.bug.bmi.pub.BMIModuleProperties;
-import com.buglabs.bug.bmi.pub.AbstractBUGModuleActivator;
-import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.api.AbstractBUGModuleActivator;
+import com.buglabs.bug.bmi.api.BMIModuleProperties;
+import com.buglabs.bug.bmi.api.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.bmi.sysfs.BMIDeviceNodeFactory;
 import com.buglabs.bug.module.camera.pub.CameraSysfsNode;

@@ -6,7 +6,7 @@ Bundle-Activator: com.buglabs.bug.module.video.Activator
 Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.module.video.pub
 Import-Package: 
- com.buglabs.bug.bmi.pub,
+ com.buglabs.bug.bmi.api,
  com.buglabs.bug.bmi.sysfs,
  com.buglabs.bug.buttons,
  com.buglabs.bug.dragonfly.module,

@@ -40,7 +40,7 @@ import com.buglabs.bug.accelerometer.pub.IAccelerometerControl;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerRawFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleFeed;
 import com.buglabs.bug.accelerometer.pub.IAccelerometerSampleProvider;
-import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
+import com.buglabs.bug.bmi.api.AbstractBUGModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;

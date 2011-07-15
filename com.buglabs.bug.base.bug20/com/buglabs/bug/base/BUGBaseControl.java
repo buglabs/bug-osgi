@@ -33,8 +33,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.buglabs.bug.base.pub.IBUG20BaseControl;
-import com.buglabs.bug.base.pub.LEDDevice;
+import com.buglabs.bug.base.bug20.pub.IBUG20BaseControl;
+import com.buglabs.bug.base.bug20.pub.LEDDevice;
 import com.buglabs.bug.sysfs.SysfsNode;
 
 /**

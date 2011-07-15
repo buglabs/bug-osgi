@@ -25,7 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
-package com.buglabs.bug.bmi.pub;
+package com.buglabs.bug.bmi.api;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -86,21 +86,21 @@ public abstract class AbstractBUGModuleActivator implements BundleActivator, IMo
 	}
 
 	/* (non-Javadoc)
-	 * @see com.buglabs.bug.bmi.pub.IModletFactory#getModuleId()
+	 * @see com.buglabs.bug.bmi.api.IModletFactory#getModuleId()
 	 */
 	public String getModuleId() {
 		return headers.get("Bug-Module-Id").toString();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.buglabs.bug.bmi.pub.IModletFactory#getName()
+	 * @see com.buglabs.bug.bmi.api.IModletFactory#getName()
 	 */
 	public String getName() {
 		return headers.get("Bundle-SymbolicName").toString();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.buglabs.bug.bmi.pub.IModletFactory#getVersion()
+	 * @see com.buglabs.bug.bmi.api.IModletFactory#getVersion()
 	 */
 	public String getVersion() {
 		return headers.get("Bundle-Version").toString();

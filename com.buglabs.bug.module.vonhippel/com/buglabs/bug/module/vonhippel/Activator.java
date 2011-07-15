@@ -29,8 +29,8 @@ package com.buglabs.bug.module.vonhippel;
 
 import org.osgi.framework.BundleContext;
 
-import com.buglabs.bug.bmi.pub.AbstractBUGModuleActivator;
-import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.api.AbstractBUGModuleActivator;
+import com.buglabs.bug.bmi.api.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 
 public class Activator extends AbstractBUGModuleActivator {	

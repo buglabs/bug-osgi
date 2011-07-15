@@ -4,7 +4,7 @@ Bundle-Activator: com.buglabs.bug.base.Activator
 Bundle-SymbolicName: com.buglabs.bug.base.bug20
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
-Export-Package: com.buglabs.bug.base.pub
+Export-Package: com.buglabs.bug.base.bug20.pub
 Import-Package: com.buglabs.bug.buttons,
  com.buglabs.bug.input.pub,
  com.buglabs.bug.sysfs,

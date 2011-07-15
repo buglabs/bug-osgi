@@ -8,13 +8,13 @@ Bundle-Vendor: Bug Labs, Inc.
 Export-Package: com.buglabs.bug.module.motion.pub
 Import-Package: 
  com.buglabs.bug.accelerometer.pub,
+ com.buglabs.bug.bmi.api,
+ com.buglabs.bug.bmi.sysfs,
  com.buglabs.bug.dragonfly.module,
  com.buglabs.bug.jni.accelerometer,
  com.buglabs.bug.jni.common,
  com.buglabs.bug.jni.motion,
- com.buglabs.bug.bmi.pub,
  com.buglabs.bug.sysfs,
- com.buglabs.bug.bmi.sysfs,
  com.buglabs.services.ws,
  com.buglabs.util.osgi,
  com.buglabs.util.xml,

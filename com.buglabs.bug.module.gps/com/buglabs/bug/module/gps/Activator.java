@@ -29,8 +29,8 @@ package com.buglabs.bug.module.gps;
 
 import org.osgi.framework.BundleContext;
 
-import com.buglabs.bug.bmi.pub.AbstractBUGModuleActivator;
-import com.buglabs.bug.bmi.pub.IModlet;
+import com.buglabs.bug.bmi.api.AbstractBUGModuleActivator;
+import com.buglabs.bug.bmi.api.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 
 /**
@@ -46,7 +46,7 @@ public class Activator extends AbstractBUGModuleActivator {
 	public static final String GPS_DEBUG_LOGGING_KEY = "com.buglabs.bug.module.gps.debug";
 
 	/* (non-Javadoc)
-	 * @see com.buglabs.bug.bmi.pub.AbstractBUGModuleActivator#createModlet(org.osgi.framework.BundleContext, int, com.buglabs.bug.bmi.sysfs.BMIDevice)
+	 * @see com.buglabs.bug.bmi.api.AbstractBUGModuleActivator#createModlet(org.osgi.framework.BundleContext, int, com.buglabs.bug.bmi.sysfs.BMIDevice)
 	 */
 	public IModlet createModlet(BundleContext context, int slotId, BMIDevice properties) {
 		return new GPSModlet(context, slotId, getModuleId(), "GPS", properties);

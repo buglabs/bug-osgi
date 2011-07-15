@@ -35,7 +35,7 @@ import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import com.buglabs.bug.bmi.pub.AbstractBUGModlet;
+import com.buglabs.bug.bmi.api.AbstractBUGModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleLEDController;
