@@ -41,12 +41,11 @@ public interface IVideoModuleControl extends IModuleControl {
 	 * @deprecated use getDisplaySize();
 	 */
 	public String getResolution();
-	
+
 	/**
-	 * @return 2-dimentional array of display resolution, 0 - x, 1 - y.  Example [640, 480]
-	 *
+	 * @returns a string of valid monitor resolutions.
 	 */
-	public int[] getDisplaySize();
+	public String[] getMonitorResolutions();
 	
 	/**
 	 * @return true if video module is currently in VGA mode
@@ -57,6 +56,12 @@ public interface IVideoModuleControl extends IModuleControl {
 	 * @return true if video module is currently in DVI mode
 	 */
 	public boolean isDVI();
+
+
+	/**
+	 * @return true if video module is currently disabled
+	 */
+	public boolean isOff();
 	
 	/**
 	 * Switch video mode to VGA.
@@ -69,4 +74,18 @@ public interface IVideoModuleControl extends IModuleControl {
 	 * @return true if request was successful.
 	 */
 	public boolean setDVI();
+
+	/**
+	 * Switch video mode off
+	 * @return true if request was successful.
+	 */
+	public boolean setOff();
+
+	/**
+	* Cause the video module to scan for a monitor, and select the best
+	* match monitor for it's output mode.
+	* @return true of there was no error during scanning and setting
+	*/
+	public boolean setAutoDetect();
+
 }
