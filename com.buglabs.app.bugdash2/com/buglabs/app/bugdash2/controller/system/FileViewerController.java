@@ -21,7 +21,7 @@ import freemarker.template.SimpleHash;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateModelRoot;
 
-public class fileViewerController extends ApplicationController {
+public class FileViewerController extends ApplicationController {
 	
 	private static final String DEFAULT_MIME_TYPE = "text/plain";
 

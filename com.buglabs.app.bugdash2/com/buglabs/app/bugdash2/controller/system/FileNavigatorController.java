@@ -16,7 +16,7 @@ import freemarker.template.SimpleHash;
 import freemarker.template.SimpleList;
 import freemarker.template.TemplateModelRoot;
 
-public class fileNavigatorController extends ApplicationController {
+public class FileNavigatorController extends ApplicationController {
 	static String curDirectory = "/home/root/";
 	private static final String HEADER_KEY = "upDirectory";
 	private static final String DEFAULT_MIME_TYPE = "text/plain";
@@ -28,7 +28,7 @@ public class fileNavigatorController extends ApplicationController {
 			HttpServletRequest req, HttpServletResponse resp) {
 		String requestURL = req.getContextPath();
 		String tempDirectory = "";
-		if(requestURL == null)
+		if(requestURL == null || requestURL.length() == 0)
 		{
 			requestURL = "/admin_system/navigator";
 		}

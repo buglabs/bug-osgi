@@ -24,7 +24,7 @@ import freemarker.template.TemplateModelRoot;
  *  2010-08-10 AK made it to use getConfigPropertyValue and saveConfigProperty as they take care of decoding/encoding 
  * 
  */
-public class BugLoginController extends ApplicationController {
+public class BUGLoginController extends ApplicationController {
 
 	public String getTemplateName() {
 		return "system_dash_login.fml";

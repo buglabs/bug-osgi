@@ -14,7 +14,7 @@ import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 
 import freemarker.template.TemplateModelRoot;
 
-public class fileDownloadController extends ApplicationController {
+public class FileDownloadController extends ApplicationController {
 
 	public TemplateModelRoot get(RequestParameters params,
 			HttpServletRequest req, HttpServletResponse resp) {

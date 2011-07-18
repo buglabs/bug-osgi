@@ -15,7 +15,7 @@ import com.buglabs.app.bugdash2.controller.software.PackageNewUpdateController;
 import com.buglabs.app.bugdash2.controller.software.PackageUpgradeController;
 import com.buglabs.app.bugdash2.controller.software.ReadPackageNewUpdateBufferController;
 import com.buglabs.app.bugdash2.controller.software.ReadPackageUpgradeBufferController;
-import com.buglabs.app.bugdash2.controller.system.BugLoginController;
+import com.buglabs.app.bugdash2.controller.system.BUGLoginController;
 import com.buglabs.app.bugdash2.controller.system.ConfigurationController;
 import com.buglabs.app.bugdash2.controller.system.ConfigurationPropertyController;
 import com.buglabs.app.bugdash2.controller.system.DateTimeController;
@@ -25,10 +25,10 @@ import com.buglabs.app.bugdash2.controller.system.LogController;
 import com.buglabs.app.bugdash2.controller.system.ReadBufferController;
 import com.buglabs.app.bugdash2.controller.system.StartReadingLogController;
 import com.buglabs.app.bugdash2.controller.system.StopReadingLogController;
-import com.buglabs.app.bugdash2.controller.system.fileBrowserController;
-import com.buglabs.app.bugdash2.controller.system.fileDownloadController;
-import com.buglabs.app.bugdash2.controller.system.fileNavigatorController;
-import com.buglabs.app.bugdash2.controller.system.fileViewerController;
+import com.buglabs.app.bugdash2.controller.system.FileBrowserController;
+import com.buglabs.app.bugdash2.controller.system.FileDownloadController;
+import com.buglabs.app.bugdash2.controller.system.FileNavigatorController;
+import com.buglabs.app.bugdash2.controller.system.FileViewerController;
 import com.buglabs.app.bugdash2.controller.utils.CheckInternetController;
 import com.buglabs.osgi.sewing.pub.SewingController;
 
@@ -177,20 +177,20 @@ public abstract class AdminControllerFactory {
 	 * System - File Browser
 	 */
 	public SewingController getFileBrowserController() {
-		return new fileBrowserController();
+		return new FileBrowserController();
 	}
 	public SewingController getFileNavigatorController() {
-		return new fileNavigatorController();
+		return new FileNavigatorController();
 	}
 	public SewingController getFileViewerController() {
-		return new fileViewerController();
+		return new FileViewerController();
 	}
 	
 	/**
 	 * Login/Logout - Secure Login/Logout for BUG
 	 */
 	public SewingController getBugLoginController(){
-		return new BugLoginController();
+		return new BUGLoginController();
 	}
 	public SewingController getLogoutController() {
 		return new LogoutController();
@@ -200,7 +200,7 @@ public abstract class AdminControllerFactory {
 	}
 
 	public SewingController getFileDownloadController() {
-		return new fileDownloadController();
+		return new FileDownloadController();
 	}
 
 	public SewingController getBUGnetController() {

@@ -17,7 +17,7 @@ import com.buglabs.osgi.sewing.pub.util.RequestParameters;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateModelRoot;
 
-public class fileBrowserController extends ApplicationController {
+public class FileBrowserController extends ApplicationController {
 	private String destination = "/home/root/fileserver/";
 	private static final String RESULT_KEY 	= "result";
 	private static final String DESTINATION_KEY = "dest";
