@@ -54,7 +54,7 @@ public class CharDeviceUtils {
 		}
 
 		if (retval < 0) {
-			throw new IOException("Unable to open device: " + devnode);
+			throw new IOException("Unable to open device: " + devnode + " open returned " + retval);
 		}
 	}
 }
