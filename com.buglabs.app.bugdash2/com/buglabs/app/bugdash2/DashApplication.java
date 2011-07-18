@@ -19,6 +19,11 @@ import com.buglabs.osgi.sewing.pub.ISewingService;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable;
 
+/**
+ * This class acts to construct the bugdash application given
+ * that all dependent services are available.
+ *
+ */
 public class DashApplication implements ManagedRunnable {
 	private ISewingService service;
 	private BUGwebAdminServlet mainServlet;
@@ -38,7 +43,7 @@ public class DashApplication implements ManagedRunnable {
 	@Override
 	public void run(Map<Object, Object> services) {
 		LogManager.logInfo("BUGwebAdminServiceTracker: start");
-		service = (ISewingService) services.get(ISewingService.class);
+		service = (ISewingService) services.get(ISewingService.class.getName());
 		
 		mainServlet = new BUGwebAdminServlet();
 		hardwareServlet = new BUGwebAdminHardwareServlet(); 
