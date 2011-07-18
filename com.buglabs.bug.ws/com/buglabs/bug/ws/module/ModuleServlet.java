@@ -46,6 +46,7 @@ import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.dragonfly.module.IModuleProperty;
 import com.buglabs.bug.dragonfly.module.MutableModuleProperty;
 import com.buglabs.bug.ws.Activator;
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.xml.XmlNode;
 
 /**
@@ -61,14 +62,24 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 	private BundleContext context;
 
 	/**
-	 * 
+	 * Construct a ModuleServlet with no existing modules.
 	 */
 	public ModuleServlet() {
 		context = Activator.getContext();
 		//Initialize the array that tracks modules.
-		this.modules = new IModuleControl[4];
+		this.modules = new IModuleControl[BUGBundleConstants.BUG_TOTAL_BMI_SLOTS];
 		for (int i = 0; i < modules.length; ++i)
 			modules[i] = null;
+	}
+	
+	/**
+	 * Construct a ModuleServlet with pre-existing modules.
+	 * 
+	 * @param mcontrols IModuleControl[]
+	 */
+	public ModuleServlet(IModuleControl[] mcontrols) {
+		context = Activator.getContext();
+		this.modules = mcontrols;
 	}
 
 	/* (non-Javadoc)
@@ -78,7 +89,7 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 		String path = req.getPathInfo();
 		// Must have a module in the path.
 		if (path == null) {
-			resp.sendError(665, "Error: invalid module.");
+			resp.sendError(BUGBundleConstants.WS_HTTP_ERROR_INVALID_MODULE, "Error: invalid module.");
 			return;
 		}
 
@@ -86,7 +97,7 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 		IModuleControl mc = modules[index];
 		// Must be a valid module
 		if (mc == null) {
-			resp.sendError(666, "Error: unknown module " + path);
+			resp.sendError(BUGBundleConstants.WS_HTTP_ERROR_UNKNOWN_MODULE, "Error: unknown module " + path);
 			return;
 		}
 
@@ -97,12 +108,12 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 
 			// TODO: Make sure all properties are valid before setting them.
 			if (!containsProperty(mc.getModuleProperties(), paramName)) {
-				resp.sendError(667, "Error: invalid property " + paramName);
+				resp.sendError(BUGBundleConstants.WS_HTTP_ERROR_INVALID_PROPERTY, "Error: invalid property " + paramName);
 				return;
 			}
 
 			if (!mc.setModuleProperty(new MutableModuleProperty(paramName, paramValue))) {
-				resp.sendError(668, "Error: unable to set property " + paramName);
+				resp.sendError(BUGBundleConstants.WS_HTTP_ERROR_CANT_SET_PROPERTY, "Error: unable to set property " + paramName);
 			}
 		}
 	}
@@ -205,12 +216,14 @@ public class ModuleServlet extends HttpServlet implements ServiceListener {
 
 	@Override
 	public void serviceChanged(ServiceEvent event) {
-		//Here we get notified when IModuleControls are added and removed from OSGi service registry.  We want to keep our state up-to-date with the modules array.
+		//Here we get notified when IModuleControls are added and removed from OSGi service registry.  
+		//We want to keep our state up-to-date with the modules array.
 		IModuleControl imc = (IModuleControl) context.getService(event.getServiceReference());
 		
 		if (event.getType() == ServiceEvent.REGISTERED) {
 			if (modules[imc.getSlotId()] != null)
-				Activator.getLog().log(LogService.LOG_WARNING, "A new IModuleControl registration is overwriting a pre-existing module.");
+				Activator.getLog().log(LogService.LOG_WARNING
+						, "A new IModuleControl registration is overwriting a pre-existing module.");
 			
 			modules[imc.getSlotId()] = imc;
 		} else if (event.getType() == ServiceEvent.UNREGISTERING) {

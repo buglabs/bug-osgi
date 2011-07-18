@@ -9,10 +9,12 @@ import org.knapsack.init.pub.KnapsackInitService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
+import org.sprinkles.Fn;
 
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.ws.module.ModuleServlet;
@@ -22,8 +24,10 @@ import com.buglabs.bug.ws.program.ProgramServlet;
 import com.buglabs.bug.ws.service.WSHtmlServlet;
 import com.buglabs.bug.ws.service.WSServlet;
 import com.buglabs.services.ws.PublicWSProvider;
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.OSGiServiceLoader;
 import com.buglabs.util.osgi.ServiceTrackerUtil;
 import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedInlineRunnable;
 
@@ -122,7 +126,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 		servlets = new Hashtable<String, HttpServlet>();
 		
 		try {
-			moduleServlet = new ModuleServlet();
+			moduleServlet = new ModuleServlet(getExistingModules());
 			context.addServiceListener(moduleServlet, FilterUtil.generateServiceFilter(IModuleControl.class.getName()));
 			servlets.put(MODULE_WS_PATH, moduleServlet);
 		} catch (InvalidSyntaxException e) {
@@ -145,14 +149,43 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 			} 
 	}
 
+	/**
+	 * @return an array of IModuleControls that reflect currently attached modules to BUG device.
+	 * 
+	 * @throws InvalidSyntaxException on OSGi filter syntax exception.
+	 */
+	private IModuleControl[] getExistingModules() throws InvalidSyntaxException {
+		final IModuleControl[] modules = new IModuleControl[BUGBundleConstants.BUG_TOTAL_BMI_SLOTS];
+		
+		Fn.map(new Fn.Function<ServiceReference, IModuleControl>() {
+
+			@Override
+			public IModuleControl apply(ServiceReference element) {
+				IModuleControl imc = (IModuleControl) context.getService(element);				
+				modules[imc.getSlotId()] = imc;
+				
+				return imc;
+			}
+		}, context.getServiceReferences(IModuleControl.class.getName(), null));		
+		
+		return modules;
+	}
+
 	@Override
 	public void shutdown() {
-		if (moduleServlet != null)
+		if (moduleServlet != null) {
 			context.removeServiceListener(moduleServlet);
+			moduleServlet = null;
+		}
 		
 		// Unregister all servlets
-		if (httpService != null && servlets != null && servlets.size() > 0)
+		if (httpService != null && servlets != null && servlets.size() > 0) {
 			for (String alias : servlets.keySet())
 				httpService.unregister(alias);
+			
+			httpService = null;
+		}
+	
+		servlets = null;
 	}
 }
