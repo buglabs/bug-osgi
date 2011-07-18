@@ -97,11 +97,18 @@ public class PipeReader extends Thread {
 
 				BufferedReader reader = new BufferedReader(new FileReader(pipeFilename));
 				String line = null;
+				String lastEvent = "";
 				
 				while ((line = reader.readLine()) != null) {
 					if (line.equals(POISON_PILL)) {
 						return;
 					}
+					
+					if (line.equals(lastEvent)) {
+						logService.log(LogService.LOG_DEBUG
+								, "Squelching duplicate event.");
+						continue;
+					} 
 					
 					if (logService != null) {
 						logService.log(LogService.LOG_DEBUG
@@ -115,6 +122,7 @@ public class PipeReader extends Thread {
 						logService.log(LogService.LOG_ERROR
 								, "Unable to parse message from event pipe: " + line);
 					}
+					lastEvent = line;
 				}
 			} catch (FileNotFoundException e) {
 				logService.log(LogService.LOG_ERROR, e.getMessage());

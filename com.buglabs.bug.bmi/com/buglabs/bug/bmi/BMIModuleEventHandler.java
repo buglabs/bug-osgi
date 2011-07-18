@@ -32,6 +32,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -113,7 +114,7 @@ public class BMIModuleEventHandler {
 
 					// Add this model to our map of running Modlets.
 					if (!activeModlets.containsKey(m.getModuleId())) {
-						activeModlets.put(m.getModuleId(), new ArrayList<IModlet>());
+						activeModlets.put(m.getModuleId(), new CopyOnWriteArrayList<IModlet>());
 					}
 
 					List<IModlet> am = activeModlets.get(m.getModuleId());
