@@ -392,7 +392,7 @@ public abstract class SewingHttpServlet extends HttpServlet {
 				file = path.substring(slash);
 			}
 
-			return context.getBundle().getResource(getResourcePath() + file);
+			return context.getBundle().getResource(getResourcePath() + "/" + file);
 		}
 
 		protected abstract String getResourcePath();
