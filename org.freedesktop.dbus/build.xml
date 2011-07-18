@@ -1,6 +1,32 @@
 <?xml version="1.0"?>
 <project name="org.freedesktop.dbus" basedir=".">
 	<!-- PROJECT CONSTANTS -->
+	
+	<!-- target: build	  Compile the source code -->
+	<target name="build" description="BUILDING: ${ant.project.name}">
+		<echo message="## PROJECT: ${ant.project.name} ## TARGET: build (from org.freedesktop.dbus)" />
+
+		<!-- These will only be set if previously undefined -->
+		<property name="manifest.location" location="${basedir}/META-INF/MANIFEST.MF"/>
+		<property name="package.version" value="${default.package.version}" />
+		<property name="env.BUILD_NUMBER" value="0" />
+		<property name="env.JOB_NAME" value="undefined" />
+		<property name="env.BUILD_URL" value="undefined" />
+
+		<property name="full.version" value="${package.version}.${env.BUILD_NUMBER}">
+		</property>
+
+		<javac destdir="${buildDirectory}" srcdir="${srcDirectory}" source="${javacSource}" target="${javacTarget}" encoding="utf-8" fork="true" includeantruntime="false" debug="${javacDebugInfo}">
+			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
+			<classpath refid="bin.classpath" />
+		</javac>
+		<manifest file="${manifest.location}" mode="update">
+			<attribute name="Bundle-Version" value="${full.version}" />
+			<attribute name="Build-Label" value="${env.JOB_NAME}" />
+			<attribute name="Build-Source" value="${env.BUILD_URL}" />
+			<attribute name="Build-Date" value="${TODAY}" />
+		</manifest>
+	</target>
 
 	<!-- PROJECT IMPORTS -->
 	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
