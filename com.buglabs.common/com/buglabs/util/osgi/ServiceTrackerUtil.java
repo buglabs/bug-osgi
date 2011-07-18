@@ -41,7 +41,13 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
- * Helper class to construct ServiceTrackers.
+ * Helper class to manage services in OSGi using the ServiceTracker API.
+ * 
+ * Clients call the static method openServiceTracker() with a ManagedRunnable, ManagedInlineRunnable, or ServiceTrackerCustomizer.
+ * For the first two, run() is called once and only once when all service dependencies are met, and shutdown()
+ * is called once and only once when a previously active tracker has lost a required service.
+ * 
+ * When passing in a ServiceTrackerCustomizer, normal (standard ServiceTracker) behaviour is followed.
  * 
  * @author kgilmer
  * 
@@ -49,12 +55,13 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 
 	private final ManagedRunnable runnable;
-	//private final String[] services;
 	private volatile int sc;
 	private final BundleContext bc;
 	private Thread thread;
 	private final Map<Object, Object> serviceMap;
 	private int serviceCount;
+	private volatile boolean runCalled;
+	private volatile boolean shutdownCalled;
 
 	/**
 	 * A runnable that provides access to OSGi services passed to
@@ -71,11 +78,11 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 		 * This is called for execution of application logic when OSGi services are available.
 		 * @param services key contains String of service name, value is service instance.
 		 */
-		public abstract void run(Map<Object, Object> services);
+		void run(Map<Object, Object> services);
 		/**
 		 * Called directly before the thread is interrupted.  Client may optionally add necessary code to shutdown thread.
 		 */
-		public abstract void shutdown();
+		void shutdown();
 	}
 
 	/**
@@ -88,15 +95,17 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	}
 
 	/**
-	 * @param bc
-	 * @param t
-	 * @param serviceCount
+	 * @param context BundleContext
+	 * @param runnable ManagedRunnable
+	 * @param serviceCount number of services tracked
 	 */
-	public ServiceTrackerUtil(BundleContext bc, ManagedRunnable t, int serviceCount) {
-		this.bc = bc;
-		this.runnable = t;
+	public ServiceTrackerUtil(BundleContext context, ManagedRunnable runnable, int serviceCount) {
+		this.bc = context;
+		this.runnable = runnable;
 		this.serviceCount = serviceCount;
 		this.serviceMap = new Hashtable<Object, Object>();
+		this.runCalled = false;
+		this.shutdownCalled = false;
 
 		sc = 0;
 	}
@@ -115,19 +124,25 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 			serviceMap.put(svc, getProperties(arg0));
 		}
 
-		if (thread == null && sc == serviceCount) {
-			if (runnable instanceof ManagedInlineRunnable) {
-				//Client wants to run in same thread, just call method.
-				runnable.run(serviceMap);
-			} else {
-				//Create new thread and pass off to client Runnable implementation.
-				thread = new Thread(new Runnable() {
+		if (thread == null && sc == serviceCount && !runCalled) {
+			synchronized (runnable) {
+				if (runnable instanceof ManagedInlineRunnable) {
+					//Client wants to run in same thread, just call method.
+					runnable.run(serviceMap);
+					runCalled = true;
+					shutdownCalled = false;
+				} else {
+					//Create new thread and pass off to client Runnable implementation.
+					thread = new Thread(new Runnable() {
 
-					public void run() {
-						runnable.run(serviceMap);
-					}
-				});
-				thread.start();
+						public void run() {
+							runnable.run(serviceMap);
+						}
+					});
+					thread.start();
+					runCalled = true;
+					shutdownCalled = false;
+				}
 			}
 		}
 
@@ -135,14 +150,14 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	}
 
 	/**
-	 * @param arg0
+	 * @param arg0 ServiceReference
 	 * @return A dictionary containing all of a service reference's properties.
 	 */
 	private Dictionary<String, Object> getProperties(ServiceReference arg0) {
 		Dictionary<String, Object> dict = new Hashtable<String, Object>();
 		
 		if (arg0.getPropertyKeys() != null) {
-			for (String key: Arrays.asList(arg0.getPropertyKeys())) {
+			for (String key : Arrays.asList(arg0.getPropertyKeys())) {
 				dict.put(key, arg0.getProperty(key));
 			}
 		}
@@ -162,6 +177,9 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference, java.lang.Object)
 	 */
 	public void removedService(ServiceReference arg0, Object arg1) {
+		if (shutdownCalled)
+			return;
+		
 		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
 		
 		if (serviceMap.containsKey(key)) {
@@ -178,12 +196,16 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 			}
 			thread.interrupt();
 			thread = null;
+			shutdownCalled = true;
+			runCalled = false;
 			
 			return;
 		}
 		
 		if (runnable instanceof ManagedInlineRunnable) {
 			((ManagedInlineRunnable) runnable).shutdown();
+			shutdownCalled = true;
+			runCalled = false;
 		}
 	}
 
@@ -191,14 +213,17 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * Convenience method for creating and opening a
 	 * ServiceTrackerRunnable-based ServiceTracker.
 	 * 
-	 * @param context
-	 * @param runnable
-	 * @param services
-	 * @return
-	 * @throws InvalidSyntaxException
+	 * @param context BundleContext
+	 * @param runnable ManagedRunnable
+	 * @param services Service or array of services
+	 * @return An instance of ClosingServiceTracker that will call shutdown() on IManagedRunnable instances when closing.
+	 * @throws InvalidSyntaxException on Filter syntax error.
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, ManagedRunnable runnable, String ... services) throws InvalidSyntaxException {
-		ServiceTracker st = new ClosingServiceTracker(context, FilterUtil.generateServiceFilter(context, services), new ServiceTrackerUtil(context, runnable, services.length), services);
+	public static ServiceTracker openServiceTracker(BundleContext context
+			, ManagedRunnable runnable, String ... services) throws InvalidSyntaxException {
+		
+		ServiceTracker st = new ClosingServiceTracker(context, FilterUtil.generateServiceFilter(context, services)
+				, new ServiceTrackerUtil(context, runnable, services.length), services);
 		st.open();
 		
 		return st;
@@ -208,15 +233,18 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * Convenience method for creating and opening a
 	 * ServiceTrackerRunnable-based ServiceTracker.
 	 * 
-	 * @param context
-	 * @param filter
-	 * @param runnable
-	 * @param services
-	 * @return
-	 * @throws InvalidSyntaxException
+	 * @param context BundleContext
+	 * @param filter OSGi filter
+	 * @param runnable ManagedRunnable
+	 * @param services Service or array of services
+	 * @return An instance of ClosingServiceTracker that will call shutdown() on IManagedRunnable instances when closing.
+	 * @throws InvalidSyntaxException on Filter syntax error.
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, Filter filter, ManagedRunnable runnable, String ... services) throws InvalidSyntaxException {
-		ServiceTracker st = new ClosingServiceTracker(context, filter, new ServiceTrackerUtil(context, runnable, services.length), services);
+	public static ServiceTracker openServiceTracker(BundleContext context, Filter filter
+			, ManagedRunnable runnable, String ... services) throws InvalidSyntaxException {
+		
+		ServiceTracker st = new ClosingServiceTracker(context
+				, filter, new ServiceTrackerUtil(context, runnable, services.length), services);
 		st.open();
 
 		return st;
@@ -226,14 +254,15 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * Convenience method for creating and opening a
 	 * ServiceTracker.
 	 * 
-	 * @param context
-	 * @param filter
-	 * @param customizer
-	 * @param services
-	 * @return
-	 * @throws InvalidSyntaxException
+	 * @param context BundleContext
+	 * @param filter OSGi filter
+	 * @param customizer ServiceTrackerCustomizer
+	 * @param services Service or array of services
+	 * @return An instance of ClosingServiceTracker that will call shutdown() on IManagedRunnable instances when closing.
+	 * @throws InvalidSyntaxException on Filter syntax error.
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, Filter filter, ServiceTrackerCustomizer customizer, String ... services) throws InvalidSyntaxException {
+	public static ServiceTracker openServiceTracker(BundleContext context, Filter filter
+			, ServiceTrackerCustomizer customizer, String ... services) throws InvalidSyntaxException {
 		ServiceTracker st = new ClosingServiceTracker(context, filter, customizer, services);
 		st.open();
 
@@ -244,14 +273,16 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	 * Convenience method for creating and opening a
 	 * ServiceTracker.
 	 * 
-	 * @param context
-	 * @param customizer
-	 * @param services
-	 * @return
-	 * @throws InvalidSyntaxException
+	 * @param context BundleContext
+	 * @param customizer ServiceTrackerCustomizer
+	 * @param services Service or array of services
+	 * @return An instance of ClosingServiceTracker that will call shutdown() on IManagedRunnable instances when closing.
+	 * @throws InvalidSyntaxException on Filter syntax error.
 	 */
-	public static ServiceTracker openServiceTracker(BundleContext context, ServiceTrackerCustomizer customizer, String ... services) throws InvalidSyntaxException {
-		ServiceTracker st = new ClosingServiceTracker(context, FilterUtil.generateServiceFilter(context, services), customizer, services);
+	public static ServiceTracker openServiceTracker(BundleContext context, ServiceTrackerCustomizer customizer
+			, String ... services) throws InvalidSyntaxException {
+		ServiceTracker st = new ClosingServiceTracker(context
+				, FilterUtil.generateServiceFilter(context, services), customizer, services);
 		st.open();
 
 		return st;
