@@ -10,6 +10,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.buglabs.app.bugdash2.servicetracker.BUGwebAdminServiceTracker;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.osgi.sewing.pub.ISewingService;
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.ServiceTrackerUtil;
 import com.buglabs.util.ui.IDesktopApp;
 
@@ -42,7 +43,7 @@ public class Activator implements BundleActivator, IDesktopApp {
 	
 	public void start(BundleContext context) throws Exception {		
 		Activator.context = context;
-		modules = new IModuleControl[4];
+		modules = new IModuleControl[BUGBundleConstants.BUG_TOTAL_BMI_SLOTS];
 		checkSetting(); 
 		
 		batteryProvider = new BatteryInfoProvider();

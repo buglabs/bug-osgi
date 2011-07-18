@@ -33,7 +33,14 @@ package com.buglabs.util.osgi;
  * @author kgilmer
  * 
  */
-public interface BUGBundleConstants {
+public final class BUGBundleConstants {
+	
+	/**
+	 * Static utility class for constants.
+	 */
+	private BUGBundleConstants() {		
+	}
+	
 	/**
 	 * A designation for core runtime bundles that provide core services.
 	 */
@@ -94,7 +101,7 @@ public interface BUGBundleConstants {
 	/**
 	 * Service key for module description.
 	 */
-	static final String MODULE_DESC_KEY = "ModuleDescription";
+	public static final String MODULE_DESC_KEY = "ModuleDescription";
 
 	/**
 	 * Service key for module serial number.
@@ -120,4 +127,29 @@ public interface BUGBundleConstants {
 	 * Service key for module slot index.
 	 */
 	public static final String MODULE_SLOT_KEY = "Slot";
+	
+	/**
+	 * Number of BMI slots available on BUG device.
+	 */
+	public static final int BUG_TOTAL_BMI_SLOTS = 4;
+
+	/**
+	 * Invalid module type was requested error code.
+	 */
+	public static final int WS_HTTP_ERROR_INVALID_MODULE = 665;
+
+	/**
+	 * Unknown module type was requested error code.
+	 */
+	public static final int WS_HTTP_ERROR_UNKNOWN_MODULE = 666;
+
+	/**
+	 * Invalid module property error code.
+	 */
+	public static final int WS_HTTP_ERROR_INVALID_PROPERTY = 667;
+
+	/**
+	 * Can't set property error code.
+	 */
+	public static final int WS_HTTP_ERROR_CANT_SET_PROPERTY = 668;
 }
