@@ -29,14 +29,19 @@ package com.buglabs.services.ws;
 
 import java.util.Map;
 
-/*
- * A simple form parser
- * 
- * @author BBalantine
- * 
+/**
+ * A simple form parser.
+ * @author bballantine
+ *
  */
-public class HttpFormParser {
+public final class HttpFormParser {
 
+	/**
+	 * Utility class.
+	 */
+	private HttpFormParser() {
+	}
+	
 	/**
 	 * @input param_string - ex. key1=value1&key2=value2
 	 * @input map

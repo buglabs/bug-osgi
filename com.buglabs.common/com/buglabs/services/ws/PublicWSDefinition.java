@@ -40,10 +40,10 @@ public interface PublicWSDefinition {
 	/**
 	 * @return The mime-type of the returned data (if any).
 	 */
-	public String getReturnType();
+	String getReturnType();
 
 	/**
 	 * @return A list of <code>String</code> that define parameter names.
 	 */
-	public List<String> getParameters();
+	List<String> getParameters();
 }

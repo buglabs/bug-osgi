@@ -35,5 +35,10 @@ package com.buglabs.bug.buttons;
  * 
  */
 public interface IButtonEventListener {
-	public void buttonEvent(ButtonEvent event);
+	/**
+	 * Method called when a button event has occurred.
+	 * 
+	 * @param event information of event
+	 */
+	void buttonEvent(ButtonEvent event);
 }

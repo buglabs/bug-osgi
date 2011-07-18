@@ -34,7 +34,15 @@ package com.buglabs.bug.buttons;
  * 
  */
 public interface IButtonEventProvider {
-	public void addListener(IButtonEventListener listener);
+	/**
+	 * Add a listener for button events.
+	 * @param listener IButtonEventListener
+	 */
+	void addListener(IButtonEventListener listener);
 
-	public void removeListener(IButtonEventListener listener);
+	/**
+	 * Remove a listener for button events.
+	 * @param listener IButtonEventListener
+	 */
+	void removeListener(IButtonEventListener listener);
 }

@@ -39,14 +39,14 @@ public interface PublicWSAdmin {
 	/**
 	 * Register a service to be exposed as a public web service.
 	 * 
-	 * @param provider
+	 * @param provider PublicWSProvider
 	 */
 	void registerService(PublicWSProvider provider);
 
 	/**
 	 * Unregister an existing service.
 	 * 
-	 * @param provider
+	 * @param provider PublicWSProvider
 	 */
 	void unregisterService(PublicWSProvider provider);
 }

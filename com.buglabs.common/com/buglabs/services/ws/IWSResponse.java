@@ -38,36 +38,36 @@ public interface IWSResponse {
 	/**
 	 * Return an appropriate mime-type for content being passed.
 	 * 
-	 * @return
+	 * @return mime type
 	 */
-	public String getMimeType();
+	String getMimeType();
 
 	/**
 	 * Get content of response.
 	 * 
-	 * @return
+	 * @return content, could be a Stream or a String.
 	 */
-	public Object getContent();
+	Object getContent();
 
 	/**
 	 * Return true if the repsonse is an error. If the response is an error,
 	 * mimeType and Content are ignored.
 	 * 
-	 * @return
+	 * @return true on error
 	 */
-	public boolean isError();
+	boolean isError();
 
 	/**
 	 * Return error code if the response is an error.
 	 * 
-	 * @return
+	 * @return HTTP error code
 	 */
-	public int getErrorCode();
+	int getErrorCode();
 
 	/**
 	 * Return error message if the response is an error.
 	 * 
-	 * @return
+	 * @return Error String
 	 */
-	public String getErrorMessage();
+	String getErrorMessage();
 }
