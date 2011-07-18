@@ -320,11 +320,9 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 							new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
 			// register static root web content
 			httpService.registerResources(ROOT_ALIAS, "static", new StaticResourceContext("static" + ROOT_ALIAS));
-		} catch (ServletException e) {
+		} catch (Exception e) {
 			logService.log(LogService.LOG_ERROR, "An error occurred registering servlet or resource: " + e.getMessage());
-		} catch (NamespaceException e) {
-			logService.log(LogService.LOG_ERROR, "An error occurred registering servlet or resource: " + e.getMessage());
-		}
+		} 
 	}
 
 	@Override
