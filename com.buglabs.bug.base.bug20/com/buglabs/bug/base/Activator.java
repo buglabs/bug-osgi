@@ -319,7 +319,7 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 					INFO_SERVLET_HTML_PATH, new SupportServlet(
 							new BUGSupportInfo(context), new SupportInfoTextFormatter()), null, null);
 			// register static root web content
-			httpService.registerResources(ROOT_ALIAS, "static", new StaticResourceContext());
+			httpService.registerResources(ROOT_ALIAS, "static", new StaticResourceContext("static" + ROOT_ALIAS));
 		} catch (ServletException e) {
 			logService.log(LogService.LOG_ERROR, "An error occurred registering servlet or resource: " + e.getMessage());
 		} catch (NamespaceException e) {
@@ -343,6 +343,12 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	 */
 	private class StaticResourceContext implements HttpContext {
 
+		private final String root;
+
+		public StaticResourceContext(String root) {
+			this.root = root;
+		}
+		
 		/* (non-Javadoc)
 		 * @see org.osgi.service.http.HttpContext#getMimeType(java.lang.String)
 		 */
@@ -354,7 +360,9 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 		 * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
 		 */
 		public URL getResource(String name) {
-
+			if (name.equals(root))
+				name = name + "index.html";
+			
 			return context.getBundle().getResource(name);
 		}
 
