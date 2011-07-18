@@ -18,6 +18,6 @@
 		<jar destfile="${distDirectory}/${dist.jar.name}.jar" 
 				basedir="${srcDirectory}" 
 				update="true" 
-				includes="**/*.png,**/*.jpg,**/*.gif,**/*.js,**/*.css,**/*.fml" />
+				includes="**/*.png,**/*.jpg,**/*.gif,**/*.js,**/*.css,**/*.fml,**/*.inc" />
 	</target>
 </project>

@@ -79,7 +79,13 @@ public class TemplateIncludesCache implements Cache {
 	 * java.lang.String)
 	 */
 	public Cacheable getItem(String name, String type) {
-		URL templateUrl = bundle_context.getBundle().getResource("/" + includes_alias + "/" + name + "." + type);
+		String path = "/" + includes_alias + "/" + name + "." + type;
+		URL templateUrl = bundle_context.getBundle().getResource(path);
+		if (templateUrl == null) {
+			LogManager.log(LogService.LOG_ERROR, "Failed to get item from input:" + path);
+			return null;
+		}
+		
 		InputSource inputSource;
 		Template t = null;
 		try {
