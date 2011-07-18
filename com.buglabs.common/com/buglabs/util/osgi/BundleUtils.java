@@ -38,13 +38,19 @@ import org.osgi.framework.BundleContext;
  * @author kgilmer
  * 
  */
-public class BundleUtils {
+public final class BundleUtils {
 
 	/**
-	 * Search (n) for a bundle with given bundleId
+	 * Utility class, not constructible.
+	 */
+	private BundleUtils() {
+	}
+	
+	/**
+	 * Search (n) for a bundle with given bundleId.
 	 * 
-	 * @param context
-	 * @param bundleId
+	 * @param context BundleContext
+	 * @param bundleId bundle id
 	 * @return Bundle or null if not found.
 	 */
 	public static Bundle findBundle(BundleContext context, long bundleId) {
@@ -65,8 +71,8 @@ public class BundleUtils {
 	 * Search for Bundle with header "Bundle-Name" as passed bundleName
 	 * parameter.
 	 * 
-	 * @param context
-	 * @param bundleName
+	 * @param context BundleContext
+	 * @param bundleName name of bundle
 	 * @return Bundle or null if not found.
 	 */
 	public static Bundle findBundle(BundleContext context, String bundleName) {
@@ -95,6 +101,13 @@ public class BundleUtils {
 		return null;
 	}
 
+	/**
+	 * Find a bundle based on id or name.
+	 * 
+	 * @param context Bundle context
+	 * @param key either id or name of bundle
+	 * @return Bundle or null if not found.
+	 */
 	public static Bundle findBundle(BundleContext context, Object key) {
 		if (isLong(key)) {
 			return BundleUtils.findBundle(context, Long.parseLong((String) key));
@@ -103,6 +116,10 @@ public class BundleUtils {
 		}
 	}
 
+	/**
+	 * @param o input object
+	 * @return true of input object is of Long type.
+	 */
 	private static boolean isLong(Object o) {
 		try {
 			Long.parseLong((String) o);
@@ -116,9 +133,9 @@ public class BundleUtils {
 	/**
 	 * Find bundle with given name/value pair in header.
 	 * 
-	 * @param context
-	 * @param headerName
-	 * @param headerValue
+	 * @param context BundleContext
+	 * @param headerName header name
+	 * @param headerValue header value
 	 * @return Bundle or null if not found.
 	 */
 	public static Bundle findBundle(BundleContext context, String headerName, String headerValue) {
@@ -143,8 +160,8 @@ public class BundleUtils {
 	/**
 	 * Get the best available name for a bundle given it's metadata.
 	 * 
-	 * @param bundle
-	 * @return
+	 * @param bundle Bundle
+	 * @return best name (human readable) available for given Bundle
 	 */
 	public static String getBestName(Bundle bundle) {
 		if (hasHeader(bundle, "Bundle-SymbolicName")) {
@@ -158,12 +175,21 @@ public class BundleUtils {
 		return bundle.getLocation();
 	}
 
+	/**
+	 * @param name raw input
+	 * @return formatted name without extra metadata
+	 */
 	private static String formatName(String name) {
-		String ss[] = name.split(";");
+		String [] ss = name.split(";");
 
 		return ss[0];
 	}
 
+	/**
+	 * @param bundle Bundle
+	 * @param headerName header name (key)
+	 * @return true of bundle has defined header, false otherwise.
+	 */
 	public static boolean hasHeader(Bundle bundle, String headerName) {
 		Dictionary d = bundle.getHeaders();
 
@@ -174,6 +200,11 @@ public class BundleUtils {
 		return false;
 	}
 
+	/**
+	 * @param bundle Bundle
+	 * @param headerName header key
+	 * @return value of header key
+	 */
 	public static String getHeader(Bundle bundle, String headerName) {
 		Dictionary d = bundle.getHeaders();
 
@@ -187,8 +218,8 @@ public class BundleUtils {
 	/**
 	 * Return state label as defined in OSGi spec.
 	 * 
-	 * @param state
-	 * @return
+	 * @param state Bundle State
+	 * @return human-readable form of bundle state.
 	 */
 	public static String getStateName(int state) {
 		switch (state) {
@@ -204,9 +235,8 @@ public class BundleUtils {
 			return "stopping";
 		case 0x00000020:
 			return "active";
-
+		default:
+			return "undefined";
 		}
-
-		return "[UNKNOWN STATE: " + state + "]";
 	}
 }
