@@ -258,6 +258,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Bun
 			if (launchListeners.containsKey(name)) {
 				launchListeners.remove(name);
 			}
+			break;
+		default:	
 		}
 	}
 	
