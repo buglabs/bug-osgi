@@ -11,14 +11,25 @@ import org.osgi.framework.ServiceReference;
  * @author kgilmer
  *
  */
-public class OSGiServiceLoader {
+public final class OSGiServiceLoader {
+	
+	/**
+	 * Utility class, not constructible.
+	 */
+	private OSGiServiceLoader() {		
+	}
+	
 	/**
 	 * This method will be called on every service that matches the criteria passed into loadServices().
 	 * @author kgilmer
 	 *
 	 */
 	public interface IServiceLoader {
-		public void load(Object service) throws Exception;
+		/**
+		 * @param service service instance
+		 * @throws Exception for any error
+		 */
+		void load(Object service) throws Exception;
 	}
 	
 	/**
@@ -40,11 +51,11 @@ public class OSGiServiceLoader {
 	}
 	
 	/**
-	 * @param context
-	 * @param clazz
-	 * @param filter
+	 * @param context BundleContext
+	 * @param clazz Class
+	 * @param filter Filter as a String
 	 * @return A list of service instances that match the input parameters.
-	 * @throws Exception
+	 * @throws Exception on any error
 	 */
 	public static List<Object> getServices(BundleContext context, String clazz, String filter) throws Exception {
 		final List<Object> svcList = new ArrayList<Object>();
