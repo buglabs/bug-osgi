@@ -36,7 +36,6 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,13 +44,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.buglabs.util.osgi.BUGBundleConstants;
-import com.buglabs.util.osgi.ServiceTrackerUtil;
-import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable;
 import com.buglabs.bug.base.bug20.pub.IBUG20BaseControl;
 import com.buglabs.bug.base.bug20.pub.ITimeProvider;
 import com.buglabs.bug.buttons.ButtonEvent;
@@ -60,7 +55,10 @@ import com.buglabs.bug.buttons.IButtonEventProvider;
 import com.buglabs.bug.input.pub.InputEventProvider;
 import com.buglabs.support.SupportInfoTextFormatter;
 import com.buglabs.support.SupportInfoXMLFormatter;
+import com.buglabs.util.osgi.BUGBundleConstants;
 import com.buglabs.util.osgi.LogServiceUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil;
+import com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable;
 
 /**
  * This bundle offers base unit features to the runtime, such as date/time and
