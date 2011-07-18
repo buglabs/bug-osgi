@@ -22,41 +22,45 @@ public class ConfigurationController extends ApplicationController {
 	public ConfigurationController() {
 
 	}
-	
-	public String getTemplateName() { return "system_manage_configuration.fml"; }
-	
+
+	public String getTemplateName() {
+		return "system_manage_configuration.fml";
+	}
+
 	public TemplateModelRoot get(RequestParameters params, HttpServletRequest req, HttpServletResponse resp) {
-		
-		Configuration[] configs = null; 
+
+		Configuration[] configs = null;
 		try {
 			configs = AdminConfigManager.getConfigurations();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InvalidSyntaxException e) {
 			e.printStackTrace();
-		} 
+		}
 		SimpleHash root = new SimpleHash();
 		SimpleList config_list = new SimpleList();
-		SimpleHash item; 
-		String pid; 
-		for (int i=0; i<configs.length; i++) {
-			pid = configs[i].getPid(); 
-			item = new SimpleHash(); 
-			item.put("pid", pid); 
-			item.put("pid_cleaned", pid.replace('.', '_'));
-			config_list.add(item); 
+		SimpleHash item;
+		String pid;
+
+		if (configs != null) {
+			for (int i = 0; i < configs.length; i++) {
+				pid = configs[i].getPid();
+				item = new SimpleHash();
+				item.put("pid", pid);
+				item.put("pid_cleaned", pid.replace('.', '_'));
+				config_list.add(item);
+			}
 		}
-		root.put("config_list", config_list); 
+		root.put("config_list", config_list);
 		root.put("created", params.get("created"));
 		return root;
 	}
 
-	public TemplateModelRoot post(RequestParameters params,
-			HttpServletRequest req, HttpServletResponse resp) {
-		
-		String task = params.get("task"); 
+	public TemplateModelRoot post(RequestParameters params, HttpServletRequest req, HttpServletResponse resp) {
+
+		String task = params.get("task");
 		if (task.equals("create")) {
-			String txt_config_pid = params.get("txt_config_pid"); 	
+			String txt_config_pid = params.get("txt_config_pid");
 			try {
 				AdminConfigManager.createConfig(txt_config_pid);
 				params.put("created", txt_config_pid);
@@ -66,16 +70,14 @@ public class ConfigurationController extends ApplicationController {
 		} else if (task.equals("update")) {
 			// not implemented
 		} else if (task.equals("delete")) {
-			String txt_remove_pid = params.get("txt_remove_pid"); 
+			String txt_remove_pid = params.get("txt_remove_pid");
 			try {
 				AdminConfigManager.deleteConfig(txt_remove_pid);
 			} catch (IOException e) {
 				LogManager.logWarning(e.getMessage());
-			} 
+			}
 		}
 		return get(params, req, resp);
 	}
-	
-	
 
 }
