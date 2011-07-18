@@ -135,7 +135,7 @@ public class BMIModuleEventHandler {
 					}
 				}
 
-				for (IModlet m : ml) 
+				for (IModlet m : removalList) 
 					ml.remove(m);
 				
 				removalList.clear();
