@@ -26,7 +26,7 @@ public final class VideoOutBMIDevice extends BMIDevice {
     */
     private static String readFileAsString(File file)  throws java.io.IOException{
         StringBuffer fileData = new StringBuffer(1000);
-        BufferedReader reader = new BufferedReader(file);
+        BufferedReader reader = new BufferedReader(new FileReader(file) );
         char[] buf = new char[1024];
         int numRead=0;
         while((numRead=reader.read(buf)) != -1){
