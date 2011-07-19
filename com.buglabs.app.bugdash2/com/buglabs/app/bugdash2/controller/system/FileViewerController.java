@@ -41,12 +41,15 @@ public class FileViewerController extends ApplicationController {
 		
 		file_type = ""; file_last_modified = ""; file_content = ""; file_size = 0; 
 		
-		file_path = req.getContextPath(); 
+		file_path = req.getQueryString();
+		if (file_path == null)
+			file_path = "";
 		file_path = htmlSpaceCheck(file_path);
 		file_title = file_path.substring(file_path.lastIndexOf("/") + 1);
-		if (file_title.equals("viewer"))
-			file_title = ""; // no file specified 
 		
+		file_path = req.getQueryString();
+		if (file_path == null)
+			file_path = "";
 		file_path = parseFilePath(req.getContextPath());
 		file_path = htmlSpaceCheck(file_path);
 		if(file_path.compareTo("") != 0) {
@@ -151,6 +154,9 @@ public class FileViewerController extends ApplicationController {
 	 */
 	private String parseFilePath(String path)
 	{
+		if (path.length() == 0)
+			return path;
+			
 		int index = path.indexOf("/viewer");
 		String result = path.substring(index + "/viewer".length());
 		if(result.compareTo("") == 0)
