@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.sprinkles.Fn;
+import org.sprinkles.Applier;
 
 import com.buglabs.bug.sysfs.SysfsNode;
 
@@ -73,7 +73,7 @@ public class BMIDevice extends SysfsNode {
 		
 		BMIDeviceNodeFactory factory;
 		try {
-			factory = Fn.find(new Fn.Function<ServiceReference, BMIDeviceNodeFactory>() {
+			factory = Applier.find(context.getServiceReferences(BMIDeviceNodeFactory.class.getName(), null), new Applier.Fn<ServiceReference, BMIDeviceNodeFactory>() {
 
 				@Override
 				public BMIDeviceNodeFactory apply(ServiceReference element) {
@@ -83,7 +83,7 @@ public class BMIDevice extends SysfsNode {
 					
 					return null;
 				}
-			}, context.getServiceReferences(BMIDeviceNodeFactory.class.getName(), null));
+			});
 			
 			if (factory != null)
 				return factory.createBMIDeviceNode(directory, slot);

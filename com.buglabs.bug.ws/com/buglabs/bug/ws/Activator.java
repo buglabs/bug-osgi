@@ -14,7 +14,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.sprinkles.Fn;
+import org.sprinkles.Applier;
 
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.bug.ws.module.ModuleServlet;
@@ -157,7 +157,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	private IModuleControl[] getExistingModules() throws InvalidSyntaxException {
 		final IModuleControl[] modules = new IModuleControl[BUGBundleConstants.BUG_TOTAL_BMI_SLOTS];
 		
-		Fn.map(new Fn.Function<ServiceReference, IModuleControl>() {
+		Applier.map(context.getServiceReferences(IModuleControl.class.getName(), null), new Applier.Fn<ServiceReference, IModuleControl>() {
 
 			@Override
 			public IModuleControl apply(ServiceReference element) {
@@ -166,7 +166,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 				
 				return imc;
 			}
-		}, context.getServiceReferences(IModuleControl.class.getName(), null));		
+		});		
 		
 		return modules;
 	}
