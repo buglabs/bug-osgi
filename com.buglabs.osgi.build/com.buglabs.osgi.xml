@@ -134,132 +134,132 @@
 
 	<target name="jar" description="compile the Java source code to class files">
 		<!-- BUG libraries -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.common" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.dragonfly" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.ws" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.util.shell" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.util.nmea" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.bmi" target="build.jars" />
 
 		<!-- project depended on to run build -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.common.tests" target="build.jars" />
 
 		<!-- BUG hardware module driver integration -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.common" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.input" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.camera" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.gps" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.motion" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.lcd" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.rxtx" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel" target="build.jars" />
 
 		<!-- BUG hardware base APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.base.bug20" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.osgi.sewing" target="build.jars" />
 
 		<!-- BUG hardware module APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.camera" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.gps" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.lcd" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.motion" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.video" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.vonhippel" target="build.jars" />
 
 		<!-- BUG Applications -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="build.jars" />
 	</target>
 
 	<target name="test" description="Test the code">
 		<!-- BUG libraries -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.common" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.dragonfly" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.ws" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.util.shell" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.util.nmea" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.bmi" target="test" />
 
 		<!-- project depended on to run build -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.common.tests" target="test" />
 
 		<!-- BUG hardware module driver integration -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.common" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.input" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.camera" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.gps" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.motion" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.lcd" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.rxtx" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel" target="test" />
 
 		<!-- BUG hardware base APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.base.bug20" target="test" />
 		
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.osgi.sewing" target="test" />
 
 		<!-- BUG hardware module APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="test" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.camera" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.gps" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.lcd" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.motion" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.video" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.vonhippel" target="test" />
 
 		<!-- BUG Applications -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="test" />
+		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="test" />
 	</target>
 
 	<target name="test-osgi" description="Test the code via OSGi context">
 		<!-- BUG libraries -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.common" target="test-osgi" />
 		
 		<!--
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="build.jars" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.dragonfly" target="build.jars" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.ws" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.util.shell" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.util.nmea" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.bmi" target="test-osgi" />
 		-->
 
 		<!-- project depended on to run build -->
 		<!--
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.common.tests" target="test-osgi" />
 		-->
 
 		<!-- BUG hardware module driver integration -->
 		<!--
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.common" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.input" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.camera" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.gps" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.motion" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.lcd" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.rxtx" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel" target="test-osgi" />
 		-->
 		<!-- BUG hardware base APIs -->
 		<!--
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.base.bug20" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.osgi.sewing" target="test-osgi" />
 		-->
 		<!-- BUG hardware module APIs -->
 		<!--
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="test-osgi" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.camera" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.gps" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.lcd" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.motion" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.video" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.vonhippel" target="test-osgi" />
 		-->
 		<!-- BUG Applications -->
 		<!--
-		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="test-osgi" />
+		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="test-osgi" />
 		-->
 	</target>
 
@@ -273,79 +273,79 @@
 			</fileset>
 		</path>
 		<javadoc destdir="${docDirectory}" classpathref="javadoc.classpath">
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.common">
+			<fileset dir="${checkout.dir}/com.buglabs.common">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.ws">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.ws">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.bmi">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.bmi">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.util.shell">
+			<fileset dir="${checkout.dir}/com.buglabs.util.shell">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.util.nmea">
+			<fileset dir="${checkout.dir}/com.buglabs.util.nmea">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.common/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.input/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.camera/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.gps/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.motion/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.lcd/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.rxtx/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel/src/java">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel/src/java">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.base.bug20">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.dragonfly">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing">
+			<fileset dir="${checkout.dir}/com.buglabs.osgi.sewing">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.module.camera">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.module.gps">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.module.lcd">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.module.motion">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.video">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.module.video">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel">
+			<fileset dir="${checkout.dir}/com.buglabs.bug.module.vonhippel">
 				<include name="**/*.java" />
 			</fileset>
-			<fileset dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2">
+			<fileset dir="${checkout.dir}/com.buglabs.app.bugdash2">
 				<include name="**/*.java" />
 			</fileset>
 		</javadoc>
@@ -353,122 +353,122 @@
 
 	<target name="checkstyle" description="Checkstyle the code">
 		<!-- BUG libraries -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.common" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.dragonfly" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.ws" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.util.shell" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.util.nmea" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.bmi" target="checkstyle" />
 
 		<!-- project depended on to run build -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.common.tests" target="checkstyle" />
 
 		<!-- BUG hardware module driver integration -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.common" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.input" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.camera" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.gps" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.motion" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.lcd" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.rxtx" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel" target="checkstyle" />
 
 		<!-- BUG hardware base APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.base.bug20" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.osgi.sewing" target="checkstyle" />
 
 		<!-- BUG hardware module APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="checkstyle" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.camera" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.gps" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.lcd" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.motion" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.video" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.vonhippel" target="checkstyle" />
 
 		<!-- BUG Applications -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="checkstyle" />
+		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="checkstyle" />
 	</target>
 
 	<target name="cpd" description="Check the code for duplications">
 		<!-- BUG libraries -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.common" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.dragonfly" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.ws" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.util.shell" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.util.nmea" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.bmi" target="cpd" />
 
 		<!-- project depended on to run build -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.common.tests" target="cpd" />
 
 		<!-- BUG hardware module driver integration -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.common" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.input" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.camera" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.gps" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.motion" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.lcd" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.rxtx" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel" target="cpd" />
 
 		<!-- BUG hardware base APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.base.bug20" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.osgi.sewing" target="cpd" />
 
 		<!-- BUG hardware module APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="cpd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.camera" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.gps" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.lcd" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.motion" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.video" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.vonhippel" target="cpd" />
 
 		<!-- BUG Applications -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="cpd" />
+		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="cpd" />
 	</target>
 
 	<target name="pmd" description="Check the code with pmd">
 		<!-- BUG libraries -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.common" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.dragonfly" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.ws" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.util.shell" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.util.nmea" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.bmi" target="pmd" />
 
 		<!-- project depended on to run build -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.common.tests" target="pmd" />
 
 		<!-- BUG hardware module driver integration -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.common" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.input" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.camera" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.gps" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.motion" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.lcd" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.rxtx" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel" target="pmd" />
 
 		<!-- BUG hardware base APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.base.bug20" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.osgi.sewing" target="pmd" />
 
 		<!-- BUG hardware module APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="pmd" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.camera" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.gps" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.lcd" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.motion" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.video" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.vonhippel" target="pmd" />
 
 		<!-- BUG Applications -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="pmd" />
+		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="pmd" />
 	</target>
 
 	<target name="clean" description="remove intermediate files">
@@ -479,42 +479,42 @@
 		<delete dir="${checkstyle.dir}" />
 
 		<!-- BUG libraries -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.dragonfly" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.ws" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.shell" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.util.nmea" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.bmi" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.common" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.dragonfly" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.ws" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.util.shell" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.util.nmea" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.bmi" target="clean" />
 
 		<!-- project depended on to run build -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.common.tests" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.common.tests" target="clean" />
 
 		<!-- BUG hardware module driver integration -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.common" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.input" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.accelerometer" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.camera" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.gps" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.motion" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.lcd" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.libmatthew" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.rxtx" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.jni.vonhippel" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.common" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.input" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.accelerometer" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.camera" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.gps" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.motion" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.lcd" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.libmatthew" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.rxtx" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.jni.vonhippel" target="clean" />
 
 		<!-- BUG hardware base APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.base.bug20" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.osgi.sewing" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.base.bug20" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.osgi.sewing" target="clean" />
 
 		<!-- BUG hardware module APIs -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.camera" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.gps" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.lcd" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.motion" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.video" target="clean" />
-		<ant dir="${basedir}/bug-osgi/com.buglabs.bug.module.vonhippel" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.camera" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.gps" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.lcd" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.motion" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.video" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.bug.module.vonhippel" target="clean" />
 
 		<!-- BUG Applications -->
-		<ant dir="${basedir}/bug-osgi/com.buglabs.app.bugdash2" target="clean" />
+		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="clean" />
 
 	</target>
 </project>
