@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-Name: Bugduino 
+Bundle-SymbolicName: com.buglabs.bug.module.bugduino
+Bundle-Version: 1.0.0
+Bundle-Activator: com.buglabs.bug.module.bugduino.Activator
+Bundle-Vendor: Bug Labs, Inc.
+Export-Package: com.buglabs.bug.module.bugduino.pub
+Import-Package: com.buglabs.bug.bmi.api,
+ com.buglabs.bug.bmi.sysfs,
+ com.buglabs.bug.buttons,
+ com.buglabs.bug.dragonfly.module,
+ com.buglabs.bug.jni.common,
+ com.buglabs.bug.sysfs,
+ com.buglabs.services.ws,
+ com.buglabs.util.osgi,
+ com.buglabs.util.xml,
+ org.osgi.framework,
+ org.osgi.service.log,
+ org.osgi.util.tracker
+Bug-Bundle-Type: Module
+Bug-Module-Id: 0010
+Bug-Module-Driver-Id: bmi_bugduino
