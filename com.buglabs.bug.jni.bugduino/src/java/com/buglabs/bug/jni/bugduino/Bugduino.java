@@ -46,6 +46,9 @@ public class Bugduino extends CharDevice {
 	public native int ioctl_BMI_BUGDUINO_I2C_READ();//TOOD: return value
 	public native int ioctl_BMI_BUGDUINO_SPI_XFER();//TODO: return value
 
-	public native int write_bugduino_program();//TODO: write me
+	/**
+     * Write a firmware blob (data) to a bugduino plugged into (slot)
+	 */
+	public native int write_bugduino_program(String instruction, int slot, byte[] data, int dataSz);
 }
 

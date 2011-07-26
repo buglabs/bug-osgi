@@ -32,10 +32,10 @@ import org.osgi.framework.BundleContext;
 import com.buglabs.bug.bmi.api.AbstractBUGModuleActivator;
 import com.buglabs.bug.bmi.api.IModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
-import com.buglabs.bug.module.lcd.pub.BugduinoModlet;
+import com.buglabs.bug.module.bugduino.pub.BugduinoModlet;
 
 /**
- * Activator for BUG LCD Module.
+ * Activator for BUG Bugduino Module.
  */
 public class Activator extends AbstractBUGModuleActivator {
 

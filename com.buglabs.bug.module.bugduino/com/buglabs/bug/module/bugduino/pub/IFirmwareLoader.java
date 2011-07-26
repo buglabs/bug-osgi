@@ -32,15 +32,18 @@ import java.io.IOException;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 
 /**
- * The interface that controls functions of the LCD module (BUG 2.0).
+ * The interface that controls loading code into another processor (BUG 2.0).
  */
 public interface IFirmwareLoader extends IModuleControl {
 	
-	/**
-	 * @param val
-	 *           A binary chunk of data to program onto the Bugduino 
-	 * 
-	 */
-	public int setProgram(int val) throws IOException;
-}
+	
+	/** 
+	 * starts a java services that watches a socket for incoming data,
+	 * if the sent data matches a 'write program' command followed by a slot
+	 * ID and data, try to write the data chunk to that slot number as 
+     * a firmware blob
+     */
+	public int startReceiveServer(int socketNumber) throws IOException;
 
+	public int passInstruction( String instruction, int slot, byte[] arguments, int argumentsSize );
+}

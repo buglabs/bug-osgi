@@ -80,7 +80,7 @@ public class BugduinoModlet extends AbstractBUGModlet {
 //		registerService(IML8953Accelerometer.class.getName(), ml8953Control, modProperties);
 //		registerService(PublicWSProvider.class.getName(), new AccelerationWS(ml8953Control, getLog()), modProperties);
 //		registerService(ILCDModuleControl.class.getName(), this, createExtendedServiceProperties());
-.//		registerService(IModuleDisplay.class.getName(), LCDModlet.this, createExtendedServiceProperties());
+//		registerService(IModuleDisplay.class.getName(), LCDModlet.this, createExtendedServiceProperties());
 	}
 
 	public void stop() throws Exception {
