@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
-
 /**
  * An abstract class for files within sysfs.  This class has helper methods in dealing with the files.
  * @author kgilmer
@@ -120,15 +118,15 @@ public abstract class SysfsNode {
 	
 
 	/**
-	 * Write a line to a file.
-	 * @param file
-	 * @param line
-	 * @throws IOException
+	 * Write a line to a file.  Will append to an existing file.
+	 * @param file file to be written to.
+	 * @param line String to be written.  LF will be appended to the file.
+	 * @throws IOException on File I/O error
 	 */
 	protected void println(File file, String line) throws IOException {
-		//TODO consider caching here.
-		FileOutputStream fos = new FileOutputStream(file);
-		IOUtils.write(line, fos);
+		FileOutputStream fos = new FileOutputStream(file, true);
+		fos.write(line.getBytes());
+		fos.write('\n');
 		fos.close();
 	}
 }

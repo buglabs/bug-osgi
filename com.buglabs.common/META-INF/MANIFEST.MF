@@ -5,7 +5,6 @@ Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Bundle-ManifestVersion: 2
 Import-Package: 
- org.apache.commons.io,
  org.osgi.framework,
  org.osgi.service.cm;resolution:=optional,
  org.osgi.service.log,
