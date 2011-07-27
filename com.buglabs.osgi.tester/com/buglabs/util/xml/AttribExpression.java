@@ -50,7 +50,7 @@ class AttribExpression {
 
 	public AttribExpression(String exprToken) {
 		String[] b;
-		String[] s = exprToken.split("[@");
+		String[] s = exprToken.split("\\[@");
 
 		if (s.length == 2) {
 			tagName = s[0];
