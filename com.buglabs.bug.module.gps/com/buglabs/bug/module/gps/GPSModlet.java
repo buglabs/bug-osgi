@@ -93,6 +93,16 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 	 */
 	private static final long GPS_STATUS_SCAN_INTERVAL = 5000;
 
+	/**
+	 * Milliseconds to wait before retrying setting the antenna.
+	 */
+	private static final long ANTENNA_SET_RETRY_INTERVAL_MILLIS = 200;
+
+	/**
+	 * Maximum number of retries to set antenna.
+	 */
+	private static final int GPS_SET_ANTENNA_MAX_RETRIES = 10;
+
 	private NMEASentenceProvider nmeaProvider;
 	private GPSControl gpsControl;
 
@@ -132,10 +142,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 			} catch (IOException e) {
 				getLog().log(LogService.LOG_ERROR, "Failed to set GPS antenna to active (external) antenna", e);
 				retry = true;
-				Thread.sleep(200);
+				Thread.sleep(ANTENNA_SET_RETRY_INTERVAL_MILLIS);
 				count++;
 			}
-		} while (retry && count < 10);
+		} while (retry && count < GPS_SET_ANTENNA_MAX_RETRIES);
 
 		//gpsd.start();
 		nmeaProvider.start();
@@ -150,7 +160,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		registerService(PublicWSProvider.class.getName(), this, null);
 
 		timer = new Timer();
-		timer.schedule(new GPSFIXLEDStatusTask(this, getLog()), 500, GPS_STATUS_SCAN_INTERVAL);
+		timer.schedule(new GPSFIXLEDStatusTask(this, getLog()), GPS_STATUS_SCAN_INTERVAL, GPS_STATUS_SCAN_INTERVAL);
 
 		registerService(IPositionProvider.class.getName(), this, createBasicServiceProperties());
 		
@@ -159,6 +169,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 				IPositionSubscriber.class.getName()));
 	}
 
+	/**
+	 * @return A dictionary of properties for the OSGi service registry.
+	 */
 	private Dictionary createBasicServiceProperties() {
 		Dictionary d = getCommonProperties();		
 
@@ -172,6 +185,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return d;
 	}
 
+	/**
+	 * Update module properties based on internal state.
+	 */
 	private void updateIModuleControlProperties(){
 		if (moduleReg!=null){
 			Dictionary modProperties = createBasicServiceProperties();
@@ -180,6 +196,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		}
 	}
 
+	/**
+	 * @return true if antenna mode is 'external', false otherwise.
+	 * @throws IOException on device I/O error
+	 */
 	private boolean isAntennaExternal() throws IOException {
 		return (getStatus() & 0xC0) == 0x40;
 	}
@@ -235,8 +255,8 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 			int status = getStatus();
 			status &= 0xFF;
 
-			String status_str = Integer.toHexString(status);
-			mprops.add(new ModuleProperty(PROPERTY_IOX, "0x" + status_str, "Integer", false));
+			String statusValue = Integer.toHexString(status);
+			mprops.add(new ModuleProperty(PROPERTY_IOX, "0x" + statusValue, "Integer", false));
 
 			mprops.add(new ModuleProperty(PROPERTY_GPS_FIX, Boolean.toString((status &= 0x1) == 0)));
 
@@ -253,6 +273,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return mprops;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.api.AbstractBUGModlet#setModuleProperty(com.buglabs.bug.dragonfly.module.IModuleProperty)
+	 */
 	public boolean setModuleProperty(IModuleProperty property) {
 		if (!property.isMutable()) {
 			return false;
@@ -274,31 +297,31 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.dragonfly.module.IModuleControl#resume()
+	 */
 	public int resume() throws IOException {
-		int result = -1;
+		getBMIDevice().resume();
 
-		result = gpsControl.ioctl_BMI_GPS_RESUME();
-		suspended = false;
-		if (result < 0) {
-			throw new IOException("ioctl BMI_GPS_RESUME failed");
-		}
 		suspended = false;
 		updateIModuleControlProperties();
-		return result;
+		return 0;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.dragonfly.module.IModuleControl#suspend()
+	 */
 	public int suspend() throws IOException {
-		int result = -1;
-
-		result = gpsControl.ioctl_BMI_GPS_SUSPEND();
-		if (result < 0) {
-			throw new IOException("ioctl BMI_GPS_SUSPEND failed");
-		}
+		getBMIDevice().suspend();
+		
 		suspended = true;
 		updateIModuleControlProperties();
-		return result;
+		return 0;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.services.ws.PublicWSProvider#discover(int)
+	 */
 	public PublicWSDefinition discover(int operation) {
 		if (operation == PublicWSProvider2.GET) {
 			return new PublicWSDefinition() {
@@ -316,6 +339,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.services.ws.PublicWSProvider#execute(int, java.lang.String)
+	 */
 	public IWSResponse execute(int operation, String input) {
 		if (operation == PublicWSProvider2.GET) {
 			return new WSResponse(getPositionXml(), "text/xml");
@@ -323,6 +349,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return null;
 	}
 
+	/**
+	 * @return a String containing the location retrieved from GPS device in XML format.
+	 */
 	private String getPositionXml() {
 		Position p = getPosition();
 
@@ -358,14 +387,23 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return root.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.services.ws.PublicWSProvider#getPublicName()
+	 */
 	public String getPublicName() {
 		return serviceName;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.services.ws.PublicWSProvider#getDescription()
+	 */
 	public String getDescription() {
 		return "Returns location as provided by GPS module.";
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.api.AbstractBUGModlet#setup()
+	 */
 	public void setup() throws Exception {
 		String devnode_gps = "/dev/ttyBMI" + Integer.toString(getSlotId());
 		String devnode_gpscontrol = "/dev/bmi_gps_control_m" + Integer.toString(getSlotId());
@@ -388,6 +426,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		nmeaProvider = new NMEASentenceProvider(gpsInputStream, context, getLog());
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.IPositionProvider#getLatitudeLongitude()
+	 */
 	public LatLon getLatitudeLongitude() {
 		com.buglabs.nmea2.RMC rmc = nmeaProvider.getLastRMC();
 
@@ -398,6 +439,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 
 	}
 
+	/**
+	 * @return
+	 * @throws IOException
+	 */
 	public int LEDGreenOff() throws IOException {
 		int result = -1;
 
@@ -412,6 +457,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/**
+	 * @return
+	 * @throws IOException
+	 */
 	public int LEDGreenOn() throws IOException {
 		int result = -1;
 
@@ -426,6 +475,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/**
+	 * @return
+	 * @throws IOException
+	 */
 	public int LEDRedOff() throws IOException {
 		int result = -1;
 
@@ -440,6 +493,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/**
+	 * @return
+	 * @throws IOException
+	 */
 	public int LEDRedOn() throws IOException {
 		int result = -1;
 
@@ -454,6 +511,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.IGPSModuleControl#getStatus()
+	 */
 	public int getStatus() throws IOException {
 		int result = -1;
 
@@ -468,6 +528,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.IGPSModuleControl#setActiveAntenna()
+	 */
 	public int setActiveAntenna() throws IOException {
 		int result = -1;
 
@@ -483,6 +546,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.module.gps.pub.IGPSModuleControl#setPassiveAntenna()
+	 */
 	public int setPassiveAntenna() throws IOException {
 		int result = -1;
 
@@ -498,6 +564,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.dragonfly.module.IModuleLEDController#setLEDGreen(boolean)
+	 */
 	public int setLEDGreen(boolean state) throws IOException {
 		int result = -1;
 
@@ -512,6 +581,9 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.dragonfly.module.IModuleLEDController#setLEDRed(boolean)
+	 */
 	public int setLEDRed(boolean state) throws IOException {
 		int result = -1;
 
@@ -527,10 +599,16 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.services.ws.PublicWSProvider2#setPublicName(java.lang.String)
+	 */
 	public void setPublicName(String name) {
 		serviceName = name;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.buglabs.bug.bmi.api.AbstractBUGModlet#isSuspended()
+	 */
 	public boolean isSuspended() {	
 		return suspended;
 	}
