@@ -41,7 +41,7 @@ public class DashApplication implements ManagedRunnable {
 	}
 
 	@Override
-	public void run(Map<Object, Object> services) {
+	public void run(Map<String, Object> services) {
 		LogManager.logInfo("BUGwebAdminServiceTracker: start");
 		service = (ISewingService) services.get(ISewingService.class.getName());
 		

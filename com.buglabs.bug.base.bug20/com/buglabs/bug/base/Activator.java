@@ -302,7 +302,7 @@ public class Activator implements BundleActivator, ITimeProvider, IButtonEventLi
 	}
 
 	@Override
-	public void run(Map<Object, Object> services) {
+	public void run(Map<String, Object> services) {
 		this.httpService = (HttpService) services.get(HttpService.class.getName());
 
 		try {

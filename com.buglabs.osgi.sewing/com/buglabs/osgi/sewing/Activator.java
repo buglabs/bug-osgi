@@ -78,7 +78,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	}
 
 	@Override
-	public void run(Map<Object, Object> services) {
+	public void run(Map<String, Object> services) {
 		httpService = (HttpService) services.get(HttpService.class.getName());
 		sewingRegistration = context.registerService(ISewingService.class.getName(), new SewingServiceImpl(httpService), null);
 	}

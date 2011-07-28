@@ -88,7 +88,7 @@ public class Activator implements BundleActivator, IDesktopApp, WindowListener, 
 		serviceTracker = ServiceTrackerUtil.openServiceTracker(context, new ServiceTrackerUtil.ManagedInlineRunnable() {
 			
 			@Override
-			public void run(Map<Object, Object> services) {	
+			public void run(Map<String, Object> services) {	
 				display = (IModuleDisplay) services.get(IModuleDisplay.class.getName());
 				networking = (INetworking) services.get(INetworking.class.getName());			
 				// Warning, this method will be called from within the same thread as the OSGi framework.  Long running operations should be avoided here.

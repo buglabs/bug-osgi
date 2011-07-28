@@ -29,6 +29,7 @@ package com.buglabs.util.osgi;
 
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -104,7 +105,7 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 		this.bc = context;
 		this.runnable = runnable;
 		this.serviceCount = serviceCount;
-		this.serviceMap = new Hashtable<String, Object>();
+		this.serviceMap = new HashMap<String, Object>();
 		this.runCalled = false;
 		this.shutdownCalled = false;
 

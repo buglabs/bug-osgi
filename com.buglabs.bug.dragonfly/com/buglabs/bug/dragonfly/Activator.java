@@ -188,7 +188,7 @@ public class Activator implements BundleActivator, ServiceListener, ManagedInlin
 	/* (non-Javadoc)
 	 * @see com.buglabs.util.osgi.ServiceTrackerUtil.ManagedRunnable#run(java.util.Map)
 	 */
-	public void run(Map<Object, Object> services) {
+	public void run(Map<String, Object> services) {
 		httpService = (HttpService) services.get(HttpService.class.getName());
 
 		try {

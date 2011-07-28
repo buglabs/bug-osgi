@@ -109,7 +109,7 @@ public class Activator implements BundleActivator, ManagedInlineRunnable {
 	}
 
 	@Override
-	public void run(Map<Object, Object> services) {
+	public void run(Map<String, Object> services) {
 		// Determine if object state is valid
 		if (servlets != null) {
 			log.log(LogService.LOG_ERROR
