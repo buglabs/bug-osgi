@@ -37,6 +37,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -58,7 +59,7 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	private volatile int sc;
 	private final BundleContext bc;
 	private Thread thread;
-	private final Map<Object, Object> serviceMap;
+	private final Map<String, Object> serviceMap;
 	private int serviceCount;
 	private volatile boolean runCalled;
 	private volatile boolean shutdownCalled;
@@ -78,7 +79,7 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 		 * This is called for execution of application logic when OSGi services are available.
 		 * @param services key contains String of service name, value is service instance.
 		 */
-		void run(Map<Object, Object> services);
+		void run(Map<String, Object> services);
 		/**
 		 * Called directly before the thread is interrupted.  Client may optionally add necessary code to shutdown thread.
 		 */
@@ -103,7 +104,7 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 		this.bc = context;
 		this.runnable = runnable;
 		this.serviceCount = serviceCount;
-		this.serviceMap = new Hashtable<Object, Object>();
+		this.serviceMap = new Hashtable<String, Object>();
 		this.runCalled = false;
 		this.shutdownCalled = false;
 
@@ -121,7 +122,7 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 			sc++;
 			serviceMap.put(key, svc);
 			//Store a dictionary of all the services properties.
-			serviceMap.put(svc, getProperties(arg0));
+			serviceMap.put(key + ".properties", getProperties(arg0));
 		}
 
 		if (thread == null && sc == serviceCount && !runCalled) {
@@ -191,8 +192,12 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 			try {
 				runnable.shutdown();
 			} catch (Exception e) {
-				//Ignore errors thrown in shutdown.
-				//TODO: consider logging these errors.
+				if (arg0 != null && arg0.getBundle() != null && arg0.getBundle().getBundleContext() != null) {
+					LogService ls = LogServiceUtil.getLogService(arg0.getBundle().getBundleContext());
+					if (ls != null) {
+						ls.log(LogService.LOG_ERROR, "An error occured while shutting down ManagedRunnable.", e);
+					}
+				}				
 			}
 			thread.interrupt();
 			thread = null;
