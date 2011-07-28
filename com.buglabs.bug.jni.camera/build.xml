@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project name="com.buglabs.bug.jni.camera" basedir=".">
 	<!-- PROJECT CONSTANTS -->
-	<property name="package.version" value="2.5" />
 	<property name="srcDirectory" value="./src/java" />
+		
 	<!-- PROJECT IMPORTS -->
 	<property name="common.ant.file" location="${base.build.dir}/toolbox/common-osgi.xml" />
 	<import file="${common.ant.file}" />

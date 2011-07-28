@@ -9,7 +9,7 @@
 	<fail unless="distDirectory" message="Ant variable distDirectory must be defined." />
 
 	<!-- The package version if previously undefined -->
-	<property name="default.package.version" value="2.5" />
+	<property name="default.package.version" value="3.0" />
 	<property name="docDirectory" value="${basedir}/javadoc" />
 	<property name="report.dir" value="${basedir}/report" />
 	<property name="report.src" location="${srcDirectory}" />
