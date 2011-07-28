@@ -41,8 +41,13 @@ import org.osgi.service.log.LogService;
  * @author kgilmer
  * 
  */
-public class LogServiceUtil {
+public final class LogServiceUtil {
 
+	/**
+	 * Utility class.
+	 */
+	private LogServiceUtil() {
+	}
 	/**
 	 * @param context
 	 *            if context is null, it will return a log service that uses
@@ -80,7 +85,8 @@ public class LogServiceUtil {
 				public void log(ServiceReference sr, int level, String message) {
 					System.out.println(levelString(level) + "Service Reference: " + sr.toString() + " " + message);
 					if (level == LogService.LOG_ERROR) {
-						System.err.println(levelString(level) + "Service Reference: " + sr.toString() + " " + message);
+						System.err.println(levelString(level) + "Service Reference: " 
+								+ sr.toString() + " " + message);
 					}
 				}
 
@@ -123,9 +129,9 @@ public class LogServiceUtil {
 	/**
 	 * Log a bundle exception and print nested exception if it exists.
 	 * 
-	 * @param logService
-	 * @param message
-	 * @param exception
+	 * @param logService LogService
+	 * @param message message
+	 * @param exception Exception to log
 	 */
 	public static void logBundleException(LogService logService, String message, BundleException exception) {
 		// Add error handling to be specific about what exactly happened.
@@ -133,16 +139,17 @@ public class LogServiceUtil {
 		stackTraceToString(exception);
 
 		if (exception.getNestedException() != null) {
-			logService.log(LogService.LOG_ERROR, "Nested Exception: " + exception.getNestedException().getMessage() + "\n" + stackTraceToString(exception.getNestedException()));
+			logService.log(LogService.LOG_ERROR, "Nested Exception: " + exception.getNestedException().getMessage() 
+					+ "\n" + stackTraceToString(exception.getNestedException()));
 		}
 	}
 
 	/**
 	 * Log an exception and print nested exception if it exists.
 	 * 
-	 * @param logService
-	 * @param message
-	 * @param exception
+	 * @param logService LogService
+	 * @param message message
+	 * @param exception Exception to log
 	 */
 	public static void logBundleException(LogService logService, String message, Exception exception) {
 		// Add error handling to be specific about what exactly happened.
@@ -150,12 +157,12 @@ public class LogServiceUtil {
 	}
 
 	/**
-	 * @param t
+	 * @param throwable Throwable
 	 * @return A stack trace as a string.
 	 */
-	private static String stackTraceToString(Throwable t) {
+	private static String stackTraceToString(Throwable throwable) {
 		StringWriter sw = new StringWriter();
-		t.printStackTrace(new PrintWriter(sw));
+		throwable.printStackTrace(new PrintWriter(sw));
 		return sw.getBuffer().toString();
 	}
 }
