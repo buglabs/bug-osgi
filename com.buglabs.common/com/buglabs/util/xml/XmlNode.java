@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009, 2011 Bug Labs, Inc.
+ * Copyright (c) 2008, 2009 Bug Labs, Inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,69 +27,88 @@
  *******************************************************************************/
 package com.buglabs.util.xml;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+import org.xmlpull.v1.XmlSerializer;
+
 /**
- * This class represents an XML Node. Any DOM document is a tree of <code>XMLNode</code>s.
+ * This class represents an XML Node. Any DOM document is a tree of
+ * <code>XMLNode</code>s.
+ * 
+ * This implementation of XmlNode uses the xpp library for parsing and serialization.
  * 
  * @author kgilmer
  * 
  */
 public class XmlNode {
+	private static XmlSerializer serializer;
+	private static XmlPullParserFactory factory;
+	private static XmlPullParser parser;
 	/**
 	 * Name of node.
 	 */
-	private String tagName = null;
+	private String name = null;
 	/**
 	 * Content of node.
 	 */
-	private String text = null;
+	private String value = null;
 
 	private Map<String, String> attributes;
 
-	private List<XmlNode> childElements;
+	private List<XmlNode> children;
 
 	private XmlNode parentNode = null;
 
 	/**
 	 * Create an empty node.
+	 * 
 	 * @param tagName
 	 */
 	public XmlNode(String tagName) {
-		guardInvalidName(tagName);
-		this.tagName = tagName;
+		this.name = tagName;
 		attributes = new HashMap<String, String>();
 	}
 
 	/**
 	 * Create a node with a String value.
+	 * 
 	 * @param tagName
 	 * @param value
 	 */
 	public XmlNode(String tagName, String value) {
 		this(tagName);
-		
+
 		if (value.length() > 0) {
-			this.text = value;
+			this.value = value;
 		}
 	}
-	
+
 	/**
 	 * Create a node with children.
+	 * 
 	 * @param tagName
 	 * @param children
 	 */
 	public XmlNode(String tagName, List<XmlNode> children) {
 		this(tagName);
-		this.childElements = children;
+		this.children = children;
 	}
 
 	/**
 	 * Create a node with a parent.
+	 * 
 	 * @param parent
 	 * @param tagName
 	 */
@@ -97,13 +116,13 @@ public class XmlNode {
 		this(tagName);
 
 		parent.addChild(this);
-		
 
 		this.parentNode = parent;
 	}
-	
+
 	/**
 	 * Create a node with a parent and children.
+	 * 
 	 * @param parent
 	 * @param tagName
 	 * @param children
@@ -114,34 +133,35 @@ public class XmlNode {
 		parent.addChild(this);
 
 		this.parentNode = parent;
-		this.childElements = children;
+		this.children = children;
 	}
 
 	/**
 	 * Create a node with a parent and a String value.
+	 * 
 	 * @param parent
 	 * @param tagName
 	 * @param value
 	 */
 	public XmlNode(XmlNode parent, String tagName, String value) {
 		this(parent, tagName);
-		if (value != null && value.length() > 0) {
-			this.text = value;
+		if (value.length() > 0) {
+			this.value = value;
 		}
 	}
-	
+
 	/**
-	 * @return true if the node has childern, false otherwise.
+	 * @return true if the node has children, false otherwise.
 	 */
 	public boolean hasChildren() {
-		return childElements != null && childElements.size() > 0;
+		return children != null && children.size() > 0;
 	}
 
 	/**
 	 * @return Name of this node.
 	 */
 	public String getName() {
-		return tagName;
+		return name;
 	}
 
 	/**
@@ -151,40 +171,48 @@ public class XmlNode {
 	 */
 	public XmlNode addAttribute(String name, String value) {
 		this.getAttributes().put(name, value);
-		
+
 		return this;
 	}
 
 	/**
 	 * Set the name of the tag.
+	 * 
 	 * @param tagName
 	 */
-	public void setName(String tagName) {
-		this.tagName = tagName;
+	public XmlNode setName(String tagName) {
+		this.name = tagName;
+		
+		return this;
 	}
 
 	/**
 	 * @return
 	 */
 	public String getValue() {
-		return text;
+		return value;
 	}
 
-	public void setValue(String text) {
-		if (text != null && text.length() > 0 && hasChildren()) {
-			throw new RuntimeException("Cannot set content on a node that has children.");
-		}
-		
-		//If an empty string is passed, set text to null.  This allows children to be added to node.
-		if (text != null && text.length() == 0) {
-			this.text = null;
+	public boolean hasValue() {
+		return value != null;
+	}
+
+	public XmlNode setValue(String text) {
+		if (text == null) {
+			clearValue();
 		} else {
-			this.text = text;
+			if (hasValue())
+				throw new RuntimeException("Cannot set content on a node that has children.");
 		}
+
+		this.value = text;
+		
+		return this;
 	}
 
 	/**
 	 * Get contents of attribute, or null if attribute does not exist.
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -193,36 +221,44 @@ public class XmlNode {
 	}
 
 	/**
-	 * Set or overwrite existing attibute of node.
 	 * @param name
 	 * @param value
+	 * @return
 	 */
-	public void setAttribute(String name, String value) {
+	public XmlNode setAttribute(String name, String value) {
 		attributes.put(name, value);
+
+		return this;
 	}
-	
+
 	/**
 	 * Clear the value of the XML node.
 	 */
-	public void clearValue() {
-		setValue(null);
+	public XmlNode clearValue() {
+		value = null;
+		
+		return this;
 	}
-	
+
 	/**
-	 * Equivalent to addChildElement except that unchecked exception is thrown on self referencing call.
+	 * Equivalent to addChildElement except that unchecked exception is thrown
+	 * on self referencing call.
+	 * 
 	 * @param element
 	 * @return
 	 */
 	public XmlNode addChild(XmlNode element) {
 		if (element == this) {
-			throw new RuntimeException("Cannot add node to itself as parent.");
+			throw new RuntimeException("Cannot add node to itself.");
 		}
-		
-		if (this.text != null) {
+
+		if (this.value != null) {
 			throw new RuntimeException("Cannot add child elements to a node that has content.");
 		}
 
 		getChildren().add(element);
+		element.setParent(this);
+		
 		return element;
 	}
 
@@ -230,11 +266,11 @@ public class XmlNode {
 	 * @return children of node, or empty list if no children exist.
 	 */
 	public List<XmlNode> getChildren() {
-		if (childElements == null) {
-			childElements = new ArrayList<XmlNode>();
+		if (children == null) {
+			children = new ArrayList<XmlNode>();
 		}
 
-		return childElements;
+		return children;
 	}
 
 	/**
@@ -243,57 +279,47 @@ public class XmlNode {
 	public Map<String, String> getAttributes() {
 		return attributes;
 	}
+	
+	/**
+	 * @return depth of this node in the DOM
+	 */
+	public int getDepth() {
+		if (parentNode == null) 
+			return 0;
+		
+		int count = 0;
+		
+		XmlNode p = this;
+		while ((p = p.getParent()) != null) {
+			count ++;
+		}
+		
+		return count;
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return printXml("");
-	}
-
-	private String printXml(String indent) {
-		String s = indent + "<" + this.tagName;
-
-		if (attributes != null) {
-			for (Iterator<String> i = attributes.keySet().iterator(); i.hasNext();) {
-				String attrib = i.next();
-
-				// Only display attributes with non-null values.
-				if (attributes.get(attrib) != null) {
-					String value = attributes.get(attrib).toString();
-
-					s += " " + makeSafeXML(attrib) + "=\"" + makeSafeXML(value) + "\"";
-				}
-
-			}
+		try {
+			return serialize(this);
+		} catch (XmlPullParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		if ((this.childElements == null || this.childElements.size() == 0) && text == null) {
-			s += "/>\n";
-
-			return s;
-		}
-
-		if (childElements != null && childElements.size() > 0) {
-			s += ">\n";
-			for (Iterator<XmlNode> i = getChildren().iterator(); i.hasNext();) {
-				s += i.next().printXml(indent + "  ");
-			}
-			s += indent;
-		} else if (text != null) {
-			s += ">" + makeSafeXML(text);
-		}
-
-		s += "</" + makeSafeXML(tagName) + ">\n";
-
-		return s;
+		return super.toString();
 	}
 
 	/**
 	 * @param name
 	 * @return true if a node with the given name exists, false otherwise.
 	 */
-	public boolean childExists(String name) {
+	public boolean hasChild(String name) {
 		if (!hasChildren()) {
 			return false;
 		}
@@ -304,19 +330,27 @@ public class XmlNode {
 
 		return false;
 	}
+	
+	/**
+	 * @param name
+	 * @return true if a node with the given name exists, false otherwise.
+	 */
+	public boolean childExists(String name) {
+		return hasChild(name);
+	}
 
 	/**
 	 * @param nodeName
 	 * @return node with given name if exists or null otherwise.
 	 */
 	public XmlNode getChild(String nodeName) {
-		if (childElements == null) {
+		if (children == null) {
 			return null;
 		}
 
 		for (Iterator<XmlNode> i = getChildren().iterator(); i.hasNext();) {
-			XmlNode child = i.next() ;
-			if (child.tagName.equals(nodeName)) {
+			XmlNode child = i.next();
+			if (child.name.equals(nodeName)) {
 				return child;
 			}
 		}
@@ -327,7 +361,8 @@ public class XmlNode {
 	/**
 	 * Retrieve a node from this element using xpath-like notation.
 	 * 
-	 * Ex. for <root><leaf1><leaf1><leaf2></root> call with "root/leaf1" to return first occurrence leaf1 node.
+	 * Ex. for <root><leaf1><leaf1><leaf2></root> call with "root/leaf1" to
+	 * return first occurrence leaf1 node.
 	 * 
 	 * @param path
 	 * @return
@@ -357,71 +392,180 @@ public class XmlNode {
 	 * @param parent
 	 * @throws SelfReferenceException
 	 */
-	public void setParent(XmlNode parent) {
+	public XmlNode setParent(XmlNode parent) {
 		if (parentNode != null) {
 			parentNode.getChildren().remove(this);
 		}
 
-		if (parent != null) {
-			parent.addChild(this);
-		}
-
 		parentNode = parent;
+		
+		return this;
 	}
 
-	public static String makeSafeXML(String string) {
-		//garbage in, garbage out
-		if (string == null) {
-			return null;
+	/**
+	 * Serialize an XmlNode into a String.
+	 * 
+	 * @param node XmlNode
+	 * @return String of XML
+	 * @throws XmlPullParserException on parse errors
+	 * @throws IOException on I/O errors
+	 */
+	public static String serialize(XmlNode node) throws XmlPullParserException, IOException {
+		if (serializer == null) {
+			if (factory == null) {
+				factory = XmlPullParserFactory.newInstance(
+						"org.xmlpull.mxp1.MXParser,org.xmlpull.mxp1_serializer.MXSerializer", null);
+			}
+			serializer = factory.newSerializer();
+			serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  ");
+			serializer.setFeature("http://xmlpull.org/v1/doc/features.html#serializer-attvalue-use-apostrophe", true);
 		}
-		//no occurences of any bad chars, don't spend the time examining every char
-		if (string.indexOf('&') == -1 && string.indexOf('\'') == -1 && string.indexOf('"') == -1 && string.indexOf('<') == -1 && string.indexOf('>') == -1) {
-			return string;
-		}
-
-		String temp = "";
-		for (int index = 0; index < string.length(); index++) {
-			if (string.charAt(index) == '&') {
-				if (index + 4 < string.length() && string.substring(index + 1, index + 4).equals("amp;")) {
-					continue;
-				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5).equals("apos;")) {
-					continue;
-				} else if (index + 5 < string.length() && string.substring(index + 1, index + 5).equals("quot;")) {
-					continue;
-				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3).equals("lt;")) {
-					continue;
-				} else if (index + 3 < string.length() && string.substring(index + 1, index + 3).equals("gt;")) {
-					continue;
-				}
-				temp += "&amp;";
-			} else if (string.charAt(index) == '"')
-				temp += "&quot;";
-			else if (string.charAt(index) == '\'')
-				temp += "&apos;";
-			else if (string.charAt(index) == '<')
-				temp += "&lt;";
-			else if (string.charAt(index) == '>')
-				temp += "&gt;";
-			else
-				temp += string.charAt(index);
-		}
-
-		return temp;
+		
+		Writer writer = new StringWriter();
+		serializer.setOutput(writer);		
+		
+		walkTree(node, serializer);
+		
+		return writer.toString();
 	}
 	
 	/**
-	 * Throw a runtime exception if a name has invalid characters for an XML node name.
-	 * 
-	 * See http://www.xml.com/pub/a/2001/07/25/namingparts.html
-	 * 
-	 * @param name
+	 * @param node XmlNode
+	 * @param serializer XmlSerializer
+	 * @throws IOException on IO error
 	 */
-	private void guardInvalidName(String name) {
-		if (name.endsWith(":") || 
-				name.contains("&") ||
-				name.contains("%") ||
-				name.contains("@"))
-			throw new RuntimeException("Invalid node name: " + name);
+	private static void walkTree(XmlNode node, XmlSerializer serializer) 
+		throws IOException {
 		
+		serializer.startTag(null, node.getName());
+		
+		for (String attrName : node.getAttributes().keySet()) {
+			serializer.attribute(null, attrName, node.getAttribute(attrName));
+		}
+		
+		if (node.hasValue()) {
+			serializer.text(node.getValue());
+		} else if (node.hasChildren()) {
+			for (XmlNode c : node.children)
+				walkTree(c, serializer);
+		}
+		
+		serializer.endTag(null, node.getName());
+	}
+
+	/**
+	 * Parse an xml string into an XmlNode.
+	 * 
+	 * @param xmlString String of XML
+	 * @return XmlNode
+	 * @throws IOException on I/O errors
+	 */
+	public static XmlNode parse(String xmlString) throws IOException {
+		try {
+			parser = getParser(true);
+			parser.setInput(new StringReader(xmlString));
+			return parse(parser, null);
+		} catch (XmlPullParserException e) {
+			throw new IOException(e);
+		}
+	}
+	
+	/**
+	 * @param xmlString
+	 * @param isNamespaceAware
+	 * @return
+	 * @throws IOException
+	 */
+	public static XmlNode parse(String xmlString, boolean isNamespaceAware) throws IOException {
+		try {
+			parser = getParser(isNamespaceAware);
+			parser.setInput(new StringReader(xmlString));
+			return parse(parser, null);
+		} catch (XmlPullParserException e) {
+			throw new IOException(e);
+		}
+	}
+	
+	/**
+	 * Parse an xml string into an XmlNode.
+	 * 
+	 * @param xmlReader Reader of XML document
+	 * @return XmlNode
+	 * @throws IOException on I/O errors
+	 */
+	public static XmlNode parse(Reader xmlReader) throws IOException {
+		try {
+			parser = getParser(true);
+			parser.setInput(xmlReader);
+			
+			return parse(parser, null);
+		} catch (XmlPullParserException e) {
+			throw new IOException(e);
+		}	
+	}	
+	
+	/**
+	 * @param xmlReader
+	 * @param isNamespaceAware
+	 * @return
+	 * @throws IOException
+	 */
+	public static XmlNode parse(Reader xmlReader, boolean isNamespaceAware) throws IOException {
+		try {
+			parser = getParser(isNamespaceAware);
+			parser.setInput(xmlReader);
+			
+			return parse(parser, null);
+		} catch (XmlPullParserException e) {
+			throw new IOException(e);
+		}	
+	}
+
+	/**
+	 * @return
+	 * @throws XmlPullParserException
+	 */
+	private static XmlPullParser getParser(boolean isNamespaceAware) throws XmlPullParserException {
+		if (parser == null) {
+			if (factory == null) {
+				factory = XmlPullParserFactory.newInstance(
+						"org.xmlpull.mxp1.MXParser,org.xmlpull.mxp1_serializer.MXSerializer", null);
+			}
+			factory.setNamespaceAware(isNamespaceAware);
+			parser = factory.newPullParser();
+		}
+		
+		parser = factory.newPullParser();
+		
+		return parser;
+	}
+
+	private static XmlNode parse(XmlPullParser parser2, XmlNode e) throws XmlPullParserException, IOException {
+		while (true) {
+			switch (parser.next()) {
+			case XmlPullParser.START_TAG:
+				if (e == null)
+					e = new XmlNode(parser.getName());
+				else 
+					e = new XmlNode(e, parser.getName());
+				
+				for (int i = 0; i < parser.getAttributeCount(); ++i) {
+					e.addAttribute(parser.getAttributeName(i), parser.getAttributeValue(i));
+				}
+				break;
+			case XmlPullParser.TEXT:	
+				if (!parser.isWhitespace())
+					e.setValue(parser.getText());
+				break;
+			case XmlPullParser.END_TAG:
+				if (e.getParent() != null)
+					e = e.getParent();
+				break;
+			case XmlPullParser.END_DOCUMENT:
+				return e;
+			default:
+				break;
+			}
+		}
 	}
 }

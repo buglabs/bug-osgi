@@ -18,4 +18,7 @@ Export-Package:
  com.buglabs.util.osgi,
  com.buglabs.util.simplerestclient,
  com.buglabs.util.ui,
- com.buglabs.util.xml
+ com.buglabs.util.xml,
+ org.xmlpull.mxp1,
+ org.xmlpull.mxp1_serializer,
+ org.xmlpull.v1
