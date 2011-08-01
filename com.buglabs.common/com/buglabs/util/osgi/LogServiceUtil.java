@@ -74,6 +74,9 @@ public final class LogServiceUtil {
 					System.out.println(levelString(level) + message);
 				}
 
+				/* (non-Javadoc)
+				 * @see org.osgi.service.log.LogService#log(int, java.lang.String, java.lang.Throwable)
+				 */
 				public void log(int level, String message, Throwable exception) {
 					System.out.println(levelString(level) + message + "\n" + exception.toString());
 					if (level == LogService.LOG_ERROR) {
@@ -82,9 +85,17 @@ public final class LogServiceUtil {
 					exception.printStackTrace(new PrintWriter(System.out, true));
 				}
 
+				/* (non-Javadoc)
+				 * @see org.osgi.service.log.LogService#log(org.osgi.framework.ServiceReference, int, java.lang.String)
+				 */
 				public void log(ServiceReference sr, int level, String message) {
+					if (sr == null) {
+						log(level, message);
+						return;
+					}
+					
 					if (message == null)
-						message = "[null]";
+						message = "[null]";								
 					
 					System.out.println(levelString(level) + "Service Reference: " + sr.toString() + " " + message);
 					if (level == LogService.LOG_ERROR) {
@@ -93,6 +104,9 @@ public final class LogServiceUtil {
 					}
 				}
 
+				/* (non-Javadoc)
+				 * @see org.osgi.service.log.LogService#log(org.osgi.framework.ServiceReference, int, java.lang.String, java.lang.Throwable)
+				 */
 				public void log(ServiceReference sr, int level, String message, Throwable exception) {
 					if (exception == null) {
 						log(sr, level, message);
@@ -107,6 +121,11 @@ public final class LogServiceUtil {
 					}
 				}
 
+				/**
+				 * Convert the log level int into a human-readable string.  See org.osgi.service.log.LogService for details.
+				 * @param level log level
+				 * @return human-readable string
+				 */
 				private String levelString(int level) {
 					switch (level) {
 					case LogService.LOG_DEBUG:
