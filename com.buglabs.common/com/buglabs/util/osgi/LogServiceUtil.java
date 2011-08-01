@@ -83,6 +83,9 @@ public final class LogServiceUtil {
 				}
 
 				public void log(ServiceReference sr, int level, String message) {
+					if (message == null)
+						message = "[null]";
+					
 					System.out.println(levelString(level) + "Service Reference: " + sr.toString() + " " + message);
 					if (level == LogService.LOG_ERROR) {
 						System.err.println(levelString(level) + "Service Reference: " 
@@ -91,6 +94,11 @@ public final class LogServiceUtil {
 				}
 
 				public void log(ServiceReference sr, int level, String message, Throwable exception) {
+					if (exception == null) {
+						log(sr, level, message);
+						return;
+					}
+					
 					System.out.println(levelString(level) + message + "\n" + exception.toString());
 					exception.printStackTrace(new PrintWriter(System.out, true));
 					if (level == LogService.LOG_ERROR) {
