@@ -39,11 +39,17 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
- * A helper class for OSGi filters.
+ * A helper class for constructing OSGi filters.
  * 
  */
 public final class FilterUtil {
 
+	/**
+	 * Non-constructible utility class.
+	 */
+	private FilterUtil() {
+		
+	}
 	/**
 	 * Generate a service filter string for a single service.
 	 * @param clazz Service name
@@ -70,10 +76,13 @@ public final class FilterUtil {
 	public static String generateServiceFilter(List<String> services) {
 		if (services == null) {
 			return null;
-		} if (services.size() == 1) {
+		} 
+		
+		if (services.size() == 1) {
 			return "(" + Constants.OBJECTCLASS + "=" + services.get(0) + ")";
 		} else if (services.size() > 1) {
-			return "(|" + generateServiceFilter(services.subList(0, 1)) + generateServiceFilter(services.subList(1, services.size())) + ")";
+			return "(|" + generateServiceFilter(services.subList(0, 1)) 
+				+ generateServiceFilter(services.subList(1, services.size())) + ")";
 		}
 
 		return "";
@@ -96,12 +105,15 @@ public final class FilterUtil {
 
 	/**
 	 * servicesMap is SortedMap<String, Map<String, String>> where the key is
-	 * the service name and the map is a map of service properties
+	 * the service name and the map is a map of service properties.
 	 * 
 	 * (| (& (objectClass=com.buglabs.bug.module.bugbee.pub.IBUGBeeControl) (&
 	 * (Provider=com.buglabs.bug.module.bugbee.BUGBeeModlet)(Slot=2))) (| (&
 	 * (objectClass=com.buglabs.module.IModuleControl)) (&
 	 * (objectClass=org.osgi.service.http.HttpService)(port=8082))))
+	 * 
+	 * @param servicesMap Map of services to generate filter with.
+	 * @return Filter as a string.
 	 * 
 	 */
 	public static String generateServiceFilter(SortedMap<String, Map<String, String>> servicesMap) {
@@ -119,15 +131,16 @@ public final class FilterUtil {
 	 * Generate a Filter as a String given a Map of property/value pairs.
 	 * (& (prop1=value1) (& (prop2=value1)))
 	 * 
-	 * @param propertiesMap
+	 * @param propertiesMap Map of properties
 	 * @return Filter as a String
 	 */
 	public static String generatePropertiesFilter(SortedMap<String, String> propertiesMap) {
 		if (propertiesMap.size() == 1) {
 			return "(" + propertiesMap.firstKey() + "=" + propertiesMap.get(propertiesMap.firstKey()) + ")";
 		} else if (propertiesMap.size() > 1) {
-			return "(&" + generatePropertiesFilter(propertiesMap.subMap(propertiesMap.firstKey(), propertiesMap.firstKey() + "\0"))
-					+ generatePropertiesFilter(propertiesMap.tailMap(propertiesMap.firstKey() + "\0")) + ")";
+			return "(&" + generatePropertiesFilter(propertiesMap.subMap(propertiesMap.firstKey(), 
+					propertiesMap.firstKey() + "\0")) + generatePropertiesFilter(
+							propertiesMap.tailMap(propertiesMap.firstKey() + "\0")) + ")";
 		}
 		return "";
 	}

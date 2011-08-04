@@ -170,19 +170,19 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 	/* (non-Javadoc)
 	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(org.osgi.framework.ServiceReference, java.lang.Object)
 	 */
-	public void modifiedService(ServiceReference arg0, Object arg1) {
-		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
+	public void modifiedService(ServiceReference reference, Object arg1) {
+		String key = ((String []) reference.getProperty(Constants.OBJECTCLASS))[0];
 		serviceMap.put(key, arg1);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference, java.lang.Object)
 	 */
-	public void removedService(ServiceReference arg0, Object arg1) {
+	public void removedService(ServiceReference reference, Object arg1) {
 		if (shutdownCalled)
 			return;
 		
-		String key = ((String []) arg0.getProperty(Constants.OBJECTCLASS))[0];
+		String key = ((String []) reference.getProperty(Constants.OBJECTCLASS))[0];
 		
 		if (serviceMap.containsKey(key)) {
 			serviceMap.remove(key);
@@ -193,8 +193,8 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 			try {
 				runnable.shutdown();
 			} catch (Exception e) {
-				if (arg0 != null && arg0.getBundle() != null && arg0.getBundle().getBundleContext() != null) {
-					LogService ls = LogServiceUtil.getLogService(arg0.getBundle().getBundleContext());
+				if (reference != null && reference.getBundle() != null && reference.getBundle().getBundleContext() != null) {
+					LogService ls = LogServiceUtil.getLogService(reference.getBundle().getBundleContext());
 					if (ls != null) {
 						ls.log(LogService.LOG_ERROR, "An error occured while shutting down ManagedRunnable.", e);
 					}
