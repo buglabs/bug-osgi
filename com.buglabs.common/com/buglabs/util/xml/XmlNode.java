@@ -74,9 +74,12 @@ public class XmlNode {
 	/**
 	 * Create an empty node.
 	 * 
-	 * @param tagName
+	 * @param tagName Name of tag.  RuntimeExeception will be thrown if null value is passed.
 	 */
 	public XmlNode(String tagName) {
+		if (tagName == null)
+			throw new RuntimeException("Tag name cannot be null");
+		
 		this.name = tagName;
 		attributes = new HashMap<String, String>();
 	}
@@ -84,13 +87,13 @@ public class XmlNode {
 	/**
 	 * Create a node with a String value.
 	 * 
-	 * @param tagName
-	 * @param value
+	 * @param tagName Name of tag.  RuntimeExeception will be thrown if null value is passed.
+	 * @param value Contents of node.  Null is safe to pass.
 	 */
 	public XmlNode(String tagName, String value) {
 		this(tagName);
-
-		if (value.length() > 0) {
+		
+		if (value != null && value.length() > 0) {
 			this.value = value;
 		}
 	}
@@ -98,8 +101,8 @@ public class XmlNode {
 	/**
 	 * Create a node with children.
 	 * 
-	 * @param tagName
-	 * @param children
+	 * @param tagName Name of tag.  RuntimeExeception will be thrown if null value is passed.
+	 * @param children List<XmlNode> of child nodes.
 	 */
 	public XmlNode(String tagName, List<XmlNode> children) {
 		this(tagName);
@@ -109,8 +112,8 @@ public class XmlNode {
 	/**
 	 * Create a node with a parent.
 	 * 
-	 * @param parent
-	 * @param tagName
+	 * @param parent Parent XmlNode.
+	 * @param tagName Name of tag.  RuntimeExeception will be thrown if null value is passed.
 	 */
 	public XmlNode(XmlNode parent, String tagName) {
 		this(tagName);
@@ -123,9 +126,9 @@ public class XmlNode {
 	/**
 	 * Create a node with a parent and children.
 	 * 
-	 * @param parent
-	 * @param tagName
-	 * @param children
+	 * @param parent Parent XmlNode
+	 * @param tagName Name of tag.  RuntimeExeception will be thrown if null value is passed.
+	 * @param children List<XmlNode> of child nodes.
 	 */
 	public XmlNode(XmlNode parent, String tagName, List<XmlNode> children) {
 		this(tagName);
@@ -139,13 +142,13 @@ public class XmlNode {
 	/**
 	 * Create a node with a parent and a String value.
 	 * 
-	 * @param parent
-	 * @param tagName
-	 * @param value
+	 * @param parent Parent XmlNode.
+	 * @param tagName Name of tag.  RuntimeExeception will be thrown if null value is passed.
+	 * @param value List<XmlNode> of child nodes.
 	 */
 	public XmlNode(XmlNode parent, String tagName, String value) {
 		this(parent, tagName);
-		if (value.length() > 0) {
+		if (value != null && value.length() > 0) {
 			this.value = value;
 		}
 	}
@@ -165,8 +168,8 @@ public class XmlNode {
 	}
 
 	/**
-	 * @param name
-	 * @param value
+	 * @param name name of attribute
+	 * @param value value of attribute
 	 * @return instance of self
 	 */
 	public XmlNode addAttribute(String name, String value) {
@@ -178,7 +181,8 @@ public class XmlNode {
 	/**
 	 * Set the name of the tag.
 	 * 
-	 * @param tagName
+	 * @param tagName Name of tag.
+	 * @return instance of node.
 	 */
 	public XmlNode setName(String tagName) {
 		this.name = tagName;
@@ -187,25 +191,33 @@ public class XmlNode {
 	}
 
 	/**
-	 * @return
+	 * @return value of tag.  Can be null.
 	 */
 	public String getValue() {
 		return value;
 	}
 
+	/**
+	 * @return true if value is not null
+	 */
 	public boolean hasValue() {
 		return value != null;
 	}
 
-	public XmlNode setValue(String text) {
-		if (text == null) {
+	/**
+	 * @param value Value of node.  Can only be called on nodes that do not contain children.  
+	 * Runtime exception will be generated otherwise.
+	 * @return instance of node.
+	 */
+	public XmlNode setValue(String value) {
+		if (value == null) {
 			clearValue();
 		} else {
 			if (hasValue())
 				throw new RuntimeException("Cannot set content on a node that has children.");
 		}
 
-		this.value = text;
+		this.value = value;
 		
 		return this;
 	}
@@ -213,17 +225,17 @@ public class XmlNode {
 	/**
 	 * Get contents of attribute, or null if attribute does not exist.
 	 * 
-	 * @param name
-	 * @return
+	 * @param name name of attribute
+	 * @return value of attribute or null if does not exist.
 	 */
 	public String getAttribute(String name) {
 		return (String) attributes.get(name);
 	}
 
 	/**
-	 * @param name
-	 * @param value
-	 * @return
+	 * @param name attribute name
+	 * @param value attribute value
+	 * @return instance of XmlNode
 	 */
 	public XmlNode setAttribute(String name, String value) {
 		attributes.put(name, value);
@@ -233,6 +245,7 @@ public class XmlNode {
 
 	/**
 	 * Clear the value of the XML node.
+	 * @return instance of XmlNode
 	 */
 	public XmlNode clearValue() {
 		value = null;
@@ -241,11 +254,11 @@ public class XmlNode {
 	}
 
 	/**
-	 * Equivalent to addChildElement except that unchecked exception is thrown
-	 * on self referencing call.
+	 * Add a child XmlNode to the current node.  Runtime exception will be thrown if a node is added to itself.
+	 * Runtime exception will also be generated if parent node already contains a value.
 	 * 
-	 * @param element
-	 * @return
+	 * @param element Child XmlNode
+	 * @return instance of XmlNode
 	 */
 	public XmlNode addChild(XmlNode element) {
 		if (element == this) {
@@ -291,7 +304,7 @@ public class XmlNode {
 		
 		XmlNode p = this;
 		while ((p = p.getParent()) != null) {
-			count ++;
+			count++;
 		}
 		
 		return count;
@@ -305,18 +318,14 @@ public class XmlNode {
 	public String toString() {
 		try {
 			return serialize(this);
-		} catch (XmlPullParserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			//Intentionally ignore any exception and fall back to toString() on Object.
 		}
 		return super.toString();
 	}
 
 	/**
-	 * @param name
+	 * @param name name of child node
 	 * @return true if a node with the given name exists, false otherwise.
 	 */
 	public boolean hasChild(String name) {
@@ -332,7 +341,8 @@ public class XmlNode {
 	}
 	
 	/**
-	 * @param name
+	 * @param name name of child node
+	 * @deprecated use hasChild()
 	 * @return true if a node with the given name exists, false otherwise.
 	 */
 	public boolean childExists(String name) {
@@ -340,7 +350,7 @@ public class XmlNode {
 	}
 
 	/**
-	 * @param nodeName
+	 * @param nodeName name of child node
 	 * @return node with given name if exists or null otherwise.
 	 */
 	public XmlNode getChild(String nodeName) {
@@ -361,11 +371,11 @@ public class XmlNode {
 	/**
 	 * Retrieve a node from this element using xpath-like notation.
 	 * 
-	 * Ex. for <root><leaf1><leaf1><leaf2></root> call with "root/leaf1" to
+	 * Example: for "<root><leaf1></leaf1><leaf2/></root>" call with "root/leaf1" to
 	 * return first occurrence leaf1 node.
 	 * 
-	 * @param path
-	 * @return
+	 * @param path tree path expressed as node names delimited with '/' character.
+	 * @return The node or null if not found.
 	 */
 	public XmlNode getFirstElement(String path) {
 		String[] elems = path.split("/");
@@ -389,8 +399,9 @@ public class XmlNode {
 	}
 
 	/**
-	 * @param parent
-	 * @throws SelfReferenceException
+	 * Set the parent node.
+	 * @param parent parent node
+	 * @return instance of XmlNode
 	 */
 	public XmlNode setParent(XmlNode parent) {
 		if (parentNode != null) {
@@ -471,10 +482,10 @@ public class XmlNode {
 	}
 	
 	/**
-	 * @param xmlString
-	 * @param isNamespaceAware
-	 * @return
-	 * @throws IOException
+	 * @param xmlString input XML as a string
+	 * @param isNamespaceAware if namespaces should be parsed
+	 * @return An XmlNode that corresponds to the root of the parsed xmlString.
+	 * @throws IOException on I/O or XML parse error.
 	 */
 	public static XmlNode parse(String xmlString, boolean isNamespaceAware) throws IOException {
 		try {
@@ -505,10 +516,10 @@ public class XmlNode {
 	}	
 	
 	/**
-	 * @param xmlReader
-	 * @param isNamespaceAware
-	 * @return
-	 * @throws IOException
+	 * @param xmlReader input XML
+	 * @param isNamespaceAware if namespaces should be parsed
+	 * @return An XmlNode that corresponds to the root of the parsed xmlString.
+	 * @throws IOException on I/O or XML parse error.
 	 */
 	public static XmlNode parse(Reader xmlReader, boolean isNamespaceAware) throws IOException {
 		try {
@@ -522,8 +533,9 @@ public class XmlNode {
 	}
 
 	/**
-	 * @return
-	 * @throws XmlPullParserException
+	 * @param isNamespaceAware if namespaces should be parsed
+	 * @return An XmlNode that corresponds to the root of the parsed xmlString.
+	 * @throws XmlPullParserException on parse error
 	 */
 	private static XmlPullParser getParser(boolean isNamespaceAware) throws XmlPullParserException {
 		if (parser == null) {
@@ -540,29 +552,36 @@ public class XmlNode {
 		return parser;
 	}
 
-	private static XmlNode parse(XmlPullParser parser2, XmlNode e) throws XmlPullParserException, IOException {
+	/**
+	 * @param pullParser parser
+	 * @param node XmlNode
+	 * @return An XmlNode that corresponds to the root of the parsed xmlString.
+	 * @throws XmlPullParserException on xml parse error
+	 * @throws IOException on I/O error
+	 */
+	private static XmlNode parse(XmlPullParser pullParser, XmlNode node) throws XmlPullParserException, IOException {
 		while (true) {
 			switch (parser.next()) {
 			case XmlPullParser.START_TAG:
-				if (e == null)
-					e = new XmlNode(parser.getName());
+				if (node == null)
+					node = new XmlNode(parser.getName());
 				else 
-					e = new XmlNode(e, parser.getName());
+					node = new XmlNode(node, parser.getName());
 				
 				for (int i = 0; i < parser.getAttributeCount(); ++i) {
-					e.addAttribute(parser.getAttributeName(i), parser.getAttributeValue(i));
+					node.addAttribute(parser.getAttributeName(i), parser.getAttributeValue(i));
 				}
 				break;
 			case XmlPullParser.TEXT:	
 				if (!parser.isWhitespace())
-					e.setValue(parser.getText());
+					node.setValue(parser.getText());
 				break;
 			case XmlPullParser.END_TAG:
-				if (e.getParent() != null)
-					e = e.getParent();
+				if (node.getParent() != null)
+					node = node.getParent();
 				break;
 			case XmlPullParser.END_DOCUMENT:
-				return e;
+				return node;
 			default:
 				break;
 			}
