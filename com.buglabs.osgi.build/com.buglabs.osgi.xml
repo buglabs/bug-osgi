@@ -170,6 +170,9 @@
 
 		<!-- BUG Applications -->
 		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="build.jars" />
+		
+		<!-- BUG Legacy API -->
+		<ant dir="${checkout.dir}/com.buglabs.bug.legacy" target="build.jars" />
 	</target>
 
 	<target name="test" description="Test the code">
@@ -211,6 +214,9 @@
 
 		<!-- BUG Applications -->
 		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="test" />
+		
+		<!-- BUG Legacy API -->
+		<ant dir="${checkout.dir}/com.buglabs.bug.legacy" target="test" />
 	</target>
 
 	<target name="test-osgi" description="Test the code via OSGi context">
@@ -515,6 +521,8 @@
 
 		<!-- BUG Applications -->
 		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="clean" />
-
+		
+		<!-- BUG Legacy API -->
+		<ant dir="${checkout.dir}/com.buglabs.bug.legacy" target="clean" />
 	</target>
 </project>
