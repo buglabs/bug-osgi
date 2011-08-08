@@ -43,7 +43,7 @@ public abstract class AbstractNMEASentence {
 	}
 
 	private String parseChecksum(String sentence) {
-		String[] splitSentence = sentence.split(CHECKSUM_SEPARATOR);
+		String[] splitSentence = sentence.split("\\" + CHECKSUM_SEPARATOR);
 
 		if (splitSentence.length > 1) {
 			checksum = splitSentence[1];
