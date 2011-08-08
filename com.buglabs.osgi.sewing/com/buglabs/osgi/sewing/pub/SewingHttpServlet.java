@@ -88,7 +88,7 @@ public abstract class SewingHttpServlet extends HttpServlet {
 	private static final String JAVASCRIPT_ROOT_KEY = "_javascriptRoot";
 
 	private BundleContext bundle_context = null;
-	private String servlet_alias = null;
+	private volatile String servlet_alias = null;
 	private ControllerMap controller_map = null;
 
 	/**
@@ -138,6 +138,9 @@ public abstract class SewingHttpServlet extends HttpServlet {
 	 * @param httpService
 	 */
 	public final void teardown(HttpService httpService) {
+		if (servlet_alias == null)
+			return;
+		
 		try {
 			httpService.unregister(servlet_alias);
 		} catch (IllegalArgumentException e) {
