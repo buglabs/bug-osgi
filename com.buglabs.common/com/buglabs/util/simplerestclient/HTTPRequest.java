@@ -291,7 +291,7 @@ public class HTTPRequest {
 	 * @param properties
 	 * @return
 	 */
-	public HTTPResponse postMultipart(String url, Map<String, String> parameters) throws IOException {
+	public HTTPResponse postMultipart(String url, Map<String, Object> parameters) throws IOException {
 		
 		HttpURLConnection conn = getAndConfigureConnection(url);
 		conn.setRequestMethod("POST");
