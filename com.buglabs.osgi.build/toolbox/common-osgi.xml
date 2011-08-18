@@ -39,6 +39,7 @@
 	<!-- COMPILER SETTINGS -->
 	<property name="javacFailOnError" value="true" />
 	<property name="javacDebugInfo" value="on" />
+	<property name="javacDebugLevel" value="lines,vars,source"/>
 	<property name="logExtension" value=".log" />
 	<property name="javacSource" value="1.6" />
 	<property name="javacTarget" value="1.6" />
@@ -71,7 +72,7 @@
 		<property name="full.version" value="${package.version}.${env.BUILD_NUMBER}">
 		</property>
 
-		<javac destdir="${buildDirectory}" srcdir="${srcDirectory}" source="${javacSource}" target="${javacTarget}" encoding="utf-8" fork="true" includeantruntime="false" debug="${javacDebugInfo}">
+		<javac destdir="${buildDirectory}" srcdir="${srcDirectory}" source="${javacSource}" target="${javacTarget}" encoding="utf-8" fork="true" includeantruntime="false" debug="${javacDebugInfo}" debuglevel=${javacDebugLevel}/>
 			<compilerarg line="${compilerArg}" compiler="${build.compiler}" />
 			<classpath refid="bin.classpath" />
 		</javac>
