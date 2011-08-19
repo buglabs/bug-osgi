@@ -120,13 +120,15 @@ public abstract class SysfsNode {
 	/**
 	 * Write a line to a file.  Will append to an existing file.
 	 * @param file file to be written to.
-	 * @param line String to be written.  LF will be appended to the file.
+	 * @param line String to be written.  LF will be appended to the line.
 	 * @throws IOException on File I/O error
 	 */
 	protected void println(File file, String line) throws IOException {
 		FileOutputStream fos = new FileOutputStream(file, true);
-		fos.write(line.getBytes());
-		fos.write('\n');
+		StringBuffer buf = new StringBuffer(line);
+		buf.append('\n');
+		fos.write(buf.toString().getBytes());
+		fos.flush();
 		fos.close();
 	}
 }
