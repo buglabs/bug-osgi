@@ -37,9 +37,9 @@ import com.buglabs.bug.dragonfly.module.IModuleControl;
 public interface ILCDModuleControl extends IModuleControl {
 	
 	/**
-	 * @param val
-	 *            Set's the intensity of the backlight 0-7.
-	 * 
+	 * Set's the intensity of the backlight.
+	 * @param val (0 - 100)
+	 * @return 0 if successful, 1 on failure.
 	 */
 	public int setBackLight(int val) throws IOException; // Set IOX backlight	
 }

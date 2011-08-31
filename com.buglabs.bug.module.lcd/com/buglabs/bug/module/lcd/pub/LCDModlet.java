@@ -40,7 +40,6 @@ import org.osgi.framework.ServiceRegistration;
 import com.buglabs.bug.bmi.api.AbstractBUGModlet;
 import com.buglabs.bug.bmi.sysfs.BMIDevice;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
-import com.buglabs.bug.dragonfly.module.IModuleLEDController;
 import com.buglabs.bug.module.lcd.AccelerationWS;
 import com.buglabs.bug.module.lcd.ML8953AccelerometerImplementation;
 import com.buglabs.services.ws.PublicWSProvider;
@@ -160,7 +159,7 @@ public class LCDModlet extends AbstractBUGModlet implements ILCDModuleControl, I
 	 */
 	public int setBackLight(int val) throws IOException {
 		if (val < 0 || val > 100) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("backlight value must be between 0 to 100.");
 		}
 
 		return writeToSysfs(new File(BRIGHTNESS_SYSFS), String.valueOf(val));
@@ -170,10 +169,10 @@ public class LCDModlet extends AbstractBUGModlet implements ILCDModuleControl, I
 	/**
 	 * TODO: replace this with sysfs API.
 	 * 
-	 * @param sysfsEntry
-	 * @param value
-	 * @return
-	 * @throws IOException
+	 * @param sysfsEntry file of sysfs entry
+	 * @param value value to write to file
+	 * @return 0
+	 * @throws IOException on File I/O error
 	 */
 	private int writeToSysfs(File sysfsEntry, String value) throws IOException {
 		BufferedWriter out;
@@ -181,7 +180,8 @@ public class LCDModlet extends AbstractBUGModlet implements ILCDModuleControl, I
 		out = new BufferedWriter(new FileWriter(sysfsEntry));
 		out.write(String.valueOf(value));
 		out.close();
-		return 1;
+		
+		return 0;
 	}
 
 	@Override
