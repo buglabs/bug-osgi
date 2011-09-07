@@ -23,6 +23,7 @@
 package com.buglabs.osgi.sewing.pub;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.net.URL;
@@ -338,7 +339,12 @@ public abstract class SewingHttpServlet extends HttpServlet {
 
 		URL templateUrl = bundle_context.getBundle().getResource("/" + TEMPLATES_ALIAS + "/" + templateName);
 
-		InputSource inputSource = new InputSource(new InputStreamReader(templateUrl.openStream()));
+		InputStream stream = templateUrl.openStream();
+		
+		if (stream == null) 
+			throw new IOException("Unable to open stream on " + templateUrl.toExternalForm());
+		
+		InputSource inputSource = new InputSource(new InputStreamReader(stream));
 
 		return new Template(inputSource);
 	}
