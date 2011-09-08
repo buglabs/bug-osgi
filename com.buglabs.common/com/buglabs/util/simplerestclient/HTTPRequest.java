@@ -57,6 +57,11 @@ import com.buglabs.util.Base64;
  */
 public class HTTPRequest {
 	
+	private static final String METHOD_POST = "POST";
+	private static final String HEADER_CONTENT_LENGTH = "Content-Length";
+	private static final String HEADER_CONTENT_TYPE = "Content-Type";
+	private static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+
 	/**
 	 * Implementors can configure the http connection before every call is made.
 	 * Useful for setting headers that always need to be present in every WS call to a given server.
@@ -65,18 +70,22 @@ public class HTTPRequest {
 	 *
 	 */
 	public interface HTTPConnectionInitializer {
-		public void initialize(HttpURLConnection connection);
+		/**
+		 * @param connection HttpURLConnection
+		 */
+		void initialize(HttpURLConnection connection);
 	}
 	
 	////////////////////////////////////////////////  HTTP REQUEST METHODS	
 	
-	private static final String HEADER_TYPE  = "Content-Type";
+	private static final String HEADER_TYPE  = HEADER_CONTENT_TYPE;
     private static final String HEADER_PARA  = "Content-Disposition: form-data";
     private static final String CONTENT_TYPE = "multipart/form-data";
     private static final String LINE_ENDING  = "\r\n";
     private static final String BOUNDARY     = "boundary=";
     private static final String PARA_NAME    = "name";
     private static final String FILE_NAME    = "filename";
+	private static final int COPY_BUFFER_SIZE = 1024 * 4;
     
     private List<HTTPConnectionInitializer> configurators;
 	
@@ -86,16 +95,17 @@ public class HTTPRequest {
 	private boolean throwHTTPErrorResponses = true;
 	
 	/**
-	 * constructor where client provides connectionProvider
+	 * Constructor where client provides connectionProvider.
 	 * 	
+	 * @param connectionProvider IConnectionProvider
 	 */
 	public HTTPRequest(IConnectionProvider connectionProvider) {
-		_connectionProvider = connectionProvider;
+		this._connectionProvider = connectionProvider;
 	}
 		
 	/**
-	 * @param connectionProvider
-	 * @param debugMode
+	 * @param connectionProvider IConnectionProvider
+	 * @param debugMode if true debug mode will be enabled, printing method calls and times.
 	 */
 	public HTTPRequest(IConnectionProvider connectionProvider, boolean debugMode) {
 		this(connectionProvider);
@@ -104,7 +114,7 @@ public class HTTPRequest {
 	
 	/**
 	 * @param connectionProvider
-	 * @param debugMode
+	 * @param debugMode if true debug mode will be enabled, printing method calls and times.
 	 */
 	public HTTPRequest(boolean debugMode) {
 		this();
@@ -133,10 +143,11 @@ public class HTTPRequest {
 	}
 	
     /**
-     * Do an authenticated HTTP GET from url
+     * Do an authenticated HTTP GET from url.
      * 
      * @param url   String URL to connect to
      * @return      HttpURLConnection ready with response data
+     * @throws IOException on I/O error
      */
 	public HTTPResponse get(String url) throws IOException {
 		
@@ -151,9 +162,9 @@ public class HTTPRequest {
 	}
 
 	/**
-	 * @param url
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @return HttpURLConnection
+	 * @throws IOException on I/O error
 	 */
 	private HttpURLConnection getAndConfigureConnection(String url) throws IOException {
 		url = guardUrl(url);
@@ -162,17 +173,19 @@ public class HTTPRequest {
 		if (configurators == null)
 			return connection;
 		
-		for (HTTPConnectionInitializer c: configurators)
+		for (HTTPConnectionInitializer c : configurators)
 			c.initialize(connection);
 		
 		return connection;
 	}
 	
 	/**
-     * Do an authenticated HTTP GET from url
+     * Do an authenticated HTTP GET from url.
      * 
      * @param url   String URL to connect to
+     * @param headers Map of <String, String> of headers to process
      * @return      HttpURLConnection ready with response data
+     * @throws IOException on I/O error
      */
 	public HTTPResponse get(String url, Map<String, String> headers) throws IOException {
 		
@@ -180,7 +193,7 @@ public class HTTPRequest {
 		conn.setDoInput(true);
 		conn.setDoOutput(false);
 		
-		for (Entry<String, String> e: headers.entrySet()) 
+		for (Entry<String, String> e : headers.entrySet()) 
 			conn.addRequestProperty(e.getKey(), e.getValue());
 		
 		if (debugMode)
@@ -191,35 +204,36 @@ public class HTTPRequest {
 	
 	
     /**
-     * Do an HTTP POST to url
+     * Do an HTTP POST to url.
      * 
      * @param url   String URL to connect to
      * @param data  String data to post 
      * @return      HttpURLConnection ready with response data
+     * @throws IOException on I/O error
      */
 	public HTTPResponse post(String url, String data) throws IOException {
 		return post(url, data, null);
 	}
 
 	/**
-	 * Do an HTTP POST to url w/ extra http headers
+	 * Do an HTTP POST to url w/ extra http headers.
 	 * 
-	 * @param url
-	 * @param data
-	 * @param headers
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param data data to pass as body of message
+	 * @param headers HTTP Headers
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse post(String url, String data, Map<String, String> headers) throws IOException {
 		
 		HttpURLConnection conn = getAndConfigureConnection(url);
 		
 		if (headers != null) 
-			for (Entry<String, String> e: headers.entrySet())
+			for (Entry<String, String> e : headers.entrySet())
 				conn.setRequestProperty(e.getKey(), e.getValue());
 			
 		if (debugMode)
-			debugMessage("POST", url + " data: " + data, conn);
+			debugMessage(METHOD_POST, url + " data: " + data, conn);
 		
 		conn.setDoOutput(true);
 		OutputStreamWriter osr = new OutputStreamWriter(conn.getOutputStream());
@@ -230,11 +244,12 @@ public class HTTPRequest {
 	}
 	
     /**
-     * Do an HTTP POST to url
+     * Do an HTTP POST to url.
      * 
      * @param url       String URL to connect to
      * @param stream    InputStream data to post 
      * @return          HttpURLConnection ready with response data
+     * @throws IOException on I/O error
      */
 	public HTTPResponse post(String url, InputStream stream) throws IOException {
 		byte[] buff = streamToByteArray(stream);
@@ -244,52 +259,54 @@ public class HTTPRequest {
 	
 	
 	/**
-	 * Posts a Map of key, value pair properties, like a web form
+	 * Posts a Map of key, value pair properties, like a web form.
 	 * 
-	 * @param url
-	 * @param properties
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param properties map of properties to pass in post
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse post(String url, Map<String, String> properties) throws IOException {
 		String data = propertyString(properties);
 		HashMap<String, String> headers = new HashMap<String, String>(); 
-		headers.put("Content-Type", "application/x-www-form-urlencoded");		
+		headers.put(HEADER_CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);		
 		return post(url, data, headers);
 	}
 	
 	/**
-	 * Posts a Map of key, value pair properties, like a web form
+	 * Posts a Map of key, value pair properties, like a web form.
 	 * 
-	 * @param url
-	 * @param properties
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param properties map of properties to pass in post
+	 * @param headers HTTP headers to pass in post
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
-	public HTTPResponse post(String url, Map<String, String> properties, Map<String, String> headers) throws IOException {
+	public HTTPResponse post(String url, Map<String, String> properties
+			, Map<String, String> headers) throws IOException {
 		String data = propertyString(properties);		 
-		headers.put("Content-Type", "application/x-www-form-urlencoded");		
+		headers.put(HEADER_CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);		
 		return post(url, data, headers);
 	}
 
 	
 	/**
-	 * Post byte data to a url
+	 * Post byte data to a url.
 	 * 
-	 * @param url
-	 * @param data
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param data message body as byte array
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse post(String url, byte[] data) throws IOException {
 		
 		HttpURLConnection conn = getAndConfigureConnection(url);
-		conn.setRequestProperty("Content-Length", String.valueOf(data.length));
-		conn.setRequestMethod("POST");
+		conn.setRequestProperty(HEADER_CONTENT_LENGTH, String.valueOf(data.length));
+		conn.setRequestMethod(METHOD_POST);
 		conn.setDoOutput(true);
 		
 		if (debugMode)
-			debugMessage("POST", url, conn);
+			debugMessage(METHOD_POST, url, conn);
 		
 		OutputStream os = conn.getOutputStream();
 		os.write(data);
@@ -298,24 +315,23 @@ public class HTTPRequest {
 	
 	/**
 	 * Does a multipart post which is different than a regular post
-	 * mostly use this one if you're posting files
+	 * mostly use this one if you're posting files.
 	 * 
-	 * @param url
-	 * @param parameters
-	 * 	Key-Value pairs in map.  Keys are always string.  Values can be string or IFormFile
-	 * @param properties
-	 * @return
+	 * @param url url of host
+	 * @param parameters Key-Value pairs in map.  Keys are always string.  Values can be string or IFormFile
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse postMultipart(String url, Map<String, Object> parameters) throws IOException {
 		
 		HttpURLConnection conn = getAndConfigureConnection(url);
-		conn.setRequestMethod("POST");
+		conn.setRequestMethod(METHOD_POST);
 		String boundary = createMultipartBoundary();
-		conn.setRequestProperty(HEADER_TYPE, CONTENT_TYPE +"; "+ BOUNDARY + boundary);
+		conn.setRequestProperty(HEADER_TYPE, CONTENT_TYPE + "; " + BOUNDARY + boundary);
         conn.setDoOutput(true);		
         
         if (debugMode)
-			debugMessage("POST", url, conn);
+			debugMessage(METHOD_POST, url, conn);
 		
 		// write things out to connection
         OutputStream os = conn.getOutputStream();
@@ -324,27 +340,27 @@ public class HTTPRequest {
         Object [] elems = parameters.keySet().toArray();
         StringBuffer buf; // lil helper
         IFormFile file;
-	    for (int i=0; i < elems.length; i++) {
-	    	String key = (String)elems[i];
+	    for (int i = 0; i < elems.length; i++) {
+	    	String key = (String) elems[i];
 	    	Object obj = parameters.get(key);
 	    	//System.out.println("--" + key);
 
 	    	buf = new StringBuffer();
 	    	if (obj instanceof IFormFile) {
-	    		file = (IFormFile)obj;
-	    		buf.append("--"+ boundary+LINE_ENDING);
+	    		file = (IFormFile) obj;
+	    		buf.append("--" + boundary + LINE_ENDING);
 	    		buf.append(HEADER_PARA);
-	    		buf.append("; "+ PARA_NAME +"=\""+ key +"\"");
-	    		buf.append("; "+ FILE_NAME +"=\""+ file.getFilename() +"\""+ LINE_ENDING);
+	    		buf.append("; " + PARA_NAME + "=\"" + key + "\"");
+	    		buf.append("; " + FILE_NAME + "=\"" + file.getFilename() + "\"" + LINE_ENDING);
 	    		buf.append(HEADER_TYPE + ": " + file.getContentType() + ";");
 	    		buf.append(LINE_ENDING);
 	    		buf.append(LINE_ENDING);
 	    		os.write(buf.toString().getBytes());
 		    	os.write(file.getBytes());	    		
 	    	} else if (obj != null) {
-		    	buf.append("--"+ boundary+LINE_ENDING);
+		    	buf.append("--" + boundary + LINE_ENDING);
 		    	buf.append(HEADER_PARA);
-		    	buf.append("; "+ PARA_NAME +"=\""+ key +"\"");
+		    	buf.append("; " + PARA_NAME + "=\"" + key + "\"");
 		    	buf.append(LINE_ENDING);
 		    	buf.append(LINE_ENDING);
 		    	buf.append(obj.toString());
@@ -352,37 +368,38 @@ public class HTTPRequest {
 	    	}
 	    	os.write(LINE_ENDING.getBytes());
 	    }
-	    os.write(("--"+ boundary+"--"+LINE_ENDING).getBytes());	
+	    os.write(("--" + boundary + "--" + LINE_ENDING).getBytes());	
 		return connect(conn);
 	}
 	
 	
 	/**
-	 * Do an HTTP PUT to url
+	 * Do an HTTP PUT to url.
 	 * 
 	 * @param url  String URL to connect to
 	 * @param data String data to post 
 	 * @return     HttpURLConnection ready with response data
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse put(String url, String data) throws IOException {
 		return put(url, data, null);
 	}
 
 	/**
-	 * Do an HTTP PUT to url with extra headers
+	 * Do an HTTP PUT to url with extra headers.
 	 * 
-	 * @param url
-	 * @param data
-	 * @param headers
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param data data as a string for content body
+	 * @param headers HTTP headers
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
-	public HTTPResponse put(String url, String data, Map<String, String> headers) throws IOException{
+	public HTTPResponse put(String url, String data, Map<String, String> headers) throws IOException {
 		
 		HttpURLConnection connection = getAndConfigureConnection(url);
 		
 		if (headers != null) 
-			for (Entry<String, String> e: headers.entrySet())
+			for (Entry<String, String> e : headers.entrySet())
 				connection.setRequestProperty(e.getKey(), e.getValue());
 		
 		if (debugMode)
@@ -398,11 +415,12 @@ public class HTTPRequest {
 	}
 	
 	/**
-     * Do an HTTP PUT to url
+     * Do an HTTP PUT to url.
      * 
      * @param url       String URL to connect to
      * @param stream    InputStream data to put 
      * @return          HttpURLConnection ready with response data
+     * @throws IOException on I/O error
      */	
 	public HTTPResponse put(String url, InputStream stream) throws IOException {
 		byte[] buff = streamToByteArray(stream);
@@ -411,11 +429,11 @@ public class HTTPRequest {
 	}	
 	
 	/**
-	 * Do an HTTP DELETE to url
+	 * Do an HTTP DELETE to url.
 	 * 
-	 * @param url
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse delete(String url) throws IOException {
 		
@@ -430,18 +448,18 @@ public class HTTPRequest {
 	}	
 	
 	/**
-	 * Do an HTTP DELETE to url
+	 * Do an HTTP DELETE to url.
 	 * 
-	 * @param url
-	 * @param headers
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param headers HTTP headers as <String, String> Map
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse delete(String url, Map<String, String> headers) throws IOException {
 		HttpURLConnection connection = getAndConfigureConnection(url);
 		
 		if (headers != null) 
-			for (Entry<String, String> e: headers.entrySet())
+			for (Entry<String, String> e : headers.entrySet())
 				connection.setRequestProperty(e.getKey(), e.getValue());
 		
 		if (debugMode)
@@ -453,39 +471,41 @@ public class HTTPRequest {
 	}
 
 	/**
-	 * Puts a Map of key, value pair properties, like a web form
+	 * Puts a Map of key, value pair properties, like a web form.
 	 * 
-	 * @param url
-	 * @param properties
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param properties map of properties for request body
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse put(String url, Map<String, String> properties) throws IOException {
 		String data = propertyString(properties);
 		HashMap<String, String> headers = new HashMap<String, String>(); 
-		headers.put("Content-Type", "application/x-www-form-urlencoded");
+		headers.put(HEADER_CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
 		return put(url, data, headers);
 	}
 	
 	/**
-	 * Puts a Map of key, value pair properties, like a web form
+	 * Puts a Map of key, value pair properties, like a web form.
 	 * 
-	 * @param url
-	 * @param properties
-	 * @return
-	 * @throws IOException
+	 * @param url url of host
+	 * @param properties properties in request body
+	 * @param headers HTTP headers for request
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
 	public HTTPResponse put(String url, Map<String, String> properties, Map<String, String> headers) throws IOException {
 		String data = propertyString(properties);	 
-		headers.put("Content-Type", "application/x-www-form-urlencoded");
+		headers.put(HEADER_CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
 		return put(url, data, headers);
 	}
 
     /**
-     * Do an HTTP HEAD to url
+     * Do an HTTP HEAD to url.
      * 
      * @param url       String URL to connect to 
      * @return          HttpURLConnection ready with response data
+     * @throws	IOException on I/O error
      */ 
 	public HTTPResponse head(String url) throws IOException {
 		HttpURLConnection connection = getAndConfigureConnection(url);
@@ -503,16 +523,20 @@ public class HTTPRequest {
 
     
 	/**
-	 * Connect to server, check the status, and return the new HTTPResponse
+	 * Connect to server, check the status, and return the new HTTPResponse.
+	 * 
+	 * @param connection HttpURLConnection
+	 * @return HTTPResponse
+	 * @throws IOException on I/O error
 	 */
-	private HTTPResponse connect(HttpURLConnection connection) throws HTTPException, IOException {
+	private HTTPResponse connect(HttpURLConnection connection) throws IOException {
 		long timestamp = 0;
 		if (debugMode)
 			timestamp = System.currentTimeMillis();
 		
 		HTTPResponse response = new HTTPResponse(connection);
 		
-		if (throwHTTPErrorResponses )
+		if (throwHTTPErrorResponses)
 			response.checkStatus();
 		
 		if (debugMode)
@@ -523,27 +547,30 @@ public class HTTPRequest {
 	
 
     /**
-     * A simple helper function
+     * Create a byte array from the contents of an input stream.
      * 
      * @param in    InputStream to turn into a byte array 
      * @return      byte array (byte[]) w/ contents of input stream
+     * @throws IOException on I/O error
      */ 
 	public static byte[] streamToByteArray(InputStream in) throws IOException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		int read = 0;
-		byte[] buff = new byte[4096];
-		try {
-			while ((read = in.read(buff)) > 0) {
-				os.write(buff, 0, read);
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		byte[] buff = new byte[COPY_BUFFER_SIZE];
+		
+		while ((read = in.read(buff)) > 0) {
+			os.write(buff, 0, read);
 		}
+		
 		return os.toByteArray();
 	}	
 
 	/**
-	 *  turns a map into a key=value property string for sending to bugnet
+	 *  turns a map into a key=value property string.
+	 *  
+	 * @param props
+	 * @return
+	 * @throws IOException
 	 */
 	public static String propertyString(Map<String, String> props) throws IOException {
 		String propstr = new String();
