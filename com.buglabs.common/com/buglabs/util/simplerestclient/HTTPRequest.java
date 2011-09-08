@@ -83,6 +83,7 @@ public class HTTPRequest {
 	private IConnectionProvider _connectionProvider;
 	
 	private boolean debugMode = false;
+	private boolean throwHTTPErrorResponses = true;
 	
 	/**
 	 * constructor where client provides connectionProvider
@@ -111,10 +112,24 @@ public class HTTPRequest {
 	}
 	
 	/**
-	 * constructor that uses default connection provider
+	 * constructor that uses default connection provider.
 	 */
 	public HTTPRequest() {
 		_connectionProvider = new DefaultConnectionProvider();
+	}
+	
+	/**
+	 * @return true if HTTP client will throw HttpExceptions on 4xx HTTP responses.
+	 */
+	public boolean getThrowsHTTPErrorsAsExceptions() {
+		return throwHTTPErrorResponses;
+	}
+	
+	/**
+	 * @param value if true, client will throw HttpException if 4xx codes are returned from server
+	 */
+	public void setThrowsHTTPErrorsAsExceptions(boolean value) {
+		this.throwHTTPErrorResponses = value;
 	}
 	
     /**
@@ -496,7 +511,9 @@ public class HTTPRequest {
 			timestamp = System.currentTimeMillis();
 		
 		HTTPResponse response = new HTTPResponse(connection);
-		response.checkStatus();
+		
+		if (throwHTTPErrorResponses )
+			response.checkStatus();
 		
 		if (debugMode)
 			debugMessage(timestamp, connection.getURL().toString());
