@@ -41,7 +41,7 @@ import com.buglabs.util.Base64;
 
 
 /**
- * class for dealing RESTfully with HTTP Requests
+ * Class for dealing RESTfully with HTTP Requests.
  * 
  * Example Usage:
  * HttpRequest req = new HttpRequest(myConnectionProvider)

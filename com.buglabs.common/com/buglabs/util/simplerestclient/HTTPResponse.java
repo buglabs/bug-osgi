@@ -47,67 +47,65 @@ public class HTTPResponse {
 
 	/////// we use the following response codes
 	/**
-	 * 200 general success
+	 * 200 general success.
 	 */
 	public static final int HTTP_CODE_OK = HttpURLConnection.HTTP_OK; // 200 general success
 	/**
-	 * 201 resource created
+	 * 201 resource created.
 	 */
 	public static final int HTTP_CODE_CREATED = HttpURLConnection.HTTP_CREATED; // 201 resource created
 	/**
-	 * 400 general error
+	 * 400 general error.
 	 */
 	public static final int HTTP_CODE_BAD_REQUEST = HttpURLConnection.HTTP_BAD_REQUEST; // 400 general error
 	/**
-	 * 401 not authorized
+	 * 401 not authorized.
 	 */
 	public static final int HTTP_CODE_NOT_AUTHORIZED = HttpURLConnection.HTTP_UNAUTHORIZED; // 401 not authorized
 	/**
-	 * 404 not found
+	 * 404 not found.
 	 */
 	public static final int HTTP_CODE_NOT_FOUND = HttpURLConnection.HTTP_NOT_FOUND; // 404 not found
 
 	/**
-	 * 415 unsupported media type
+	 * 415 unsupported media type.
 	 */
 	public static final int HTTP_CODE_UNSUPPORTED_TYPE = HttpURLConnection.HTTP_UNSUPPORTED_TYPE; // 415 unsupported media type
 	/**
-	 * 500 internal/application error
+	 * 500 internal/application error.
 	 */
 	public static final int HTTP_CODE_INTERNAL_ERROR = HttpURLConnection.HTTP_INTERNAL_ERROR; // 500 internal/application error
 
-	private static final String DEFAULT_ERROR_MESSAGE = "There was a connection error.  The server responded with status code ";
-	private HttpURLConnection _connection;
+	private static final String DEFAULT_ERROR_MESSAGE = "There was an HTTP connection error.  The server responded with status code ";
+	private HttpURLConnection connection;
 
 	/**
-	 * constructor must take in an HttpURLConnection
+	 * Constructor must take in an HttpURLConnection.
+	 * @param connection HttpURLConnection
 	 */
 	public HTTPResponse(HttpURLConnection connection) {
-		_connection = connection;
+		this.connection = connection;
 	}
 
 	/**
 	 * Check the response status in http header throw error if an error status
-	 * is returned
+	 * is returned.
 	 * 
-	 * @throws IOException
-	 * @throws HTTPException
+	 * @throws IOException on I/O error
 	 */
-	public void checkStatus() throws IOException, HTTPException {
+	public void checkStatus() throws IOException {
 		checkStatus(null);
 	}
 
 	/**
-	 * Get an input stream from the connection
-	 * 
-	 * @param connection
-	 * @return InputStream body of HTTP Response
-	 * @throws BugnetException
+	 * Get an input stream from the connection.
+	 * @return response as a stream
+	 * @throws IOException on I/O error
 	 */
-	public InputStream getStream() throws IOException, HTTPException {
+	public InputStream getStream() throws IOException {
 		InputStream is = null;
 		try {
-			is = _connection.getInputStream();
+			is = connection.getInputStream();
 		} catch (IOException e) {
 			throwHTTPException(e);
 		}
@@ -115,70 +113,48 @@ public class HTTPResponse {
 	}
 
 	/**
-	 * Get a string from the connection
+	 * Get a string from the connection.
 	 * 
-	 * @param connection
 	 * @return String body of HTTP Response
-	 * @throws IOException
+	 * @throws IOException on I/O error
 	 */
-	public String getString() throws IOException, HTTPException {
+	public String getString() throws IOException {
 		InputStream is = getStream();
 		return inputStreamToString(is);
 	}
 
 	/**
-	 * Get an Image from the connection
+	 * Get response code from request.
 	 * 
 	 * @param connection
-	 * @return Payload of HTTP response as image
-	 * @throws IOException
-	 */
-	/*  Depends on some dragonfly stuff which isn't integrated yet, but want to implement soon
-	public ImageData getImage() throws IOException, HTTPException {
-		InputStream is = getStream();
-		return inputStreamToImage(is);
-	}
-	*/
-
-	/**
-	 * get response code from request
-	 * 
-	 * @param connection
-	 * @return
+	 * @return response code or -1 if no response was provided in response.
 	 */
 	public int getResponseCode() {
 		try {
-			return _connection.getResponseCode();
-		} catch (IOException e) {
-			//Not sure what to do here with this exception.
-			e.printStackTrace();
-		}
-		return -1;		
+			return connection.getResponseCode();
+		} catch (IOException e) {		
+			return -1;
+		}				
 	}
 
 	/**
-	 * Gets a header value from the http response
+	 * Gets a header value from the http response.
 	 * 
-	 * @param key
-	 * @return
+	 * @param key header key
+	 * @return value of header or null if no header by the key name exists.
 	 */
 	public String getHeaderField(String key) {
-		return _connection.getHeaderField(key);
+		return connection.getHeaderField(key);
 	}
 
 	/**
-	 * Get error message out of connection
+	 * Get error message out of connection.
 	 * 
-	 * @param connection
-	 * @return
-	 * @throws IOException
+	 * @return error from response or empty string if no error.
+	 * @throws IOException on I/O error
 	 */
 	public String getErrorMessage() throws IOException {
-		InputStream is = _connection.getErrorStream();
-		String errorStr = "";
-		if (is != null)
-			errorStr = inputStreamToString(is);
-		return errorStr;
+		return inputStreamToString(connection.getErrorStream());		
 	}
 
 	/////////////////////////////////////////////////////////// Helpful Methods Club
@@ -187,12 +163,14 @@ public class HTTPResponse {
 	 * Check the status of the current connection and throw an error if we find
 	 * an http error code. Pass in a default error message.
 	 * 
+	 * @param errorMessage error message
+	 * @throws IOException error exception if response is an error.
 	 */
-	private void checkStatus(String errorMessage) throws IOException, HTTPException {
+	private void checkStatus(String errorMessage) throws IOException {
 		// Get Response code out
 		int response = getResponseCode();
 		// only set message from response body if it's an HTTP error
-		if (response >= 400) {
+		if (response >= HTTP_CODE_BAD_REQUEST) {
 			// gobble up the error so as not to hold us back getting an error message set
 			try {
 				errorMessage = getErrorMessage();
@@ -205,56 +183,40 @@ public class HTTPResponse {
 	}
 
 	/**
-	 * Helper function deals w/ all http errors
-	 * 
+	 * Helper function deals w/ all http errors.
+	 * 	
+	 * @param exception input exception
+	 * @throws IOException exception relating to HTTP response.
 	 */
-	private void throwHTTPException(IOException ioexception) throws IOException, HTTPException {
+	private void throwHTTPException(IOException exception) throws IOException {
 		// Turn exception into HTTPException if possible
-		if (_connection != null) {
-			checkStatus(ioexception.getMessage());
+		if (connection != null) {
+			checkStatus(exception.getMessage());
 		}
-		throw ioexception;
+		throw exception;
 	}
 
 	/**
-	 * convert input stream to string
+	 * Convert input stream to string.
 	 * 
-	 * @param is
-	 * @return
-	 * @throws IOException
+	 * @param is input stream
+	 * @return error as string or empty string if stream is empty.
+	 * @throws IOException on I/O error
 	 */
 	private static String inputStreamToString(InputStream is) throws IOException {
+		if (is == null)
+			return "";
+		
 		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-		String line, resp = new String("");
+		String line = null;
+		StringBuilder sb = new StringBuilder();
+		
 		while ((line = rd.readLine()) != null) {
-			resp = resp + line + "\n";
+			sb.append(line);
+			sb.append('\n');
 		}
 		rd.close();
-		return resp;
+		
+		return sb.toString();
 	}
-
-	/**
-	 * Convert input stream to Image
-	 * 
-	 * @param is
-	 * @return
-	 * @throws IOException
-	 */
-	/* Depends on some dragonfly stuff which isn't integrated yet, but want to integrate soon
-	private static ImageData inputStreamToImage(InputStream is) throws IOException {
-		byte[] buf = new byte[1024];
-		int read = 0;
-
-		DynamicByteBuffer dynBuf = new DynamicByteBuffer();
-		while ((read = is.read(buf)) > 0) {
-			for (int i = 0; i < read; ++i) {
-				dynBuf.append(buf[i]);
-			}
-		}
-
-		ImageData id = new ImageData(new ByteArrayInputStream(dynBuf.toArray()));
-		return id;
-	}
-	*/
-
 }
