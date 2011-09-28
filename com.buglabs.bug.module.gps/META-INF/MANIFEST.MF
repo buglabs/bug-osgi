@@ -4,9 +4,9 @@ Bundle-SymbolicName: com.buglabs.bug.module.gps
 Bundle-Version: 1.0.0
 Bundle-Activator: com.buglabs.bug.module.gps.Activator
 Bundle-Vendor: Bug Labs, Inc.
-Export-Package: com.buglabs.bug.module.gps.pub,
- org.osgi.util.position,
- org.osgi.util.measurement
+Export-Package: com.buglabs.bug.module.gps.pub; version="3.0",
+ org.osgi.util.position; version="1.0",
+ org.osgi.util.measurement; version="1.0"
 Import-Package: com.buglabs.bug.bmi.api,
  com.buglabs.bug.bmi.sysfs,
  com.buglabs.bug.dragonfly.module,
