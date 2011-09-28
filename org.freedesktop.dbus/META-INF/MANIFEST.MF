@@ -3,11 +3,13 @@ Bundle-Name: JAVA DBUS BUNDLE
 Bundle-SymbolicName: org.freedesktop.dbus
 Bundle-Version: 2.5.1
 Bundle-Vendor: Bug Labs, Inc.
+Bundle-DocURL: http://dbus.freedesktop.org/doc/dbus-java/
+Bundle-License: LGPL
+Bundle-Copyright: Copyright (c) 2005-2006 Matthew Johnson
 Import-Package: 
- cx.ath.matthew.io,
+ cx.ath.matthew.debug,
  cx.ath.matthew.unix,
- cx.ath.matthew.utils,
- cx.ath.matthew.debug
-Export-Package: org.freedesktop,
- org.freedesktop.dbus,
- org.freedesktop.dbus.exceptions
+ cx.ath.matthew.utils
+Export-Package: org.freedesktop; version="2.5",
+ org.freedesktop.dbus; version="2.5",
+ org.freedesktop.dbus.exceptions; version="2.5"

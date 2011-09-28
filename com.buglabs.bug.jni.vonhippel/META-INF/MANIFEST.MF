@@ -5,6 +5,6 @@ Bundle-SymbolicName: com.buglabs.bug.jni.vonhippel
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: com.buglabs.bug.jni.common
-Export-Package: com.buglabs.bug.jni.vonhippel
+Export-Package: com.buglabs.bug.jni.vonhippel; version="3.0"
 Bundle-NativeCode: /lib/libVonHippel.so;
  osname=linux; processor=armv7l

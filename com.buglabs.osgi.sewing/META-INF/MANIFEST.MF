@@ -13,7 +13,7 @@ Import-Package: com.buglabs.util.osgi,
  org.osgi.service.http,
  org.osgi.service.log,
  org.osgi.util.tracker
-Export-Package: com.buglabs.osgi.sewing.pub,
- com.buglabs.osgi.sewing.pub.util,
+Export-Package: com.buglabs.osgi.sewing.pub; version="3.0",
+ com.buglabs.osgi.sewing.pub.util; version="3.0",
  freemarker.template
 BUG-API-Version: 1.4.4

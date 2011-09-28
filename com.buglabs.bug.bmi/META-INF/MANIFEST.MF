@@ -14,5 +14,5 @@ Import-Package:
  com.buglabs.bug.dragonfly.module,
  org.apache.commons.io;version="2.0.1"
 Export-Package: 
- com.buglabs.bug.bmi.api,
- com.buglabs.bug.bmi.sysfs
+ com.buglabs.bug.bmi.api; version="3.0",
+ com.buglabs.bug.bmi.sysfs; version="3.0"

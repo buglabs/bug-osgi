@@ -3,6 +3,6 @@ Bundle-Name: BUG NMEA Parser
 Bundle-SymbolicName: com.buglabs.util.nmea
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
-Export-Package: com.buglabs.nmea,
- com.buglabs.nmea.sentences,
- com.buglabs.nmea2
+Export-Package: com.buglabs.nmea; version="3.0",
+ com.buglabs.nmea.sentences; version="3.0",
+ com.buglabs.nmea2; version="3.0"

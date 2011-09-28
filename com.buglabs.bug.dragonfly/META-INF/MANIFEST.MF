@@ -15,5 +15,5 @@ Import-Package:
  org.osgi.service.log,
  org.osgi.util.tracker
 Export-Package: 
- com.buglabs.bug.dragonfly,
- com.buglabs.bug.dragonfly.module
+ com.buglabs.bug.dragonfly; version="3.0",
+ com.buglabs.bug.dragonfly.module; version="3.0"

@@ -13,7 +13,7 @@ Import-Package:
  javax.servlet.http,
  org.osgi.service.log,
  com.buglabs.util.osgi
-Export-Package: com.buglabs.bug.networking,
- com.buglabs.bug.networking.pub
+Export-Package: com.buglabs.bug.networking; version="3.0",
+ com.buglabs.bug.networking.pub; version="3.0"
 Require-Bundle: org.freedesktop.dbus
 BUG-API-Version: 2.0.2

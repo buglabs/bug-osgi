@@ -4,6 +4,6 @@ Bundle-SymbolicName: com.buglabs.bug.jni.camera
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: com.buglabs.bug.jni.common
-Export-Package: com.buglabs.bug.jni.camera
+Export-Package: com.buglabs.bug.jni.camera; version="3.0"
 Bundle-NativeCode: /lib/libCamera.so;
  osname=linux; processor=armv7l

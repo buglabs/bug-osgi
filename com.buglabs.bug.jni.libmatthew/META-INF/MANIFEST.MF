@@ -3,6 +3,9 @@ Bundle-Name: libMatthew JNI BUNDLE
 Bundle-SymbolicName: com.buglabs.bug.jni.libmatthew
 Bundle-Version: 0.7.1
 Bundle-Vendor: Bug Labs, Inc.
+Bundle-DocURL: http://www.matthew.ath.cx/projects/java/
+Bundle-License: LGPL
+Bundle-Copyright: Copyright (c) Matthew Johnson 2005
 Export-Package: 
  cx.ath.matthew.io,
  cx.ath.matthew.unix,

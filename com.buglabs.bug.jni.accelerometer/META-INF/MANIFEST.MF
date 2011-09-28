@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.buglabs.bug.jni.accelerometer
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: com.buglabs.bug.jni.common
-Export-Package: com.buglabs.bug.jni.accelerometer,
- com.buglabs.bug.accelerometer.pub
+Export-Package: com.buglabs.bug.jni.accelerometer; version="3.0",
+ com.buglabs.bug.accelerometer.pub; version="3.0"
 Bundle-NativeCode: lib/libAccelerometer.so;
  osname=linux; processor=armv7l

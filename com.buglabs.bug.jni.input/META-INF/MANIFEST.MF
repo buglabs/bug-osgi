@@ -7,7 +7,7 @@ Import-Package: com.buglabs.bug.buttons,
  com.buglabs.bug.jni.common,
  org.osgi.framework,
  org.osgi.service.log
-Export-Package: com.buglabs.bug.jni.input,
- com.buglabs.bug.input.pub
+Export-Package: com.buglabs.bug.jni.input; version="3.0",
+ com.buglabs.bug.input.pub; version="3.0"
 Bundle-NativeCode: /lib/libInputDevice.so;
  osname=linux; processor=armv7l

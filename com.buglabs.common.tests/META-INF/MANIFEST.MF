@@ -17,4 +17,4 @@ Import-Package:
  org.osgi.framework,
  org.osgi.service.log,
  org.osgi.util.tracker
-Export-Package: com.buglabs.common.tests.osgi.pub
+Export-Package: com.buglabs.common.tests.osgi.pub; version="3.0"

@@ -5,6 +5,6 @@ Bundle-SymbolicName: com.buglabs.bug.jni.motion
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
 Import-Package: com.buglabs.bug.jni.common
-Export-Package: com.buglabs.bug.jni.motion
+Export-Package: com.buglabs.bug.jni.motion; version="3.0"
 Bundle-NativeCode: lib/libMotion.so;
  osname=linux; processor=armv7l

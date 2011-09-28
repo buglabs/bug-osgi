@@ -3,6 +3,6 @@ Bundle-Name: BUG JNI Common
 Bundle-SymbolicName: com.buglabs.bug.jni.common
 Bundle-Version: 1.0.0
 Bundle-Vendor: Bug Labs, Inc.
-Export-Package: com.buglabs.bug.jni.common
+Export-Package: com.buglabs.bug.jni.common; version="3.0"
 Bundle-NativeCode: /lib/libCommon.so;
  osname=linux; processor=armv7l
