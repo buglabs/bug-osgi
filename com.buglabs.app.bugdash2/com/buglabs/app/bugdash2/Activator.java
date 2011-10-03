@@ -3,6 +3,8 @@ import java.net.URL;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
@@ -11,10 +13,11 @@ import com.buglabs.app.bugdash2.servicetracker.BUGwebAdminServiceTracker;
 import com.buglabs.bug.dragonfly.module.IModuleControl;
 import com.buglabs.osgi.sewing.pub.ISewingService;
 import com.buglabs.util.osgi.BUGBundleConstants;
+import com.buglabs.util.osgi.FilterUtil;
 import com.buglabs.util.osgi.ServiceTrackerUtil;
 import com.buglabs.util.ui.IDesktopApp;
 
-public class Activator implements BundleActivator, IDesktopApp {
+public class Activator implements BundleActivator, IDesktopApp, ServiceListener {
 	
 	/**
 	 * List of OSGi services that must be available before dash will run.
@@ -53,9 +56,13 @@ public class Activator implements BundleActivator, IDesktopApp {
 		new BUGwebAdminServiceTracker(context);
 		
 		appReg = context.registerService(IDesktopApp.class.getName(), this, null);	
+		
+		//Listen for add/remove of IModuleControls to be notified of BUG module changes.
+		context.addServiceListener(this, FilterUtil.generateServiceFilter(IModuleControl.class.getName()));
 	}
 	
 	public void stop(BundleContext context) throws Exception {
+		context.removeServiceListener(this);
 		appReg.unregister();
 		ShellUtil.destroySession();
 		stc.close();
@@ -118,5 +125,32 @@ public class Activator implements BundleActivator, IDesktopApp {
 	}
 	public static double getBatteryLife(String path) {
 		return batteryProvider.getValue(path); 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.osgi.framework.ServiceListener#serviceChanged(org.osgi.framework.ServiceEvent)
+	 */
+	@Override
+	public void serviceChanged(ServiceEvent event) {
+		//In this method we track IModuleControl and maintain the active state of attached BUG modules.
+		Object svc = null;
+		switch (event.getType()) {
+		case ServiceEvent.REGISTERED:
+			svc = context.getService(event.getServiceReference());
+	        if (svc instanceof IModuleControl) {	
+	        	IModuleControl module = (IModuleControl) svc;
+	        	Activator.setModule(module);
+	        }
+			break;
+		case ServiceEvent.UNREGISTERING:
+			svc = context.getService(event.getServiceReference());
+		     if (svc instanceof IModuleControl) {
+		         IModuleControl mc = (IModuleControl) svc;
+		         Activator.clearModule(mc.getSlotId());
+		     }
+			break;
+		default:
+			break;
+		}
 	}
 }
