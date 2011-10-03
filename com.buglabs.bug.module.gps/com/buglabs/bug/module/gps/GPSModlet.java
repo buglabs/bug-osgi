@@ -286,10 +286,10 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 		} else if (property.getName().equals(PROPERTY_ANTENNA)) {
 			if (property.getValue().toString().equals(PROPERTY_ANTENNA_PASSIVE)) {
 				gpsControl.ioctl_BMI_GPS_PASSIVE_ANT();
-				System.out.println("Passive");
+				logService.log(LogService.LOG_DEBUG, "Set antenna to passive.");
 			} else {
 				gpsControl.ioctl_BMI_GPS_ACTIVE_ANT();
-				System.out.println("Active");
+				logService.log(LogService.LOG_DEBUG, "Set antenna to active.");
 			}
 			return true;
 		}  else {
@@ -536,7 +536,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 
 		if (gpsControl != null) {
 			result = gpsControl.ioctl_BMI_GPS_ACTIVE_ANT();
-			System.out.println("Result: "+result);
+			logService.log(LogService.LOG_DEBUG, "Result of call to gpsControl.ioctl_BMI_GPS_ACTIVE_ANT(): " + result);
 		}
 
 		if (result < 0) {
@@ -554,7 +554,7 @@ public class GPSModlet extends AbstractBUGModlet implements IGPSModuleControl, P
 
 		if (gpsControl != null) {
 			result = gpsControl.ioctl_BMI_GPS_PASSIVE_ANT();
-			System.out.println("Result: "+result);
+			logService.log(LogService.LOG_DEBUG, "Result of call to gpsControl.ioctl_BMI_GPS_PASSIVE_ANT(): " + result);
 		}
 
 		if (result < 0) {
