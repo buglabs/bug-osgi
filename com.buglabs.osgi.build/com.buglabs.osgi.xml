@@ -60,31 +60,37 @@
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
+			<arg line="-nc" />
 			<arg line="${apache.mirror}${framework.fqpn}-${framework.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
+			<arg line="-nc" />
 			<arg line="${apache.mirror}${log.jar.name}" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
+			<arg line="-nc" />
 			<arg line="${apache.mirror}${configadmin.jar.name}" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
+			<arg line="-nc" />
 			<arg line="${apache.mirror}${compendium.fqpn}-${compendium.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
+			<arg line="-nc" />
 			<arg line="${apache.mirror}${http.fqpn}-${http.version}.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
+			<arg line="-nc" />
 			<arg line="--no-check-certificate" />
 			<arg line="${junit.jar.url}" />
 		</exec>
@@ -92,30 +98,35 @@
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
 			<arg line="--no-check-certificate" />
+			<arg line="-nc" />
 			<arg line="${osgi-tester.jar.url}" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
 			<arg line="--no-check-certificate" />
+			<arg line="-nc" />
 			<arg line="${knapsack.jar.url}" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
 			<arg line="--no-check-certificate" />
+			<arg line="-nc" />
 			<arg line="https://leafcutter.ci.cloudbees.com/job/Sprinkles/lastSuccessfulBuild/artifact/Sprinkles.jar" />
 		</exec>
 
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
 			<arg line="--no-check-certificate" />
+			<arg line="-nc" />
 			<arg line="http://hamcrest.googlecode.com/files/hamcrest-all-1.3.0RC2.jar" />
 		</exec>
 
 		<!-- commons-io is not distributed as a jar, so have to unzip the archive and move the file manually. -->
 		<exec executable="${wget.bin}">
 			<arg line="-P ${externalDirectory}" />
+			<arg line="-nc" />
 			<arg line="--no-check-certificate" />
 			<arg line="http://www.meisei-u.ac.jp/mirror/apache/dist//commons/io/binaries/commons-io-2.0.1-bin.zip" />
 		</exec>
