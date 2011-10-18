@@ -55,7 +55,7 @@ public class BundleTestRunnerThread extends Thread {
 
 			if (srefs != null && srefs.length > 0) {				
 
-				for (ServiceReference sr : Arrays.asList(srefs)) {
+				for (ServiceReference sr : srefs) {
 					TestSuite ts = (TestSuite) context.getService(sr);
 
 					if (ts != null)
@@ -80,7 +80,7 @@ public class BundleTestRunnerThread extends Thread {
 		}
 		
 		//Shutdown all the bundles
-		for (Bundle bundle : Arrays.asList(context.getBundles())) {
+		for (Bundle bundle : context.getBundles()) {
 			if (bundle.getBundleId() != 0) {
 				try {
 					bundle.stop();

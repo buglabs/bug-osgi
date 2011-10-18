@@ -159,7 +159,7 @@ public class ServiceTrackerUtil implements ServiceTrackerCustomizer {
 		Dictionary<String, Object> dict = new Hashtable<String, Object>();
 		
 		if (arg0.getPropertyKeys() != null) {
-			for (String key : Arrays.asList(arg0.getPropertyKeys())) {
+			for (String key : arg0.getPropertyKeys()) {
 				dict.put(key, arg0.getProperty(key));
 			}
 		}

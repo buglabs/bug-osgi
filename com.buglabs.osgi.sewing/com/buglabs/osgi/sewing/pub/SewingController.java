@@ -187,7 +187,7 @@ public abstract class SewingController {
 	 * @return true if all keys are present, false otherwise
 	 */
 	protected final String getMissingParameter(RequestParameters params, String ... requiredKeys) {
-		for (String key: Arrays.asList(requiredKeys))
+		for (String key: requiredKeys)
 			if (params.get(key) == null)
 				return key;
 		

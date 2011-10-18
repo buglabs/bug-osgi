@@ -64,7 +64,7 @@ public final class FilterUtil {
 	 * @return A LDAP filter string that can be used to construct a Filter.  If null passed in, null is returned to caller.
 	 */
 	public static String generateServiceFilter(String ... services) {
-		return generateServiceFilter(Arrays.asList(services));
+		return generateServiceFilter(services);
 	}
 	
 	/**
@@ -98,9 +98,7 @@ public final class FilterUtil {
 	 * @throws InvalidSyntaxException thrown if a syntax error is found in the generated Filter.
 	 */
 	public static Filter generateServiceFilter(BundleContext context, String[] services) throws InvalidSyntaxException {
-		String filterString = generateServiceFilter(Arrays.asList(services));
-
-		return context.createFilter(filterString);
+		return context.createFilter(generateServiceFilter(services));
 	}
 
 	/**
