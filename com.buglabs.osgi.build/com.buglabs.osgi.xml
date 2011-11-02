@@ -19,7 +19,7 @@
 	<property name="unzip.bin" location="/usr/bin/unzip" />
 	<property name="cp.bin" location="/bin/cp" />
 
-	<property name="framework.version" value="3.2.2" />
+	<property name="framework.version" value="4.0.1" />
 	<property name="log.version" value="1.0.1" />
 	<property name="configadmin.version" value="1.2.8" />
 	<property name="http.version" value="2.2.0" />
@@ -128,19 +128,19 @@
 			<arg line="-P ${externalDirectory}" />
 			<arg line="-nc" />
 			<arg line="--no-check-certificate" />
-			<arg line="http://www.meisei-u.ac.jp/mirror/apache/dist//commons/io/binaries/commons-io-2.0.1-bin.zip" />
+			<arg line="http://www.meisei-u.ac.jp/mirror/apache/dist//commons/io/binaries/commons-io-2.1-bin.zip" />
 		</exec>
 
 		<exec executable="${unzip.bin}">
-			<arg line="${externalDirectory}/commons-io-2.0.1-bin.zip" />
+			<arg line="${externalDirectory}/commons-io-2.1-bin.zip" />
 			<arg line="-d ${externalDirectory}" />
 		</exec>
 
 		<exec executable="${cp.bin}">
-			<arg line="${externalDirectory}/commons-io-2.0.1/commons-io-2.0.1.jar" />
+			<arg line="${externalDirectory}/commons-io-2.1/commons-io-2.1.jar" />
 			<arg line="${externalDirectory}" />
 		</exec>
-		<delete dir="${externalDirectory}/commons-io-2.0.1/" />
+		<delete dir="${externalDirectory}/commons-io-2.1/" />
 	</target>
 
 	<target name="jar" description="compile the Java source code to class files">
@@ -487,9 +487,12 @@
 		<!-- BUG Applications -->
 		<ant dir="${checkout.dir}/com.buglabs.app.bugdash2" target="pmd" />
 	</target>
+	
+	<target name="clobber" depends="clean"  description="remove all non repo files" >
+		<delete dir="${externalDirectory}" />
+	</target>
 
 	<target name="clean" description="remove intermediate files">
-		<delete dir="${externalDirectory}" />
 		<delete dir="${distDirectory}" />
 		<delete dir="${docDirectory}" />
 		<delete dir="${report.dir}" />
