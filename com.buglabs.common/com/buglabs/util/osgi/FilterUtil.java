@@ -64,7 +64,7 @@ public final class FilterUtil {
 	 * @return A LDAP filter string that can be used to construct a Filter.  If null passed in, null is returned to caller.
 	 */
 	public static String generateServiceFilter(String ... services) {
-		return generateServiceFilter(services);
+		return generateServiceFilter(Arrays.asList(services));
 	}
 	
 	/**
@@ -98,7 +98,9 @@ public final class FilterUtil {
 	 * @throws InvalidSyntaxException thrown if a syntax error is found in the generated Filter.
 	 */
 	public static Filter generateServiceFilter(BundleContext context, String[] services) throws InvalidSyntaxException {
-		return context.createFilter(generateServiceFilter(services));
+		 String filterString = generateServiceFilter(Arrays.asList(services));
+		 
+		 return context.createFilter(filterString);
 	}
 
 	/**
@@ -116,8 +118,8 @@ public final class FilterUtil {
 	 */
 	public static String generateServiceFilter(SortedMap<String, Map<String, String>> servicesMap) {
 		if (servicesMap.size() == 1) {
-			return "(&(" + Constants.OBJECTCLASS + "=" + ((String) servicesMap.firstKey()) + ")"
-					+ generatePropertiesFilter(new TreeMap((Map) servicesMap.get(servicesMap.firstKey()))) + ")";
+			return "(&(" + Constants.OBJECTCLASS + "=" + servicesMap.firstKey() + ")"
+					+ generatePropertiesFilter(new TreeMap(servicesMap.get(servicesMap.firstKey()))) + ")";
 		} else if (servicesMap.size() > 1) {
 			return "(|" + generateServiceFilter(servicesMap.subMap(servicesMap.firstKey(), servicesMap.firstKey() + "\0"))
 					+ generateServiceFilter(servicesMap.tailMap(servicesMap.firstKey() + "\0")) + ")";
